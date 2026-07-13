@@ -1,0 +1,46 @@
+name: tabare3
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  dartz: ^0.10.1
+  get_it: ^8.0.2
+  flutter_bloc: ^9.0.0
+  equatable: ^2.0.7
+  google_fonts: ^6.2.1
+  flutter_svg: ^2.0.10+1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/logo.png
+    - assets/images/demo.png
+    - assets/images/demo1.png
+    - assets/images/icon6.png
+    - assets/images/icon7.png
+    - assets/images/icon8.png
+    - assets/images/icon9.png
+    - assets/images/avatar.png
+    - assets/images/reward.png
+    - assets/icons/icon1.svg
+    - assets/icons/icon2.svg
+    - assets/icons/icon3.svg
+    - assets/icons/icon4.svg
+    - assets/icons/icon5.svg
+    - assets/icons/icon6.svg
+    - assets/icons/icon7.svg
+    - assets/icons/icon8.svg
+    - assets/icons/icon9.svg
