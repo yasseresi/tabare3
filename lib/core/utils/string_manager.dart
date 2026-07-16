@@ -159,4 +159,9 @@ class AppStrings {
   static const String bags = 'bags';
   static const String yes = 'yes';
   static const String no = 'no';
+
+  // Quran & Hadith — Arabic only, never translated
+  static const String quranVerse = 'quran_verse';
+  static const String hadithRelief = 'hadith_relief';
+  static const String quranSavingLife = 'quran_saving_life';
 }
