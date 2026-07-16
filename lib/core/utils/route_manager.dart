@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../features/splash/presentation/pages/splash_screen.dart';
 import '../../features/auth/presentation/pages/role_selection_screen.dart';
-import '../../features/auth/presentation/pages/login_screen.dart';
+import '../../features/auth/presentation/pages/welcome_screen.dart';
 import '../../features/auth/presentation/pages/login_form_screen.dart';
 import '../../features/auth/presentation/pages/signup_screen.dart' show SignUpScreen;
 import '../../features/requester_home/presentation/pages/requester_home_screen.dart';
@@ -22,7 +22,7 @@ import '../../features/profile/presentation/pages/requester_profile_screen.dart'
 class Routes {
   static const String splashRoute = '/';
   static const String roleSelectionRoute = '/role-selection';
-  static const String loginRoute = '/login';
+  static const String welcomeRoute = '/welcome';
   static const String loginFormRoute = '/login-form';
   static const String signupRoute = '/signup';
 
@@ -54,8 +54,8 @@ class RouteGenerator {
       // Auth
       case Routes.roleSelectionRoute:
         return MaterialPageRoute(builder: (_) => const RoleSelectionScreen());
-      case Routes.loginRoute:
-        return MaterialPageRoute(builder: (_) => const LoginScreen());
+      case Routes.welcomeRoute:
+        return MaterialPageRoute(builder: (_) => const WelcomeScreen());
       case Routes.loginFormRoute:
         return MaterialPageRoute(builder: (_) => const LoginFormScreen());
       case Routes.signupRoute:
