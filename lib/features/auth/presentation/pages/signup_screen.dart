@@ -1,4 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/presentation/widgets/app_dialog.dart';
+import '../../../../core/presentation/widgets/app_text_field.dart';
+import '../../../../core/presentation/widgets/loading_overlay.dart';
+import '../../../../core/utils/assets_manager.dart';
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/font_manager.dart';
+import '../../../../core/utils/styles_manager.dart';
+import '../../../../core/utils/values_manager.dart';
+import '../../../../injection_container.dart';
+import '../../domain/repositories/auth_repository.dart';
+import '../bloc/auth_bloc.dart';
+import 'login_form_screen.dart';
 import 'role_selection_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -11,137 +25,170 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   int _currentStep = 1;
   bool _agreeToTerms = false;
-  bool _obscurePassword = true;
+
+  final _usernameController = TextEditingController();
+  final _fullNameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _dobController = TextEditingController();
+  final _genderController = TextEditingController();
+  final _nationalIdController = TextEditingController();
+  final _bloodTypeController = TextEditingController();
+  final _weightController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _chronicDiseasesController = TextEditingController();
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _fullNameController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _dobController.dispose();
+    _genderController.dispose();
+    _nationalIdController.dispose();
+    _bloodTypeController.dispose();
+    _weightController.dispose();
+    _cityController.dispose();
+    _chronicDiseasesController.dispose();
+    super.dispose();
+  }
 
   void _nextStep() {
     if (_currentStep < 3) {
-      setState(() {
-        _currentStep++;
-      });
+      setState(() => _currentStep++);
     } else {
-      _showSuccessDialog();
+      if (!_agreeToTerms) return;
+      _dispatchSignup();
     }
   }
 
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        final theme = Theme.of(context);
-        return Dialog(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF4CAF50),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check,
-                    color: Colors.white,
-                    size: 50,
-                  ),
-                ),
-                const SizedBox(height: 25),
-                Text(
-                  'لقد تم إنشاء حساب بنجاح',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyLarge?.copyWith(color: Colors.grey),
-                ),
-                const SizedBox(height: 10),
-                Image.asset(
-                  'assets/images/icon6.png',
-                  height: 70,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.bloodtype_outlined, size: 70, color: Color(0xFF8B1D1D)),
-                ),
-                const SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => const RoleSelectionScreen()),
-                      (route) => false,
-                    );
-                  },
-                  child: const Text('الصفحة الرئيسية'),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+  void _dispatchSignup() {
+    final params = SignupParams(
+      username: _usernameController.text.trim(),
+      fullName: _fullNameController.text.trim(),
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+      phone: _phoneController.text.trim(),
+      dateOfBirth: DateTime.tryParse(_dobController.text) ?? DateTime(2000),
+      gender: _genderController.text.trim().toLowerCase() == 'ذكر'
+          ? 'male'
+          : 'female',
+      bloodType: _bloodTypeController.text.trim(),
+      city: _cityController.text.trim(),
+      nationalId: _nationalIdController.text.trim().isEmpty
+          ? null
+          : _nationalIdController.text.trim(),
+      weight: double.tryParse(_weightController.text.trim()),
+      chronicDiseases: _chronicDiseasesController.text.trim().isEmpty
+          ? null
+          : _chronicDiseasesController.text.trim(),
     );
+    context.read<AuthBloc>().add(SignupRequested(params));
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      body: Directionality(
-        textDirection: TextDirection.rtl,
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 30.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                Image.asset(
-                  'assets/images/icon6.png',
-                  height: 70,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.bloodtype_outlined, size: 70, color: Color(0xFF8B1D1D)),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'إنشاء حساب',
-                  style: theme.textTheme.titleLarge?.copyWith(fontSize: 28),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  _getStepTitle(),
-                  style: theme.textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 30),
-                _buildStepIndicator(),
-                const SizedBox(height: 30),
-                _buildCurrentStepView(),
-                const SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: _nextStep,
-                  child: Text(_currentStep == 3 ? 'إنشاء حساب' : 'التالي'),
-                ),
-                if (_currentStep == 1) ...[
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'لديك حساب بالفعل؟ ',
-                        style: theme.textTheme.bodyMedium,
-                      ),
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Text(
-                          'تسجيل الدخول',
-                          style: TextStyle(
-                            color: theme.primaryColor,
-                            fontWeight: FontWeight.bold,
+    return BlocProvider(
+      create: (_) => sl<AuthBloc>(),
+      child: BlocConsumer<AuthBloc, AuthState>(
+        listener: _authListener,
+        builder: (context, state) {
+          return LoadingOverlay(
+            visible: state is AuthLoading,
+            message: 'جاري إنشاء الحساب',
+            child: Scaffold(
+              backgroundColor: ColorManager.white,
+              body: Directionality(
+                textDirection: TextDirection.rtl,
+                child: SafeArea(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppPadding.p20,
+                    ),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: AppSize.s20),
+                        Image.asset(
+                          ImageAssets.icon6,
+                          width: AppSize.s76,
+                          height: AppSize.s76,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.bloodtype_outlined,
+                            color: ColorManager.primary,
+                            size: AppSize.s76,
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: AppSize.s10),
+                        Text(
+                          'إنشاء حساب',
+                          style: getBoldStyle(
+                            fontSize: FontSize.s24,
+                            color: ColorManager.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: AppSize.s5),
+                        Text(
+                          _getStepTitle(),
+                          style: getRegularStyle(
+                            fontSize: FontSize.s14,
+                            color: ColorManager.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: AppSize.s20),
+                        _buildStepIndicator(),
+                        const SizedBox(height: AppSize.s20),
+                        _buildCurrentStepView(),
+                        const SizedBox(height: AppSize.s20),
+                        ElevatedButton(
+                          onPressed: _currentStep == 3 && !_agreeToTerms
+                              ? null
+                              : _nextStep,
+                          child: Text(
+                            _currentStep == 3 ? 'إنشاء حساب' : 'التالي',
+                          ),
+                        ),
+                        if (_currentStep == 1) ...[
+                          const SizedBox(height: AppSize.s20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'لديك حساب بالفعل؟ ',
+                                style: getRegularStyle(
+                                  fontSize: FontSize.s12,
+                                  color: ColorManager.textMuted,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () => Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const LoginFormScreen(),
+                                  ),
+                                ),
+                                child: Text(
+                                  'تسجيل الدخول',
+                                  style: getBoldStyle(
+                                    fontSize: FontSize.s12,
+                                    color: ColorManager.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                        const SizedBox(height: AppSize.s20),
+                      ],
+                    ),
                   ),
-                ],
-                const SizedBox(height: 20),
-              ],
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -164,40 +211,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildCircle(1),
-        _buildLine(1),
+        _buildLine(),
         _buildCircle(2),
-        _buildLine(2),
+        _buildLine(),
         _buildCircle(3),
       ],
     );
   }
 
   Widget _buildCircle(int step) {
-    bool isCurrent = _currentStep == step;
+    final isCurrent = _currentStep == step;
     return Container(
-      width: 35,
-      height: 35,
+      width: AppSize.s35,
+      height: AppSize.s35,
       decoration: BoxDecoration(
-        color: isCurrent ? const Color(0xFF8B1D1D) : const Color(0xFFEEEEEE),
+        color: isCurrent ? ColorManager.primary : ColorManager.surface,
         shape: BoxShape.circle,
       ),
       child: Center(
         child: Text(
           '$step',
-          style: TextStyle(
-            color: isCurrent ? Colors.white : Colors.grey,
-            fontWeight: FontWeight.bold,
+          style: getBoldStyle(
+            fontSize: FontSize.s16,
+            color: isCurrent ? ColorManager.white : ColorManager.textLight,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildLine(int afterStep) {
+  Widget _buildLine() {
     return Container(
-      width: 40,
-      height: 2,
-      color: const Color(0xFFEEEEEE),
+      width: AppSize.s40,
+      height: AppSize.s2,
+      color: ColorManager.dividerGrey,
     );
   }
 
@@ -217,13 +264,38 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _buildStep1() {
     return Column(
       children: [
-        _buildTextField('اسم المستخدم', Icons.person_outline),
-        const SizedBox(height: 15),
-        _buildTextField('رقم الجوال', Icons.phone_outlined),
-        const SizedBox(height: 15),
-        _buildTextField('البريد الإلكتروني', Icons.email_outlined),
-        const SizedBox(height: 15),
-        _buildTextField('..........', Icons.lock_outline, isPassword: true),
+        AppTextField(
+          hintText: 'الاسم الكامل',
+          prefixIcon: Icons.person_outline,
+          controller: _fullNameController,
+        ),
+        const SizedBox(height: AppSize.s15),
+        AppTextField(
+          hintText: 'اسم المستخدم',
+          prefixIcon: Icons.alternate_email,
+          controller: _usernameController,
+        ),
+        const SizedBox(height: AppSize.s15),
+        AppTextField(
+          hintText: 'رقم الجوال',
+          prefixIcon: Icons.phone_outlined,
+          controller: _phoneController,
+          keyboardType: TextInputType.phone,
+        ),
+        const SizedBox(height: AppSize.s15),
+        AppTextField(
+          hintText: 'البريد الإلكتروني',
+          prefixIcon: Icons.email_outlined,
+          controller: _emailController,
+          keyboardType: TextInputType.emailAddress,
+        ),
+        const SizedBox(height: AppSize.s15),
+        AppTextField(
+          hintText: '............',
+          prefixIcon: Icons.lock_outline,
+          isPassword: true,
+          controller: _passwordController,
+        ),
       ],
     );
   }
@@ -231,19 +303,58 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _buildStep2() {
     return Column(
       children: [
-        _buildTextField('تاريخ الميلاد', Icons.calendar_today_outlined),
-        const SizedBox(height: 15),
-        _buildTextField('الجنس', Icons.person_outline),
-        const SizedBox(height: 15),
-        _buildTextField('رقم بطاقة التعريف الوطني', Icons.badge_outlined),
-        const SizedBox(height: 15),
-        _buildTextField('فصيلة الدم', Icons.opacity),
-        const SizedBox(height: 15),
-        _buildTextField('الوزن', Icons.monitor_weight_outlined),
-        const SizedBox(height: 15),
-        _buildTextField('الولاية', Icons.location_city_outlined),
-        const SizedBox(height: 15),
-        _buildTextField('الأمراض المزمنة', Icons.coronavirus_outlined, isMultiline: true),
+        AppTextField(
+          hintText: 'تاريخ الميلاد',
+          prefixIcon: Icons.calendar_today_outlined,
+          controller: _dobController,
+          keyboardType: TextInputType.datetime,
+        ),
+        const SizedBox(height: AppSize.s15),
+        AppTextField(
+          hintText: 'الجنس',
+          prefixIcon: Icons.person_outline,
+          controller: _genderController,
+        ),
+        const SizedBox(height: AppSize.s15),
+        AppTextField(
+          hintText: 'رقم بطاقة التعريف الوطني',
+          prefixIcon: Icons.badge_outlined,
+          controller: _nationalIdController,
+        ),
+        const SizedBox(height: AppSize.s15),
+        DropdownButtonFormField<String>(
+          decoration: const InputDecoration(
+            hintText: 'فصيلة الدم',
+            prefixIcon: Icon(Icons.opacity),
+          ),
+          items: const ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
+              .map((type) => DropdownMenuItem(
+                    value: type,
+                    child: Text(type),
+                  ))
+              .toList(),
+          onChanged: (v) => _bloodTypeController.text = v ?? '',
+        ),
+        const SizedBox(height: AppSize.s15),
+        AppTextField(
+          hintText: 'الوزن',
+          prefixIcon: Icons.monitor_weight_outlined,
+          controller: _weightController,
+          keyboardType: TextInputType.number,
+        ),
+        const SizedBox(height: AppSize.s15),
+        AppTextField(
+          hintText: 'الولاية',
+          prefixIcon: Icons.location_city_outlined,
+          controller: _cityController,
+        ),
+        const SizedBox(height: AppSize.s15),
+        AppTextField(
+          hintText: 'الأمراض المزمنة',
+          prefixIcon: Icons.coronavirus_outlined,
+          controller: _chronicDiseasesController,
+          isMultiline: true,
+        ),
       ],
     );
   }
@@ -252,34 +363,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(AppPadding.p20),
           decoration: BoxDecoration(
-            color: const Color(0xFFF5F5F5),
-            borderRadius: BorderRadius.circular(20),
+            color: ColorManager.surface,
+            borderRadius: BorderRadius.circular(AppSize.s20),
           ),
-          child: const Text(
+          child: Text(
             'باستخدامك لهذا التطبيق، فإنك توافق على تقديم معلومات صحيحة، واستخدام المنصة لأغراض التبرع بالدم وطلبه فقط. تلتزم المنصة بحماية بياناتك الشخصية وعدم مشاركتها إلا عند الضرورة. تحتفظ إدارة التطبيق بحق تعديل الخدمات أو تعليق الحسابات المخالفة للشروط. بإنشاء حساب، فإنك توافق على هذه الشروط والأحكام.',
-            style: TextStyle(fontSize: 16, height: 1.5, color: Colors.black87),
+            style: getRegularStyle(
+              fontSize: FontSize.s16,
+              color: ColorManager.textPrimary,
+            ),
             textAlign: TextAlign.justify,
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: AppSize.s20),
         Row(
           children: [
             Transform.scale(
               scale: 0.8,
               child: Switch(
                 value: _agreeToTerms,
-                onChanged: (value) {
-                  setState(() {
-                    _agreeToTerms = value;
-                  });
-                },
+                onChanged: (v) => setState(() => _agreeToTerms = v),
               ),
             ),
-            const Text(
+            Text(
               'أوافق على الشروط والأحكام',
-              style: TextStyle(color: Colors.grey, fontSize: 14),
+              style: getRegularStyle(
+                fontSize: FontSize.s14,
+                color: ColorManager.textSecondary,
+              ),
             ),
           ],
         ),
@@ -287,26 +400,36 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildTextField(String hint, IconData icon, {bool isPassword = false, bool isMultiline = false}) {
-    return TextField(
-      maxLines: isMultiline ? 4 : 1,
-      obscureText: isPassword ? _obscurePassword : false,
-      decoration: InputDecoration(
-        hintText: hint,
-        prefixIcon: isPassword ? Icon(icon) : null,
-        suffixIcon: isPassword
-            ? IconButton(
-                icon: Icon(
-                  _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscurePassword = !_obscurePassword;
-                  });
-                },
-              )
-            : Icon(icon),
-      ),
-    );
+  void _authListener(BuildContext context, AuthState state) {
+    if (state is Authenticated) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => AppDialog.success(
+          title: 'لقد تم إنشاء حساب بنجاح',
+          actionLabel: 'الصفحة الرئيسية',
+          onAction: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const RoleSelectionScreen(),
+              ),
+              (route) => false,
+            );
+          },
+        ),
+      );
+    } else if (state is AuthError) {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (_) => AppDialog.error(
+          title: 'خطأ في إنشاء الحساب',
+          message: state.failure.message,
+          actionLabel: 'إعادة المحاولة',
+          onAction: () => Navigator.pop(context),
+        ),
+      );
+    }
   }
 }

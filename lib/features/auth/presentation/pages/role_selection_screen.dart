@@ -1,84 +1,208 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../features/requester_home/presentation/pages/requester_home_screen.dart';
-import '../../../../features/donor_home/presentation/pages/donor_home_screen.dart';
+
+import '../../../../core/utils/assets_manager.dart';
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/font_manager.dart';
+import '../../../../core/utils/styles_manager.dart';
+import '../../../../core/utils/values_manager.dart';
+import '../../../../injection_container.dart';
+import '../bloc/auth_bloc.dart';
+import '../../../donor_home/presentation/pages/donor_home_screen.dart';
+import '../../../requester_home/presentation/pages/requester_home_screen.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => sl<AuthBloc>(),
+      child: BlocConsumer<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is RoleUpdated) {
+            final isDonor = state.user.isDonor;
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (_) => isDonor
+                    ? const DonorHomeScreen()
+                    : const RequesterHomeScreen(),
+              ),
+              (route) => false,
+            );
+          }
+        },
+        builder: (context, state) {
+          return Scaffold(
+            body: Directionality(
+              textDirection: TextDirection.rtl,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppPadding.p20,
+                    vertical: AppPadding.p20,
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppPadding.p24,
+                      horizontal: AppPadding.p20,
+                    ),
+                    decoration: BoxDecoration(
+                      color: ColorManager.surface,
+                      borderRadius: BorderRadius.circular(AppSize.s40),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            ImageAssets.icon6,
+                            height: AppSize.s80,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.bloodtype_outlined,
+                              size: AppSize.s80,
+                              color: ColorManager.primary,
+                            ),
+                          ),
+                          const SizedBox(height: AppSize.s20),
+                          Text(
+                            'قال رسول الله ﷺ:',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.cairo(
+                              fontSize: FontSize.s18,
+                              fontWeight: FontWeightManager.bold,
+                              color: ColorManager.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: AppSize.s10),
+                          Text(
+                            '«مَنْ نَفَّسَ عَنْ مُؤْمِنٍ كُرْبَةً مِنْ كُرَبِ الدُّنْيَا، نَفَّسَ اللهُ عَنْهُ كُرْبَةً مِنْ كُرَبِ يَوْمِ الْقِيَامَةِ»',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.cairo(
+                              fontSize: FontSize.s14,
+                              fontWeight: FontWeightManager.semiBold,
+                              color: ColorManager.textSecondary,
+                              height: 1.6,
+                            ),
+                          ),
+                          const SizedBox(height: AppSize.s24),
+                          Text(
+                            'هل انت',
+                            style: getBoldStyle(
+                              fontSize: FontSize.s20,
+                              color: ColorManager.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: AppSize.s24),
+                          SizedBox(
+                            width: 220,
+                            height: 55,
+                            child: ElevatedButton(
+                              onPressed: () =>
+                                  _showConfirmationDialog(context),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: ColorManager.white,
+                                foregroundColor: ColorManager.primary,
+                                elevation: AppSize.s2,
+                                shadowColor: Colors.black26,
+                              ),
+                              child: const Text('أحتاج دم'),
+                            ),
+                          ),
+                          const SizedBox(height: AppSize.s15),
+                          SizedBox(
+                            width: 220,
+                            height: 55,
+                            child: TextButton(
+                              onPressed: () =>
+                                  _selectRole(context, isDonor: true),
+                              style: TextButton.styleFrom(
+                                foregroundColor: ColorManager.textSecondary,
+                              ),
+                              child: const Text(
+                                'أنا متبرع',
+                                style: TextStyle(
+                                  fontSize: FontSize.s18,
+                                  fontWeight: FontWeightManager.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   void _showConfirmationDialog(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: true,
-      builder: (BuildContext context) {
-        final theme = Theme.of(context);
+      builder: (dialogContext) {
         return Directionality(
           textDirection: TextDirection.rtl,
           child: Dialog(
             child: Padding(
-              padding: const EdgeInsets.all(25.0),
+              padding: const EdgeInsets.all(AppPadding.p24),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Warning Icon
                   const Icon(
                     Icons.warning_rounded,
                     color: Colors.red,
-                    size: 80,
+                    size: AppSize.s80,
                   ),
-                  const SizedBox(height: 20),
-                  // Title
+                  const SizedBox(height: AppSize.s20),
                   Text(
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[700],
-                      height: 1.6,
-                    ),
                     'تأكيد تحديث الحالة !',
-                  ),
-                  const SizedBox(height: 15),
-                  // Description
-                  Text(
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[700],
-                      height: 1.6,
+                    style: getBoldStyle(
+                      fontSize: FontSize.s20,
+                      color: ColorManager.textSecondary,
                     ),
-                    'عند تقديم طلب للحصول على الدم، سيتم إلغاء حالة "أنا متبرع" تلقائياً ولن تظهر ضمن قائمة المتبرعين النشطين، يمكنك إعادة تفعيلها لاحقاً بعد انتهاء طلبك.',
                   ),
-                  const SizedBox(height: 30),
-                  // Confirm Button
+                  const SizedBox(height: AppSize.s15),
+                  Text(
+                    'عند تقديم طلب للحصول على الدم، سيتم إلغاء حالة "أنا متبرع" تلقائياً ولن تظهر ضمن قائمة المتبرعين النشطين، يمكنك إعادة تفعيلها لاحقاً بعد انتهاء طلبك.',
+                    textAlign: TextAlign.center,
+                    style: getBoldStyle(
+                      fontSize: FontSize.s16,
+                      color: ColorManager.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSize.s30),
                   SizedBox(
                     width: 220,
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pop(context); // Close dialog
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => const RequesterHomeScreen()),
-                          (route) => false,
-                        );
+                        Navigator.pop(dialogContext);
+                        _selectRole(context, isDonor: false, isRecipient: true);
                       },
                       child: const Text('تأكيد'),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  // Cancel Button
+                  const SizedBox(height: AppSize.s10),
                   SizedBox(
                     width: 220,
                     height: 50,
                     child: TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+                      onPressed: () => Navigator.pop(dialogContext),
                       child: Text(
                         'إلغاء',
-                        style: theme.textTheme.titleMedium?.copyWith(color: Colors.grey),
+                        style: getSemiBoldStyle(
+                          fontSize: FontSize.s16,
+                          color: ColorManager.textSecondary,
+                        ),
                       ),
                     ),
                   ),
@@ -91,113 +215,13 @@ class RoleSelectionScreen extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      body: Directionality(
-        textDirection: TextDirection.rtl,
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 20),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5F5F5),
-                borderRadius: BorderRadius.circular(40),
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Logo/App Name
-                    Image.asset(
-                      'assets/images/icon6.png',
-                      height: 80,
-                      errorBuilder: (context, error, stackTrace) => const Icon(
-                        Icons.bloodtype_outlined,
-                        size: 80,
-                        color: Color(0xFF8B1D1D),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Religious Quote Title
-                    Text(
-                      'قال رسول الله ﷺ:',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.cairo(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      '«مَنْ نَفَّسَ عَنْ مُؤْمِنٍ كُرْبَةً مِنْ كُرَبِ الدُّنْيَا، نَفَّسَ اللهُ عَنْهُ كُرْبَةً مِنْ كُرَبِ يَوْمِ الْقِيَامَةِ، وَمَنْ يَسَّرَ عَلَى مُعْسِرٍ، يَسَّرَ اللهُ عَلَيْهِ فِي الدُّنْيَا وَالْآخِرَةِ، وَمَنْ سَتَرَ مُسْلِمًا، سَتَرَه اللهُ فِي الدُّنْيَا وَالْآخِرَةِ، وَاللهُ فِي عَوْنِ الْعَبْدِ مَا كَانَ الْعَبْدُ فِي عَوْنِ أَخِيهِ»',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.cairo(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[700],
-                        height: 1.6,
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    // Question
-                    Text(
-                      'هل انت',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    // "I need blood" Button
-                    SizedBox(
-                      width: 220,
-                      height: 55,
-                      child: ElevatedButton(
-                        onPressed: () => _showConfirmationDialog(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: theme.primaryColor,
-                          elevation: 2,
-                          shadowColor: Colors.black26,
-                        ),
-                        child: const Text('أحتاج دم'),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    // "I am a donor" Button
-                    SizedBox(
-                      width: 220,
-                      height: 55,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (context) => const DonorHomeScreen()),
-                            (route) => false,
-                          );
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.grey[600],
-                        ),
-                        child: const Text(
-                          'أنا متبرع',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+  void _selectRole(
+    BuildContext context, {
+    required bool isDonor,
+    bool isRecipient = false,
+  }) {
+    context.read<AuthBloc>().add(
+          UpdateRoleRequested(isDonor: isDonor, isRecipient: isRecipient),
+        );
   }
 }
