@@ -13,59 +13,42 @@ import 'package:tabare3/features/auth/domain/usecases/update_user_role.dart';
 import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:tabare3/features/auth/presentation/pages/signup_screen.dart';
 
-class MockLoginWithEmailPassword extends Mock
-    implements LoginWithEmailPassword {}
-
-class MockSignupWithEmailPassword extends Mock
-    implements SignupWithEmailPassword {}
-
+class MockLoginWithUsernamePassword extends Mock implements LoginWithUsernamePassword {}
+class MockSignupWithUsernamePassword extends Mock implements SignupWithUsernamePassword {}
 class MockSignOut extends Mock implements SignOut {}
-
 class MockGetCurrentSession extends Mock implements GetCurrentSession {}
-
 class MockUpdateUserRole extends Mock implements UpdateUserRole {}
 
 void main() {
   final sl = GetIt.instance;
 
   setUpAll(() {
-    registerFallbackValue(
-      SignupParams(
-        username: 'fallback',
-        fullName: 'fallback',
-        email: 'fallback@test.com',
-        password: 'fallback',
-        phone: '0000',
-        dateOfBirth: DateTime(2000),
-        gender: 'male',
-        bloodType: 'O+',
-        city: 'fallback',
-      ),
-    );
-    registerFallbackValue(LoginParams(email: 'fallback', password: 'fallback'));
+    registerFallbackValue(SignupParams(
+      username: 'fallback',
+      fullName: 'fallback',
+      password: 'fallback',
+      phone: '0000',
+      dateOfBirth: DateTime(2000),
+      gender: 'male',
+      bloodType: 'O+',
+      city: 'fallback',
+    ));
+    registerFallbackValue(LoginParams(username: 'fallback', password: 'fallback'));
     registerFallbackValue(NoParams());
-    registerFallbackValue(
-      const UpdateRoleParams(isDonor: false, isRecipient: false),
-    );
+    registerFallbackValue(const UpdateRoleParams(isDonor: false, isRecipient: false));
   });
 
   setUp(() {
     sl.reset();
-    sl.registerFactory(
-      () => AuthBloc(
-        loginWithEmailPassword: sl(),
-        signupWithEmailPassword: sl(),
-        signOutUseCase: sl(),
-        getCurrentSession: sl(),
-        updateUserRole: sl(),
-      ),
-    );
-    sl.registerLazySingleton<LoginWithEmailPassword>(
-      () => MockLoginWithEmailPassword(),
-    );
-    sl.registerLazySingleton<SignupWithEmailPassword>(
-      () => MockSignupWithEmailPassword(),
-    );
+    sl.registerFactory(() => AuthBloc(
+          loginWithUsernamePassword: sl(),
+          signupWithUsernamePassword: sl(),
+          signOutUseCase: sl(),
+          getCurrentSession: sl(),
+          updateUserRole: sl(),
+        ));
+    sl.registerLazySingleton<LoginWithUsernamePassword>(() => MockLoginWithUsernamePassword());
+    sl.registerLazySingleton<SignupWithUsernamePassword>(() => MockSignupWithUsernamePassword());
     sl.registerLazySingleton<SignOut>(() => MockSignOut());
     sl.registerLazySingleton<GetCurrentSession>(() => MockGetCurrentSession());
     sl.registerLazySingleton<UpdateUserRole>(() => MockUpdateUserRole());
@@ -80,7 +63,6 @@ void main() {
     expect(find.text('الاسم الكامل'), findsOneWidget);
     expect(find.text('اسم المستخدم'), findsOneWidget);
     expect(find.text('رقم الجوال'), findsOneWidget);
-    expect(find.text('البريد الإلكتروني'), findsOneWidget);
     expect(find.text('التالي'), findsOneWidget);
   });
 

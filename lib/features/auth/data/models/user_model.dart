@@ -11,10 +11,10 @@ abstract class UserModel with _$UserModel {
     required String id,
     @Default('') String email,
     required String username,
-    required String fullName,
-    @Default(false) bool isDonor,
-    @Default(false) bool isRecipient,
-    required String bloodType,
+    @JsonKey(name: 'full_name') required String fullName,
+    @JsonKey(name: 'is_donor') @Default(false) bool isDonor,
+    @JsonKey(name: 'is_recipient') @Default(false) bool isRecipient,
+    @JsonKey(name: 'blood_type') required String bloodType,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
@@ -23,12 +23,12 @@ abstract class UserModel with _$UserModel {
 
 extension UserModelX on UserModel {
   UserEntity toEntity() => UserEntity(
-    id: id,
-    email: email,
-    username: username,
-    fullName: fullName,
-    isDonor: isDonor,
-    isRecipient: isRecipient,
-    bloodType: bloodType,
-  );
+        id: id,
+        email: email,
+        username: username,
+        fullName: fullName,
+        isDonor: isDonor,
+        isRecipient: isRecipient,
+        bloodType: bloodType,
+      );
 }

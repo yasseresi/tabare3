@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LoginParams {
 
- String get email; String get password;
+ String get username; String get password;
 /// Create a copy of LoginParams
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $LoginParamsCopyWith<LoginParams> get copyWith => _$LoginParamsCopyWithImpl<Logi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginParams&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginParams&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,email,password);
+int get hashCode => Object.hash(runtimeType,username,password);
 
 @override
 String toString() {
-  return 'LoginParams(email: $email, password: $password)';
+  return 'LoginParams(username: $username, password: $password)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $LoginParamsCopyWith<$Res>  {
   factory $LoginParamsCopyWith(LoginParams value, $Res Function(LoginParams) _then) = _$LoginParamsCopyWithImpl;
 @useResult
 $Res call({
- String email, String password
+ String username, String password
 });
 
 
@@ -62,9 +62,9 @@ class _$LoginParamsCopyWithImpl<$Res>
 
 /// Create a copy of LoginParams
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? email = null,Object? password = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? username = null,Object? password = null,}) {
   return _then(_self.copyWith(
-email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,
   ));
@@ -151,10 +151,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String email,  String password)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String username,  String password)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LoginParams() when $default != null:
-return $default(_that.email,_that.password);case _:
+return $default(_that.username,_that.password);case _:
   return orElse();
 
 }
@@ -172,10 +172,10 @@ return $default(_that.email,_that.password);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String email,  String password)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String username,  String password)  $default,) {final _that = this;
 switch (_that) {
 case _LoginParams():
-return $default(_that.email,_that.password);case _:
+return $default(_that.username,_that.password);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -192,10 +192,10 @@ return $default(_that.email,_that.password);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String email,  String password)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String username,  String password)?  $default,) {final _that = this;
 switch (_that) {
 case _LoginParams() when $default != null:
-return $default(_that.email,_that.password);case _:
+return $default(_that.username,_that.password);case _:
   return null;
 
 }
@@ -207,10 +207,10 @@ return $default(_that.email,_that.password);case _:
 
 
 class _LoginParams implements LoginParams {
-  const _LoginParams({required this.email, required this.password});
+  const _LoginParams({required this.username, required this.password});
   
 
-@override final  String email;
+@override final  String username;
 @override final  String password;
 
 /// Create a copy of LoginParams
@@ -223,16 +223,16 @@ _$LoginParamsCopyWith<_LoginParams> get copyWith => __$LoginParamsCopyWithImpl<_
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LoginParams&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LoginParams&&(identical(other.username, username) || other.username == username)&&(identical(other.password, password) || other.password == password));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,email,password);
+int get hashCode => Object.hash(runtimeType,username,password);
 
 @override
 String toString() {
-  return 'LoginParams(email: $email, password: $password)';
+  return 'LoginParams(username: $username, password: $password)';
 }
 
 
@@ -243,7 +243,7 @@ abstract mixin class _$LoginParamsCopyWith<$Res> implements $LoginParamsCopyWith
   factory _$LoginParamsCopyWith(_LoginParams value, $Res Function(_LoginParams) _then) = __$LoginParamsCopyWithImpl;
 @override @useResult
 $Res call({
- String email, String password
+ String username, String password
 });
 
 
@@ -260,9 +260,9 @@ class __$LoginParamsCopyWithImpl<$Res>
 
 /// Create a copy of LoginParams
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? email = null,Object? password = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? username = null,Object? password = null,}) {
   return _then(_LoginParams(
-email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,
   ));
@@ -274,7 +274,7 @@ as String,
 /// @nodoc
 mixin _$SignupParams {
 
- String get username; String get fullName; String get email; String get password; String get phone; DateTime get dateOfBirth; String get gender; String get bloodType; String get city; String? get nationalId; double? get weight; String? get chronicDiseases;
+ String get username; String get fullName; String get password; String get phone; DateTime get dateOfBirth; String get gender; String get bloodType; String get city; String? get nationalId; double? get weight; String? get chronicDiseases;
 /// Create a copy of SignupParams
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -285,16 +285,16 @@ $SignupParamsCopyWith<SignupParams> get copyWith => _$SignupParamsCopyWithImpl<S
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignupParams&&(identical(other.username, username) || other.username == username)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.city, city) || other.city == city)&&(identical(other.nationalId, nationalId) || other.nationalId == nationalId)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.chronicDiseases, chronicDiseases) || other.chronicDiseases == chronicDiseases));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignupParams&&(identical(other.username, username) || other.username == username)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.password, password) || other.password == password)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.city, city) || other.city == city)&&(identical(other.nationalId, nationalId) || other.nationalId == nationalId)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.chronicDiseases, chronicDiseases) || other.chronicDiseases == chronicDiseases));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,username,fullName,email,password,phone,dateOfBirth,gender,bloodType,city,nationalId,weight,chronicDiseases);
+int get hashCode => Object.hash(runtimeType,username,fullName,password,phone,dateOfBirth,gender,bloodType,city,nationalId,weight,chronicDiseases);
 
 @override
 String toString() {
-  return 'SignupParams(username: $username, fullName: $fullName, email: $email, password: $password, phone: $phone, dateOfBirth: $dateOfBirth, gender: $gender, bloodType: $bloodType, city: $city, nationalId: $nationalId, weight: $weight, chronicDiseases: $chronicDiseases)';
+  return 'SignupParams(username: $username, fullName: $fullName, password: $password, phone: $phone, dateOfBirth: $dateOfBirth, gender: $gender, bloodType: $bloodType, city: $city, nationalId: $nationalId, weight: $weight, chronicDiseases: $chronicDiseases)';
 }
 
 
@@ -305,7 +305,7 @@ abstract mixin class $SignupParamsCopyWith<$Res>  {
   factory $SignupParamsCopyWith(SignupParams value, $Res Function(SignupParams) _then) = _$SignupParamsCopyWithImpl;
 @useResult
 $Res call({
- String username, String fullName, String email, String password, String phone, DateTime dateOfBirth, String gender, String bloodType, String city, String? nationalId, double? weight, String? chronicDiseases
+ String username, String fullName, String password, String phone, DateTime dateOfBirth, String gender, String bloodType, String city, String? nationalId, double? weight, String? chronicDiseases
 });
 
 
@@ -322,11 +322,10 @@ class _$SignupParamsCopyWithImpl<$Res>
 
 /// Create a copy of SignupParams
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? username = null,Object? fullName = null,Object? email = null,Object? password = null,Object? phone = null,Object? dateOfBirth = null,Object? gender = null,Object? bloodType = null,Object? city = null,Object? nationalId = freezed,Object? weight = freezed,Object? chronicDiseases = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? username = null,Object? fullName = null,Object? password = null,Object? phone = null,Object? dateOfBirth = null,Object? gender = null,Object? bloodType = null,Object? city = null,Object? nationalId = freezed,Object? weight = freezed,Object? chronicDiseases = freezed,}) {
   return _then(_self.copyWith(
 username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
-as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
 as String,dateOfBirth: null == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
@@ -421,10 +420,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String username,  String fullName,  String email,  String password,  String phone,  DateTime dateOfBirth,  String gender,  String bloodType,  String city,  String? nationalId,  double? weight,  String? chronicDiseases)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String username,  String fullName,  String password,  String phone,  DateTime dateOfBirth,  String gender,  String bloodType,  String city,  String? nationalId,  double? weight,  String? chronicDiseases)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SignupParams() when $default != null:
-return $default(_that.username,_that.fullName,_that.email,_that.password,_that.phone,_that.dateOfBirth,_that.gender,_that.bloodType,_that.city,_that.nationalId,_that.weight,_that.chronicDiseases);case _:
+return $default(_that.username,_that.fullName,_that.password,_that.phone,_that.dateOfBirth,_that.gender,_that.bloodType,_that.city,_that.nationalId,_that.weight,_that.chronicDiseases);case _:
   return orElse();
 
 }
@@ -442,10 +441,10 @@ return $default(_that.username,_that.fullName,_that.email,_that.password,_that.p
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String username,  String fullName,  String email,  String password,  String phone,  DateTime dateOfBirth,  String gender,  String bloodType,  String city,  String? nationalId,  double? weight,  String? chronicDiseases)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String username,  String fullName,  String password,  String phone,  DateTime dateOfBirth,  String gender,  String bloodType,  String city,  String? nationalId,  double? weight,  String? chronicDiseases)  $default,) {final _that = this;
 switch (_that) {
 case _SignupParams():
-return $default(_that.username,_that.fullName,_that.email,_that.password,_that.phone,_that.dateOfBirth,_that.gender,_that.bloodType,_that.city,_that.nationalId,_that.weight,_that.chronicDiseases);case _:
+return $default(_that.username,_that.fullName,_that.password,_that.phone,_that.dateOfBirth,_that.gender,_that.bloodType,_that.city,_that.nationalId,_that.weight,_that.chronicDiseases);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -462,10 +461,10 @@ return $default(_that.username,_that.fullName,_that.email,_that.password,_that.p
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String username,  String fullName,  String email,  String password,  String phone,  DateTime dateOfBirth,  String gender,  String bloodType,  String city,  String? nationalId,  double? weight,  String? chronicDiseases)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String username,  String fullName,  String password,  String phone,  DateTime dateOfBirth,  String gender,  String bloodType,  String city,  String? nationalId,  double? weight,  String? chronicDiseases)?  $default,) {final _that = this;
 switch (_that) {
 case _SignupParams() when $default != null:
-return $default(_that.username,_that.fullName,_that.email,_that.password,_that.phone,_that.dateOfBirth,_that.gender,_that.bloodType,_that.city,_that.nationalId,_that.weight,_that.chronicDiseases);case _:
+return $default(_that.username,_that.fullName,_that.password,_that.phone,_that.dateOfBirth,_that.gender,_that.bloodType,_that.city,_that.nationalId,_that.weight,_that.chronicDiseases);case _:
   return null;
 
 }
@@ -477,12 +476,11 @@ return $default(_that.username,_that.fullName,_that.email,_that.password,_that.p
 
 
 class _SignupParams implements SignupParams {
-  const _SignupParams({required this.username, required this.fullName, required this.email, required this.password, required this.phone, required this.dateOfBirth, required this.gender, required this.bloodType, required this.city, this.nationalId, this.weight, this.chronicDiseases});
+  const _SignupParams({required this.username, required this.fullName, required this.password, required this.phone, required this.dateOfBirth, required this.gender, required this.bloodType, required this.city, this.nationalId, this.weight, this.chronicDiseases});
   
 
 @override final  String username;
 @override final  String fullName;
-@override final  String email;
 @override final  String password;
 @override final  String phone;
 @override final  DateTime dateOfBirth;
@@ -503,16 +501,16 @@ _$SignupParamsCopyWith<_SignupParams> get copyWith => __$SignupParamsCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SignupParams&&(identical(other.username, username) || other.username == username)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.city, city) || other.city == city)&&(identical(other.nationalId, nationalId) || other.nationalId == nationalId)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.chronicDiseases, chronicDiseases) || other.chronicDiseases == chronicDiseases));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SignupParams&&(identical(other.username, username) || other.username == username)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.password, password) || other.password == password)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.city, city) || other.city == city)&&(identical(other.nationalId, nationalId) || other.nationalId == nationalId)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.chronicDiseases, chronicDiseases) || other.chronicDiseases == chronicDiseases));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,username,fullName,email,password,phone,dateOfBirth,gender,bloodType,city,nationalId,weight,chronicDiseases);
+int get hashCode => Object.hash(runtimeType,username,fullName,password,phone,dateOfBirth,gender,bloodType,city,nationalId,weight,chronicDiseases);
 
 @override
 String toString() {
-  return 'SignupParams(username: $username, fullName: $fullName, email: $email, password: $password, phone: $phone, dateOfBirth: $dateOfBirth, gender: $gender, bloodType: $bloodType, city: $city, nationalId: $nationalId, weight: $weight, chronicDiseases: $chronicDiseases)';
+  return 'SignupParams(username: $username, fullName: $fullName, password: $password, phone: $phone, dateOfBirth: $dateOfBirth, gender: $gender, bloodType: $bloodType, city: $city, nationalId: $nationalId, weight: $weight, chronicDiseases: $chronicDiseases)';
 }
 
 
@@ -523,7 +521,7 @@ abstract mixin class _$SignupParamsCopyWith<$Res> implements $SignupParamsCopyWi
   factory _$SignupParamsCopyWith(_SignupParams value, $Res Function(_SignupParams) _then) = __$SignupParamsCopyWithImpl;
 @override @useResult
 $Res call({
- String username, String fullName, String email, String password, String phone, DateTime dateOfBirth, String gender, String bloodType, String city, String? nationalId, double? weight, String? chronicDiseases
+ String username, String fullName, String password, String phone, DateTime dateOfBirth, String gender, String bloodType, String city, String? nationalId, double? weight, String? chronicDiseases
 });
 
 
@@ -540,11 +538,10 @@ class __$SignupParamsCopyWithImpl<$Res>
 
 /// Create a copy of SignupParams
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? username = null,Object? fullName = null,Object? email = null,Object? password = null,Object? phone = null,Object? dateOfBirth = null,Object? gender = null,Object? bloodType = null,Object? city = null,Object? nationalId = freezed,Object? weight = freezed,Object? chronicDiseases = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? username = null,Object? fullName = null,Object? password = null,Object? phone = null,Object? dateOfBirth = null,Object? gender = null,Object? bloodType = null,Object? city = null,Object? nationalId = freezed,Object? weight = freezed,Object? chronicDiseases = freezed,}) {
   return _then(_SignupParams(
 username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
-as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
 as String,phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
 as String,dateOfBirth: null == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable

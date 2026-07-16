@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserModel {
 
- String get id; String get email; String get username; String get fullName; bool get isDonor; bool get isRecipient; String get bloodType;
+ String get id; String get email; String get username;@JsonKey(name: 'full_name') String get fullName;@JsonKey(name: 'is_donor') bool get isDonor;@JsonKey(name: 'is_recipient') bool get isRecipient;@JsonKey(name: 'blood_type') String get bloodType;
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $UserModelCopyWith<$Res>  {
   factory $UserModelCopyWith(UserModel value, $Res Function(UserModel) _then) = _$UserModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String email, String username, String fullName, bool isDonor, bool isRecipient, String bloodType
+ String id, String email, String username,@JsonKey(name: 'full_name') String fullName,@JsonKey(name: 'is_donor') bool isDonor,@JsonKey(name: 'is_recipient') bool isRecipient,@JsonKey(name: 'blood_type') String bloodType
 });
 
 
@@ -159,7 +159,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String username,  String fullName,  bool isDonor,  bool isRecipient,  String bloodType)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String username, @JsonKey(name: 'full_name')  String fullName, @JsonKey(name: 'is_donor')  bool isDonor, @JsonKey(name: 'is_recipient')  bool isRecipient, @JsonKey(name: 'blood_type')  String bloodType)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserModel() when $default != null:
 return $default(_that.id,_that.email,_that.username,_that.fullName,_that.isDonor,_that.isRecipient,_that.bloodType);case _:
@@ -180,7 +180,7 @@ return $default(_that.id,_that.email,_that.username,_that.fullName,_that.isDonor
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String username,  String fullName,  bool isDonor,  bool isRecipient,  String bloodType)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String username, @JsonKey(name: 'full_name')  String fullName, @JsonKey(name: 'is_donor')  bool isDonor, @JsonKey(name: 'is_recipient')  bool isRecipient, @JsonKey(name: 'blood_type')  String bloodType)  $default,) {final _that = this;
 switch (_that) {
 case _UserModel():
 return $default(_that.id,_that.email,_that.username,_that.fullName,_that.isDonor,_that.isRecipient,_that.bloodType);case _:
@@ -200,7 +200,7 @@ return $default(_that.id,_that.email,_that.username,_that.fullName,_that.isDonor
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String username,  String fullName,  bool isDonor,  bool isRecipient,  String bloodType)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String username, @JsonKey(name: 'full_name')  String fullName, @JsonKey(name: 'is_donor')  bool isDonor, @JsonKey(name: 'is_recipient')  bool isRecipient, @JsonKey(name: 'blood_type')  String bloodType)?  $default,) {final _that = this;
 switch (_that) {
 case _UserModel() when $default != null:
 return $default(_that.id,_that.email,_that.username,_that.fullName,_that.isDonor,_that.isRecipient,_that.bloodType);case _:
@@ -215,16 +215,16 @@ return $default(_that.id,_that.email,_that.username,_that.fullName,_that.isDonor
 @JsonSerializable()
 
 class _UserModel implements UserModel {
-  const _UserModel({required this.id, this.email = '', required this.username, required this.fullName, this.isDonor = false, this.isRecipient = false, required this.bloodType});
+  const _UserModel({required this.id, this.email = '', required this.username, @JsonKey(name: 'full_name') required this.fullName, @JsonKey(name: 'is_donor') this.isDonor = false, @JsonKey(name: 'is_recipient') this.isRecipient = false, @JsonKey(name: 'blood_type') required this.bloodType});
   factory _UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
 
 @override final  String id;
 @override@JsonKey() final  String email;
 @override final  String username;
-@override final  String fullName;
-@override@JsonKey() final  bool isDonor;
-@override@JsonKey() final  bool isRecipient;
-@override final  String bloodType;
+@override@JsonKey(name: 'full_name') final  String fullName;
+@override@JsonKey(name: 'is_donor') final  bool isDonor;
+@override@JsonKey(name: 'is_recipient') final  bool isRecipient;
+@override@JsonKey(name: 'blood_type') final  String bloodType;
 
 /// Create a copy of UserModel
 /// with the given fields replaced by the non-null parameter values.
@@ -259,7 +259,7 @@ abstract mixin class _$UserModelCopyWith<$Res> implements $UserModelCopyWith<$Re
   factory _$UserModelCopyWith(_UserModel value, $Res Function(_UserModel) _then) = __$UserModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String email, String username, String fullName, bool isDonor, bool isRecipient, String bloodType
+ String id, String email, String username,@JsonKey(name: 'full_name') String fullName,@JsonKey(name: 'is_donor') bool isDonor,@JsonKey(name: 'is_recipient') bool isRecipient,@JsonKey(name: 'blood_type') String bloodType
 });
 
 

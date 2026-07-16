@@ -29,7 +29,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _usernameController = TextEditingController();
   final _fullNameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _dobController = TextEditingController();
   final _genderController = TextEditingController();
@@ -44,7 +43,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _usernameController.dispose();
     _fullNameController.dispose();
     _phoneController.dispose();
-    _emailController.dispose();
     _passwordController.dispose();
     _dobController.dispose();
     _genderController.dispose();
@@ -69,7 +67,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final params = SignupParams(
       username: _usernameController.text.trim(),
       fullName: _fullNameController.text.trim(),
-      email: _emailController.text.trim(),
       password: _passwordController.text,
       phone: _phoneController.text.trim(),
       dateOfBirth: DateTime.tryParse(_dobController.text) ?? DateTime(2000),
@@ -281,13 +278,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
           prefixIcon: Icons.phone_outlined,
           controller: _phoneController,
           keyboardType: TextInputType.phone,
-        ),
-        const SizedBox(height: AppSize.s15),
-        AppTextField(
-          hintText: 'البريد الإلكتروني',
-          prefixIcon: Icons.email_outlined,
-          controller: _emailController,
-          keyboardType: TextInputType.emailAddress,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(

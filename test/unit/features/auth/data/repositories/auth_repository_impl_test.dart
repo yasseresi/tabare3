@@ -11,12 +11,11 @@ import 'package:tabare3/features/auth/domain/entities/user_entity.dart';
 import 'package:tabare3/features/auth/domain/repositories/auth_repository.dart';
 
 class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
-
 class MockNetworkInfo extends Mock implements NetworkInfo {}
 
 const testUserModel = UserModel(
   id: 'user-123',
-  email: 'test@test.com',
+  email: 'testuser@tabara3.dz',
   username: 'testuser',
   fullName: 'Test User',
   bloodType: 'O+',
@@ -28,19 +27,16 @@ void main() {
   late MockNetworkInfo mockNetworkInfo;
 
   setUpAll(() {
-    registerFallbackValue(
-      SignupParams(
-        username: 'fallback',
-        fullName: 'fallback',
-        email: 'fallback@test.com',
-        password: 'fallback',
-        phone: '0000',
-        dateOfBirth: DateTime(2000),
-        gender: 'male',
-        bloodType: 'O+',
-        city: 'fallback',
-      ),
-    );
+    registerFallbackValue(SignupParams(
+      username: 'fallback',
+      fullName: 'fallback',
+      password: 'fallback',
+      phone: '0000',
+      dateOfBirth: DateTime(2000),
+      gender: 'male',
+      bloodType: 'O+',
+      city: 'fallback',
+    ));
   });
 
   setUp(() {
@@ -52,32 +48,30 @@ void main() {
     );
   });
 
-  group('loginWithEmailPassword', () {
+  group('loginWithUsernamePassword', () {
     test('returns Right(UserEntity) on success', () async {
       when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-      when(
-        () => mockDataSource.signIn(
-          email: any(named: 'email'),
-          password: any(named: 'password'),
-        ),
-      ).thenAnswer((_) async => testUserModel);
+      when(() => mockDataSource.signIn(
+            username: any(named: 'username'),
+            password: any(named: 'password'),
+          )).thenAnswer((_) async => testUserModel);
 
-      final result = await repository.loginWithEmailPassword(
-        email: 'test@test.com',
+      final result = await repository.loginWithUsernamePassword(
+        username: 'testuser',
         password: 'password',
       );
 
       expect(result.isRight(), isTrue);
       final user = result.fold((l) => null, (r) => r);
       expect(user, isA<UserEntity>());
-      expect(user!.email, 'test@test.com');
+      expect(user!.username, 'testuser');
     });
 
     test('returns Left(NetworkFailure) when offline', () async {
       when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
 
-      final result = await repository.loginWithEmailPassword(
-        email: 'test@test.com',
+      final result = await repository.loginWithUsernamePassword(
+        username: 'testuser',
         password: 'password',
       );
 
@@ -86,15 +80,13 @@ void main() {
 
     test('returns Left(Failure) when datasource throws', () async {
       when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-      when(
-        () => mockDataSource.signIn(
-          email: any(named: 'email'),
-          password: any(named: 'password'),
-        ),
-      ).thenThrow(Exception('Auth failed'));
+      when(() => mockDataSource.signIn(
+            username: any(named: 'username'),
+            password: any(named: 'password'),
+          )).thenThrow(Exception('Auth failed'));
 
-      final result = await repository.loginWithEmailPassword(
-        email: 'test@test.com',
+      final result = await repository.loginWithUsernamePassword(
+        username: 'testuser',
         password: 'password',
       );
 
@@ -102,12 +94,11 @@ void main() {
     });
   });
 
-  group('signupWithEmailPassword', () {
+  group('signupWithUsernamePassword', () {
     test('returns Right(UserEntity) on success', () async {
       final params = SignupParams(
         username: 'testuser',
         fullName: 'Test User',
-        email: 'test@test.com',
         password: 'password',
         phone: '0555123456',
         dateOfBirth: DateTime(2000, 1, 1),
@@ -117,11 +108,10 @@ void main() {
       );
 
       when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-      when(
-        () => mockDataSource.signUp(params: any(named: 'params')),
-      ).thenAnswer((_) async => testUserModel);
+      when(() => mockDataSource.signUp(params: any(named: 'params')))
+          .thenAnswer((_) async => testUserModel);
 
-      final result = await repository.signupWithEmailPassword(params: params);
+      final result = await repository.signupWithUsernamePassword(params: params);
 
       expect(result.isRight(), isTrue);
     });
@@ -130,7 +120,6 @@ void main() {
       final params = SignupParams(
         username: 'testuser',
         fullName: 'Test User',
-        email: 'test@test.com',
         password: 'password',
         phone: '0555123456',
         dateOfBirth: DateTime(2000, 1, 1),
@@ -141,7 +130,7 @@ void main() {
 
       when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
 
-      final result = await repository.signupWithEmailPassword(params: params);
+      final result = await repository.signupWithUsernamePassword(params: params);
 
       expect(result, const Left(NetworkFailure()));
     });
@@ -175,9 +164,7 @@ void main() {
     });
 
     test('returns Right(UserEntity) when session exists', () async {
-      when(
-        () => mockDataSource.getCurrentUser(),
-      ).thenAnswer((_) async => testUserModel);
+      when(() => mockDataSource.getCurrentUser()).thenAnswer((_) async => testUserModel);
 
       final result = await repository.getCurrentSession();
 

@@ -5,13 +5,13 @@ import '../../../../core/usecases/usecase.dart';
 import '../entities/user_entity.dart';
 import '../repositories/auth_repository.dart';
 
-class SignupWithEmailPassword implements BaseUseCase<UserEntity, SignupParams> {
+class SignupWithUsernamePassword implements BaseUseCase<UserEntity, SignupParams> {
   final AuthRepository repository;
 
-  SignupWithEmailPassword(this.repository);
+  SignupWithUsernamePassword(this.repository);
 
   @override
   Future<Either<Failure, UserEntity>> call(SignupParams params) {
-    return repository.signupWithEmailPassword(params: params);
+    return repository.signupWithUsernamePassword(params: params);
   }
 }

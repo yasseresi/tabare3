@@ -14,15 +14,15 @@ export 'auth_event.dart';
 export 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final LoginWithEmailPassword loginWithEmailPassword;
-  final SignupWithEmailPassword signupWithEmailPassword;
+  final LoginWithUsernamePassword loginWithUsernamePassword;
+  final SignupWithUsernamePassword signupWithUsernamePassword;
   final SignOut signOutUseCase;
   final GetCurrentSession getCurrentSession;
   final UpdateUserRole updateUserRole;
 
   AuthBloc({
-    required this.loginWithEmailPassword,
-    required this.signupWithEmailPassword,
+    required this.loginWithUsernamePassword,
+    required this.signupWithUsernamePassword,
     required this.signOutUseCase,
     required this.getCurrentSession,
     required this.updateUserRole,
@@ -39,8 +39,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
-    final result = await loginWithEmailPassword(
-      LoginParams(email: event.email, password: event.password),
+    final result = await loginWithUsernamePassword(
+      LoginParams(username: event.username, password: event.password),
     );
     result.fold(
       (failure) => emit(AuthError(failure)),
@@ -53,7 +53,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
-    final result = await signupWithEmailPassword(event.params);
+    final result = await signupWithUsernamePassword(event.params);
     result.fold(
       (failure) => emit(AuthError(failure)),
       (user) => emit(Authenticated(user)),

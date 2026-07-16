@@ -37,16 +37,16 @@ Future<void> initCore() async {
 Future<void> initAuth() async {
   sl.registerFactory(
     () => AuthBloc(
-      loginWithEmailPassword: sl(),
-      signupWithEmailPassword: sl(),
+      loginWithUsernamePassword: sl(),
+      signupWithUsernamePassword: sl(),
       signOutUseCase: sl(),
       getCurrentSession: sl(),
       updateUserRole: sl(),
     ),
   );
 
-  sl.registerLazySingleton(() => LoginWithEmailPassword(sl()));
-  sl.registerLazySingleton(() => SignupWithEmailPassword(sl()));
+  sl.registerLazySingleton(() => LoginWithUsernamePassword(sl()));
+  sl.registerLazySingleton(() => SignupWithUsernamePassword(sl()));
   sl.registerLazySingleton(() => SignOut(sl()));
   sl.registerLazySingleton(() => GetCurrentSession(sl()));
   sl.registerLazySingleton(() => UpdateUserRole(sl()));

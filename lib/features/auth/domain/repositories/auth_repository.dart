@@ -8,7 +8,7 @@ part 'auth_repository.freezed.dart';
 
 @freezed
 abstract class LoginParams with _$LoginParams {
-  const factory LoginParams({required String email, required String password}) =
+  const factory LoginParams({required String username, required String password}) =
       _LoginParams;
 }
 
@@ -17,7 +17,6 @@ abstract class SignupParams with _$SignupParams {
   const factory SignupParams({
     required String username,
     required String fullName,
-    required String email,
     required String password,
     required String phone,
     required DateTime dateOfBirth,
@@ -46,12 +45,12 @@ extension SignupParamsX on SignupParams {
 }
 
 abstract class AuthRepository {
-  Future<Either<Failure, UserEntity>> loginWithEmailPassword({
-    required String email,
+  Future<Either<Failure, UserEntity>> loginWithUsernamePassword({
+    required String username,
     required String password,
   });
 
-  Future<Either<Failure, UserEntity>> signupWithEmailPassword({
+  Future<Either<Failure, UserEntity>> signupWithUsernamePassword({
     required SignupParams params,
   });
 

@@ -3,8 +3,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../models/user_model.dart';
 
+const _fakeEmailDomain = 'tabara3.dz';
+
+String _usernameToEmail(String username) => '$username@$_fakeEmailDomain';
+
 abstract class AuthRemoteDataSource {
-  Future<UserModel> signIn({required String email, required String password});
+  Future<UserModel> signIn({required String username, required String password});
   Future<UserModel> signUp({required SignupParams params});
   Future<void> signOut();
   Future<UserModel?> getCurrentUser();
@@ -21,11 +25,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<UserModel> signIn({
-    required String email,
+    required String username,
     required String password,
   }) async {
     final response = await client.auth.signInWithPassword(
-      email: email,
+      email: _usernameToEmail(username),
       password: password,
     );
     return _fetchUserProfile(response.user!.id);
@@ -34,7 +38,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserModel> signUp({required SignupParams params}) async {
     final response = await client.auth.signUp(
-      email: params.email,
+      email: _usernameToEmail(params.username),
       password: params.password,
       data: params.toMetadata(),
     );

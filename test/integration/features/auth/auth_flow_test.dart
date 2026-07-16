@@ -36,7 +36,7 @@ class MockNetworkInfo extends Mock implements NetworkInfo {}
 
 const testDonorModel = UserModel(
   id: 'user-123',
-  email: 'test@test.com',
+  email: 'testuser@tabara3.dz',
   username: 'testuser',
   fullName: 'Test User',
   bloodType: 'O+',
@@ -45,7 +45,7 @@ const testDonorModel = UserModel(
 
 const testRecipientModel = UserModel(
   id: 'user-123',
-  email: 'test@test.com',
+  email: 'testuser@tabara3.dz',
   username: 'testuser',
   fullName: 'Test User',
   bloodType: 'O+',
@@ -55,7 +55,7 @@ const testRecipientModel = UserModel(
 
 const testUserModel = UserModel(
   id: 'user-123',
-  email: 'test@test.com',
+  email: 'testuser@tabara3.dz',
   username: 'testuser',
   fullName: 'Test User',
   bloodType: 'O+',
@@ -74,16 +74,16 @@ void registerAllDependencies({
     () => AuthRepositoryImpl(remoteDataSource: sl(), networkInfo: sl()),
   );
 
-  sl.registerLazySingleton(() => LoginWithEmailPassword(sl()));
-  sl.registerLazySingleton(() => SignupWithEmailPassword(sl()));
+  sl.registerLazySingleton(() => LoginWithUsernamePassword(sl()));
+  sl.registerLazySingleton(() => SignupWithUsernamePassword(sl()));
   sl.registerLazySingleton(() => SignOut(sl()));
   sl.registerLazySingleton(() => GetCurrentSession(sl()));
   sl.registerLazySingleton(() => UpdateUserRole(sl()));
 
   sl.registerFactory(
     () => AuthBloc(
-      loginWithEmailPassword: sl(),
-      signupWithEmailPassword: sl(),
+      loginWithUsernamePassword: sl(),
+      signupWithUsernamePassword: sl(),
       signOutUseCase: sl(),
       getCurrentSession: sl(),
       updateUserRole: sl(),
@@ -113,7 +113,6 @@ void main() {
       SignupParams(
         username: 'fallback',
         fullName: 'fallback',
-        email: 'fallback@test.com',
         password: 'fallback',
         phone: '0000',
         dateOfBirth: DateTime(2000),
@@ -122,7 +121,7 @@ void main() {
         city: 'fallback',
       ),
     );
-    registerFallbackValue(LoginParams(email: 'fallback', password: 'fallback'));
+    registerFallbackValue(LoginParams(username: 'fallback', password: 'fallback'));
     registerFallbackValue(NoParams());
     registerFallbackValue(
       const UpdateRoleParams(isDonor: false, isRecipient: false),
@@ -163,7 +162,7 @@ void main() {
 
         when(
           () => mockDataSource.signIn(
-            email: any(named: 'email'),
+            username: any(named: 'username'),
             password: any(named: 'password'),
           ),
         ).thenAnswer((_) async => testUserModel);
@@ -219,7 +218,7 @@ void main() {
 
         when(
           () => mockDataSource.signIn(
-            email: any(named: 'email'),
+            username: any(named: 'username'),
             password: any(named: 'password'),
           ),
         ).thenAnswer((_) async => testUserModel);
@@ -251,7 +250,6 @@ void main() {
         ).thenAnswer((_) async {
           final updatedModel = UserModel(
             id: 'user-123',
-            email: 'test@test.com',
             username: 'testuser',
             fullName: 'Test User',
             bloodType: 'O+',
@@ -283,7 +281,7 @@ void main() {
 
         when(
           () => mockDataSource.signIn(
-            email: any(named: 'email'),
+            username: any(named: 'username'),
             password: any(named: 'password'),
           ),
         ).thenThrow(Exception('Invalid credentials'));
@@ -328,8 +326,7 @@ void main() {
         await tester.enterText(step1Fields.at(0), 'Test User');
         await tester.enterText(step1Fields.at(1), 'testuser');
         await tester.enterText(step1Fields.at(2), '0555123456');
-        await tester.enterText(step1Fields.at(3), 'test@test.com');
-        await tester.enterText(step1Fields.at(4), 'password123');
+        await tester.enterText(step1Fields.at(3), 'password123');
 
         await tester.ensureVisible(
           find.widgetWithText(ElevatedButton, 'التالي'),
@@ -380,7 +377,6 @@ void main() {
       ) async {
         final sessionUser = UserModel(
           id: 'user-456',
-          email: 'donor@test.com',
           username: 'donoruser',
           fullName: 'Donor User',
           bloodType: 'A+',
@@ -459,7 +455,7 @@ void main() {
 
         when(
           () => mockDataSource.signIn(
-            email: any(named: 'email'),
+            username: any(named: 'username'),
             password: any(named: 'password'),
           ),
         ).thenAnswer((_) async => testUserModel);
@@ -504,7 +500,7 @@ void main() {
 
         when(
           () => mockDataSource.signIn(
-            email: any(named: 'email'),
+            username: any(named: 'username'),
             password: any(named: 'password'),
           ),
         ).thenAnswer((_) async => testUserModel);

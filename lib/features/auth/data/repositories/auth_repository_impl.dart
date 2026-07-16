@@ -18,8 +18,8 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
-  Future<Either<Failure, UserEntity>> loginWithEmailPassword({
-    required String email,
+  Future<Either<Failure, UserEntity>> loginWithUsernamePassword({
+    required String username,
     required String password,
   }) async {
     if (!await networkInfo.isConnected) {
@@ -27,7 +27,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
     try {
       final userModel = await remoteDataSource.signIn(
-        email: email,
+        username: username,
         password: password,
       );
       return Right(userModel.toEntity());
@@ -37,7 +37,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserEntity>> signupWithEmailPassword({
+  Future<Either<Failure, UserEntity>> signupWithUsernamePassword({
     required SignupParams params,
   }) async {
     if (!await networkInfo.isConnected) {

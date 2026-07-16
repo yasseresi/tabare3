@@ -14,21 +14,17 @@ import 'package:tabare3/features/auth/domain/usecases/signup_with_email_password
 import 'package:tabare3/features/auth/domain/usecases/update_user_role.dart';
 import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
 
-class MockLoginWithEmailPassword extends Mock
-    implements LoginWithEmailPassword {}
-
-class MockSignupWithEmailPassword extends Mock
-    implements SignupWithEmailPassword {}
-
+class MockLoginWithUsernamePassword extends Mock
+    implements LoginWithUsernamePassword {}
+class MockSignupWithUsernamePassword extends Mock
+    implements SignupWithUsernamePassword {}
 class MockSignOut extends Mock implements SignOut {}
-
 class MockGetCurrentSession extends Mock implements GetCurrentSession {}
-
 class MockUpdateUserRole extends Mock implements UpdateUserRole {}
 
 const testUser = UserEntity(
   id: '123',
-  email: 'test@test.com',
+  email: 'testuser@tabara3.dz',
   username: 'testuser',
   fullName: 'Test User',
   bloodType: 'O+',
@@ -37,43 +33,38 @@ const testUser = UserEntity(
 
 void main() {
   late AuthBloc bloc;
-  late MockLoginWithEmailPassword mockLogin;
-  late MockSignupWithEmailPassword mockSignup;
+  late MockLoginWithUsernamePassword mockLogin;
+  late MockSignupWithUsernamePassword mockSignup;
   late MockSignOut mockSignOut;
   late MockGetCurrentSession mockGetCurrentSession;
   late MockUpdateUserRole mockUpdateUserRole;
 
   setUpAll(() {
-    registerFallbackValue(
-      SignupParams(
-        username: 'fallback',
-        fullName: 'fallback',
-        email: 'fallback@test.com',
-        password: 'fallback',
-        phone: '0000',
-        dateOfBirth: DateTime(2000),
-        gender: 'male',
-        bloodType: 'O+',
-        city: 'fallback',
-      ),
-    );
-    registerFallbackValue(LoginParams(email: 'fallback', password: 'fallback'));
+    registerFallbackValue(SignupParams(
+      username: 'fallback',
+      fullName: 'fallback',
+      password: 'fallback',
+      phone: '0000',
+      dateOfBirth: DateTime(2000),
+      gender: 'male',
+      bloodType: 'O+',
+      city: 'fallback',
+    ));
+    registerFallbackValue(LoginParams(username: 'fallback', password: 'fallback'));
     registerFallbackValue(NoParams());
-    registerFallbackValue(
-      const UpdateRoleParams(isDonor: false, isRecipient: false),
-    );
+    registerFallbackValue(const UpdateRoleParams(isDonor: false, isRecipient: false));
   });
 
   setUp(() {
-    mockLogin = MockLoginWithEmailPassword();
-    mockSignup = MockSignupWithEmailPassword();
+    mockLogin = MockLoginWithUsernamePassword();
+    mockSignup = MockSignupWithUsernamePassword();
     mockSignOut = MockSignOut();
     mockGetCurrentSession = MockGetCurrentSession();
     mockUpdateUserRole = MockUpdateUserRole();
 
     bloc = AuthBloc(
-      loginWithEmailPassword: mockLogin,
-      signupWithEmailPassword: mockSignup,
+      loginWithUsernamePassword: mockLogin,
+      signupWithUsernamePassword: mockSignup,
       signOutUseCase: mockSignOut,
       getCurrentSession: mockGetCurrentSession,
       updateUserRole: mockUpdateUserRole,
@@ -88,28 +79,28 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, Authenticated] on success',
       build: () {
-        when(
-          () => mockLogin(any()),
-        ).thenAnswer((_) async => const Right(testUser));
+        when(() => mockLogin(any()))
+            .thenAnswer((_) async => const Right(testUser));
         return bloc;
       },
-      act: (bloc) => bloc.add(
-        const LoginRequested(email: 'test@test.com', password: 'password'),
-      ),
+      act: (bloc) => bloc.add(const LoginRequested(
+        username: 'testuser',
+        password: 'password',
+      )),
       expect: () => [isA<AuthLoading>(), const Authenticated(testUser)],
     );
 
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthError] on failure',
       build: () {
-        when(
-          () => mockLogin(any()),
-        ).thenAnswer((_) async => const Left(AuthFailure()));
+        when(() => mockLogin(any()))
+            .thenAnswer((_) async => const Left(AuthFailure()));
         return bloc;
       },
-      act: (bloc) => bloc.add(
-        const LoginRequested(email: 'wrong@test.com', password: 'wrong'),
-      ),
+      act: (bloc) => bloc.add(const LoginRequested(
+        username: 'wrong',
+        password: 'wrong',
+      )),
       expect: () => [isA<AuthLoading>(), isA<AuthError>()],
     );
   });
@@ -118,7 +109,6 @@ void main() {
     final signupParams = SignupParams(
       username: 'testuser',
       fullName: 'Test User',
-      email: 'test@test.com',
       password: 'password',
       phone: '0555123456',
       dateOfBirth: DateTime(2000, 1, 1),
@@ -130,9 +120,8 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, Authenticated] on success',
       build: () {
-        when(
-          () => mockSignup(any()),
-        ).thenAnswer((_) async => const Right(testUser));
+        when(() => mockSignup(any()))
+            .thenAnswer((_) async => const Right(testUser));
         return bloc;
       },
       act: (bloc) => bloc.add(SignupRequested(signupParams)),
@@ -144,9 +133,8 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, Unauthenticated] on success',
       build: () {
-        when(
-          () => mockSignOut(any()),
-        ).thenAnswer((_) async => const Right(null));
+        when(() => mockSignOut(any()))
+            .thenAnswer((_) async => const Right(null));
         return bloc;
       },
       act: (bloc) => bloc.add(SignOutRequested()),
@@ -158,9 +146,8 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, Authenticated] when session exists',
       build: () {
-        when(
-          () => mockGetCurrentSession(any()),
-        ).thenAnswer((_) async => const Right(testUser));
+        when(() => mockGetCurrentSession(any()))
+            .thenAnswer((_) async => const Right(testUser));
         return bloc;
       },
       act: (bloc) => bloc.add(SessionCheckRequested()),
@@ -170,9 +157,8 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, Unauthenticated] when no session',
       build: () {
-        when(
-          () => mockGetCurrentSession(any()),
-        ).thenAnswer((_) async => const Right(null));
+        when(() => mockGetCurrentSession(any()))
+            .thenAnswer((_) async => const Right(null));
         return bloc;
       },
       act: (bloc) => bloc.add(SessionCheckRequested()),
@@ -184,14 +170,14 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, RoleUpdated] on success',
       build: () {
-        when(
-          () => mockUpdateUserRole(any()),
-        ).thenAnswer((_) async => const Right(testUser));
+        when(() => mockUpdateUserRole(any()))
+            .thenAnswer((_) async => const Right(testUser));
         return bloc;
       },
-      act: (bloc) => bloc.add(
-        const UpdateRoleRequested(isDonor: true, isRecipient: false),
-      ),
+      act: (bloc) => bloc.add(const UpdateRoleRequested(
+        isDonor: true,
+        isRecipient: false,
+      )),
       expect: () => [isA<AuthLoading>(), isA<RoleUpdated>()],
     );
   });

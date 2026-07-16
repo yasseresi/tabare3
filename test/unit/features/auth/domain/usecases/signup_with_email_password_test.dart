@@ -10,34 +10,30 @@ import 'package:tabare3/features/auth/domain/usecases/signup_with_email_password
 class MockAuthRepository extends Mock implements AuthRepository {}
 
 void main() {
-  late SignupWithEmailPassword usecase;
+  late SignupWithUsernamePassword usecase;
   late MockAuthRepository mockRepository;
 
   setUpAll(() {
-    registerFallbackValue(
-      SignupParams(
-        username: 'fallback',
-        fullName: 'fallback',
-        email: 'fallback@test.com',
-        password: 'fallback',
-        phone: '0000',
-        dateOfBirth: DateTime(2000),
-        gender: 'male',
-        bloodType: 'O+',
-        city: 'fallback',
-      ),
-    );
+    registerFallbackValue(SignupParams(
+      username: 'fallback',
+      fullName: 'fallback',
+      password: 'fallback',
+      phone: '0000',
+      dateOfBirth: DateTime(2000),
+      gender: 'male',
+      bloodType: 'O+',
+      city: 'fallback',
+    ));
   });
 
   setUp(() {
     mockRepository = MockAuthRepository();
-    usecase = SignupWithEmailPassword(mockRepository);
+    usecase = SignupWithUsernamePassword(mockRepository);
   });
 
   final testParams = SignupParams(
     username: 'testuser',
     fullName: 'Test User',
-    email: 'test@test.com',
     password: 'password123',
     phone: '0555123456',
     dateOfBirth: DateTime(2000, 1, 1),
@@ -49,30 +45,26 @@ void main() {
   test('should return UserEntity when repository returns Right', () async {
     const testUser = UserEntity(
       id: '123',
-      email: 'test@test.com',
+      email: 'testuser@tabara3.dz',
       username: 'testuser',
       fullName: 'Test User',
       bloodType: 'O+',
     );
-    when(
-      () =>
-          mockRepository.signupWithEmailPassword(params: any(named: 'params')),
-    ).thenAnswer((_) async => const Right(testUser));
+    when(() => mockRepository.signupWithUsernamePassword(
+          params: any(named: 'params'),
+        )).thenAnswer((_) async => const Right(testUser));
 
     final result = await usecase(testParams);
 
     expect(result, const Right(testUser));
-    verify(
-      () => mockRepository.signupWithEmailPassword(params: testParams),
-    ).called(1);
+    verify(() => mockRepository.signupWithUsernamePassword(params: testParams)).called(1);
   });
 
   test('should return Failure when repository returns Left', () async {
-    const failure = AuthFailure(-9, 'Email already registered');
-    when(
-      () =>
-          mockRepository.signupWithEmailPassword(params: any(named: 'params')),
-    ).thenAnswer((_) async => const Left(failure));
+    const failure = AuthFailure(-9, 'Username already taken');
+    when(() => mockRepository.signupWithUsernamePassword(
+          params: any(named: 'params'),
+        )).thenAnswer((_) async => const Left(failure));
 
     final result = await usecase(testParams);
 

@@ -22,13 +22,13 @@ class LoginFormScreen extends StatefulWidget {
 }
 
 class _LoginFormScreenState extends State<LoginFormScreen> {
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _rememberMe = false;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -36,7 +36,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
   void _dispatchLogin(AuthBloc bloc) {
     bloc.add(
       LoginRequested(
-        email: _emailController.text.trim(),
+        username: _usernameController.text.trim(),
         password: _passwordController.text,
       ),
     );
@@ -97,8 +97,8 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                         AppTextField(
                           hintText: 'اسم المستخدم',
                           prefixIcon: Icons.person_outline,
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
+                          controller: _usernameController,
+                          keyboardType: TextInputType.text,
                         ),
                         const SizedBox(height: AppSize.s16),
                         AppTextField(
