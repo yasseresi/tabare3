@@ -29,13 +29,11 @@ class AppDialog extends StatelessWidget {
     this.onAction,
   }) : type = AppDialogType.error;
 
-  const AppDialog.loading({
-    super.key,
-    required this.title,
-  })  : message = null,
-        actionLabel = null,
-        onAction = null,
-        type = AppDialogType.loading;
+  const AppDialog.loading({super.key, required this.title})
+    : message = null,
+      actionLabel = null,
+      onAction = null,
+      type = AppDialogType.loading;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +56,11 @@ class AppDialog extends StatelessWidget {
     switch (type) {
       case AppDialogType.success:
         return [
-          Icon(Icons.check_circle, color: ColorManager.secondary, size: AppSize.s60),
+          Icon(
+            Icons.check_circle,
+            color: ColorManager.secondary,
+            size: AppSize.s60,
+          ),
           const SizedBox(height: AppSize.s10),
           Text(
             title,
@@ -84,7 +86,11 @@ class AppDialog extends StatelessWidget {
         ];
       case AppDialogType.error:
         return [
-          Icon(Icons.error_outline, color: ColorManager.error, size: AppSize.s60),
+          Icon(
+            Icons.error_outline,
+            color: ColorManager.error,
+            size: AppSize.s60,
+          ),
           const SizedBox(height: AppSize.s10),
           Text(
             title,

@@ -100,7 +100,10 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
                           color: Color(0xFFF5F5F5),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.notifications_none_rounded, color: Colors.black),
+                        child: const Icon(
+                          Icons.notifications_none_rounded,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
                   ],
@@ -110,10 +113,7 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
                 _buildStatsCard(),
                 const SizedBox(height: 30),
                 // Content based on state
-                if (!_hasRequests)
-                  _buildEmptyState()
-                else
-                  _buildActiveState(),
+                if (!_hasRequests) _buildEmptyState() else _buildActiveState(),
                 const SizedBox(height: 100),
               ],
             ),
@@ -144,9 +144,14 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: _hasRequests ? const Color(0xFFE8F5E9) : const Color(0xFFFFEBEE),
+                  color: _hasRequests
+                      ? const Color(0xFFE8F5E9)
+                      : const Color(0xFFFFEBEE),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -206,7 +211,11 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
                 child: Image.asset(
                   'assets/images/demo.png',
                   height: 100,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.bloodtype, color: Color(0xFF8B1D1D), size: 80),
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.bloodtype,
+                    color: Color(0xFF8B1D1D),
+                    size: 80,
+                  ),
                 ),
               ),
             ],
@@ -236,13 +245,7 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
             color: Colors.black,
           ),
         ),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.grey,
-          ),
-        ),
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
       ],
     );
   }
@@ -353,10 +356,7 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
                   const SizedBox(width: 12),
                   const Text(
                     'علي بن محمد',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -384,7 +384,11 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
               ),
               Text(
                 '1/3',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF8B1D1D)),
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF8B1D1D),
+                ),
               ),
             ],
           ),
@@ -395,7 +399,9 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
               value: 0.33,
               minHeight: 8,
               backgroundColor: const Color(0xFFEEEEEE),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B1D1D)),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                Color(0xFF8B1D1D),
+              ),
             ),
           ),
           const SizedBox(height: 20),
@@ -406,7 +412,9 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const EditRequestScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const EditRequestScreen(),
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -417,7 +425,10 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
               ),
               child: const Text(
                 'تعديل الطلب',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -438,7 +449,11 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
         children: [
           Text(
             label,
-            style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 10,
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(width: 4),
           Icon(Icons.circle, size: 6, color: color),
@@ -453,10 +468,7 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 14, color: Colors.grey),
-          ),
+          Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
           Text(
             value,
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),

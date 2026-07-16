@@ -155,9 +155,18 @@ ThemeData getAppTheme() {
         borderRadius: BorderRadius.circular(AppSize.radiusLarge),
         borderSide: BorderSide(color: ColorManager.error, width: AppSize.s1),
       ),
-      hintStyle: getRegularStyle(color: ColorManager.textLight, fontSize: FontSize.s14),
-      labelStyle: getMediumStyle(color: ColorManager.textMuted, fontSize: FontSize.s14),
-      errorStyle: getRegularStyle(color: ColorManager.error, fontSize: FontSize.s12),
+      hintStyle: getRegularStyle(
+        color: ColorManager.textLight,
+        fontSize: FontSize.s14,
+      ),
+      labelStyle: getMediumStyle(
+        color: ColorManager.textMuted,
+        fontSize: FontSize.s14,
+      ),
+      errorStyle: getRegularStyle(
+        color: ColorManager.error,
+        fontSize: FontSize.s12,
+      ),
       prefixIconColor: ColorManager.textLight,
       suffixIconColor: ColorManager.textLight,
     ),
@@ -171,14 +180,12 @@ ThemeData getAppTheme() {
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.all(ColorManager.white),
       trackColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected)) return ColorManager.secondary;
+        if (states.contains(WidgetState.selected))
+          return ColorManager.secondary;
         return ColorManager.dividerGrey;
       }),
     ),
-    iconTheme: IconThemeData(
-      color: ColorManager.textMuted,
-      size: AppSize.s24,
-    ),
+    iconTheme: IconThemeData(color: ColorManager.textMuted, size: AppSize.s24),
     dividerTheme: DividerThemeData(
       color: ColorManager.dividerGrey,
       thickness: AppSize.s1,

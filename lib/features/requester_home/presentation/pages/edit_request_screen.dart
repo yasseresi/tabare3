@@ -32,20 +32,13 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                     color: Color(0xFF4CAF50),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.check,
-                    color: Colors.white,
-                    size: 50,
-                  ),
+                  child: const Icon(Icons.check, color: Colors.white, size: 50),
                 ),
                 const SizedBox(height: 25),
                 const Text(
                   'تم التعديل بنجاح',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 18, color: Colors.grey),
                 ),
                 const SizedBox(height: 10),
                 Image.asset(
@@ -127,17 +120,28 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                 // Form Fields
                 _buildTextField('عدد الأكياس المطلوبة', Icons.tag),
                 const SizedBox(height: 15),
-                _buildTextField('الولاية', Icons.map_outlined, isDropdown: true),
+                _buildTextField(
+                  'الولاية',
+                  Icons.map_outlined,
+                  isDropdown: true,
+                ),
                 const SizedBox(height: 15),
                 _buildTextField('اسم المستشفى', Icons.local_hospital_outlined),
                 const SizedBox(height: 15),
                 _buildTextField('تاريخ آخر أجل', Icons.calendar_today_outlined),
                 const SizedBox(height: 15),
-                _buildTextField('ملاحظات', Icons.sticky_note_2_outlined, isMultiline: true),
+                _buildTextField(
+                  'ملاحظات',
+                  Icons.sticky_note_2_outlined,
+                  isMultiline: true,
+                ),
                 const SizedBox(height: 30),
                 // Request Status Toggle
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -159,11 +163,17 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                         children: [
                           const Text(
                             'حالة الطلب',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
                           ),
                           Text(
                             _requestStatus ? 'نشط / اغلاق' : 'غير نشط',
-                            style: const TextStyle(color: Colors.grey, fontSize: 11),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 11,
+                            ),
                           ),
                         ],
                       ),
@@ -249,10 +259,7 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
             ),
             Text(
               'تعديل طلب التبرع',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
           ],
         ),
@@ -264,7 +271,11 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
               color: Color(0xFFF5F5F5),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black, size: 20),
+            child: const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: Colors.black,
+              size: 20,
+            ),
           ),
         ),
       ],
@@ -343,14 +354,21 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
     );
   }
 
-  Widget _buildTextField(String hint, IconData icon, {bool isMultiline = false, bool isDropdown = false}) {
+  Widget _buildTextField(
+    String hint,
+    IconData icon, {
+    bool isMultiline = false,
+    bool isDropdown = false,
+  }) {
     return TextField(
       maxLines: isMultiline ? 4 : 1,
       readOnly: isDropdown,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.grey),
-        prefixIcon: isDropdown ? const Icon(Icons.keyboard_arrow_down, color: Colors.grey) : null,
+        prefixIcon: isDropdown
+            ? const Icon(Icons.keyboard_arrow_down, color: Colors.grey)
+            : null,
         suffixIcon: Icon(icon, color: Colors.grey),
         filled: true,
         fillColor: const Color(0xFFF5F5F5),

@@ -61,10 +61,7 @@ class _RequesterProfileScreenState extends State<RequesterProfileScreen> {
               ),
               Text(
                 'نتمنى لك الشفاء العاجل',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -111,10 +108,7 @@ class _RequesterProfileScreenState extends State<RequesterProfileScreen> {
         ),
         const Text(
           'louciftamer3@gmail.com',
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey,
-          ),
+          style: TextStyle(fontSize: 14, color: Colors.grey),
         ),
         const SizedBox(height: 15),
         GestureDetector(
@@ -140,10 +134,7 @@ class _RequesterProfileScreenState extends State<RequesterProfileScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Icon(
-                  _isEditing ? Icons.check : Icons.edit_outlined,
-                  size: 16,
-                ),
+                Icon(_isEditing ? Icons.check : Icons.edit_outlined, size: 16),
               ],
             ),
           ),
@@ -276,9 +267,13 @@ class _RequesterProfileScreenState extends State<RequesterProfileScreen> {
         ),
         child: Row(
           children: const [
-             Icon(Icons.arrow_back_ios_new_rounded, color: Colors.grey, size: 16),
-             Spacer(),
-             Text(
+            Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.grey,
+              size: 16,
+            ),
+            Spacer(),
+            Text(
               'معلومات التطبيق',
               style: TextStyle(
                 fontSize: 16,
@@ -286,8 +281,8 @@ class _RequesterProfileScreenState extends State<RequesterProfileScreen> {
                 color: Colors.grey,
               ),
             ),
-             SizedBox(width: 15),
-             Icon(Icons.info_outline, color: Colors.grey, size: 24),
+            SizedBox(width: 15),
+            Icon(Icons.info_outline, color: Colors.grey, size: 24),
           ],
         ),
       ),
@@ -319,7 +314,11 @@ class _RequesterProfileScreenState extends State<RequesterProfileScreen> {
             )
           else ...[
             if (isDropdown)
-              const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 20),
+              const Icon(
+                Icons.keyboard_arrow_down,
+                color: Colors.grey,
+                size: 20,
+              ),
             Text(
               value,
               style: const TextStyle(fontSize: 14, color: Colors.grey),

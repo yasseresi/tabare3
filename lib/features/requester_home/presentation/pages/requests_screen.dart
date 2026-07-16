@@ -13,7 +13,10 @@ class RequestsScreen extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 20,
+              ),
               child: Column(
                 children: [
                   // Header
@@ -46,7 +49,10 @@ class RequestsScreen extends StatelessWidget {
                           color: Color(0xFFF5F5F5),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.notifications_none_rounded, color: Colors.black),
+                        child: const Icon(
+                          Icons.notifications_none_rounded,
+                          color: Colors.black,
+                        ),
                       ),
                     ],
                   ),
@@ -61,7 +67,10 @@ class RequestsScreen extends StatelessWidget {
                       suffixIcon: const Icon(Icons.search, color: Colors.grey),
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
                         borderSide: BorderSide(color: Colors.grey[300]!),
@@ -161,10 +170,7 @@ class RequestsScreen extends StatelessWidget {
                   const SizedBox(width: 12),
                   const Text(
                     'علي بن محمد',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -172,7 +178,11 @@ class RequestsScreen extends StatelessWidget {
                 children: [
                   if (isCritical) _buildBadge('حرج', Colors.red),
                   const SizedBox(width: 8),
-                  _buildBadge(status, statusColor, backgroundColor: backgroundColor),
+                  _buildBadge(
+                    status,
+                    statusColor,
+                    backgroundColor: backgroundColor,
+                  ),
                 ],
               ),
             ],
@@ -192,7 +202,11 @@ class RequestsScreen extends StatelessWidget {
               ),
               Text(
                 bags,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF8B1D1D)),
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF8B1D1D),
+                ),
               ),
             ],
           ),
@@ -203,7 +217,9 @@ class RequestsScreen extends StatelessWidget {
               value: progress,
               minHeight: 8,
               backgroundColor: const Color(0xFFEEEEEE),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B1D1D)),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                Color(0xFF8B1D1D),
+              ),
             ),
           ),
           const SizedBox(height: 20),
@@ -225,7 +241,11 @@ class RequestsScreen extends StatelessWidget {
                       ),
                       child: const Text(
                         'المتبرعين المتاحين',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                   ),
@@ -239,7 +259,9 @@ class RequestsScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const EditRequestScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const EditRequestScreen(),
+                        ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -251,7 +273,10 @@ class RequestsScreen extends StatelessWidget {
                     ),
                     child: const Text(
                       'تعديل الطلب',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -277,7 +302,11 @@ class RequestsScreen extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             label,
-            style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 10,
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
@@ -290,10 +319,7 @@ class RequestsScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 14, color: Colors.grey),
-          ),
+          Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
           Text(
             value,
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),

@@ -11,7 +11,10 @@ class DonorRecordScreen extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 20,
+              ),
               child: Column(
                 children: [
                   // Header
@@ -23,11 +26,17 @@ class DonorRecordScreen extends StatelessWidget {
                         children: [
                           const Text(
                             'مرحباً، أحمد',
-                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           Text(
                             'كل تبرع بالدم هو فرصة جديدة للحياة',
-                            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
                           ),
                         ],
                       ),
@@ -37,7 +46,10 @@ class DonorRecordScreen extends StatelessWidget {
                           color: Color(0xFFF5F5F5),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.notifications_none_rounded, color: Colors.black),
+                        child: const Icon(
+                          Icons.notifications_none_rounded,
+                          color: Colors.black,
+                        ),
                       ),
                     ],
                   ),
@@ -77,7 +89,11 @@ class DonorRecordScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Icon(Icons.local_hospital_rounded, color: Colors.white, size: 60),
+                        const Icon(
+                          Icons.local_hospital_rounded,
+                          color: Colors.white,
+                          size: 60,
+                        ),
                       ],
                     ),
                   ),
@@ -171,8 +187,16 @@ class DonorRecordScreen extends StatelessWidget {
           ),
           const SizedBox(height: 15),
           _buildInfoRow('المريض', patient, valueColor: const Color(0xFF8B1D1D)),
-          _buildInfoRow('تاريخ التبرع', date, valueColor: const Color(0xFF8B1D1D)),
-          _buildInfoRow('الموقع', location, valueColor: const Color(0xFF8B1D1D)),
+          _buildInfoRow(
+            'تاريخ التبرع',
+            date,
+            valueColor: const Color(0xFF8B1D1D),
+          ),
+          _buildInfoRow(
+            'الموقع',
+            location,
+            valueColor: const Color(0xFF8B1D1D),
+          ),
         ],
       ),
     );
@@ -187,7 +211,11 @@ class DonorRecordScreen extends StatelessWidget {
           Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
           Text(
             value,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: valueColor ?? Colors.black),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: valueColor ?? Colors.black,
+            ),
           ),
         ],
       ),

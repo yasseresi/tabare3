@@ -328,10 +328,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             prefixIcon: Icon(Icons.opacity),
           ),
           items: const ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
-              .map((type) => DropdownMenuItem(
-                    value: type,
-                    child: Text(type),
-                  ))
+              .map((type) => DropdownMenuItem(value: type, child: Text(type)))
               .toList(),
           onChanged: (v) => _bloodTypeController.text = v ?? '',
         ),
@@ -411,9 +408,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           onAction: () {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
-                builder: (_) => const RoleSelectionScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
               (route) => false,
             );
           },

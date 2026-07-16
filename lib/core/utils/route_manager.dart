@@ -3,7 +3,8 @@ import '../../features/splash/presentation/pages/splash_screen.dart';
 import '../../features/auth/presentation/pages/role_selection_screen.dart';
 import '../../features/auth/presentation/pages/welcome_screen.dart';
 import '../../features/auth/presentation/pages/login_form_screen.dart';
-import '../../features/auth/presentation/pages/signup_screen.dart' show SignUpScreen;
+import '../../features/auth/presentation/pages/signup_screen.dart'
+    show SignUpScreen;
 import '../../features/requester_home/presentation/pages/requester_home_screen.dart';
 import '../../features/requester_home/presentation/pages/create_request_screen.dart';
 import '../../features/requester_home/presentation/pages/edit_request_screen.dart';
@@ -75,7 +76,9 @@ class RouteGenerator {
       case Routes.donorHistoryRoute:
         return MaterialPageRoute(builder: (_) => const DonorHistoryScreen());
       case Routes.requesterProfileRoute:
-        return MaterialPageRoute(builder: (_) => const RequesterProfileScreen());
+        return MaterialPageRoute(
+          builder: (_) => const RequesterProfileScreen(),
+        );
 
       // Donor
       case Routes.donorHomeRoute:
@@ -83,7 +86,9 @@ class RouteGenerator {
       case Routes.donorRequestsRoute:
         return MaterialPageRoute(builder: (_) => const DonorRequestsScreen());
       case Routes.donorAppointmentsRoute:
-        return MaterialPageRoute(builder: (_) => const DonorAppointmentsScreen());
+        return MaterialPageRoute(
+          builder: (_) => const DonorAppointmentsScreen(),
+        );
       case Routes.donorCardRoute:
         return MaterialPageRoute(builder: (_) => const DonorCardScreen());
       case Routes.donorCardInfoRoute:

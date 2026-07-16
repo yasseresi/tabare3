@@ -35,10 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const Text(
                   'هل أنت متأكد من تسجيل الخروج؟',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 15),
                 const Text(
@@ -163,7 +160,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             _isEditing = !_isEditing;
                           });
                         },
-                        icon: Icon(_isEditing ? Icons.check : Icons.edit_outlined),
+                        icon: Icon(
+                          _isEditing ? Icons.check : Icons.edit_outlined,
+                        ),
                       ),
                     ],
                   ),
@@ -184,7 +183,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const DonorCardScreen()),
+                            MaterialPageRoute(
+                              builder: (context) => const DonorCardScreen(),
+                            ),
                           );
                         },
                       ),
@@ -213,10 +214,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: _buildAccountSettings(),
                 ),
                 const SizedBox(height: 20),
-                _buildSection(
-                  title: 'عن التطبيق',
-                  child: _buildAboutSection(),
-                ),
+                _buildSection(title: 'عن التطبيق', child: _buildAboutSection()),
                 const SizedBox(height: 40),
                 // Logout Button
                 Padding(
@@ -241,7 +239,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           SizedBox(width: 10),
                           Text(
                             'تسجيل الخروج',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
@@ -284,7 +285,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     color: Color(0xFF8B1D1D),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                  child: const Icon(
+                    Icons.camera_alt,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                 ),
               ),
           ],
@@ -302,7 +307,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildQuickAction({required IconData icon, required String label, required VoidCallback onTap}) {
+  Widget _buildQuickAction({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -316,7 +325,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Icon(icon, color: const Color(0xFF8B1D1D)),
           ),
           const SizedBox(height: 8),
-          Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );
@@ -359,11 +371,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         _buildInfoRow('الاسم الكامل', 'أحمد لوصيف', Icons.person_outline),
         const Divider(height: 30),
-        _buildInfoRow('تاريخ الميلاد', '12 ماي 1995', Icons.calendar_today_outlined),
+        _buildInfoRow(
+          'تاريخ الميلاد',
+          '12 ماي 1995',
+          Icons.calendar_today_outlined,
+        ),
         const Divider(height: 30),
         _buildInfoRow('فصيلة الدم', 'O+', Icons.opacity),
         const Divider(height: 30),
-        _buildInfoRow('الولاية', 'قسنطينة', Icons.location_on_outlined, isDropdown: _isEditing),
+        _buildInfoRow(
+          'الولاية',
+          'قسنطينة',
+          Icons.location_on_outlined,
+          isDropdown: _isEditing,
+        ),
       ],
     );
   }
@@ -381,7 +402,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const RoleSelectionScreen()),
+              MaterialPageRoute(
+                builder: (context) => const RoleSelectionScreen(),
+              ),
             );
           },
         ),
@@ -403,7 +426,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text('حالة الحساب', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    const Text(
+                      'حالة الحساب',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
                     Text(
                       _accountStatus ? 'نشط / غير متاح حالياً' : 'غير نشط',
                       style: const TextStyle(color: Colors.grey, fontSize: 11),
@@ -412,13 +441,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
                 const SizedBox(width: 15),
-                const Icon(Icons.power_settings_new_rounded, color: Colors.grey),
+                const Icon(
+                  Icons.power_settings_new_rounded,
+                  color: Colors.grey,
+                ),
               ],
             ),
           ],
         ),
         const Divider(height: 30),
-        _buildInfoRow('تغيير اللغة', 'العربية', Icons.language_outlined, isDropdown: true, onTap: _showLanguageDialog),
+        _buildInfoRow(
+          'تغيير اللغة',
+          'العربية',
+          Icons.language_outlined,
+          isDropdown: true,
+          onTap: _showLanguageDialog,
+        ),
       ],
     );
   }
@@ -435,7 +473,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value, IconData icon, {bool isDropdown = false, VoidCallback? onTap}) {
+  Widget _buildInfoRow(
+    String label,
+    String value,
+    IconData icon, {
+    bool isDropdown = false,
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Row(
@@ -444,7 +488,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           if (isDropdown && _isEditing)
             const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 20)
           else if (onTap != null)
-            const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.grey, size: 16)
+            const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.grey,
+              size: 16,
+            )
           else
             const SizedBox(),
           Expanded(
@@ -454,9 +502,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                    Text(
+                      label,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
                     if (value.isNotEmpty)
-                      Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                      Text(
+                        value,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                   ],
                 ),
                 const SizedBox(width: 15),
@@ -472,7 +529,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildLanguageOption(String title, bool isSelected) {
     return ListTile(
       title: Text(title, textAlign: TextAlign.right),
-      trailing: isSelected ? const Icon(Icons.check, color: Color(0xFF8B1D1D)) : null,
+      trailing: isSelected
+          ? const Icon(Icons.check, color: Color(0xFF8B1D1D))
+          : null,
       onTap: () => Navigator.pop(context),
     );
   }

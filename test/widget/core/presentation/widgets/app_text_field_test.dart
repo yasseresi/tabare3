@@ -60,7 +60,9 @@ void main() {
     expect(changedValue, 'test@test.com');
   });
 
-  testWidgets('validator returns error for empty input in Form', (tester) async {
+  testWidgets('validator returns error for empty input in Form', (
+    tester,
+  ) async {
     final formKey = GlobalKey<FormState>();
     String? validationResult;
 

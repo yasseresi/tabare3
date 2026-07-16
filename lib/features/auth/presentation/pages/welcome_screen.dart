@@ -100,7 +100,9 @@ class WelcomeScreen extends StatelessWidget {
                           vertical: AppPadding.p20,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppSize.radiusCircle),
+                          borderRadius: BorderRadius.circular(
+                            AppSize.radiusCircle,
+                          ),
                         ),
                         textStyle: getSemiBoldStyle(
                           fontSize: FontSize.s18,

@@ -7,22 +7,30 @@ import 'package:tabare3/features/auth/data/models/user_model.dart';
 import 'package:tabare3/features/auth/domain/repositories/auth_repository.dart';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
+
 class MockGoTrueClient extends Mock implements GoTrueClient {}
+
 class MockUserResponse extends Mock implements UserResponse {}
+
 class MockAuthResponse extends Mock implements AuthResponse {}
+
 class MockPostgrestClient extends Mock implements PostgrestClient {}
+
 class MockPostgrestQueryBuilder extends Mock implements PostgrestQueryBuilder {}
-class MockPostgrestFilterBuilder extends Mock implements PostgrestFilterBuilder<Map<String, dynamic>> {}
+
+class MockPostgrestFilterBuilder extends Mock
+    implements PostgrestFilterBuilder<Map<String, dynamic>> {}
+
 class MockUser extends Mock implements User {}
 
 const testUserJson = {
   'id': 'user-123',
   'email': 'test@test.com',
   'username': 'testuser',
-  'full_name': 'Test User',
-  'is_donor': false,
-  'is_recipient': false,
-  'blood_type': 'O+',
+  'fullName': 'Test User',
+  'isDonor': false,
+  'isRecipient': false,
+  'bloodType': 'O+',
 };
 
 void main() {
@@ -30,17 +38,19 @@ void main() {
   late MockSupabaseClient mockClient;
 
   setUpAll(() {
-    registerFallbackValue(SignupParams(
-      username: 'fallback',
-      fullName: 'fallback',
-      email: 'fallback@test.com',
-      password: 'fallback',
-      phone: '0000',
-      dateOfBirth: DateTime(2000),
-      gender: 'male',
-      bloodType: 'O+',
-      city: 'fallback',
-    ));
+    registerFallbackValue(
+      SignupParams(
+        username: 'fallback',
+        fullName: 'fallback',
+        email: 'fallback@test.com',
+        password: 'fallback',
+        phone: '0000',
+        dateOfBirth: DateTime(2000),
+        gender: 'male',
+        bloodType: 'O+',
+        city: 'fallback',
+      ),
+    );
   });
 
   setUp(() {

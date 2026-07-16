@@ -14,51 +14,70 @@ import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:tabare3/features/splash/presentation/pages/splash_screen.dart';
 import 'package:dartz/dartz.dart';
 
-class MockLoginWithEmailPassword extends Mock implements LoginWithEmailPassword {}
-class MockSignupWithEmailPassword extends Mock implements SignupWithEmailPassword {}
+class MockLoginWithEmailPassword extends Mock
+    implements LoginWithEmailPassword {}
+
+class MockSignupWithEmailPassword extends Mock
+    implements SignupWithEmailPassword {}
+
 class MockSignOut extends Mock implements SignOut {}
+
 class MockGetCurrentSession extends Mock implements GetCurrentSession {}
+
 class MockUpdateUserRole extends Mock implements UpdateUserRole {}
 
 void main() {
   final sl = GetIt.instance;
 
   setUpAll(() {
-    registerFallbackValue(SignupParams(
-      username: 'fallback',
-      fullName: 'fallback',
-      email: 'fallback@test.com',
-      password: 'fallback',
-      phone: '0000',
-      dateOfBirth: DateTime(2000),
-      gender: 'male',
-      bloodType: 'O+',
-      city: 'fallback',
-    ));
+    registerFallbackValue(
+      SignupParams(
+        username: 'fallback',
+        fullName: 'fallback',
+        email: 'fallback@test.com',
+        password: 'fallback',
+        phone: '0000',
+        dateOfBirth: DateTime(2000),
+        gender: 'male',
+        bloodType: 'O+',
+        city: 'fallback',
+      ),
+    );
     registerFallbackValue(LoginParams(email: 'fallback', password: 'fallback'));
     registerFallbackValue(NoParams());
-    registerFallbackValue(const UpdateRoleParams(isDonor: false, isRecipient: false));
+    registerFallbackValue(
+      const UpdateRoleParams(isDonor: false, isRecipient: false),
+    );
   });
 
   setUp(() {
     sl.reset();
-    sl.registerFactory(() => AuthBloc(
-          loginWithEmailPassword: sl(),
-          signupWithEmailPassword: sl(),
-          signOutUseCase: sl(),
-          getCurrentSession: sl(),
-          updateUserRole: sl(),
-        ));
-    sl.registerLazySingleton<LoginWithEmailPassword>(() => MockLoginWithEmailPassword());
-    sl.registerLazySingleton<SignupWithEmailPassword>(() => MockSignupWithEmailPassword());
+    sl.registerFactory(
+      () => AuthBloc(
+        loginWithEmailPassword: sl(),
+        signupWithEmailPassword: sl(),
+        signOutUseCase: sl(),
+        getCurrentSession: sl(),
+        updateUserRole: sl(),
+      ),
+    );
+    sl.registerLazySingleton<LoginWithEmailPassword>(
+      () => MockLoginWithEmailPassword(),
+    );
+    sl.registerLazySingleton<SignupWithEmailPassword>(
+      () => MockSignupWithEmailPassword(),
+    );
     sl.registerLazySingleton<SignOut>(() => MockSignOut());
     sl.registerLazySingleton<GetCurrentSession>(() => MockGetCurrentSession());
     sl.registerLazySingleton<UpdateUserRole>(() => MockUpdateUserRole());
   });
 
-  testWidgets('SplashScreen renders logo and progress indicator', (tester) async {
-    when(() => sl<GetCurrentSession>().call(any()))
-        .thenAnswer((_) async => const Right(null));
+  testWidgets('SplashScreen renders logo and progress indicator', (
+    tester,
+  ) async {
+    when(
+      () => sl<GetCurrentSession>().call(any()),
+    ).thenAnswer((_) async => const Right(null));
 
     await tester.pumpWidget(const MaterialApp(home: SplashScreen()));
     await tester.pump();

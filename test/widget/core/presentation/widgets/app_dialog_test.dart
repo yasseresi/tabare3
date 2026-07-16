@@ -3,10 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tabare3/core/presentation/widgets/app_dialog.dart';
 
 void main() {
-  Future<void> pumpDialog(
-    WidgetTester tester,
-    AppDialog dialog,
-  ) async {
+  Future<void> pumpDialog(WidgetTester tester, AppDialog dialog) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -72,14 +69,19 @@ void main() {
       );
 
       expect(find.text('خطأ'), findsOneWidget);
-      expect(find.text('البريد الإلكتروني أو كلمة المرور غير صحيحة'), findsOneWidget);
+      expect(
+        find.text('البريد الإلكتروني أو كلمة المرور غير صحيحة'),
+        findsOneWidget,
+      );
       expect(find.text('إعادة المحاولة'), findsOneWidget);
       expect(find.byIcon(Icons.error_outline), findsOneWidget);
     });
   });
 
   group('AppDialog.loading', () {
-    testWidgets('renders title and spinner without action button', (tester) async {
+    testWidgets('renders title and spinner without action button', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -88,7 +90,8 @@ void main() {
                 onPressed: () => showDialog(
                   context: context,
                   barrierDismissible: false,
-                  builder: (_) => const AppDialog.loading(title: 'جاري التحميل'),
+                  builder: (_) =>
+                      const AppDialog.loading(title: 'جاري التحميل'),
                 ),
                 child: const Text('open'),
               ),
@@ -103,7 +106,10 @@ void main() {
       expect(find.text('جاري التحميل'), findsOneWidget);
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       expect(
-        find.descendant(of: find.byType(Dialog), matching: find.byType(ElevatedButton)),
+        find.descendant(
+          of: find.byType(Dialog),
+          matching: find.byType(ElevatedButton),
+        ),
         findsNothing,
       );
     });

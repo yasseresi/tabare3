@@ -12,24 +12,24 @@ class AppButton extends StatelessWidget {
     required this.label,
     this.onPressed,
     this.width,
-  })  : _isOutlined = false,
-        _isText = false;
+  }) : _isOutlined = false,
+       _isText = false;
 
   const AppButton.outlined({
     super.key,
     required this.label,
     this.onPressed,
     this.width,
-  })  : _isOutlined = true,
-        _isText = false;
+  }) : _isOutlined = true,
+       _isText = false;
 
   const AppButton.text({
     super.key,
     required this.label,
     this.onPressed,
     this.width,
-  })  : _isOutlined = false,
-        _isText = true;
+  }) : _isOutlined = false,
+       _isText = true;
 
   @override
   Widget build(BuildContext context) {

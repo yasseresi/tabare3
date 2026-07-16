@@ -18,7 +18,10 @@ void main() {
     usecase = LoginWithEmailPassword(mockRepository);
   });
 
-  const testParams = LoginParams(email: 'test@test.com', password: 'password123');
+  const testParams = LoginParams(
+    email: 'test@test.com',
+    password: 'password123',
+  );
   const testUser = UserEntity(
     id: '123',
     email: 'test@test.com',
@@ -28,26 +31,32 @@ void main() {
   );
 
   test('should return UserEntity when repository returns Right', () async {
-    when(() => mockRepository.loginWithEmailPassword(
-          email: any(named: 'email'),
-          password: any(named: 'password'),
-        )).thenAnswer((_) async => const Right(testUser));
+    when(
+      () => mockRepository.loginWithEmailPassword(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      ),
+    ).thenAnswer((_) async => const Right(testUser));
 
     final result = await usecase(testParams);
 
     expect(result, const Right(testUser));
-    verify(() => mockRepository.loginWithEmailPassword(
-          email: testParams.email,
-          password: testParams.password,
-        )).called(1);
+    verify(
+      () => mockRepository.loginWithEmailPassword(
+        email: testParams.email,
+        password: testParams.password,
+      ),
+    ).called(1);
   });
 
   test('should return Failure when repository returns Left', () async {
     const failure = AuthFailure();
-    when(() => mockRepository.loginWithEmailPassword(
-          email: any(named: 'email'),
-          password: any(named: 'password'),
-        )).thenAnswer((_) async => const Left(failure));
+    when(
+      () => mockRepository.loginWithEmailPassword(
+        email: any(named: 'email'),
+        password: any(named: 'password'),
+      ),
+    ).thenAnswer((_) async => const Left(failure));
 
     final result = await usecase(testParams);
 

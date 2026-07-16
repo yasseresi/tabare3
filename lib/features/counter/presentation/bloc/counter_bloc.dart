@@ -11,10 +11,8 @@ class CounterBloc extends Bloc<CounterEvent, CounterState> {
   final GetCounter getCounter;
   final IncrementCounter incrementCounter;
 
-  CounterBloc({
-    required this.getCounter,
-    required this.incrementCounter,
-  }) : super(const CounterInitial()) {
+  CounterBloc({required this.getCounter, required this.incrementCounter})
+    : super(const CounterInitial()) {
     on<GetCounterEvent>((event, emit) async {
       emit(const CounterLoading());
       final failureOrCounter = await getCounter(NoParams());

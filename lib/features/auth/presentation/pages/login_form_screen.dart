@@ -34,10 +34,12 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
   }
 
   void _dispatchLogin(AuthBloc bloc) {
-    bloc.add(LoginRequested(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    ));
+    bloc.add(
+      LoginRequested(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      ),
+    );
   }
 
   @override
@@ -138,8 +140,9 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                                 vertical: AppPadding.p18,
                               ),
                               shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(AppSize.s20),
+                                borderRadius: BorderRadius.circular(
+                                  AppSize.s20,
+                                ),
                               ),
                               textStyle: getMediumStyle(
                                 fontSize: FontSize.s18,
@@ -202,9 +205,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
           onAction: () {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
-                builder: (_) => const RoleSelectionScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
               (route) => false,
             );
           },

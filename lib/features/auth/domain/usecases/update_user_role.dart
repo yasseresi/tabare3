@@ -23,8 +23,5 @@ class UpdateRoleParams {
   final bool isDonor;
   final bool isRecipient;
 
-  const UpdateRoleParams({
-    required this.isDonor,
-    required this.isRecipient,
-  });
+  const UpdateRoleParams({required this.isDonor, required this.isRecipient});
 }

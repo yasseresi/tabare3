@@ -34,11 +34,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.warning_rounded,
-                  color: Colors.red,
-                  size: 80,
-                ),
+                const Icon(Icons.warning_rounded, color: Colors.red, size: 80),
                 const SizedBox(height: 20),
                 const Text(
                   'بيانات الملف الشخصي',
@@ -132,20 +128,13 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                     color: Color(0xFF4CAF50),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
-                    Icons.check,
-                    color: Colors.white,
-                    size: 50,
-                  ),
+                  child: const Icon(Icons.check, color: Colors.white, size: 50),
                 ),
                 const SizedBox(height: 25),
                 const Text(
                   'تم إنشاء طلب التبرع بنجاح',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 18, color: Colors.grey),
                 ),
                 const SizedBox(height: 10),
                 Image.asset(
@@ -233,7 +222,10 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                         color: Color(0xFFF5F5F5),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.notifications_none_rounded, color: Colors.black),
+                      child: const Icon(
+                        Icons.notifications_none_rounded,
+                        color: Colors.black,
+                      ),
                     ),
                   ],
                 ),
@@ -305,13 +297,21 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                 // Form Fields
                 _buildTextField('عدد الأكياس المطلوبة', Icons.tag),
                 const SizedBox(height: 15),
-                _buildTextField('الولاية', Icons.map_outlined, isDropdown: true),
+                _buildTextField(
+                  'الولاية',
+                  Icons.map_outlined,
+                  isDropdown: true,
+                ),
                 const SizedBox(height: 15),
                 _buildTextField('اسم المستشفى', Icons.local_hospital_outlined),
                 const SizedBox(height: 15),
                 _buildTextField('تاريخ آخر أجل', Icons.calendar_today_outlined),
                 const SizedBox(height: 15),
-                _buildTextField('ملاحظات', Icons.sticky_note_2_outlined, isMultiline: true),
+                _buildTextField(
+                  'ملاحظات',
+                  Icons.sticky_note_2_outlined,
+                  isMultiline: true,
+                ),
                 const SizedBox(height: 30),
                 // Bottom Buttons
                 Row(
@@ -403,14 +403,21 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     );
   }
 
-  Widget _buildTextField(String hint, IconData icon, {bool isMultiline = false, bool isDropdown = false}) {
+  Widget _buildTextField(
+    String hint,
+    IconData icon, {
+    bool isMultiline = false,
+    bool isDropdown = false,
+  }) {
     return TextField(
       maxLines: isMultiline ? 4 : 1,
       readOnly: isDropdown,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.grey),
-        prefixIcon: isDropdown ? const Icon(Icons.keyboard_arrow_down, color: Colors.grey) : null,
+        prefixIcon: isDropdown
+            ? const Icon(Icons.keyboard_arrow_down, color: Colors.grey)
+            : null,
         suffixIcon: Icon(icon, color: Colors.grey),
         filled: true,
         fillColor: const Color(0xFFF5F5F5),

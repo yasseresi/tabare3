@@ -100,8 +100,7 @@ class RoleSelectionScreen extends StatelessWidget {
                             width: 220,
                             height: 55,
                             child: ElevatedButton(
-                              onPressed: () =>
-                                  _showConfirmationDialog(context),
+                              onPressed: () => _showConfirmationDialog(context),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: ColorManager.white,
                                 foregroundColor: ColorManager.primary,
@@ -221,7 +220,7 @@ class RoleSelectionScreen extends StatelessWidget {
     bool isRecipient = false,
   }) {
     context.read<AuthBloc>().add(
-          UpdateRoleRequested(isDonor: isDonor, isRecipient: isRecipient),
-        );
+      UpdateRoleRequested(isDonor: isDonor, isRecipient: isRecipient),
+    );
   }
 }

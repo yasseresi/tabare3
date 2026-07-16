@@ -14,17 +14,19 @@ void main() {
   late MockAuthRepository mockRepository;
 
   setUpAll(() {
-    registerFallbackValue(SignupParams(
-      username: 'fallback',
-      fullName: 'fallback',
-      email: 'fallback@test.com',
-      password: 'fallback',
-      phone: '0000',
-      dateOfBirth: DateTime(2000),
-      gender: 'male',
-      bloodType: 'O+',
-      city: 'fallback',
-    ));
+    registerFallbackValue(
+      SignupParams(
+        username: 'fallback',
+        fullName: 'fallback',
+        email: 'fallback@test.com',
+        password: 'fallback',
+        phone: '0000',
+        dateOfBirth: DateTime(2000),
+        gender: 'male',
+        bloodType: 'O+',
+        city: 'fallback',
+      ),
+    );
   });
 
   setUp(() {
@@ -52,21 +54,25 @@ void main() {
       fullName: 'Test User',
       bloodType: 'O+',
     );
-    when(() => mockRepository.signupWithEmailPassword(
-          params: any(named: 'params'),
-        )).thenAnswer((_) async => const Right(testUser));
+    when(
+      () =>
+          mockRepository.signupWithEmailPassword(params: any(named: 'params')),
+    ).thenAnswer((_) async => const Right(testUser));
 
     final result = await usecase(testParams);
 
     expect(result, const Right(testUser));
-    verify(() => mockRepository.signupWithEmailPassword(params: testParams)).called(1);
+    verify(
+      () => mockRepository.signupWithEmailPassword(params: testParams),
+    ).called(1);
   });
 
   test('should return Failure when repository returns Left', () async {
     const failure = AuthFailure(-9, 'Email already registered');
-    when(() => mockRepository.signupWithEmailPassword(
-          params: any(named: 'params'),
-        )).thenAnswer((_) async => const Left(failure));
+    when(
+      () =>
+          mockRepository.signupWithEmailPassword(params: any(named: 'params')),
+    ).thenAnswer((_) async => const Left(failure));
 
     final result = await usecase(testParams);
 

@@ -21,7 +21,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 20,
+                ),
                 child: Column(
                   children: [
                     // Header: Greeting (Right) and Bell (Left)
@@ -68,12 +71,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       textAlign: TextAlign.right,
                       decoration: InputDecoration(
                         hintText: 'ابحث عن الاشعارات...',
-                        hintStyle: const TextStyle(color: Colors.grey, fontSize: 15),
+                        hintStyle: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 15,
+                        ),
                         // In RTL, suffixIcon is on the left
-                        suffixIcon: const Icon(Icons.search, color: Colors.grey, size: 28),
+                        suffixIcon: const Icon(
+                          Icons.search,
+                          color: Colors.grey,
+                          size: 28,
+                        ),
                         filled: true,
                         fillColor: const Color(0xFFF8F8F8),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 15,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25),
                           borderSide: BorderSide.none,
@@ -84,7 +97,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25),
-                          borderSide: const BorderSide(color: Color(0xFF8B1D1D), width: 1),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF8B1D1D),
+                            width: 1,
+                          ),
                         ),
                       ),
                     ),
@@ -94,10 +110,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               const Center(
                 child: Text(
                   'الاشعارات',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(height: 20),
@@ -179,7 +192,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           // Content in the middle
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // Left in RTL is start? No, right is start.
+              crossAxisAlignment: CrossAxisAlignment
+                  .start, // Left in RTL is start? No, right is start.
               // We want text aligned to the right, which is "start" in RTL
               children: [
                 Text(

@@ -8,7 +8,10 @@ abstract class AuthRemoteDataSource {
   Future<UserModel> signUp({required SignupParams params});
   Future<void> signOut();
   Future<UserModel?> getCurrentUser();
-  Future<UserModel> updateUserRole({required bool isDonor, required bool isRecipient});
+  Future<UserModel> updateUserRole({
+    required bool isDonor,
+    required bool isRecipient,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -17,7 +20,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   AuthRemoteDataSourceImpl({required this.client});
 
   @override
-  Future<UserModel> signIn({required String email, required String password}) async {
+  Future<UserModel> signIn({
+    required String email,
+    required String password,
+  }) async {
     final response = await client.auth.signInWithPassword(
       email: email,
       password: password,

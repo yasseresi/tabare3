@@ -15,49 +15,67 @@ import 'package:tabare3/features/auth/presentation/pages/welcome_screen.dart';
 import 'package:tabare3/features/auth/presentation/pages/login_form_screen.dart';
 import 'package:tabare3/features/auth/presentation/pages/signup_screen.dart';
 
-class MockLoginWithEmailPassword extends Mock implements LoginWithEmailPassword {}
-class MockSignupWithEmailPassword extends Mock implements SignupWithEmailPassword {}
+class MockLoginWithEmailPassword extends Mock
+    implements LoginWithEmailPassword {}
+
+class MockSignupWithEmailPassword extends Mock
+    implements SignupWithEmailPassword {}
+
 class MockSignOut extends Mock implements SignOut {}
+
 class MockGetCurrentSession extends Mock implements GetCurrentSession {}
+
 class MockUpdateUserRole extends Mock implements UpdateUserRole {}
 
 void main() {
   final sl = GetIt.instance;
 
   setUpAll(() {
-    registerFallbackValue(SignupParams(
-      username: 'fallback',
-      fullName: 'fallback',
-      email: 'fallback@test.com',
-      password: 'fallback',
-      phone: '0000',
-      dateOfBirth: DateTime(2000),
-      gender: 'male',
-      bloodType: 'O+',
-      city: 'fallback',
-    ));
+    registerFallbackValue(
+      SignupParams(
+        username: 'fallback',
+        fullName: 'fallback',
+        email: 'fallback@test.com',
+        password: 'fallback',
+        phone: '0000',
+        dateOfBirth: DateTime(2000),
+        gender: 'male',
+        bloodType: 'O+',
+        city: 'fallback',
+      ),
+    );
     registerFallbackValue(LoginParams(email: 'fallback', password: 'fallback'));
     registerFallbackValue(NoParams());
-    registerFallbackValue(const UpdateRoleParams(isDonor: false, isRecipient: false));
+    registerFallbackValue(
+      const UpdateRoleParams(isDonor: false, isRecipient: false),
+    );
   });
 
   setUp(() {
     sl.reset();
-    sl.registerFactory(() => AuthBloc(
-          loginWithEmailPassword: sl(),
-          signupWithEmailPassword: sl(),
-          signOutUseCase: sl(),
-          getCurrentSession: sl(),
-          updateUserRole: sl(),
-        ));
-    sl.registerLazySingleton<LoginWithEmailPassword>(() => MockLoginWithEmailPassword());
-    sl.registerLazySingleton<SignupWithEmailPassword>(() => MockSignupWithEmailPassword());
+    sl.registerFactory(
+      () => AuthBloc(
+        loginWithEmailPassword: sl(),
+        signupWithEmailPassword: sl(),
+        signOutUseCase: sl(),
+        getCurrentSession: sl(),
+        updateUserRole: sl(),
+      ),
+    );
+    sl.registerLazySingleton<LoginWithEmailPassword>(
+      () => MockLoginWithEmailPassword(),
+    );
+    sl.registerLazySingleton<SignupWithEmailPassword>(
+      () => MockSignupWithEmailPassword(),
+    );
     sl.registerLazySingleton<SignOut>(() => MockSignOut());
     sl.registerLazySingleton<GetCurrentSession>(() => MockGetCurrentSession());
     sl.registerLazySingleton<UpdateUserRole>(() => MockUpdateUserRole());
   });
 
-  testWidgets('WelcomeScreen renders welcome text, logo and both buttons', (tester) async {
+  testWidgets('WelcomeScreen renders welcome text, logo and both buttons', (
+    tester,
+  ) async {
     await tester.pumpWidget(const MaterialApp(home: WelcomeScreen()));
 
     expect(find.textContaining('مرحباً بك في'), findsOneWidget);

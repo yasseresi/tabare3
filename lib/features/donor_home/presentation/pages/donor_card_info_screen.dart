@@ -32,10 +32,7 @@ class DonorCardInfoScreen extends StatelessWidget {
                         ),
                         Text(
                           'كل تبرع بالدم هو فرصة جديدة للحياة',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -47,7 +44,10 @@ class DonorCardInfoScreen extends StatelessWidget {
                           color: Colors.white.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.notifications_none_rounded, color: Colors.white),
+                        child: const Icon(
+                          Icons.notifications_none_rounded,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],
@@ -55,7 +55,10 @@ class DonorCardInfoScreen extends StatelessWidget {
                 const SizedBox(height: 30),
                 // Title Badge
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -63,7 +66,11 @@ class DonorCardInfoScreen extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: const [
-                      Icon(Icons.card_giftcard, color: Colors.deepPurple, size: 20),
+                      Icon(
+                        Icons.card_giftcard,
+                        color: Colors.deepPurple,
+                        size: 20,
+                      ),
                       SizedBox(width: 8),
                       Text(
                         'بطاقة المتبرع',
@@ -157,7 +164,11 @@ class DonorCardInfoScreen extends StatelessWidget {
           child: Text(
             content,
             textAlign: TextAlign.justify,
-            style: const TextStyle(color: Colors.grey, height: 1.6, fontSize: 14),
+            style: const TextStyle(
+              color: Colors.grey,
+              height: 1.6,
+              fontSize: 14,
+            ),
           ),
         ),
       ],
@@ -194,7 +205,11 @@ class DonorCardInfoScreen extends StatelessWidget {
           const SizedBox(width: 5),
           Text(
             value,
-            style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
           ),
         ],
       ),
@@ -209,10 +224,22 @@ class DonorCardInfoScreen extends StatelessWidget {
           children: [
             const Icon(Icons.circle, size: 8, color: Colors.deepPurpleAccent),
             const SizedBox(width: 10),
-            Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
-        Text(range, style: const TextStyle(color: Colors.deepPurpleAccent, fontWeight: FontWeight.bold)),
+        Text(
+          range,
+          style: const TextStyle(
+            color: Colors.deepPurpleAccent,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ],
     );
   }

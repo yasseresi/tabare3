@@ -68,9 +68,8 @@ class SplashScreen extends StatelessWidget {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder: (_) => isDonor
-                ? const DonorHomeScreen()
-                : const RequesterHomeScreen(),
+            builder: (_) =>
+                isDonor ? const DonorHomeScreen() : const RequesterHomeScreen(),
           ),
           (route) => false,
         );

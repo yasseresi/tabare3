@@ -19,7 +19,9 @@ void main() {
   });
 
   test('should return Right(void) when repository succeeds', () async {
-    when(() => mockRepository.signOut()).thenAnswer((_) async => const Right(null));
+    when(
+      () => mockRepository.signOut(),
+    ).thenAnswer((_) async => const Right(null));
 
     final result = await usecase(NoParams());
 
@@ -29,7 +31,9 @@ void main() {
 
   test('should return Failure when repository fails', () async {
     const failure = AuthFailure();
-    when(() => mockRepository.signOut()).thenAnswer((_) async => const Left(failure));
+    when(
+      () => mockRepository.signOut(),
+    ).thenAnswer((_) async => const Left(failure));
 
     final result = await usecase(NoParams());
 

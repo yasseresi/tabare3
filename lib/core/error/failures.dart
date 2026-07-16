@@ -28,8 +28,5 @@ class AuthFailure extends Failure {
 }
 
 class StorageFailure extends Failure {
-  const StorageFailure([
-    super.code = -10,
-    super.message = 'Storage error',
-  ]);
+  const StorageFailure([super.code = -10, super.message = 'Storage error']);
 }

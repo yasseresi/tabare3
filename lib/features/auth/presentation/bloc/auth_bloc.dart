@@ -78,16 +78,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     final result = await getCurrentSession(NoParams());
-    result.fold(
-      (failure) => emit(Unauthenticated()),
-      (user) {
-        if (user != null) {
-          emit(Authenticated(user));
-        } else {
-          emit(Unauthenticated());
-        }
-      },
-    );
+    result.fold((failure) => emit(Unauthenticated()), (user) {
+      if (user != null) {
+        emit(Authenticated(user));
+      } else {
+        emit(Unauthenticated());
+      }
+    });
   }
 
   Future<void> _onUpdateRoleRequested(
@@ -96,10 +93,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     final result = await updateUserRole(
-      UpdateRoleParams(
-        isDonor: event.isDonor,
-        isRecipient: event.isRecipient,
-      ),
+      UpdateRoleParams(isDonor: event.isDonor, isRecipient: event.isRecipient),
     );
     result.fold(
       (failure) => emit(AuthError(failure)),

@@ -11,7 +11,10 @@ class DonorHistoryScreen extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 20,
+              ),
               child: Column(
                 children: [
                   // Header
@@ -44,7 +47,10 @@ class DonorHistoryScreen extends StatelessWidget {
                           color: Color(0xFFF5F5F5),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.notifications_none_rounded, color: Colors.black),
+                        child: const Icon(
+                          Icons.notifications_none_rounded,
+                          color: Colors.black,
+                        ),
                       ),
                     ],
                   ),
@@ -102,10 +108,7 @@ class DonorHistoryScreen extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: Text(
                   'قائمة المتبرعين',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -220,7 +223,11 @@ class DonorHistoryScreen extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 11,
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(width: 4),
           Icon(Icons.circle, size: 8, color: color),
@@ -237,11 +244,19 @@ class DonorHistoryScreen extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w500),
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.grey,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           Text(
             value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF8B1D1D)),
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF8B1D1D),
+            ),
           ),
         ],
       ),

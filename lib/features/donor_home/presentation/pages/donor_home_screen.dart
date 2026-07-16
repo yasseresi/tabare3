@@ -93,7 +93,10 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
                           color: Color(0xFFF5F5F5),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.notifications_none_rounded, color: Colors.black),
+                        child: const Icon(
+                          Icons.notifications_none_rounded,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
                   ],
@@ -186,9 +189,14 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
               GestureDetector(
                 onTap: () => setState(() => _isEligible = !_isEligible),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
-                    color: _isEligible ? const Color(0xFFE8F5E9) : const Color(0xFFFFEBEE),
+                    color: _isEligible
+                        ? const Color(0xFFE8F5E9)
+                        : const Color(0xFFFFEBEE),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -249,7 +257,11 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
                 child: Image.asset(
                   'assets/images/demo.png',
                   height: 100,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.bloodtype, color: Color(0xFF8B1D1D), size: 80),
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.bloodtype,
+                    color: Color(0xFF8B1D1D),
+                    size: 80,
+                  ),
                 ),
               ),
             ],
@@ -257,7 +269,10 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
           const SizedBox(height: 20),
           _buildDonorInfoRow('إجمالي تبرعاتي', '12'),
           _buildDonorInfoRow('طلبات قريبة منك', '14'),
-          _buildDonorInfoRow('آخر تبرع', _isEligible ? '15 جانفي 2025' : '15 جانفي 2026'),
+          _buildDonorInfoRow(
+            'آخر تبرع',
+            _isEligible ? '15 جانفي 2025' : '15 جانفي 2026',
+          ),
           _buildDonorInfoRow('موعد التبرع القادم', '15 جانفي 2026'),
         ],
       ),
@@ -270,13 +285,14 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 14, color: Colors.grey),
-          ),
+          Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
           Text(
             value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
           ),
         ],
       ),
@@ -359,7 +375,11 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
               ),
               const Text(
                 '1/3',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF8B1D1D)),
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF8B1D1D),
+                ),
               ),
             ],
           ),
@@ -370,7 +390,9 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
               value: progress,
               minHeight: 8,
               backgroundColor: const Color(0xFFEEEEEE),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B1D1D)),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                Color(0xFF8B1D1D),
+              ),
             ),
           ),
           const SizedBox(height: 20),
@@ -392,7 +414,10 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
               ),
               child: const Text(
                 'قبول الطلب',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -415,7 +440,11 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
           const SizedBox(width: 4),
           Text(
             label,
-            style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 10,
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
@@ -428,10 +457,7 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 14, color: Colors.grey),
-          ),
+          Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
           Text(
             value,
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),

@@ -1,67 +1,48 @@
 import 'package:dartz/dartz.dart';
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../../core/error/failures.dart';
 import '../entities/user_entity.dart';
 
-class LoginParams extends Equatable {
-  final String email;
-  final String password;
+part 'auth_repository.freezed.dart';
 
-  const LoginParams({required this.email, required this.password});
-
-  @override
-  List<Object?> get props => [email, password];
+@freezed
+abstract class LoginParams with _$LoginParams {
+  const factory LoginParams({required String email, required String password}) =
+      _LoginParams;
 }
 
-class SignupParams extends Equatable {
-  final String username;
-  final String fullName;
-  final String email;
-  final String password;
-  final String phone;
-  final DateTime dateOfBirth;
-  final String gender;
-  final String bloodType;
-  final String city;
-  final String? nationalId;
-  final double? weight;
-  final String? chronicDiseases;
+@freezed
+abstract class SignupParams with _$SignupParams {
+  const factory SignupParams({
+    required String username,
+    required String fullName,
+    required String email,
+    required String password,
+    required String phone,
+    required DateTime dateOfBirth,
+    required String gender,
+    required String bloodType,
+    required String city,
+    String? nationalId,
+    double? weight,
+    String? chronicDiseases,
+  }) = _SignupParams;
+}
 
-  const SignupParams({
-    required this.username,
-    required this.fullName,
-    required this.email,
-    required this.password,
-    required this.phone,
-    required this.dateOfBirth,
-    required this.gender,
-    required this.bloodType,
-    required this.city,
-    this.nationalId,
-    this.weight,
-    this.chronicDiseases,
-  });
-
+extension SignupParamsX on SignupParams {
   Map<String, dynamic> toMetadata() => {
-        'username': username,
-        'full_name': fullName,
-        'phone': phone,
-        'date_of_birth': dateOfBirth.toIso8601String().split('T')[0],
-        'gender': gender,
-        'blood_type': bloodType,
-        'city': city,
-        if (nationalId != null) 'national_id': nationalId,
-        if (weight != null) 'weight': weight.toString(),
-        if (chronicDiseases != null) 'chronic_diseases': chronicDiseases,
-      };
-
-  @override
-  List<Object?> get props => [
-        username, fullName, email, password, phone,
-        dateOfBirth, gender, bloodType, city,
-        nationalId, weight, chronicDiseases,
-      ];
+    'username': username,
+    'full_name': fullName,
+    'phone': phone,
+    'date_of_birth': dateOfBirth.toIso8601String().split('T')[0],
+    'gender': gender,
+    'blood_type': bloodType,
+    'city': city,
+    if (nationalId != null) 'national_id': nationalId,
+    if (weight != null) 'weight': weight.toString(),
+    if (chronicDiseases != null) 'chronic_diseases': chronicDiseases,
+  };
 }
 
 abstract class AuthRepository {

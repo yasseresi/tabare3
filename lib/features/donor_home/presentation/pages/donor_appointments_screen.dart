@@ -4,7 +4,8 @@ class DonorAppointmentsScreen extends StatefulWidget {
   const DonorAppointmentsScreen({super.key});
 
   @override
-  State<DonorAppointmentsScreen> createState() => _DonorAppointmentsScreenState();
+  State<DonorAppointmentsScreen> createState() =>
+      _DonorAppointmentsScreenState();
 }
 
 class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
@@ -16,7 +17,9 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
       builder: (context) => Directionality(
         textDirection: TextDirection.rtl,
         child: Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(25.0),
             child: Column(
@@ -33,7 +36,11 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
                 const Text(
                   'إلغاء للطلب سيتم إشعار صاحب الطلب بأنك غير مستعد للتبرع بالدم.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: Colors.grey, height: 1.5),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    height: 1.5,
+                  ),
                 ),
                 const SizedBox(height: 30),
                 SizedBox(
@@ -46,9 +53,17 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF8B1D1D),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
                     ),
-                    child: const Text('تأكيد', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      'تأكيد',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -59,9 +74,17 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
                     ),
-                    child: const Text('إلغاء', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      'إلغاء',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -80,7 +103,10 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 20,
+              ),
               child: Column(
                 children: [
                   // Header
@@ -92,18 +118,30 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
                         children: [
                           const Text(
                             'مرحباً، أحمد',
-                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           Text(
                             'كل تبرع بالدم هو فرصة جديدة للحياة',
-                            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
                           ),
                         ],
                       ),
                       Container(
                         padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(color: Color(0xFFF5F5F5), shape: BoxShape.circle),
-                        child: const Icon(Icons.notifications_none_rounded, color: Colors.black),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFF5F5F5),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.notifications_none_rounded,
+                          color: Colors.black,
+                        ),
                       ),
                     ],
                   ),
@@ -143,7 +181,11 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Icon(Icons.local_hospital_rounded, color: Colors.white, size: 60),
+                        const Icon(
+                          Icons.local_hospital_rounded,
+                          color: Colors.white,
+                          size: 60,
+                        ),
                       ],
                     ),
                   ),
@@ -156,7 +198,9 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
             ),
             const SizedBox(height: 15),
             Expanded(
-              child: _hasAppointments ? _buildAppointmentsList() : _buildEmptyState(),
+              child: _hasAppointments
+                  ? _buildAppointmentsList()
+                  : _buildEmptyState(),
             ),
           ],
         ),
@@ -240,18 +284,28 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.assignment_rounded, color: Colors.grey, size: 40),
+                  const Icon(
+                    Icons.assignment_rounded,
+                    color: Colors.grey,
+                    size: 40,
+                  ),
                   const SizedBox(width: 12),
                   Text(
                     hospital,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
               Container(
                 width: 12,
                 height: 12,
-                decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                decoration: const BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
               ),
             ],
           ),
@@ -266,7 +320,9 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
               value: progress,
               minHeight: 8,
               backgroundColor: const Color(0xFFEEEEEE),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B1D1D)),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                Color(0xFF8B1D1D),
+              ),
             ),
           ),
           const SizedBox(height: 20),
@@ -277,9 +333,17 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
               onPressed: _showCancelConfirmationDialog,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey[600],
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
               ),
-              child: const Text('إلغاء', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: const Text(
+                'إلغاء',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ],
@@ -296,7 +360,11 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
           Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
           Text(
             value,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: valueColor ?? Colors.black),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: valueColor ?? Colors.black,
+            ),
           ),
         ],
       ),

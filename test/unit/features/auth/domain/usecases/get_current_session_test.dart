@@ -29,8 +29,9 @@ void main() {
   );
 
   test('should return UserEntity when session exists', () async {
-    when(() => mockRepository.getCurrentSession())
-        .thenAnswer((_) async => const Right(testUser));
+    when(
+      () => mockRepository.getCurrentSession(),
+    ).thenAnswer((_) async => const Right(testUser));
 
     final result = await usecase(NoParams());
 
@@ -38,8 +39,9 @@ void main() {
   });
 
   test('should return null when no session', () async {
-    when(() => mockRepository.getCurrentSession())
-        .thenAnswer((_) async => const Right(null));
+    when(
+      () => mockRepository.getCurrentSession(),
+    ).thenAnswer((_) async => const Right(null));
 
     final result = await usecase(NoParams());
 
@@ -48,8 +50,9 @@ void main() {
 
   test('should return Failure on error', () async {
     const failure = AuthFailure();
-    when(() => mockRepository.getCurrentSession())
-        .thenAnswer((_) async => const Left(failure));
+    when(
+      () => mockRepository.getCurrentSession(),
+    ).thenAnswer((_) async => const Left(failure));
 
     final result = await usecase(NoParams());
 
