@@ -21,7 +21,6 @@ class AppStrings {
   static const String close = 'close';
   static const String back = 'back';
   static const String seeAll = 'see_all';
-  static const String empty = '';
   static const String all = 'all';
 
   // Auth
@@ -152,4 +151,12 @@ class AppStrings {
   static const String accountInfo = 'account_info';
   static const String appInfo = 'app_info';
   static const String developerContact = 'developer_contact';
+
+  // Misc
+  static const String male = 'male';
+  static const String female = 'female';
+  static const String kg = 'kg';
+  static const String bags = 'bags';
+  static const String yes = 'yes';
+  static const String no = 'no';
 }
