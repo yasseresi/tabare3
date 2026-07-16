@@ -4,8 +4,6 @@ import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:tabare3/core/usecases/usecase.dart';
-import 'package:tabare3/core/error/failures.dart';
-import 'package:tabare3/features/auth/domain/entities/user_entity.dart';
 import 'package:tabare3/features/auth/domain/repositories/auth_repository.dart';
 import 'package:tabare3/features/auth/domain/usecases/get_current_session.dart';
 import 'package:tabare3/features/auth/domain/usecases/login_with_email_password.dart';

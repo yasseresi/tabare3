@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:tabare3/core/error/failures.dart';
 import 'package:tabare3/core/usecases/usecase.dart';
-import 'package:tabare3/core/network/network_info.dart';
-import 'package:tabare3/features/auth/domain/entities/user_entity.dart';
 import 'package:tabare3/features/auth/domain/repositories/auth_repository.dart';
 import 'package:tabare3/features/auth/domain/usecases/get_current_session.dart';
 import 'package:tabare3/features/auth/domain/usecases/login_with_email_password.dart';
@@ -16,8 +13,6 @@ import 'package:tabare3/features/auth/domain/usecases/update_user_role.dart';
 import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:tabare3/features/auth/presentation/pages/login_form_screen.dart';
 import 'package:tabare3/features/auth/presentation/pages/signup_screen.dart';
-import 'package:get_it/get_it.dart';
-import 'package:dartz/dartz.dart';
 
 class MockLoginWithEmailPassword extends Mock implements LoginWithEmailPassword {}
 class MockSignupWithEmailPassword extends Mock implements SignupWithEmailPassword {}

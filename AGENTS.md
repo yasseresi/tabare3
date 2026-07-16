@@ -26,7 +26,7 @@
 - Conventional Commits (`feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`).
 - Dart formatting: `dart format .` — follow `analysis_options.yaml` lint rules.
 - No comments unless asked. No emojis in code.
-- Prefer `const` constructors. Use `equatable` for value equality in entities/states.
+- Prefer `const` constructors. Use `equatable` for BLoC states/events. Use `freezed` for data models/DTOs (immutable + generated fromJson/toJson).
 
 ## Architecture — Clean Architecture (3 layers) + BLoC
 
@@ -38,7 +38,7 @@ Data → Domain ← Presentation. Domain depends on nothing. Data implements dom
 lib/features/<feature>/
   data/
     datasources/     # remote + local data sources
-    models/          # JSON DTOs (json_serializable / manual fromJson)
+    models/          # JSON DTOs (freezed + json_annotation, generated .g.dart/.freezed.dart)
     repositories/    # repository implementations
   domain/
     entities/        # pure domain models (no Flutter/JSON deps)
@@ -65,6 +65,8 @@ lib/features/<feature>/
 - State: `flutter_bloc` ^9.0.0, `equatable` ^2.0.7
 - DI: `get_it` ^8.0.2
 - FP: `dartz` ^0.10.1
+- Routing: `go_router` ^14.8.1 (declarative routing, no Navigator 1.0 push/pop)
+- Serialization: `freezed` ^2.5.8 + `json_annotation` ^4.9.0 (generated fromJson/toJson via build_runner)
 - Styling: `google_fonts` (Cairo), `flutter_svg`
 - Linting: `flutter_lints` ^5.0.0, `analysis_options.yaml`
 
@@ -88,10 +90,12 @@ lib/features/<feature>/
 - After any code modification: run `graphify update .` (AST-only, no API cost).
 
 ## Supabase
-- Project: `ssxwiykaknwnfrjnoodz` (Ecollect)
-- URL: `https://ssxwiykaknwnfrjnoodz.supabase.co`
-- Publishable key: `sb_publishable_kVnLqzsGMe2_TDWpqu_OHA_0XEsngAc`
+- Project: `nzsaghjwyitjhyagdbjb` (Tabara3)
+- URL: `https://nzsaghjwyitjhyagdbjb.supabase.co`
+- Publishable key: `sb_publishable_1n_-1Jz7yiiERq3odEIPOg_0eKi2ly1`
+- Config: `.env` (SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY), loaded via `String.fromEnvironment`
 - Use RLS policies on every table. Use migrations for DDL; `execute_sql` for DML/debug.
+- Profile creation: `handle_new_user()` trigger on `auth.users` INSERT populates `public.users` from `raw_user_meta_data` (migration 00003).
 
 ## Memory (MANDATORY — run FIRST every session)
 1. **claude-mem** — `/recall` or `mcp__claude-mem__*` search → prior session actions (files, commands, edits).
