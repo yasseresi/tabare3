@@ -28,14 +28,6 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _rememberMe = false;
-
-  @override
-  void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
 
   void _dispatchLogin(AuthBloc bloc) {
     if (!_formKey.currentState!.validate()) return;
@@ -115,27 +107,6 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                             isPassword: true,
                             controller: _passwordController,
                             validator: validatePassword,
-                          ),
-                          const SizedBox(height: AppSize.s24),
-                          Row(
-                            children: [
-                              Text(
-                                AppStrings.rememberMe.tr(),
-                                style: getRegularStyle(
-                                  fontSize: FontSize.s12,
-                                  color: ColorManager.textMuted,
-                                ),
-                              ),
-                              const Spacer(),
-                              Transform.scale(
-                                scale: 0.8,
-                                child: Switch(
-                                  value: _rememberMe,
-                                  onChanged: (v) =>
-                                      setState(() => _rememberMe = v),
-                                ),
-                              ),
-                            ],
                           ),
                           const SizedBox(height: AppSize.s30),
                           SizedBox(

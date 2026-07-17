@@ -27,6 +27,7 @@ class AppStrings {
   // Auth
   static const String login = 'login';
   static const String username = 'username';
+  static const String rememberMe = 'remember_me';
   static const String loginError = 'login_error';
   static const String signingUp = 'signing_up';
   static const String signupError = 'signup_error';
@@ -39,7 +40,6 @@ class AppStrings {
   static const String email = 'email';
   static const String password = 'password';
   static const String forgotPassword = 'forgot_password';
-  static const String rememberMe = 'remember_me';
   static const String noAccount = 'no_account';
   static const String hasAccount = 'has_account';
   static const String chooseRole = 'choose_role';
