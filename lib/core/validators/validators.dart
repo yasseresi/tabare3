@@ -88,6 +88,16 @@ String? validateGender(String? value) {
   return null;
 }
 
+String? validatePasswordConfirmation(String? value, String originalPassword) {
+  if (!isRequired(value)) {
+    return ErrorMessages.getValidationMessage(ValidationKeys.passwordConfirmRequired);
+  }
+  if (value != originalPassword) {
+    return ErrorMessages.getValidationMessage(ValidationKeys.passwordConfirmMismatch);
+  }
+  return null;
+}
+
 String? validateCity(String? value) {
   if (!isRequired(value)) {
     return ErrorMessages.getValidationMessage(ValidationKeys.cityRequired);

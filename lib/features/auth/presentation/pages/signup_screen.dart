@@ -27,13 +27,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   int _currentStep = 1;
   bool _agreeToTerms = false;
+  DateTime? _selectedDate;
+  String _genderValue = 'ذكر';
 
   final _usernameController = TextEditingController();
   final _fullNameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _passwordConfirmController = TextEditingController();
   final _dobController = TextEditingController();
-  final _genderController = TextEditingController();
   final _nationalIdController = TextEditingController();
   final _bloodTypeController = TextEditingController();
   final _weightController = TextEditingController();
@@ -46,8 +48,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _fullNameController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
+    _passwordConfirmController.dispose();
     _dobController.dispose();
-    _genderController.dispose();
     _nationalIdController.dispose();
     _bloodTypeController.dispose();
     _weightController.dispose();
@@ -66,6 +68,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime(2000),
+      firstDate: DateTime(1920),
+      lastDate: DateTime.now(),
+      locale: const Locale('ar'),
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+        _dobController.text =
+            '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+      });
+    }
+  }
+
   void _dispatchSignup() {
     if (!_formKey.currentState!.validate()) return;
     final params = SignupParams(
@@ -73,8 +92,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       fullName: _fullNameController.text.trim(),
       password: _passwordController.text,
       phone: _phoneController.text.trim(),
-      dateOfBirth: DateTime.tryParse(_dobController.text.trim()) ?? DateTime(2000),
-      gender: _genderController.text.trim() == 'ذكر' ? 'male' : 'female',
+      dateOfBirth: _selectedDate ?? DateTime(2000),
+      gender: _genderValue == 'ذكر' ? 'male' : 'female',
       bloodType: _bloodTypeController.text.trim(),
       city: _cityController.text.trim(),
       nationalId: _nationalIdController.text.trim().isEmpty
@@ -289,11 +308,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
-          hintText: '............',
+          hintText: 'كلمة المرور',
           prefixIcon: Icons.lock_outline,
           isPassword: true,
           controller: _passwordController,
           validator: validatePassword,
+        ),
+        const SizedBox(height: AppSize.s15),
+        AppTextField(
+          hintText: 'تأكيد كلمة المرور',
+          prefixIcon: Icons.lock_outline,
+          isPassword: true,
+          controller: _passwordConfirmController,
+          validator: (v) =>
+              validatePasswordConfirmation(v, _passwordController.text),
         ),
       ],
     );
@@ -302,19 +330,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget _buildStep2() {
     return Column(
       children: [
-        AppTextField(
-          hintText: 'تاريخ الميلاد',
-          prefixIcon: Icons.calendar_today_outlined,
-          controller: _dobController,
-          keyboardType: TextInputType.datetime,
-          validator: validateDate,
+        GestureDetector(
+          onTap: _pickDate,
+          child: AbsorbPointer(
+            child: AppTextField(
+              hintText: 'تاريخ الميلاد',
+              prefixIcon: Icons.calendar_today_outlined,
+              controller: _dobController,
+              validator: (v) => validateDate(v),
+            ),
+          ),
         ),
         const SizedBox(height: AppSize.s15),
-        AppTextField(
-          hintText: 'الجنس',
-          prefixIcon: Icons.person_outline,
-          controller: _genderController,
-          validator: validateGender,
+        DropdownButtonFormField<String>(
+          initialValue: _genderValue,
+          decoration: const InputDecoration(
+            hintText: 'الجنس',
+            prefixIcon: Icon(Icons.person_outline),
+          ),
+          items: const [
+            DropdownMenuItem(value: 'ذكر', child: Text('ذكر')),
+            DropdownMenuItem(value: 'أنثى', child: Text('أنثى')),
+          ],
+          onChanged: (v) => setState(() => _genderValue = v ?? 'ذكر'),
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(

@@ -162,6 +162,8 @@ class AppStrings {
   static const String cityRequired = 'city_required';
   static const String bloodTypeRequired = 'blood_type_required';
   static const String termsRequired = 'terms_required';
+  static const String passwordConfirmRequired = 'password_confirm_required';
+  static const String passwordConfirmMismatch = 'password_confirm_mismatch';
 
   // Info
   static const String aboutApp = 'about_app';

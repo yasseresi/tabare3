@@ -52,6 +52,7 @@ void main() {
     await tester.enterText(fields.at(1), 'testuser1');
     await tester.enterText(fields.at(2), '0555123456');
     await tester.enterText(fields.at(3), 'password1234');
+    await tester.enterText(fields.at(4), 'password1234');
   }
 
   testWidgets('renders step 1 with account info fields', (tester) async {
@@ -95,11 +96,11 @@ void main() {
     await tester.pump();
 
     await tester.enterText(find.widgetWithText(TextFormField, 'تاريخ الميلاد'), '2000-01-01');
-    await tester.enterText(find.widgetWithText(TextFormField, 'الجنس'), 'ذكر');
 
-    await tester.scrollUntilVisible(find.byType(DropdownButtonFormField<String>), 400,
+    await tester.scrollUntilVisible(
+        find.widgetWithText(DropdownButtonFormField<String>, 'فصيلة الدم'), 400,
         scrollable: find.byType(Scrollable).first);
-    await tester.tap(find.byType(DropdownButtonFormField<String>));
+    await tester.tap(find.widgetWithText(DropdownButtonFormField<String>, 'فصيلة الدم'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('O+').last);
     await tester.pumpAndSettle();

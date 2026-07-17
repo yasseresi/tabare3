@@ -324,9 +324,10 @@ void main() {
 
         final step1Fields = find.byType(TextFormField);
         await tester.enterText(step1Fields.at(0), 'Test User');
-        await tester.enterText(step1Fields.at(1), 'testuser');
+        await tester.enterText(step1Fields.at(1), 'testuser1');
         await tester.enterText(step1Fields.at(2), '0555123456');
         await tester.enterText(step1Fields.at(3), 'password123');
+        await tester.enterText(step1Fields.at(4), 'password123');
 
         await tester.ensureVisible(
           find.widgetWithText(ElevatedButton, 'التالي'),
@@ -339,10 +340,9 @@ void main() {
 
         await tester.enterText(
             find.widgetWithText(TextFormField, 'تاريخ الميلاد'), '1990-01-01');
-        await tester.enterText(
-            find.widgetWithText(TextFormField, 'الجنس'), 'ذكر');
 
-        final bloodTypeDropdown = find.byType(DropdownButtonFormField<String>);
+        final bloodTypeDropdown =
+            find.widgetWithText(DropdownButtonFormField<String>, 'فصيلة الدم');
         await tester.tap(bloodTypeDropdown);
         await tester.pumpAndSettle();
         await tester.tap(find.text('O+').last);
