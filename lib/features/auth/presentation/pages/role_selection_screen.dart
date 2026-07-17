@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/presentation/widgets/app_dialog.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
@@ -31,6 +32,17 @@ class RoleSelectionScreen extends StatelessWidget {
                     : const RequesterHomeScreen(),
               ),
               (route) => false,
+            );
+          } else if (state is AuthError) {
+            showDialog(
+              context: context,
+              barrierDismissible: true,
+              builder: (_) => AppDialog.error(
+                title: 'خطأ في تحديث الحالة',
+                message: state.failure.message,
+                actionLabel: 'إعادة المحاولة',
+                onAction: () => Navigator.pop(context),
+              ),
             );
           }
         },
