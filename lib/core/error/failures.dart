@@ -5,10 +5,7 @@ abstract class Failure {
 }
 
 class ServerFailure extends Failure {
-  const ServerFailure([
-    super.code = -7,
-    super.message = 'خطأ في الخادم، يرجى المحاولة لاحقاً',
-  ]);
+  const ServerFailure([super.code = -7, super.message = 'خطأ في الخادم، يرجى المحاولة لاحقاً']);
 }
 
 class CacheFailure extends Failure {
@@ -16,10 +13,7 @@ class CacheFailure extends Failure {
 }
 
 class NetworkFailure extends Failure {
-  const NetworkFailure([
-    super.code = -6,
-    super.message = 'لا يوجد اتصال بالإنترنت',
-  ]);
+  const NetworkFailure([super.code = -6, super.message = 'لا يوجد اتصال بالإنترنت']);
 }
 
 class DatabaseFailure extends Failure {

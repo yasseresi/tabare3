@@ -122,6 +122,31 @@ class AppStrings {
   static const String confirmCancelRequest = 'confirm_cancel_request';
   static const String confirmAcceptRequest = 'confirm_accept_request';
 
+  // Error messages
+  static const String authError = 'auth_error';
+  static const String invalidLoginCredentials = 'invalid_login_credentials';
+  static const String userAlreadyRegistered = 'user_already_registered';
+  static const String emailNotConfirmed = 'email_not_confirmed';
+  static const String weakPassword = 'weak_password';
+  static const String invalidEmail = 'invalid_email';
+  static const String tooManyRequests = 'too_many_requests';
+  static const String userNotFound = 'user_not_found';
+  static const String signupDisabled = 'signup_disabled';
+  static const String missingRequiredFields = 'missing_required_fields';
+  static const String sessionExpired = 'session_expired';
+  static const String networkError = 'network_error';
+  static const String timeoutError = 'timeout_error';
+  static const String connectionError = 'connection_error';
+  static const String databaseError = 'database_error';
+  static const String duplicateEntry = 'duplicate_entry';
+  static const String referenceError = 'reference_error';
+  static const String notFoundError = 'not_found_error';
+  static const String permissionDenied = 'permission_denied';
+  static const String storageError = 'storage_error';
+  static const String fileTooLarge = 'file_too_large';
+  static const String serverError = 'server_error';
+  static const String defaultError = 'default_error';
+
   // Info
   static const String aboutApp = 'about_app';
   static const String privacyPolicy = 'privacy_policy';
