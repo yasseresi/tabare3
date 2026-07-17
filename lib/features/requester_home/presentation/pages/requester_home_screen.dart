@@ -1,5 +1,7 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tabare3/core/utils/string_manager.dart';
 import 'package:tabare3/features/profile/presentation/pages/requester_profile_screen.dart';
 import 'requests_screen.dart';
 import 'create_request_screen.dart';
@@ -68,16 +70,16 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'مرحباً، أحمد',
-                          style: TextStyle(
+                        Text(
+                          AppStrings.welcomeUser.tr(),
+                          style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
                         ),
                         Text(
-                          'نتمنى لك الشفاء العاجل',
+                          AppStrings.getWellSoon.tr(),
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -158,7 +160,7 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      _hasRequests ? 'طلبك مفعل' : 'ليس لديك أي طلبات',
+                      _hasRequests ? AppStrings.requestActive.tr() : AppStrings.noRequestsYou.tr(),
                       style: TextStyle(
                         fontSize: 12,
                         color: _hasRequests ? Colors.green : Colors.red,
@@ -185,18 +187,18 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'قال رسول الله ﷺ:',
-                      style: TextStyle(
+                    Text(
+                      AppStrings.hadithIntro.tr(),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF8B1D1D),
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      '«عجبًا لأمر المؤمن، إن أمره كله خير، وليس ذاك لأحد إلا للمؤمن، إن أصابته سراء شكر فكان خيرًا له، وإن أصابته ضراء صبر فكان خيرًا له»',
-                      style: TextStyle(
+                    Text(
+                      AppStrings.hadithBelieverAffair.tr(),
+                      style: const TextStyle(
                         fontSize: 13,
                         color: Colors.grey,
                         height: 1.4,
@@ -224,9 +226,9 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildStatItem('01', 'عدد الطلبات'),
-              _buildStatItem('05', 'المتبرعين المستجيبين'),
-              _buildStatItem('02', 'الطلبات المكتملة'),
+              _buildStatItem('01', AppStrings.requestsCount.tr()),
+              _buildStatItem('05', AppStrings.respondingDonors.tr()),
+              _buildStatItem('02', AppStrings.completedRequests.tr()),
             ],
           ),
         ],
@@ -270,9 +272,9 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
-              child: const Text(
-                'إنشاء طلب',
-                style: TextStyle(
+              child: Text(
+                AppStrings.createRequest.tr(),
+                style: const TextStyle(
                   fontSize: 18,
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -292,9 +294,9 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'طلباتي',
-              style: TextStyle(
+            Text(
+              AppStrings.myRequests.tr(),
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
@@ -302,9 +304,9 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
             ),
             TextButton(
               onPressed: () => setState(() => _selectedIndex = 1),
-              child: const Text(
-                'عرض الكل',
-                style: TextStyle(color: Color(0xFF8B1D1D)),
+              child: Text(
+                AppStrings.seeAll.tr(),
+                style: const TextStyle(color: Color(0xFF8B1D1D)),
               ),
             ),
           ],
@@ -362,25 +364,25 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
               ),
               Row(
                 children: [
-                  _buildBadge('حرج', Colors.red),
+                  _buildBadge(AppStrings.veryUrgent.tr(), Colors.red),
                   const SizedBox(width: 8),
-                  _buildBadge('مفعل', Colors.green),
+                  _buildBadge(AppStrings.activeStatus.tr(), Colors.green),
                 ],
               ),
             ],
           ),
           const SizedBox(height: 20),
-          _buildInfoRow('فصيلة الدم', 'O+'),
-          _buildInfoRow('تاريخ الطلب', '01 جانفي 2026'),
-          _buildInfoRow('آخر أجل', '15 جانفي 2026'),
+          _buildInfoRow(AppStrings.bloodType.tr(), 'O+'),
+          _buildInfoRow(AppStrings.requestDate.tr(), '01 جانفي 2026'),
+          _buildInfoRow(AppStrings.deadline.tr(), '15 جانفي 2026'),
           _buildInfoRow('مستشفى مصطفى باشا', 'الجزائر'),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               Text(
-                'تم توفير 1 من 3 أكياس',
-                style: TextStyle(fontSize: 13, color: Colors.grey),
+                AppStrings.bagsProvided.tr(namedArgs: {'count': '1', 'total': '3'}),
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
               ),
               Text(
                 '1/3',
@@ -423,9 +425,9 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
                   borderRadius: BorderRadius.circular(15),
                 ),
               ),
-              child: const Text(
-                'تعديل الطلب',
-                style: TextStyle(
+              child: Text(
+                AppStrings.editRequest.tr(),
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),

@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:tabare3/core/utils/string_manager.dart';
 
 class DonorAppointmentsScreen extends StatefulWidget {
   const DonorAppointmentsScreen({super.key});
@@ -27,14 +29,14 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
               children: [
                 const Icon(Icons.warning_rounded, color: Colors.red, size: 80),
                 const SizedBox(height: 20),
-                const Text(
-                  'هل أنت متأكد من إلغاء هذا الطلب؟',
+                Text(
+                  AppStrings.confirmCancelRequest.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 15),
-                const Text(
-                  'إلغاء للطلب سيتم إشعار صاحب الطلب بأنك غير مستعد للتبرع بالدم.',
+                Text(
+                  AppStrings.cancelRequestNotice.tr(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -57,9 +59,9 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                    child: const Text(
-                      'تأكيد',
-                      style: TextStyle(
+                    child: Text(
+                      AppStrings.confirm.tr(),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
@@ -78,8 +80,8 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                    child: const Text(
-                      'إلغاء',
+                    child: Text(
+                      AppStrings.cancel.tr(),
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -116,15 +118,15 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'مرحباً، أحمد',
-                            style: TextStyle(
+                          Text(
+                            AppStrings.welcomeUser.tr(),
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            'كل تبرع بالدم هو فرصة جديدة للحياة',
+                            AppStrings.donationLifeChance.tr(),
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[600],
@@ -159,18 +161,18 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text(
-                                'مواعيدي',
-                                style: TextStyle(
+                                AppStrings.myAppointments.tr(),
+                                style: const TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Text(
-                                'إدارة ومتابعة جميع مواعيد التبرع بالدم الخاصة بك بسهولة، والاطلاع على تفاصيل المواعيد القادمة والسابقة.',
+                                AppStrings.appointmentsDescription.tr(),
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Colors.white70,
@@ -192,9 +194,9 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
                 ],
               ),
             ),
-            const Text(
-              'المواعيد القادمة',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              AppStrings.upcomingAppointments.tr(),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 15),
             Expanded(
@@ -216,7 +218,7 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
           hospital: 'مستشفى مصطفى باشا',
           patientName: 'علي بن محمد',
           deadline: '15 جانفي 2026',
-          bagsInfo: 'تم توفير 1 من 3 أكياس',
+          bagsInfo: AppStrings.bagsProvided.tr(namedArgs: {'count': '1', 'total': '3'}),
           progress: 0.33,
         ),
         const SizedBox(height: 20),
@@ -224,7 +226,7 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
           hospital: 'مستشفى مصطفى باشا',
           patientName: 'علي بن محمد',
           deadline: '15 جانفي 2026',
-          bagsInfo: 'تم توفير 1 من 3 أكياس',
+          bagsInfo: AppStrings.bagsProvided.tr(namedArgs: {'count': '1', 'total': '3'}),
           progress: 0.33,
         ),
         const SizedBox(height: 100),
@@ -241,13 +243,13 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
           const SizedBox(height: 40),
           const Icon(Icons.assignment_rounded, size: 100, color: Colors.grey),
           const SizedBox(height: 40),
-          const Text(
-            'لا توجد مواعيد قادمة',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          Text(
+            AppStrings.noUpcomingAppointments.tr(),
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 15),
-          const Text(
-            'ليس لديك أي موعد تبرع مجدول حالياً. يمكنك استعراض الطلبات المتاحة وحجز موعد جديد للمساهمة في مساعدة المحتاجين.',
+          Text(
+            AppStrings.noAppointmentsDescription.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 16, color: Colors.grey, height: 1.5),
           ),
@@ -310,9 +312,9 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          _buildInfoRow('المريض', patientName, valueColor: Colors.red),
-          _buildInfoRow('آخر أجل', deadline, valueColor: Colors.red),
-          _buildInfoRow('أكياس الدم', bagsInfo, valueColor: Colors.grey),
+          _buildInfoRow(AppStrings.patient.tr(), patientName, valueColor: Colors.red),
+          _buildInfoRow(AppStrings.deadline.tr(), deadline, valueColor: Colors.red),
+          _buildInfoRow(AppStrings.bloodBags.tr(), bagsInfo, valueColor: Colors.grey),
           const SizedBox(height: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
@@ -337,9 +339,9 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
                   borderRadius: BorderRadius.circular(15),
                 ),
               ),
-              child: const Text(
-                'إلغاء',
-                style: TextStyle(
+              child: Text(
+                AppStrings.cancel.tr(),
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),

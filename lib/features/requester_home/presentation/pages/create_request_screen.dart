@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:tabare3/core/utils/string_manager.dart';
 
 class CreateRequestScreen extends StatefulWidget {
   final VoidCallback? onSuccess;
@@ -9,12 +11,11 @@ class CreateRequestScreen extends StatefulWidget {
 }
 
 class _CreateRequestScreenState extends State<CreateRequestScreen> {
-  String _selectedUrgency = 'عادي';
+  String _selectedUrgency = AppStrings.normal;
 
   @override
   void initState() {
     super.initState();
-    // Show the "Before" popup after the screen is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showBeforeDialog();
     });
@@ -36,20 +37,20 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
               children: [
                 const Icon(Icons.warning_rounded, color: Colors.red, size: 80),
                 const SizedBox(height: 20),
-                const Text(
-                  'بيانات الملف الشخصي',
+                Text(
+                  AppStrings.profileDataTitle.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.grey,
                   ),
                 ),
                 const SizedBox(height: 15),
-                const Text(
-                  'يتم تعبئة بيانات هذا الطلب تلقائيًا من ملفك الشخصي. يرجى تحديث بياناتك إذا طرأ عليها أي تغيير.',
+                Text(
+                  AppStrings.profileDataNotice.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
                     height: 1.5,
@@ -67,9 +68,9 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                    child: const Text(
-                      'تأكيد',
-                      style: TextStyle(
+                    child: Text(
+                      AppStrings.confirm.tr(),
+                      style: const TextStyle(
                         fontSize: 18,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -89,9 +90,9 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                    child: const Text(
-                      'تحديث الملف الشخصي',
-                      style: TextStyle(
+                    child: Text(
+                      AppStrings.updateProfile.tr(),
+                      style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -131,10 +132,10 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                   child: const Icon(Icons.check, color: Colors.white, size: 50),
                 ),
                 const SizedBox(height: 25),
-                const Text(
-                  'تم إنشاء طلب التبرع بنجاح',
+                Text(
+                  AppStrings.requestCreated.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                  style: const TextStyle(fontSize: 18, color: Colors.grey),
                 ),
                 const SizedBox(height: 10),
                 Image.asset(
@@ -148,11 +149,11 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(context); // Close dialog
+                      Navigator.pop(context);
                       if (widget.onSuccess != null) {
                         widget.onSuccess!();
                       } else {
-                        Navigator.pop(context); // Go back to home
+                        Navigator.pop(context);
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -161,9 +162,9 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: const Text(
-                      'طلباتي',
-                      style: TextStyle(
+                    child: Text(
+                      AppStrings.myRequests.tr(),
+                      style: const TextStyle(
                         fontSize: 18,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -192,23 +193,22 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-                // Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'مرحباً، أحمد',
-                          style: TextStyle(
+                        Text(
+                          AppStrings.welcomeUser.tr(),
+                          style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
                         ),
                         Text(
-                          'نتمنى لك الشفاء العاجل',
+                          AppStrings.getWellSoon.tr(),
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -230,7 +230,6 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                   ],
                 ),
                 const SizedBox(height: 30),
-                // Red Banner Card
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
@@ -243,19 +242,19 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
-                              'إنشاء طلب تبرع بالدم',
-                              style: TextStyle(
+                              AppStrings.createRequestBanner.tr(),
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
-                              'أدخل بيانات طلبك بدقة لمساعدتنا في العثور على متبرعين متوافقين مع فصيلة الدم المطلوبة وفي أقرب وقت ممكن.',
-                              style: TextStyle(
+                              AppStrings.requestFormDescription.tr(),
+                              style: const TextStyle(
                                 fontSize: 13,
                                 color: Colors.white70,
                                 height: 1.4,
@@ -275,45 +274,46 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                // Urgency Degree
-                const Center(
+                Center(
                   child: Text(
-                    'درجة الاستعجال',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    AppStrings.urgencyLevel.tr(),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
                 const SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildUrgencyBadge('حرج', Colors.red),
+                    _buildUrgencyBadge(AppStrings.veryUrgent, Colors.red),
                     const SizedBox(width: 15),
-                    _buildUrgencyBadge('مستعجل', Colors.orange),
+                    _buildUrgencyBadge(AppStrings.urgent, Colors.orange),
                     const SizedBox(width: 15),
-                    _buildUrgencyBadge('عادي', Colors.green),
+                    _buildUrgencyBadge(AppStrings.normal, Colors.green),
                   ],
                 ),
                 const SizedBox(height: 30),
-                // Form Fields
-                _buildTextField('عدد الأكياس المطلوبة', Icons.tag),
+                _buildTextField(AppStrings.bagsRequired.tr(), Icons.tag),
                 const SizedBox(height: 15),
                 _buildTextField(
-                  'الولاية',
+                  AppStrings.governorate.tr(),
                   Icons.map_outlined,
                   isDropdown: true,
                 ),
                 const SizedBox(height: 15),
-                _buildTextField('اسم المستشفى', Icons.local_hospital_outlined),
+                _buildTextField(
+                    AppStrings.hospitalNameField.tr(),
+                    Icons.local_hospital_outlined),
                 const SizedBox(height: 15),
-                _buildTextField('تاريخ آخر أجل', Icons.calendar_today_outlined),
+                _buildTextField(AppStrings.deadlineField.tr(),
+                    Icons.calendar_today_outlined),
                 const SizedBox(height: 15),
                 _buildTextField(
-                  'ملاحظات',
+                  AppStrings.notes.tr(),
                   Icons.sticky_note_2_outlined,
                   isMultiline: true,
                 ),
                 const SizedBox(height: 30),
-                // Bottom Buttons
                 Row(
                   children: [
                     Expanded(
@@ -327,9 +327,9 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: const Text(
-                            'التالي',
-                            style: TextStyle(
+                          child: Text(
+                            AppStrings.next.tr(),
+                            style: const TextStyle(
                               fontSize: 18,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -350,9 +350,9 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: const Text(
-                            'محو',
-                            style: TextStyle(
+                          child: Text(
+                            AppStrings.clearFields.tr(),
+                            style: const TextStyle(
                               fontSize: 18,
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
@@ -372,10 +372,10 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     );
   }
 
-  Widget _buildUrgencyBadge(String label, Color color) {
-    bool isSelected = _selectedUrgency == label;
+  Widget _buildUrgencyBadge(String key, Color color) {
+    bool isSelected = _selectedUrgency == key;
     return GestureDetector(
-      onTap: () => setState(() => _selectedUrgency = label),
+      onTap: () => setState(() => _selectedUrgency = key),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         decoration: BoxDecoration(
@@ -391,7 +391,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             Icon(Icons.circle, size: 8, color: color),
             const SizedBox(width: 8),
             Text(
-              label,
+              key.tr(),
               style: TextStyle(
                 color: isSelected ? color : Colors.grey,
                 fontWeight: FontWeight.bold,

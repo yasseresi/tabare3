@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:tabare3/core/utils/string_manager.dart';
 
 class DonorCardInfoScreen extends StatelessWidget {
   const DonorCardInfoScreen({super.key});
@@ -21,18 +23,18 @@ class DonorCardInfoScreen extends StatelessWidget {
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
-                          'مرحباً، أحمد',
-                          style: TextStyle(
+                          AppStrings.welcomeUser.tr(),
+                          style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                         ),
                         Text(
-                          'كل تبرع بالدم هو فرصة جديدة للحياة',
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                          AppStrings.donationLifeChance.tr(),
+                          style: const TextStyle(fontSize: 14, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -65,7 +67,7 @@ class DonorCardInfoScreen extends StatelessWidget {
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
+                    children: [
                       Icon(
                         Icons.card_giftcard,
                         color: Colors.deepPurple,
@@ -73,8 +75,8 @@ class DonorCardInfoScreen extends StatelessWidget {
                       ),
                       SizedBox(width: 8),
                       Text(
-                        'بطاقة المتبرع',
-                        style: TextStyle(
+                        AppStrings.donorCard.tr(),
+                        style: const TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
@@ -97,29 +99,28 @@ class DonorCardInfoScreen extends StatelessWidget {
                 const SizedBox(height: 30),
                 // Info Section
                 _buildSection(
-                  title: 'ماهي بطاقة المتبرع',
-                  content:
-                      'بطاقة المتبرع هي ملفك الشخصي التفاعلي داخل المنصة، حيث تعرض مستوى عطائك، عدد تبرعاتك، النقاط التي حصلت عليها، والإنجازات التي حققتها خلال رحلتك الإنسانية. اكسب النقاط من خلال التبرع والالتزام والمشاركة، وارتق عبر خمسة مستويات تعكس مدى تأثيرك في المجتمع، فمع كل تبرع جديد تقترب أكثر من تحقيق إنجازات أكبر والوصول إلى لقب "أسطورة التبرع". لأن كل قطرة دم تمنح الأمل وتساهم في إنقاذ الأرواح.',
+                  title: AppStrings.whatIsDonorCard.tr(),
+                  content: AppStrings.donorCardExplanation.tr(),
                 ),
                 const SizedBox(height: 30),
                 // How to earn points
-                _buildSectionTitle('كيف تكسب النقاط'),
+                _buildSectionTitle(AppStrings.howToEarnPoints.tr()),
                 const SizedBox(height: 15),
                 Wrap(
                   spacing: 10,
                   runSpacing: 10,
                   alignment: WrapAlignment.center,
                   children: [
-                    _buildPointChip('التبرع بالدم', '+8', Colors.green),
-                    _buildPointChip('الالتزام بالموعد', '+2', Colors.green),
-                    _buildPointChip('الالغاء', '-5', Colors.red),
-                    _buildPointChip('التبرع المستعجل', '+10', Colors.green),
-                    _buildPointChip('3 اشهر و الحساب مغلق', '-3', Colors.red),
+                    _buildPointChip(AppStrings.bloodDonation.tr(), '+8', Colors.green),
+                    _buildPointChip(AppStrings.appointmentCommitment.tr(), '+2', Colors.green),
+                    _buildPointChip(AppStrings.cancellationLabel.tr(), '-5', Colors.red),
+                    _buildPointChip(AppStrings.urgentDonation.tr(), '+10', Colors.green),
+                    _buildPointChip(AppStrings.threeMonthsInactive.tr(), '-3', Colors.red),
                   ],
                 ),
                 const SizedBox(height: 30),
                 // Levels
-                _buildSectionTitle('المستويات'),
+                _buildSectionTitle(AppStrings.levels.tr()),
                 const SizedBox(height: 15),
                 Container(
                   padding: const EdgeInsets.all(20),
@@ -129,15 +130,15 @@ class DonorCardInfoScreen extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
-                      _buildLevelRow('قطرة امل', '0-10'),
+                      _buildLevelRow(AppStrings.dropOfHope.tr(), '0-10'),
                       const Divider(color: Colors.white10, height: 20),
-                      _buildLevelRow('متبرع نشط', '10-50'),
+                      _buildLevelRow(AppStrings.activeDonor.tr(), '10-50'),
                       const Divider(color: Colors.white10, height: 20),
-                      _buildLevelRow('متبرع ملتزم', '50-90'),
+                      _buildLevelRow(AppStrings.committedDonor.tr(), '50-90'),
                       const Divider(color: Colors.white10, height: 20),
-                      _buildLevelRow('متبرع متميز', '90-120'),
+                      _buildLevelRow(AppStrings.distinguishedDonor.tr(), '90-120'),
                       const Divider(color: Colors.white10, height: 20),
-                      _buildLevelRow('تستحق جائزة', '+120'),
+                      _buildLevelRow(AppStrings.deserveReward.tr(), '+120'),
                     ],
                   ),
                 ),

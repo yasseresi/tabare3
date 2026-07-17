@@ -1,5 +1,6 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tabare3/core/utils/string_manager.dart';
 
 class RequesterProfileScreen extends StatefulWidget {
   const RequesterProfileScreen({super.key});
@@ -26,10 +27,10 @@ class _RequesterProfileScreenState extends State<RequesterProfileScreen> {
                 const SizedBox(height: 10),
                 _buildProfileInfo(),
                 const SizedBox(height: 20),
-                _buildSectionHeader('معلومات الحساب'),
+                _buildSectionHeader(AppStrings.accountInfo.tr()),
                 _buildAccountInfo(),
                 const SizedBox(height: 20),
-                _buildSectionHeader('المعلومات الشخصية'),
+                _buildSectionHeader(AppStrings.personalInfo.tr()),
                 _buildPersonalInfo(),
                 const SizedBox(height: 20),
                 _buildAppInfo(),
@@ -51,16 +52,16 @@ class _RequesterProfileScreenState extends State<RequesterProfileScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'مرحباً، أحمد',
-                style: TextStyle(
+              Text(
+                AppStrings.welcomeUser.tr(),
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
               ),
               Text(
-                'نتمنى لك الشفاء العاجل',
+                AppStrings.getWellSoon.tr(),
                 style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               ),
             ],
@@ -127,7 +128,7 @@ class _RequesterProfileScreenState extends State<RequesterProfileScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  _isEditing ? 'حفظ التعديلات' : 'تعديل',
+                  _isEditing ? AppStrings.saveChanges.tr() : AppStrings.edit.tr(),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -172,21 +173,21 @@ class _RequesterProfileScreenState extends State<RequesterProfileScreen> {
           children: [
             _buildListItem(
               icon: Icons.phone_outlined,
-              label: 'رقم الهاتف',
+              label: AppStrings.phoneNumberLabel.tr(),
               value: '0676 24 41 89',
             ),
             const Divider(height: 1, indent: 20, endIndent: 20),
             _buildListItem(
               icon: Icons.person_pin_outlined,
-              label: 'نوع الحساب',
-              value: 'أحتاج دم / أنا متبرع',
+              label: AppStrings.accountType.tr(),
+              value: '${AppStrings.iNeedBlood.tr()} / ${AppStrings.iAmDonor.tr()}',
               isDropdown: _isEditing,
             ),
             const Divider(height: 1, indent: 20, endIndent: 20),
             _buildSwitchItem(
               icon: Icons.notifications_none_outlined,
-              label: 'حالة الحساب',
-              subtitle: 'نشط / غير متاح حالياً',
+              label: AppStrings.accountStatus.tr(),
+              subtitle: AppStrings.accountStatusSubtitle.tr(),
               value: _accountStatus,
               onChanged: (val) => setState(() => _accountStatus = val),
             ),
@@ -209,44 +210,44 @@ class _RequesterProfileScreenState extends State<RequesterProfileScreen> {
           children: [
             _buildListItem(
               icon: Icons.calendar_today_outlined,
-              label: 'تاريخ الميلاد',
+              label: AppStrings.dateOfBirth.tr(),
               value: '27 نوفمبر 2005',
             ),
             const Divider(height: 1, indent: 20, endIndent: 20),
             _buildListItem(
               icon: Icons.person_outline,
-              label: 'الجنس',
-              value: 'ذكر',
+              label: AppStrings.gender.tr(),
+              value: AppStrings.male.tr(),
             ),
             const Divider(height: 1, indent: 20, endIndent: 20),
             _buildListItem(
               icon: Icons.badge_outlined,
-              label: 'رقم بطاقة التعريف الوطني',
+              label: AppStrings.nationalId.tr(),
               value: '10101010101010101010',
               isLongValue: true,
             ),
             const Divider(height: 1, indent: 20, endIndent: 20),
             _buildListItem(
               icon: Icons.opacity,
-              label: 'فصيلة الدم',
+              label: AppStrings.bloodType.tr(),
               value: 'O+',
             ),
             const Divider(height: 1, indent: 20, endIndent: 20),
             _buildListItem(
               icon: Icons.monitor_weight_outlined,
-              label: 'الوزن',
+              label: AppStrings.weight.tr(),
               value: '80 kg',
             ),
             const Divider(height: 1, indent: 20, endIndent: 20),
             _buildListItem(
               icon: Icons.location_city_outlined,
-              label: 'الولاية',
+              label: AppStrings.governorate.tr(),
               value: 'الجزائر العاصمة',
             ),
             const Divider(height: 1, indent: 20, endIndent: 20),
             _buildListItem(
               icon: Icons.coronavirus_outlined,
-              label: 'الامراض المزمنة',
+              label: AppStrings.chronicDiseasesLabel.tr(),
               value: '/',
             ),
           ],
@@ -266,15 +267,15 @@ class _RequesterProfileScreenState extends State<RequesterProfileScreen> {
           border: Border.all(color: Colors.grey.withOpacity(0.1)),
         ),
         child: Row(
-          children: const [
-            Icon(
+          children: [
+            const Icon(
               Icons.arrow_back_ios_new_rounded,
               color: Colors.grey,
               size: 16,
             ),
-            Spacer(),
+            const Spacer(),
             Text(
-              'معلومات التطبيق',
+              AppStrings.appInformation.tr(),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

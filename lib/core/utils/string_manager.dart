@@ -5,6 +5,7 @@ class AppStrings {
 
   // General
   static const String loading = 'loading';
+  static const String loggingIn = 'logging_in';
   static const String retryAgain = 'retry_again';
   static const String ok = 'ok';
   static const String success = 'success';
@@ -25,6 +26,14 @@ class AppStrings {
 
   // Auth
   static const String login = 'login';
+  static const String username = 'username';
+  static const String loginError = 'login_error';
+  static const String signingUp = 'signing_up';
+  static const String signupError = 'signup_error';
+  static const String termsAndConditions = 'terms_and_conditions';
+  static const String passwordConfirm = 'password_confirm';
+  static const String chronicDiseases = 'chronic_diseases';
+  static const String termsBody = 'terms_body';
   static const String signup = 'signup';
   static const String logout = 'logout';
   static const String email = 'email';
@@ -34,6 +43,11 @@ class AppStrings {
   static const String noAccount = 'no_account';
   static const String hasAccount = 'has_account';
   static const String chooseRole = 'choose_role';
+  static const String areYou = 'are_you';
+  static const String hadithIntro = 'hadith_intro';
+  static const String roleUpdateError = 'role_update_error';
+  static const String confirmRoleUpdate = 'confirm_role_update';
+  static const String roleSwitchWarning = 'role_switch_warning';
   static const String iAmDonor = 'i_am_donor';
   static const String iNeedBlood = 'i_need_blood';
   static const String fullName = 'full_name';
@@ -62,6 +76,7 @@ class AppStrings {
 
   // Home
   static const String welcome = 'welcome';
+  static const String welcomeTo = 'welcome_to';
   static const String activeDonor = 'active_donor';
   static const String latestNearbyRequests = 'latest_nearby_requests';
   static const String urgentRequests = 'urgent_requests';
@@ -202,6 +217,118 @@ class AppStrings {
   static const String bags = 'bags';
   static const String yes = 'yes';
   static const String no = 'no';
+
+  // Greetings
+  static const String welcomeUser = 'welcome_user';
+  static const String getWellSoon = 'get_well_soon';
+  static const String donationLifeChance = 'donation_life_chance';
+  static const String hadithBelieverAffair = 'hadith_believer_affair';
+  static const String requestsNearYou = 'requests_near_you';
+  static const String nextDonationAppointment = 'next_donation_appointment';
+
+  // Request status
+  static const String requestActive = 'request_active';
+  static const String noRequestsYou = 'no_requests_you';
+  static const String requestsCount = 'requests_count';
+  static const String respondingDonors = 'responding_donors';
+  static const String requestDate = 'request_date';
+  static const String deadline = 'deadline';
+  static const String activeStatus = 'active_status';
+  static const String notActive = 'not_active';
+  static const String requestStatus = 'request_status';
+  static const String activeOrClosed = 'active_or_closed';
+  static const String availableDonors = 'available_donors';
+  static const String bagsProvided = 'bags_provided';
+  static const String searchRequests = 'search_requests';
+  static const String allRequests = 'all_requests';
+  static const String doneStatus = 'done_status';
+  static const String noRequestsYet = 'no_requests_yet';
+  static const String noRequestsDescription = 'no_requests_description';
+  static const String thanksForDonating = 'thanks_for_donating';
+
+  // Create/Edit request
+  static const String profileDataTitle = 'profile_data_title';
+  static const String profileDataNotice = 'profile_data_notice';
+  static const String createRequestBanner = 'create_request_banner';
+  static const String requestFormDescription = 'request_form_description';
+  static const String bagsRequired = 'bags_required';
+  static const String hospitalNameField = 'hospital_name_field';
+  static const String deadlineField = 'deadline_field';
+  static const String notes = 'notes';
+  static const String clearFields = 'clear_fields';
+  static const String editRequestBanner = 'edit_request_banner';
+  static const String editRequestSubtitle = 'edit_request_subtitle';
+  static const String confirmAcceptRequestMsg = 'confirm_accept_request_msg';
+  static const String acceptRequestNotice = 'accept_request_notice';
+  static const String acceptRequestThanks = 'accept_request_thanks';
+
+  // Donor history / donors
+  static const String donors = 'donors';
+  static const String donorsSectionDescription = 'donors_section_description';
+  static const String donorsList = 'donors_list';
+  static const String donationSuccessful = 'donation_successful';
+  static const String location = 'location';
+
+  // Notifications
+  static const String notificationsHeader = 'notifications_header';
+  static const String donorsCompleted = 'donors_completed';
+  static const String donorsCompletedDesc = 'donors_completed_desc';
+  static const String newDonorAccepted = 'new_donor_accepted';
+
+  // Profile
+  static const String saveChanges = 'save_changes';
+  static const String phoneNumberLabel = 'phone_number_label';
+  static const String accountType = 'account_type';
+  static const String accountStatusSubtitle = 'account_status_subtitle';
+  static const String chronicDiseasesLabel = 'chronic_diseases_label';
+  static const String appInformation = 'app_information';
+  static const String record = 'record';
+  static const String accountSettings = 'account_settings';
+  static const String changeLanguage = 'change_language';
+  static const String arabic = 'arabic';
+  static const String chooseLanguage = 'choose_language';
+  static const String aboutUs = 'about_us';
+  static const String privacyPolicyLabel = 'privacy_policy_label';
+  static const String appValues = 'app_values';
+  static const String logoutMessage = 'logout_message';
+  static const String logoutSeeYou = 'logout_see_you';
+  static const String fullNameValue = 'full_name_value';
+
+  // Donor card
+  static const String dropOfHope = 'drop_of_hope';
+  static const String committedDonor = 'committed_donor';
+  static const String distinguishedDonor = 'distinguished_donor';
+  static const String deserveReward = 'deserve_reward';
+  static const String pointsCount = 'points_count';
+  static const String donorCardMotivation = 'donor_card_motivation';
+  static const String pointsForNextLevel = 'points_for_next_level';
+  static const String earnedBadges = 'earned_badges';
+  static const String whatIsDonorCard = 'what_is_donor_card';
+  static const String donorCardExplanation = 'donor_card_explanation';
+  static const String howToEarnPoints = 'how_to_earn_points';
+  static const String bloodDonation = 'blood_donation';
+  static const String appointmentCommitment = 'appointment_commitment';
+  static const String cancellationLabel = 'cancellation_label';
+  static const String urgentDonation = 'urgent_donation';
+  static const String threeMonthsInactive = 'three_months_inactive';
+  static const String levels = 'levels';
+  static const String campaignDonation = 'campaign_donation';
+  static const String campaignDate = 'campaign_date';
+  static const String startTime = 'start_time';
+  static const String endTime = 'end_time';
+  static const String place = 'place';
+  static const String organizingEntity = 'organizing_entity';
+  static const String myAppointments = 'my_appointments';
+  static const String appointmentsDescription = 'appointments_description';
+  static const String upcomingAppointments = 'upcoming_appointments';
+  static const String noUpcomingAppointments = 'no_upcoming_appointments';
+  static const String noAppointmentsDescription = 'no_appointments_description';
+  static const String patient = 'patient';
+  static const String bloodBags = 'blood_bags';
+  static const String donationRecord = 'donation_record';
+  static const String donationRecordDescription = 'donation_record_description';
+  static const String donationCard = 'donation_card';
+  static const String cancelRequestNotice = 'cancel_request_notice';
 
   // Quran & Hadith — Arabic only, never translated
   static const String quranVerse = 'quran_verse';

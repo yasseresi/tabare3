@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -7,6 +8,7 @@ import '../../../../core/presentation/widgets/loading_overlay.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
+import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../../../core/validators/validators.dart';
@@ -54,7 +56,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
         builder: (context, state) {
           return LoadingOverlay(
             visible: state is AuthLoading,
-            message: 'جاري تسجيل الدخول',
+            message: AppStrings.loggingIn.tr(),
             child: Scaffold(
               backgroundColor: ColorManager.white,
               body: Directionality(
@@ -92,7 +94,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                           ),
                           const SizedBox(height: AppSize.s15),
                           Text(
-                            'تسجيل الدخول',
+                            AppStrings.login.tr(),
                             style: getBoldStyle(
                               fontSize: FontSize.s30,
                               color: ColorManager.black,
@@ -100,7 +102,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                           ),
                           const SizedBox(height: AppSize.s30),
                           AppTextField(
-                            hintText: 'اسم المستخدم',
+                            hintText: AppStrings.username.tr(),
                             prefixIcon: Icons.person_outline,
                             controller: _usernameController,
                             keyboardType: TextInputType.text,
@@ -118,7 +120,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                           Row(
                             children: [
                               Text(
-                                'تذكرني في المرة القادمة',
+                                AppStrings.rememberMe.tr(),
                                 style: getRegularStyle(
                                   fontSize: FontSize.s12,
                                   color: ColorManager.textMuted,
@@ -157,7 +159,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                               ),
                               onPressed: () =>
                                   _dispatchLogin(context.read<AuthBloc>()),
-                              child: const Text('تسجيل الدخول'),
+                              child: Text(AppStrings.login.tr()),
                             ),
                           ),
                           const SizedBox(height: AppSize.s5),
@@ -165,7 +167,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'ليس لديك حساب؟ ',
+                                '${AppStrings.noAccount.tr()} ',
                                 style: getRegularStyle(
                                   fontSize: FontSize.s12,
                                   color: ColorManager.textMuted,
@@ -179,7 +181,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                                   ),
                                 ),
                                 child: Text(
-                                  'إنشاء حساب',
+                                  AppStrings.signup.tr(),
                                   style: getBoldStyle(
                                     fontSize: FontSize.s12,
                                     color: ColorManager.primary,
@@ -207,8 +209,8 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
         context: context,
         barrierDismissible: false,
         builder: (_) => AppDialog.success(
-          title: 'لقد سجلت الدخول بنجاح إلى تطبيق',
-          actionLabel: 'الصفحة الرئيسية',
+          title: AppStrings.loginSuccess.tr(),
+          actionLabel: AppStrings.homePage.tr(),
           onAction: () {
             Navigator.pushAndRemoveUntil(
               context,
@@ -225,9 +227,9 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
         context: context,
         barrierDismissible: true,
         builder: (_) => AppDialog.error(
-          title: 'خطأ في تسجيل الدخول',
+          title: AppStrings.loginError.tr(),
           message: state.failure.message,
-          actionLabel: 'إعادة المحاولة',
+          actionLabel: AppStrings.retryAgain.tr(),
           onAction: () => Navigator.pop(context),
         ),
       );

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,6 +7,7 @@ import '../../../../core/presentation/widgets/app_dialog.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
+import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../../../injection_container.dart';
@@ -38,9 +40,9 @@ class RoleSelectionScreen extends StatelessWidget {
               context: context,
               barrierDismissible: true,
               builder: (_) => AppDialog.error(
-                title: 'خطأ في تحديث الحالة',
+                title: AppStrings.roleUpdateError.tr(),
                 message: state.failure.message,
-                actionLabel: 'إعادة المحاولة',
+                actionLabel: AppStrings.retryAgain.tr(),
                 onAction: () => Navigator.pop(context),
               ),
             );
@@ -80,7 +82,7 @@ class RoleSelectionScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: AppSize.s20),
                           Text(
-                            'قال رسول الله ﷺ:',
+                            AppStrings.hadithIntro.tr(),
                             textAlign: TextAlign.center,
                             style: GoogleFonts.cairo(
                               fontSize: FontSize.s18,
@@ -90,7 +92,7 @@ class RoleSelectionScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: AppSize.s10),
                           Text(
-                            '«مَنْ نَفَّسَ عَنْ مُؤْمِنٍ كُرْبَةً مِنْ كُرَبِ الدُّنْيَا، نَفَّسَ اللهُ عَنْهُ كُرْبَةً مِنْ كُرَبِ يَوْمِ الْقِيَامَةِ»',
+                            '«${AppStrings.hadithRelief.tr()}»',
                             textAlign: TextAlign.center,
                             style: GoogleFonts.cairo(
                               fontSize: FontSize.s14,
@@ -101,7 +103,7 @@ class RoleSelectionScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: AppSize.s24),
                           Text(
-                            'هل انت',
+                            AppStrings.areYou.tr(),
                             style: getBoldStyle(
                               fontSize: FontSize.s20,
                               color: ColorManager.textPrimary,
@@ -119,7 +121,7 @@ class RoleSelectionScreen extends StatelessWidget {
                                 elevation: AppSize.s2,
                                 shadowColor: Colors.black26,
                               ),
-                              child: const Text('أحتاج دم'),
+                              child: Text(AppStrings.iNeedBlood.tr()),
                             ),
                           ),
                           const SizedBox(height: AppSize.s15),
@@ -132,9 +134,9 @@ class RoleSelectionScreen extends StatelessWidget {
                               style: TextButton.styleFrom(
                                 foregroundColor: ColorManager.textSecondary,
                               ),
-                              child: const Text(
-                                'أنا متبرع',
-                                style: TextStyle(
+                              child: Text(
+                                AppStrings.iAmDonor.tr(),
+                                style: const TextStyle(
                                   fontSize: FontSize.s18,
                                   fontWeight: FontWeightManager.bold,
                                 ),
@@ -174,7 +176,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSize.s20),
                   Text(
-                    'تأكيد تحديث الحالة !',
+                    AppStrings.confirmRoleUpdate.tr(),
                     textAlign: TextAlign.center,
                     style: getBoldStyle(
                       fontSize: FontSize.s20,
@@ -183,7 +185,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSize.s15),
                   Text(
-                    'عند تقديم طلب للحصول على الدم، سيتم إلغاء حالة "أنا متبرع" تلقائياً ولن تظهر ضمن قائمة المتبرعين النشطين، يمكنك إعادة تفعيلها لاحقاً بعد انتهاء طلبك.',
+                    AppStrings.roleSwitchWarning.tr(),
                     textAlign: TextAlign.center,
                     style: getBoldStyle(
                       fontSize: FontSize.s16,
@@ -199,7 +201,7 @@ class RoleSelectionScreen extends StatelessWidget {
                         Navigator.pop(dialogContext);
                         _selectRole(context, isDonor: false, isRecipient: true);
                       },
-                      child: const Text('تأكيد'),
+                      child: Text(AppStrings.confirm.tr()),
                     ),
                   ),
                   const SizedBox(height: AppSize.s10),
@@ -209,7 +211,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     child: TextButton(
                       onPressed: () => Navigator.pop(dialogContext),
                       child: Text(
-                        'إلغاء',
+                        AppStrings.cancel.tr(),
                         style: getSemiBoldStyle(
                           fontSize: FontSize.s16,
                           color: ColorManager.textSecondary,

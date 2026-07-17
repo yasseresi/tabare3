@@ -36,7 +36,7 @@ void main() {
 
       expect(find.text('لقد سجلت الدخول بنجاح إلى تطبيق'), findsOneWidget);
       expect(find.text('الصفحة الرئيسية'), findsOneWidget);
-      expect(find.byIcon(Icons.check_circle), findsOneWidget);
+      expect(find.byIcon(Icons.check), findsOneWidget);
     });
 
     testWidgets('calls onAction when button tapped', (tester) async {
@@ -74,7 +74,7 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('إعادة المحاولة'), findsOneWidget);
-      expect(find.byIcon(Icons.error_outline), findsOneWidget);
+      expect(find.byIcon(Icons.close), findsOneWidget);
     });
   });
 

@@ -1,5 +1,6 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tabare3/core/utils/string_manager.dart';
 
 class DonorRequestsScreen extends StatefulWidget {
   const DonorRequestsScreen({super.key});
@@ -27,14 +28,14 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
               children: [
                 const Icon(Icons.warning_rounded, color: Colors.red, size: 80),
                 const SizedBox(height: 20),
-                const Text(
-                  'هل أنت متأكد من قبول هذا الطلب؟',
+                Text(
+                  AppStrings.confirmAcceptRequestMsg.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 15),
-                const Text(
-                  'بقبولك للطلب سيتم إشعار صاحب الطلب بأنك مستعد للتبرع بالدم.',
+                Text(
+                  AppStrings.acceptRequestNotice.tr(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -57,9 +58,9 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                    child: const Text(
-                      'تأكيد',
-                      style: TextStyle(
+                    child: Text(
+                      AppStrings.confirm.tr(),
+                      style: const TextStyle(
                         fontSize: 18,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -79,8 +80,8 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                    child: const Text(
-                      'إلغاء',
+                    child: Text(
+                      AppStrings.cancel.tr(),
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey,
@@ -121,14 +122,14 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
                   child: const Icon(Icons.check, color: Colors.white, size: 50),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'تم قبول الطلب بنجاح',
+                Text(
+                  AppStrings.requestAccepted.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 15),
-                const Text(
-                  'شكراً لك على مساهمتك الإنسانية. تم إشعار صاحب الطلب باستعدادك للتبرع، وسيتم التواصل معك عند الحاجة.',
+                Text(
+                  AppStrings.acceptRequestThanks.tr(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -148,9 +149,9 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                    child: const Text(
-                      'تأكيد',
-                      style: TextStyle(
+                    child: Text(
+                      AppStrings.confirm.tr(),
+                      style: const TextStyle(
                         fontSize: 18,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -187,16 +188,16 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'مرحباً، أحمد',
-                            style: TextStyle(
+                          Text(
+                            AppStrings.welcomeUser.tr(),
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
                           ),
                           Text(
-                            'كل تبرع بالدم هو فرصة جديدة للحياة',
+                            AppStrings.donationLifeChance.tr(),
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[600],
@@ -222,7 +223,7 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
                   TextField(
                     textAlign: TextAlign.right,
                     decoration: InputDecoration(
-                      hintText: 'ابحث عن مريض أو مستشفى...',
+                      hintText: AppStrings.searchRequests.tr(),
                       hintStyle: const TextStyle(color: Colors.grey),
                       prefixIcon: const Icon(Icons.search, color: Colors.grey),
                       filled: true,
@@ -240,9 +241,9 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
                 ],
               ),
             ),
-            const Text(
-              'كل الطلبات',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              AppStrings.allRequests.tr(),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 15),
             Expanded(
@@ -262,27 +263,27 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
         const SizedBox(height: 20),
         _buildRequestCard(
           name: 'علي بن محمد',
-          urgency: 'حرج',
+          urgency: AppStrings.veryUrgent.tr(),
           urgencyColor: Colors.red,
           bloodType: 'O+',
           requestDate: '01 جانفي 2026',
           deadline: '15 جانفي 2026',
           hospital: 'مستشفى مصطفى باشا',
           location: 'الجزائر',
-          bagsInfo: 'تم توفير 1 من 3 أكياس',
+          bagsInfo: AppStrings.bagsProvided.tr(namedArgs: {'count': '1', 'total': '3'}),
           progress: 0.33,
         ),
         const SizedBox(height: 20),
         _buildRequestCard(
           name: 'علي بن محمد',
-          urgency: 'مستعجل',
+          urgency: AppStrings.urgent.tr(),
           urgencyColor: Colors.orange,
           bloodType: 'O+',
           requestDate: '01 جانفي 2026',
           deadline: '15 جانفي 2026',
           hospital: 'مستشفى مصطفى باشا',
           location: 'الجزائر',
-          bagsInfo: 'تم توفير 1 من 3 أكياس',
+          bagsInfo: AppStrings.bagsProvided.tr(namedArgs: {'count': '1', 'total': '3'}),
           progress: 0.33,
         ),
         const SizedBox(height: 100),
@@ -307,19 +308,19 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'لا توجد طلبات حالياً',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          Text(
+            AppStrings.noRequestsYet.tr(),
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 15),
-          const Text(
-            'لم يتم العثور على أي طلبات تبرع بالدم في منطقتك حالياً. يرجى العودة لاحقاً أو تفعيل الإشعارات ليتم إعلامك فور توفر طلبات جديدة.',
+          Text(
+            AppStrings.noRequestsDescription.tr(),
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 15, color: Colors.grey, height: 1.5),
+            style: const TextStyle(fontSize: 15, color: Colors.grey, height: 1.5),
           ),
           const SizedBox(height: 15),
-          const Text(
-            'شكراً لاستعدادك للتبرع، مساهمتك قد تنقذ حياة شخص يحتاج إلى المساعدة.',
+          Text(
+            AppStrings.thanksForDonating.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 15, color: Colors.grey, height: 1.5),
           ),
@@ -356,37 +357,37 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
                     size: 40,
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    'حملة تبرع',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Text(
+                    AppStrings.campaignDonation.tr(),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
-              _buildBadge('حرج', Colors.red),
+              _buildBadge(AppStrings.veryUrgent.tr(), Colors.red),
             ],
           ),
           const SizedBox(height: 20),
-          _buildInfoRow('تاريخ الحملة', '01 جانفي 2026', isCampaign: true),
+          _buildInfoRow(AppStrings.campaignDate.tr(), '01 جانفي 2026', isCampaign: true),
           _buildInfoRow(
-            'وقت البداية',
+            AppStrings.startTime.tr(),
             '09:00 صباحاً',
             valueColor: const Color(0xFF8B1D1D),
             isCampaign: true,
           ),
           _buildInfoRow(
-            'وقت النهاية',
+            AppStrings.endTime.tr(),
             '04:00 مساءاً',
             valueColor: const Color(0xFF8B1D1D),
             isCampaign: true,
           ),
           _buildInfoRow(
-            'المكان',
+            AppStrings.place.tr(),
             'المركز الثقافي - قاعة المؤتمرات، قسنطينة',
             valueColor: const Color(0xFF8B1D1D),
             isCampaign: true,
           ),
           _buildInfoRow(
-            'الجهة المنظمة',
+            AppStrings.organizingEntity.tr(),
             'جمعية تبرع',
             valueColor: const Color(0xFF8B1D1D),
             isCampaign: true,
@@ -458,9 +459,9 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          _buildInfoRow('فصيلة الدم', bloodType),
-          _buildInfoRow('تاريخ الطلب', requestDate),
-          _buildInfoRow('آخر أجل', deadline),
+          _buildInfoRow(AppStrings.bloodType.tr(), bloodType),
+          _buildInfoRow(AppStrings.requestDate.tr(), requestDate),
+          _buildInfoRow(AppStrings.deadline.tr(), deadline),
           _buildInfoRow(hospital, location),
           const SizedBox(height: 20),
           Row(
@@ -504,9 +505,9 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
                   borderRadius: BorderRadius.circular(15),
                 ),
               ),
-              child: const Text(
-                'قبول الطلب',
-                style: TextStyle(
+              child: Text(
+                AppStrings.acceptRequest.tr(),
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),

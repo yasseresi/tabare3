@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:tabare3/core/utils/string_manager.dart';
 
 class DonorRecordScreen extends StatelessWidget {
   const DonorRecordScreen({super.key});
@@ -24,15 +26,15 @@ class DonorRecordScreen extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'مرحباً، أحمد',
-                            style: TextStyle(
+                          Text(
+                            AppStrings.welcomeUser.tr(),
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            'كل تبرع بالدم هو فرصة جديدة للحياة',
+                            AppStrings.donationLifeChance.tr(),
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[600],
@@ -67,18 +69,18 @@ class DonorRecordScreen extends StatelessWidget {
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text(
-                                'سجل تبرعاتي',
-                                style: TextStyle(
+                                AppStrings.donationRecord.tr(),
+                                style: const TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Text(
-                                'استعرض جميع عمليات التبرع بالدم التي قمت بها سابقاً وتابع مساهماتك الإنسانية وأثرها في مساعدة المحتاجين.',
+                                AppStrings.donationRecordDescription.tr(),
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Colors.white70,
@@ -100,9 +102,9 @@ class DonorRecordScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const Text(
-              'بطاقة التبرع',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              AppStrings.donationCard.tr(),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 15),
             Expanded(
@@ -168,9 +170,9 @@ class DonorRecordScreen extends StatelessWidget {
                 children: [
                   const Icon(Icons.circle, color: Colors.green, size: 10),
                   const SizedBox(width: 8),
-                  const Text(
-                    'تم التبرع بنجاح',
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  Text(
+                    AppStrings.donationSuccessful.tr(),
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                 ],
               ),
@@ -186,14 +188,14 @@ class DonorRecordScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 15),
-          _buildInfoRow('المريض', patient, valueColor: const Color(0xFF8B1D1D)),
+          _buildInfoRow(AppStrings.patient.tr(), patient, valueColor: const Color(0xFF8B1D1D)),
           _buildInfoRow(
-            'تاريخ التبرع',
+            AppStrings.donationDate.tr(),
             date,
             valueColor: const Color(0xFF8B1D1D),
           ),
           _buildInfoRow(
-            'الموقع',
+            AppStrings.location.tr(),
             location,
             valueColor: const Color(0xFF8B1D1D),
           ),

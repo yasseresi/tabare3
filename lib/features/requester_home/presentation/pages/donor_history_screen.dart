@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:tabare3/core/utils/string_manager.dart';
 
 class DonorHistoryScreen extends StatelessWidget {
   const DonorHistoryScreen({super.key});
@@ -24,16 +26,16 @@ class DonorHistoryScreen extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'مرحباً، أحمد',
-                            style: TextStyle(
+                          Text(
+                            AppStrings.welcomeUser.tr(),
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
                           ),
                           Text(
-                            'نتمنى لك الشفاء العاجل',
+                            AppStrings.getWellSoon.tr(),
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[600],
@@ -68,18 +70,18 @@ class DonorHistoryScreen extends StatelessWidget {
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text(
-                                'المتبرعين',
-                                style: TextStyle(
+                                AppStrings.donors.tr(),
+                                style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Text(
-                                'يعرض هذا القسم المتبرعين الموافقين مع طلبك، والذين يمكنهم المساعدة في توفير الدم المطلوب.',
+                                AppStrings.donorsSectionDescription.tr(),
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Colors.white70,
@@ -102,13 +104,13 @@ class DonorHistoryScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  'قائمة المتبرعين',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  AppStrings.donorsList.tr(),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -119,7 +121,7 @@ class DonorHistoryScreen extends StatelessWidget {
                 children: [
                   _buildDonorCard(
                     hospital: 'مستشفى مصطفى باشا',
-                    status: 'تم التبرع بنجاح',
+                    status: AppStrings.donationSuccessful.tr(),
                     statusColor: Colors.green,
                     name: 'علي بن محمد',
                     date: '15 جانفي 2026',
@@ -128,7 +130,7 @@ class DonorHistoryScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   _buildDonorCard(
                     hospital: 'مستشفى مصطفى باشا',
-                    status: 'في الانتظار',
+                    status: AppStrings.pending.tr(),
                     statusColor: Colors.red,
                     name: 'علي بن محمد',
                     date: '/',
@@ -137,7 +139,7 @@ class DonorHistoryScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   _buildDonorCard(
                     hospital: 'مستشفى مصطفى باشا',
-                    status: 'في الانتظار',
+                    status: AppStrings.pending.tr(),
                     statusColor: Colors.red,
                     name: 'علي بن محمد',
                     date: '/',
@@ -203,9 +205,9 @@ class DonorHistoryScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          _buildInfoRow('الاسم واللقب', name),
-          _buildInfoRow('تاريخ التبرع', date),
-          _buildInfoRow('الموقع', location),
+          _buildInfoRow(AppStrings.fullName.tr(), name),
+          _buildInfoRow(AppStrings.donationDate.tr(), date),
+          _buildInfoRow(AppStrings.location.tr(), location),
         ],
       ),
     );

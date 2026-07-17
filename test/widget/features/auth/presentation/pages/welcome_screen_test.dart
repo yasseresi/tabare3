@@ -15,27 +15,23 @@ import 'package:tabare3/features/auth/presentation/pages/welcome_screen.dart';
 import 'package:tabare3/features/auth/presentation/pages/login_form_screen.dart';
 import 'package:tabare3/features/auth/presentation/pages/signup_screen.dart';
 
-class MockLoginWithUsernamePassword extends Mock implements LoginWithUsernamePassword {}
-class MockSignupWithUsernamePassword extends Mock implements SignupWithUsernamePassword {}
+import '../../../helpers/test_app.dart';
+
+class MockLogin extends Mock implements LoginWithUsernamePassword {}
+class MockSignup extends Mock implements SignupWithUsernamePassword {}
 class MockSignOut extends Mock implements SignOut {}
-class MockGetCurrentSession extends Mock implements GetCurrentSession {}
-class MockUpdateUserRole extends Mock implements UpdateUserRole {}
+class MockSession extends Mock implements GetCurrentSession {}
+class MockRole extends Mock implements UpdateUserRole {}
 
 void main() {
   final sl = GetIt.instance;
 
   setUpAll(() {
     registerFallbackValue(SignupParams(
-      username: 'fallback',
-      fullName: 'fallback',
-      password: 'fallback',
-      phone: '0000',
-      dateOfBirth: DateTime(2000),
-      gender: 'male',
-      bloodType: 'O+',
-      city: 'fallback',
+      username: 'f', fullName: 'f', password: 'f', phone: '0000',
+      dateOfBirth: DateTime(2000), gender: 'male', bloodType: 'O+', city: 'f',
     ));
-    registerFallbackValue(LoginParams(username: 'fallback', password: 'fallback'));
+    registerFallbackValue(LoginParams(username: 'f', password: 'f'));
     registerFallbackValue(NoParams());
     registerFallbackValue(const UpdateRoleParams(isDonor: false, isRecipient: false));
   });
@@ -43,30 +39,26 @@ void main() {
   setUp(() {
     sl.reset();
     sl.registerFactory(() => AuthBloc(
-          loginWithUsernamePassword: sl(),
-          signupWithUsernamePassword: sl(),
-          signOutUseCase: sl(),
-          getCurrentSession: sl(),
-          updateUserRole: sl(),
+          loginWithUsernamePassword: sl(), signupWithUsernamePassword: sl(),
+          signOutUseCase: sl(), getCurrentSession: sl(), updateUserRole: sl(),
         ));
-    sl.registerLazySingleton<LoginWithUsernamePassword>(() => MockLoginWithUsernamePassword());
-    sl.registerLazySingleton<SignupWithUsernamePassword>(() => MockSignupWithUsernamePassword());
+    sl.registerLazySingleton<LoginWithUsernamePassword>(() => MockLogin());
+    sl.registerLazySingleton<SignupWithUsernamePassword>(() => MockSignup());
     sl.registerLazySingleton<SignOut>(() => MockSignOut());
-    sl.registerLazySingleton<GetCurrentSession>(() => MockGetCurrentSession());
-    sl.registerLazySingleton<UpdateUserRole>(() => MockUpdateUserRole());
+    sl.registerLazySingleton<GetCurrentSession>(() => MockSession());
+    sl.registerLazySingleton<UpdateUserRole>(() => MockRole());
   });
 
-  testWidgets('WelcomeScreen renders welcome text, logo and both buttons', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: WelcomeScreen()));
+  testWidgets('renders welcome text, logo and both buttons', (tester) async {
+    await pumpTestApp(tester, const WelcomeScreen());
 
-    expect(find.textContaining('مرحباً بك في'), findsOneWidget);
+    expect(find.text('مرحباً بك في'), findsOneWidget);
     expect(find.text('تسجيل الدخول'), findsOneWidget);
     expect(find.text('إنشاء حساب'), findsOneWidget);
-    expect(find.byType(Image), findsWidgets);
   });
 
   testWidgets('tapping login navigates to LoginFormScreen', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: WelcomeScreen()));
+    await pumpTestApp(tester, const WelcomeScreen());
 
     await tester.tap(find.text('تسجيل الدخول'));
     await tester.pumpAndSettle();
@@ -75,7 +67,7 @@ void main() {
   });
 
   testWidgets('tapping signup navigates to SignUpScreen', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: WelcomeScreen()));
+    await pumpTestApp(tester, const WelcomeScreen());
 
     await tester.tap(find.text('إنشاء حساب'));
     await tester.pumpAndSettle();

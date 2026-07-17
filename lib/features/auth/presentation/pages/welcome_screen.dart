@@ -1,8 +1,10 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
+import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import 'login_form_screen.dart';
@@ -37,7 +39,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSize.s10),
                   Text(
-                    ' مرحباً بك في ',
+                    AppStrings.welcomeTo.tr(),
                     style: getMediumStyle(
                       fontSize: FontSize.s32,
                       color: const Color(0xff5A5A5A),
@@ -81,7 +83,7 @@ class WelcomeScreen extends StatelessWidget {
                           ),
                         );
                       },
-                      child: const Text('تسجيل الدخول'),
+                      child: Text(AppStrings.login.tr()),
                     ),
                   ),
                   const SizedBox(height: AppSize.s20),
@@ -117,7 +119,7 @@ class WelcomeScreen extends StatelessWidget {
                           ),
                         );
                       },
-                      child: const Text('إنشاء حساب'),
+                      child: Text(AppStrings.signup.tr()),
                     ),
                   ),
                 ],

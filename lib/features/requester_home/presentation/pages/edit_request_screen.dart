@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:tabare3/core/utils/string_manager.dart';
 
 class EditRequestScreen extends StatefulWidget {
   const EditRequestScreen({super.key});
@@ -8,7 +10,7 @@ class EditRequestScreen extends StatefulWidget {
 }
 
 class _EditRequestScreenState extends State<EditRequestScreen> {
-  String _selectedUrgency = 'حرج';
+  String _selectedUrgency = AppStrings.veryUrgent;
   bool _requestStatus = true;
 
   void _showSuccessDialog() {
@@ -35,10 +37,10 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                   child: const Icon(Icons.check, color: Colors.white, size: 50),
                 ),
                 const SizedBox(height: 25),
-                const Text(
-                  'تم التعديل بنجاح',
+                Text(
+                  AppStrings.editSuccess.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                  style: const TextStyle(fontSize: 18, color: Colors.grey),
                 ),
                 const SizedBox(height: 10),
                 Image.asset(
@@ -52,8 +54,8 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(context); // Close dialog
-                      Navigator.pop(context); // Go back to requests/home
+                      Navigator.pop(context);
+                      Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF8B1D1D),
@@ -61,9 +63,9 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: const Text(
-                      'الصفحة الرئيسية',
-                      style: TextStyle(
+                    child: Text(
+                      AppStrings.homePage.tr(),
+                      style: const TextStyle(
                         fontSize: 18,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -92,51 +94,50 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-                // Header with Back Button
                 _buildHeader(context),
                 const SizedBox(height: 30),
-                // Red Banner Card
                 _buildBanner(),
                 const SizedBox(height: 30),
-                // Urgency Degree
-                const Center(
+                Center(
                   child: Text(
-                    'درجة الاستعجال',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    AppStrings.urgencyLevel.tr(),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
                 const SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildUrgencyBadge('حرج', Colors.red),
+                    _buildUrgencyBadge(AppStrings.veryUrgent, Colors.red),
                     const SizedBox(width: 15),
-                    _buildUrgencyBadge('مستعجل', Colors.orange),
+                    _buildUrgencyBadge(AppStrings.urgent, Colors.orange),
                     const SizedBox(width: 15),
-                    _buildUrgencyBadge('عادي', Colors.green),
+                    _buildUrgencyBadge(AppStrings.normal, Colors.green),
                   ],
                 ),
                 const SizedBox(height: 30),
-                // Form Fields
-                _buildTextField('عدد الأكياس المطلوبة', Icons.tag),
+                _buildTextField(AppStrings.bagsRequired.tr(), Icons.tag),
                 const SizedBox(height: 15),
                 _buildTextField(
-                  'الولاية',
+                  AppStrings.governorate.tr(),
                   Icons.map_outlined,
                   isDropdown: true,
                 ),
                 const SizedBox(height: 15),
-                _buildTextField('اسم المستشفى', Icons.local_hospital_outlined),
+                _buildTextField(
+                    AppStrings.hospitalNameField.tr(),
+                    Icons.local_hospital_outlined),
                 const SizedBox(height: 15),
-                _buildTextField('تاريخ آخر أجل', Icons.calendar_today_outlined),
+                _buildTextField(AppStrings.deadlineField.tr(),
+                    Icons.calendar_today_outlined),
                 const SizedBox(height: 15),
                 _buildTextField(
-                  'ملاحظات',
+                  AppStrings.notes.tr(),
                   Icons.sticky_note_2_outlined,
                   isMultiline: true,
                 ),
                 const SizedBox(height: 30),
-                // Request Status Toggle
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
@@ -161,15 +162,17 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text(
-                            'حالة الطلب',
-                            style: TextStyle(
+                          Text(
+                            AppStrings.requestStatus.tr(),
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
                           ),
                           Text(
-                            _requestStatus ? 'نشط / اغلاق' : 'غير نشط',
+                            _requestStatus
+                                ? AppStrings.activeOrClosed.tr()
+                                : AppStrings.notActive.tr(),
                             style: const TextStyle(
                               color: Colors.grey,
                               fontSize: 11,
@@ -181,7 +184,6 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                // Bottom Buttons
                 Row(
                   children: [
                     Expanded(
@@ -195,9 +197,9 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: const Text(
-                            'حفظ',
-                            style: TextStyle(
+                          child: Text(
+                            AppStrings.save.tr(),
+                            style: const TextStyle(
                               fontSize: 18,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -220,9 +222,9 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                          child: const Text(
-                            'إلغاء',
-                            style: TextStyle(
+                          child: Text(
+                            AppStrings.cancel.tr(),
+                            style: const TextStyle(
                               fontSize: 18,
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
@@ -249,16 +251,16 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'مرحباً، أحمد',
-              style: TextStyle(
+            Text(
+              AppStrings.welcomeUser.tr(),
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
             ),
             Text(
-              'تعديل طلب التبرع',
+              AppStrings.editRequestSubtitle.tr(),
               style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
           ],
@@ -295,19 +297,19 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  'تعديل طلب تبرع بالدم',
-                  style: TextStyle(
+                  AppStrings.editRequestBanner.tr(),
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
-                  'أدخل بيانات طلبك بدقة لمساعدتنا في العثور على متبرعين متوافقين مع فصيلة الدم المطلوبة وفي أقرب وقت ممكن.',
-                  style: TextStyle(
+                  AppStrings.requestFormDescription.tr(),
+                  style: const TextStyle(
                     fontSize: 13,
                     color: Colors.white70,
                     height: 1.4,
@@ -323,10 +325,10 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
     );
   }
 
-  Widget _buildUrgencyBadge(String label, Color color) {
-    bool isSelected = _selectedUrgency == label;
+  Widget _buildUrgencyBadge(String key, Color color) {
+    bool isSelected = _selectedUrgency == key;
     return GestureDetector(
-      onTap: () => setState(() => _selectedUrgency = label),
+      onTap: () => setState(() => _selectedUrgency = key),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         decoration: BoxDecoration(
@@ -342,7 +344,7 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
             Icon(Icons.circle, size: 8, color: color),
             const SizedBox(width: 8),
             Text(
-              label,
+              key.tr(),
               style: TextStyle(
                 color: isSelected ? color : Colors.grey,
                 fontWeight: FontWeight.bold,

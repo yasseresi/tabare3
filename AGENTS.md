@@ -31,12 +31,20 @@
 ## No Hardcoded Values in Views (MANDATORY)
 - **Never** put literal strings, ints, or doubles inside presentation/pages or widgets. No magic numbers, no inline text, no raw hex colors.
 - Centralize every literal in dedicated files under `lib/core/`:
-  - UI text / labels / messages → `lib/core/constants/app_strings.dart` (localization-ready).
+  - UI text / labels / messages → `lib/core/utils/string_manager.dart` (`AppStrings` constants) + translation JSONs (`assets/translations/ar.json`, `en.json`). Views use `AppStrings.xxx.tr()`.
   - Sizes, spacing, radii, durations → `lib/core/constants/app_dimensions.dart`.
   - Colors → theme / `lib/core/theme/app_colors.dart` (never inline `Color(0x...)` in a page).
   - Keys, routes, API paths, config → their own `lib/core/constants/` files.
 - Views reference the constant, never the literal. One source of truth per value.
 - Applies to all `presentation/pages/` and widget files. Enum-like fixed sets go in domain, not the view.
+- **Adding a new UI string:** add key to `AppStrings` in `string_manager.dart`, add Arabic value to `ar.json`, add English value to `en.json`, then use `AppStrings.key.tr()` in the view. Never skip the translation files.
+
+## Arabic Text Direction (MANDATORY)
+- Arabic text must always render RIGHT-TO-LEFT (RTL). Never write Arabic content in a left-to-right order that forces the reader to read it backwards.
+- All screens wrapping Arabic content must use `Directionality(textDirection: TextDirection.rtl, ...)`.
+- When using `Row`, `Column`, or `Text` with Arabic, verify the visual order is correct: the first widget/text in code appears on the RIGHT side in RTL.
+- `textAlign: TextAlign.right` for Arabic paragraphs. `CrossAxisAlignment.end` in LTR rows maps to the right side.
+- If a string looks "backwards" or "reversed" on screen, the issue is missing RTL wrapping — do NOT reverse the string characters. Fix the directionality, never the text.
 
 ## Architecture — Clean Architecture (3 layers) + BLoC
 

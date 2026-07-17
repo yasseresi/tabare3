@@ -1,5 +1,7 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tabare3/core/utils/string_manager.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -34,16 +36,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'مرحباً، أحمد',
-                              style: TextStyle(
+                            Text(
+                              AppStrings.welcomeUser.tr(),
+                              style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                             ),
                             Text(
-                              'نتمنى لك الشفاء العاجل',
+                              AppStrings.getWellSoon.tr(),
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[600],
@@ -70,7 +72,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     TextField(
                       textAlign: TextAlign.right,
                       decoration: InputDecoration(
-                        hintText: 'ابحث عن الاشعارات...',
+                        hintText: AppStrings.searchNotifications.tr(),
                         hintStyle: const TextStyle(
                           color: Colors.grey,
                           fontSize: 15,
@@ -107,10 +109,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   ],
                 ),
               ),
-              const Center(
+              Center(
                 child: Text(
-                  'الاشعارات',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  AppStrings.notificationsHeader.tr(),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(height: 20),
@@ -119,21 +121,21 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   children: [
                     _buildNotificationCard(
-                      title: 'اكتمل عدد المتبرعين',
-                      description: 'تم تغطية طلب التبرع بالدم بالكامل',
+                      title: AppStrings.donorsCompleted.tr(),
+                      description: AppStrings.donorsCompletedDesc.tr(),
                       time: 'منذ 30 د',
                       isSuccess: true,
                     ),
                     const SizedBox(height: 15),
                     _buildNotificationCard(
-                      title: 'متبرع جديد',
+                      title: AppStrings.newDonorAccepted.tr(),
                       description: 'تم قبول طلب التبرع من قبل خالد بن عبد الله',
                       time: 'منذ 30 د',
                       isSuccess: false,
                     ),
                     const SizedBox(height: 15),
                     _buildNotificationCard(
-                      title: 'متبرع جديد',
+                      title: AppStrings.newDonorAccepted.tr(),
                       description: 'تم قبول طلب التبرع من قبل احمد لوصيف',
                       time: 'منذ ساعة',
                       isSuccess: false,

@@ -1,5 +1,7 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tabare3/core/utils/string_manager.dart';
 import 'edit_request_screen.dart';
 
 class RequestsScreen extends StatelessWidget {
@@ -26,16 +28,16 @@ class RequestsScreen extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'مرحباً، أحمد',
-                            style: TextStyle(
+                          Text(
+                            AppStrings.welcomeUser.tr(),
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
                           ),
                           Text(
-                            'نتمنى لك الشفاء العاجل',
+                            AppStrings.getWellSoon.tr(),
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[600],
@@ -61,7 +63,7 @@ class RequestsScreen extends StatelessWidget {
                   TextField(
                     textAlign: TextAlign.right,
                     decoration: InputDecoration(
-                      hintText: 'ابحث عن طلب...',
+                      hintText: AppStrings.searchRequests.tr(),
                       hintStyle: const TextStyle(color: Colors.grey),
                       // suffixIcon appears on the left in RTL
                       suffixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -90,23 +92,23 @@ class RequestsScreen extends StatelessWidget {
                 children: [
                   _buildRequestCard(
                     context,
-                    status: 'مفعل',
+                    status: AppStrings.activeStatus.tr(),
                     statusColor: Colors.green,
                     isCritical: true,
                     bags: '1/3',
-                    bagsText: 'تم توفير 1 من 3 أكياس',
+                    bagsText: AppStrings.bagsProvided.tr(namedArgs: {'provided': '1', 'total': '3'}),
                     progress: 0.33,
                     showDonorsButton: true,
                   ),
                   const SizedBox(height: 20),
                   _buildRequestCard(
                     context,
-                    status: 'تم',
+                    status: AppStrings.doneStatus.tr(),
                     statusColor: const Color(0xFFE53935),
                     backgroundColor: const Color(0xFFFFEBEE),
                     isCritical: true,
                     bags: '3/3',
-                    bagsText: 'تم توفير 3 من 3 أكياس',
+                    bagsText: AppStrings.bagsProvided.tr(namedArgs: {'provided': '3', 'total': '3'}),
                     progress: 1.0,
                     showDonorsButton: false,
                   ),
@@ -176,7 +178,7 @@ class RequestsScreen extends StatelessWidget {
               ),
               Row(
                 children: [
-                  if (isCritical) _buildBadge('حرج', Colors.red),
+                  if (isCritical) _buildBadge(AppStrings.veryUrgent.tr(), Colors.red),
                   const SizedBox(width: 8),
                   _buildBadge(
                     status,
@@ -188,9 +190,9 @@ class RequestsScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          _buildInfoRow('فصيلة الدم', 'O+'),
-          _buildInfoRow('تاريخ الطلب', '01 جانفي 2026'),
-          _buildInfoRow('آخر أجل', '15 جانفي 2026'),
+          _buildInfoRow(AppStrings.bloodType.tr(), 'O+'),
+          _buildInfoRow(AppStrings.requestDate.tr(), '01 جانفي 2026'),
+          _buildInfoRow(AppStrings.deadline.tr(), '15 جانفي 2026'),
           _buildInfoRow('مستشفى مصطفى باشا', 'الجزائر'),
           const SizedBox(height: 20),
           Row(
@@ -239,9 +241,9 @@ class RequestsScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(15),
                         ),
                       ),
-                      child: const Text(
-                        'المتبرعين المتاحين',
-                        style: TextStyle(
+                      child: Text(
+                        AppStrings.availableDonors.tr(),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -271,9 +273,9 @@ class RequestsScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(15),
                       ),
                     ),
-                    child: const Text(
-                      'تعديل الطلب',
-                      style: TextStyle(
+                    child: Text(
+                      AppStrings.editRequest.tr(),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),

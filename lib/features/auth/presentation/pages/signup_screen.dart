@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -7,6 +8,7 @@ import '../../../../core/presentation/widgets/loading_overlay.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
+import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../../../core/validators/validators.dart';
@@ -28,7 +30,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   int _currentStep = 1;
   bool _agreeToTerms = false;
   DateTime? _selectedDate;
-  String _genderValue = 'ذكر';
+  String _genderValue = 'male';
 
   final _usernameController = TextEditingController();
   final _fullNameController = TextEditingController();
@@ -93,7 +95,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       password: _passwordController.text,
       phone: _phoneController.text.trim(),
       dateOfBirth: _selectedDate ?? DateTime(2000),
-      gender: _genderValue == 'ذكر' ? 'male' : 'female',
+      gender: _genderValue,
       bloodType: _bloodTypeController.text.trim(),
       city: _cityController.text.trim(),
       nationalId: _nationalIdController.text.trim().isEmpty
@@ -116,7 +118,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         builder: (context, state) {
           return LoadingOverlay(
             visible: state is AuthLoading,
-            message: 'جاري إنشاء الحساب',
+            message: AppStrings.signingUp.tr(),
             child: Scaffold(
               backgroundColor: ColorManager.white,
               body: Directionality(
@@ -143,7 +145,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           const SizedBox(height: AppSize.s10),
                           Text(
-                            'إنشاء حساب',
+                            AppStrings.signup.tr(),
                             style: getBoldStyle(
                               fontSize: FontSize.s24,
                               color: ColorManager.textPrimary,
@@ -167,7 +169,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 ? null
                                 : _nextStep,
                             child: Text(
-                              _currentStep == 3 ? 'إنشاء حساب' : 'التالي',
+                              _currentStep == 3
+                                  ? AppStrings.signup.tr()
+                                  : AppStrings.next.tr(),
                             ),
                           ),
                           if (_currentStep == 1) ...[
@@ -176,7 +180,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'لديك حساب بالفعل؟ ',
+                                  '${AppStrings.hasAccount.tr()} ',
                                   style: getRegularStyle(
                                     fontSize: FontSize.s12,
                                     color: ColorManager.textMuted,
@@ -190,7 +194,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     ),
                                   ),
                                   child: Text(
-                                    'تسجيل الدخول',
+                                    AppStrings.login.tr(),
                                     style: getBoldStyle(
                                       fontSize: FontSize.s12,
                                       color: ColorManager.primary,
@@ -217,11 +221,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String _getStepTitle() {
     switch (_currentStep) {
       case 1:
-        return 'معلومات الحساب';
+        return AppStrings.accountInfo.tr();
       case 2:
-        return 'المعلومات الشخصية';
+        return AppStrings.personalInfo.tr();
       case 3:
-        return 'الشروط والأحكام';
+        return AppStrings.termsAndConditions.tr();
       default:
         return '';
     }
@@ -286,21 +290,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Column(
       children: [
         AppTextField(
-          hintText: 'الاسم الكامل',
+          hintText: AppStrings.fullName.tr(),
           prefixIcon: Icons.person_outline,
           controller: _fullNameController,
           validator: validateFullName,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
-          hintText: 'اسم المستخدم',
+          hintText: AppStrings.username.tr(),
           prefixIcon: Icons.alternate_email,
           controller: _usernameController,
           validator: validateUsername,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
-          hintText: 'رقم الجوال',
+          hintText: AppStrings.phoneNumber.tr(),
           prefixIcon: Icons.phone_outlined,
           controller: _phoneController,
           keyboardType: TextInputType.phone,
@@ -308,7 +312,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
-          hintText: 'كلمة المرور',
+          hintText: AppStrings.password.tr(),
           prefixIcon: Icons.lock_outline,
           isPassword: true,
           controller: _passwordController,
@@ -316,7 +320,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
-          hintText: 'تأكيد كلمة المرور',
+          hintText: AppStrings.passwordConfirm.tr(),
           prefixIcon: Icons.lock_outline,
           isPassword: true,
           controller: _passwordConfirmController,
@@ -334,7 +338,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           onTap: _pickDate,
           child: AbsorbPointer(
             child: AppTextField(
-              hintText: 'تاريخ الميلاد',
+              hintText: AppStrings.dateOfBirth.tr(),
               prefixIcon: Icons.calendar_today_outlined,
               controller: _dobController,
               validator: (v) => validateDate(v),
@@ -344,27 +348,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
         const SizedBox(height: AppSize.s15),
         DropdownButtonFormField<String>(
           initialValue: _genderValue,
-          decoration: const InputDecoration(
-            hintText: 'الجنس',
-            prefixIcon: Icon(Icons.person_outline),
+          decoration: InputDecoration(
+            hintText: AppStrings.gender.tr(),
+            prefixIcon: const Icon(Icons.person_outline),
           ),
-          items: const [
-            DropdownMenuItem(value: 'ذكر', child: Text('ذكر')),
-            DropdownMenuItem(value: 'أنثى', child: Text('أنثى')),
+          items: [
+            DropdownMenuItem(
+              value: 'male',
+              child: Text(AppStrings.male.tr()),
+            ),
+            DropdownMenuItem(
+              value: 'female',
+              child: Text(AppStrings.female.tr()),
+            ),
           ],
-          onChanged: (v) => setState(() => _genderValue = v ?? 'ذكر'),
+          onChanged: (v) => setState(() => _genderValue = v ?? 'male'),
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
-          hintText: 'رقم بطاقة التعريف الوطني',
+          hintText: AppStrings.nationalId.tr(),
           prefixIcon: Icons.badge_outlined,
           controller: _nationalIdController,
         ),
         const SizedBox(height: AppSize.s15),
         DropdownButtonFormField<String>(
-          decoration: const InputDecoration(
-            hintText: 'فصيلة الدم',
-            prefixIcon: Icon(Icons.opacity),
+          decoration: InputDecoration(
+            hintText: AppStrings.bloodType.tr(),
+            prefixIcon: const Icon(Icons.opacity),
           ),
           items: const ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
               .map((type) => DropdownMenuItem(
@@ -379,21 +389,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
-          hintText: 'الوزن',
+          hintText: AppStrings.weight.tr(),
           prefixIcon: Icons.monitor_weight_outlined,
           controller: _weightController,
           keyboardType: TextInputType.number,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
-          hintText: 'الولاية',
+          hintText: AppStrings.governorate.tr(),
           prefixIcon: Icons.location_city_outlined,
           controller: _cityController,
           validator: validateCity,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
-          hintText: 'الأمراض المزمنة',
+          hintText: AppStrings.chronicDiseases.tr(),
           prefixIcon: Icons.coronavirus_outlined,
           controller: _chronicDiseasesController,
           isMultiline: true,
@@ -412,7 +422,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             borderRadius: BorderRadius.circular(AppSize.s20),
           ),
           child: Text(
-            'باستخدامك لهذا التطبيق، فإنك توافق على تقديم معلومات صحيحة، واستخدام المنصة لأغراض التبرع بالدم وطلبه فقط. تلتزم المنصة بحماية بياناتك الشخصية وعدم مشاركتها إلا عند الضرورة. تحتفظ إدارة التطبيق بحق تعديل الخدمات أو تعليق الحسابات المخالفة للشروط. بإنشاء حساب، فإنك توافق على هذه الشروط والأحكام.',
+            AppStrings.termsBody.tr(),
             style: getRegularStyle(
               fontSize: FontSize.s16,
               color: ColorManager.textPrimary,
@@ -431,7 +441,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
             Text(
-              'أوافق على الشروط والأحكام',
+              AppStrings.acceptTerms.tr(),
               style: getRegularStyle(
                 fontSize: FontSize.s14,
                 color: ColorManager.textSecondary,
@@ -449,8 +459,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         context: context,
         barrierDismissible: false,
         builder: (_) => AppDialog.success(
-          title: 'لقد تم إنشاء حساب بنجاح',
-          actionLabel: 'الصفحة الرئيسية',
+          title: AppStrings.signupSuccess.tr(),
+          actionLabel: AppStrings.homePage.tr(),
           onAction: () {
             Navigator.pushAndRemoveUntil(
               context,
@@ -467,9 +477,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         context: context,
         barrierDismissible: true,
         builder: (_) => AppDialog.error(
-          title: 'خطأ في إنشاء الحساب',
+          title: AppStrings.signupError.tr(),
           message: state.failure.message,
-          actionLabel: 'إعادة المحاولة',
+          actionLabel: AppStrings.retryAgain.tr(),
           onAction: () => Navigator.pop(context),
         ),
       );

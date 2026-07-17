@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:tabare3/core/utils/string_manager.dart';
 import 'package:tabare3/features/auth/presentation/pages/role_selection_screen.dart';
 import 'package:tabare3/features/donor_home/presentation/pages/donor_card_screen.dart';
 
@@ -32,14 +34,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   size: 80,
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'هل أنت متأكد من تسجيل الخروج؟',
+                Text(
+                  AppStrings.logoutMessage.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 15),
-                const Text(
-                  'نتطلع إلى رؤيتك مجدداً، شكراً لمساهمتك في دعم مجتمع التبرع بالدم.',
+                Text(
+                  AppStrings.logoutSeeYou.tr(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -61,9 +63,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                    child: const Text(
-                      'تسجيل الخروج',
-                      style: TextStyle(
+                    child: Text(
+                      AppStrings.logout.tr(),
+                      style: const TextStyle(
                         fontSize: 18,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -83,9 +85,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                    child: const Text(
-                      'إلغاء',
-                      style: TextStyle(
+                    child: Text(
+                      AppStrings.cancel.tr(),
+                      style: const TextStyle(
                         fontSize: 16,
                         color: Colors.grey,
                         fontWeight: FontWeight.bold,
@@ -114,12 +116,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'اختر اللغة',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  AppStrings.chooseLanguage.tr(),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
-                _buildLanguageOption('العربية', true),
+                _buildLanguageOption(AppStrings.arabic.tr(), true),
                 _buildLanguageOption('English', false),
                 _buildLanguageOption('Français', false),
               ],
@@ -147,9 +149,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'الملف الشخصي',
-                        style: TextStyle(
+                      Text(
+                        AppStrings.profile.tr(),
+                        style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
                         ),
@@ -179,7 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       _buildQuickAction(
                         icon: Icons.credit_card,
-                        label: 'بطاقة المتبرع',
+                        label: AppStrings.donorCard.tr(),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -191,12 +193,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       _buildQuickAction(
                         icon: Icons.history,
-                        label: 'السجل',
+                        label: AppStrings.record.tr(),
                         onTap: () {},
                       ),
                       _buildQuickAction(
                         icon: Icons.notifications_none,
-                        label: 'الإشعارات',
+                        label: AppStrings.notifications.tr(),
                         onTap: () {},
                       ),
                     ],
@@ -205,16 +207,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 30),
                 // Main Info Sections
                 _buildSection(
-                  title: 'المعلومات الشخصية',
+                  title: AppStrings.personalInfo.tr(),
                   child: _buildPersonalInfo(),
                 ),
                 const SizedBox(height: 20),
                 _buildSection(
-                  title: 'إعدادات الحساب',
+                  title: AppStrings.accountSettings.tr(),
                   child: _buildAccountSettings(),
                 ),
                 const SizedBox(height: 20),
-                _buildSection(title: 'عن التطبيق', child: _buildAboutSection()),
+                _buildSection(title: AppStrings.aboutApp.tr(), child: _buildAboutSection()),
                 const SizedBox(height: 40),
                 // Logout Button
                 Padding(
@@ -234,11 +236,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Icon(Icons.logout_rounded),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Text(
-                            'تسجيل الخروج',
+                            AppStrings.logout.tr(),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -299,8 +301,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           'أحمد لوصيف',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
-        const Text(
-          'كل تبرع بالدم هو فرصة جديدة للحياة',
+        Text(
+          AppStrings.donationLifeChance.tr(),
           style: TextStyle(fontSize: 14, color: Colors.grey),
         ),
       ],
@@ -369,18 +371,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildPersonalInfo() {
     return Column(
       children: [
-        _buildInfoRow('الاسم الكامل', 'أحمد لوصيف', Icons.person_outline),
+        _buildInfoRow(AppStrings.fullName.tr(), 'أحمد لوصيف', Icons.person_outline),
         const Divider(height: 30),
         _buildInfoRow(
-          'تاريخ الميلاد',
+          AppStrings.dateOfBirth.tr(),
           '12 ماي 1995',
           Icons.calendar_today_outlined,
         ),
         const Divider(height: 30),
-        _buildInfoRow('فصيلة الدم', 'O+', Icons.opacity),
+        _buildInfoRow(AppStrings.bloodType.tr(), 'O+', Icons.opacity),
         const Divider(height: 30),
         _buildInfoRow(
-          'الولاية',
+          AppStrings.governorate.tr(),
           'قسنطينة',
           Icons.location_on_outlined,
           isDropdown: _isEditing,
@@ -392,11 +394,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildAccountSettings() {
     return Column(
       children: [
-        _buildInfoRow('رقم الهاتف', '0676 24 41 89', Icons.phone_outlined),
+        _buildInfoRow(AppStrings.phoneNumberLabel.tr(), '0676 24 41 89', Icons.phone_outlined),
         const Divider(height: 30),
         _buildInfoRow(
-          'نوع الحساب',
-          'أحتاج دم / أنا متبرع',
+          AppStrings.accountType.tr(),
+          '${AppStrings.iNeedBlood.tr()} / ${AppStrings.iAmDonor.tr()}',
           Icons.person_pin_outlined,
           isDropdown: _isEditing,
           onTap: () {
@@ -426,15 +428,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text(
-                      'حالة الحساب',
-                      style: TextStyle(
+                    Text(
+                      AppStrings.accountStatus.tr(),
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
                     ),
                     Text(
-                      _accountStatus ? 'نشط / غير متاح حالياً' : 'غير نشط',
+                      _accountStatus ? AppStrings.accountStatusSubtitle.tr() : AppStrings.notActive.tr(),
                       style: const TextStyle(color: Colors.grey, fontSize: 11),
                       textAlign: TextAlign.right,
                     ),
@@ -451,8 +453,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const Divider(height: 30),
         _buildInfoRow(
-          'تغيير اللغة',
-          'العربية',
+          AppStrings.changeLanguage.tr(),
+          AppStrings.arabic.tr(),
           Icons.language_outlined,
           isDropdown: true,
           onTap: _showLanguageDialog,
@@ -464,11 +466,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildAboutSection() {
     return Column(
       children: [
-        _buildInfoRow('من نحن', '', Icons.info_outline),
+        _buildInfoRow(AppStrings.aboutUs.tr(), '', Icons.info_outline),
         const Divider(height: 30),
-        _buildInfoRow('سياسة الخصوصية', '', Icons.privacy_tip_outlined),
+        _buildInfoRow(AppStrings.privacyPolicyLabel.tr(), '', Icons.privacy_tip_outlined),
         const Divider(height: 30),
-        _buildInfoRow('قيم التطبيق', '', Icons.star_outline),
+        _buildInfoRow(AppStrings.appValues.tr(), '', Icons.star_outline),
       ],
     );
   }

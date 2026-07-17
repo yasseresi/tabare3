@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:tabare3/core/utils/string_manager.dart';
 import 'donor_card_info_screen.dart';
 
 class DonorCardScreen extends StatelessWidget {
@@ -22,18 +24,18 @@ class DonorCardScreen extends StatelessWidget {
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
-                          'مرحباً، أحمد',
-                          style: TextStyle(
+                          AppStrings.welcomeUser.tr(),
+                          style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                         ),
                         Text(
-                          'كل تبرع بالدم هو فرصة جديدة للحياة',
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                          AppStrings.donationLifeChance.tr(),
+                          style: const TextStyle(fontSize: 14, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -63,7 +65,7 @@ class DonorCardScreen extends StatelessWidget {
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
+                    children: [
                       Icon(
                         Icons.card_giftcard,
                         color: Colors.deepPurple,
@@ -71,8 +73,8 @@ class DonorCardScreen extends StatelessWidget {
                       ),
                       SizedBox(width: 8),
                       Text(
-                        'بطاقة المتبرع',
-                        style: TextStyle(
+                        AppStrings.donorCard.tr(),
+                        style: const TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
@@ -99,11 +101,11 @@ class DonorCardScreen extends StatelessWidget {
                   runSpacing: 10,
                   alignment: WrapAlignment.center,
                   children: [
-                    _buildLevelChip('قطرة امل', false),
-                    _buildLevelChip('متبرع نشط', true),
-                    _buildLevelChip('متبرع ملتزم', false),
-                    _buildLevelChip('متبرع متميز', false),
-                    _buildLevelChip('تستحق جائزة', false),
+                    _buildLevelChip(AppStrings.dropOfHope.tr(), false),
+                    _buildLevelChip(AppStrings.activeDonor.tr(), true),
+                    _buildLevelChip(AppStrings.committedDonor.tr(), false),
+                    _buildLevelChip(AppStrings.distinguishedDonor.tr(), false),
+                    _buildLevelChip(AppStrings.deserveReward.tr(), false),
                   ],
                 ),
                 const SizedBox(height: 30),
@@ -124,9 +126,9 @@ class DonorCardScreen extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'متبرع نشط',
-                            style: TextStyle(
+                          Text(
+                            AppStrings.activeDonor.tr(),
+                            style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -136,9 +138,9 @@ class DonorCardScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 15),
-                      const Text(
-                        'كل تبرع يقربك من مستوى جديد ويزيد من تأثيرك في إنقاذ الأرواح، لأن العطاء المستمر يستحق التقدير والاحتفاء.',
-                        style: TextStyle(
+                      Text(
+                        AppStrings.donorCardMotivation.tr(),
+                        style: const TextStyle(
                           color: Colors.grey,
                           height: 1.5,
                           fontSize: 13,
@@ -182,11 +184,11 @@ class DonorCardScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 30),
-                const Align(
+                Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    'الشارات المتحصل عليها',
-                    style: TextStyle(
+                    AppStrings.earnedBadges.tr(),
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -196,9 +198,9 @@ class DonorCardScreen extends StatelessWidget {
                 const SizedBox(height: 15),
                 Row(
                   children: [
-                    Expanded(child: _buildBadgeCard('قطرة امل', '10 نقطة')),
+                    Expanded(child: _buildBadgeCard(AppStrings.dropOfHope.tr(), '10 نقطة')),
                     const SizedBox(width: 15),
-                    Expanded(child: _buildBadgeCard('متبرع نشط', '50 نقطة')),
+                    Expanded(child: _buildBadgeCard(AppStrings.activeDonor.tr(), '50 نقطة')),
                   ],
                 ),
                 const SizedBox(height: 30),
@@ -221,9 +223,9 @@ class DonorCardScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: const Text(
-                      'ماهي بطاقة المتبرع',
-                      style: TextStyle(
+                    child: Text(
+                      AppStrings.whatIsDonorCard.tr(),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,

@@ -1,5 +1,7 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tabare3/core/utils/string_manager.dart';
 import 'package:tabare3/features/profile/presentation/pages/profile_screen.dart';
 import 'package:tabare3/features/requester_home/presentation/pages/notifications_screen.dart';
 import 'donor_requests_screen.dart';
@@ -61,16 +63,16 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'مرحباً، أحمد',
-                          style: TextStyle(
+                        Text(
+                          AppStrings.welcomeUser.tr(),
+                          style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
                         ),
                         Text(
-                          'كل تبرع بالدم هو فرصة جديدة للحياة',
+                          AppStrings.donationLifeChance.tr(),
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -109,9 +111,9 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'أحدث الطلبات القريبة',
-                      style: TextStyle(
+                    Text(
+                      AppStrings.latestNearbyRequests.tr(),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -123,8 +125,8 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
                           _selectedIndex = 1;
                         });
                       },
-                      child: const Text(
-                        'عرض الكل',
+                      child: Text(
+                        AppStrings.seeAll.tr(),
                         style: TextStyle(color: Color(0xFF8B1D1D)),
                       ),
                     ),
@@ -134,27 +136,27 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
                 // Request Cards
                 _buildRequestCard(
                   name: 'علي بن محمد',
-                  urgency: 'حرج',
+                  urgency: AppStrings.veryUrgent.tr(),
                   urgencyColor: Colors.red,
                   bloodType: 'O+',
                   requestDate: '01 جانفي 2026',
                   deadline: '15 جانفي 2026',
                   hospital: 'مستشفى مصطفى باشا',
                   location: 'الجزائر',
-                  bagsInfo: 'تم توفير 1 من 3 أكياس',
+                  bagsInfo: AppStrings.bagsProvided.tr(namedArgs: {'count': '1', 'total': '3'}),
                   progress: 0.33,
                 ),
                 const SizedBox(height: 20),
                 _buildRequestCard(
                   name: 'علي بن محمد',
-                  urgency: 'مستعجل',
+                  urgency: AppStrings.urgent.tr(),
                   urgencyColor: Colors.orange,
                   bloodType: 'O+',
                   requestDate: '01 جانفي 2026',
                   deadline: '15 جانفي 2026',
                   hospital: 'مستشفى مصطفى باشا',
                   location: 'الجزائر',
-                  bagsInfo: 'تم توفير 1 من 3 أكياس',
+                  bagsInfo: AppStrings.bagsProvided.tr(namedArgs: {'count': '1', 'total': '3'}),
                   progress: 0.33,
                 ),
                 const SizedBox(height: 100),
@@ -203,7 +205,7 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _isEligible ? 'مؤهل الآن' : 'غير مؤهل الآن',
+                        _isEligible ? AppStrings.eligibleNow.tr() : AppStrings.notEligibleNow.tr(),
                         style: TextStyle(
                           fontSize: 12,
                           color: _isEligible ? Colors.green : Colors.red,
@@ -231,18 +233,18 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'قال رسول الله ﷺ:',
-                      style: TextStyle(
+                    Text(
+                      AppStrings.hadithIntro.tr(),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF8B1D1D),
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      '«مَنْ نَفَّسَ عَنْ مُؤْمِنٍ كُرْبَةً مِنْ كُرَبِ الدُّنْيَا، نَفَّسَ اللهُ عَنْهُ كُرْبَةً مِنْ كُرَبِ يَوْمِ الْقِيَامَةِ»',
-                      style: TextStyle(
+                    Text(
+                      AppStrings.hadithRelief.tr(),
+                      style: const TextStyle(
                         fontSize: 13,
                         color: Colors.grey,
                         height: 1.4,
@@ -267,13 +269,14 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          _buildDonorInfoRow('إجمالي تبرعاتي', '12'),
-          _buildDonorInfoRow('طلبات قريبة منك', '14'),
+          _buildDonorInfoRow(AppStrings.totalDonations.tr(), '12'),
+          _buildDonorInfoRow(AppStrings.requestsNearYou.tr(), '14'),
           _buildDonorInfoRow(
-            'آخر تبرع',
+            AppStrings.lastDonation.tr(),
             _isEligible ? '15 جانفي 2025' : '15 جانفي 2026',
           ),
-          _buildDonorInfoRow('موعد التبرع القادم', '15 جانفي 2026'),
+          _buildDonorInfoRow(
+            AppStrings.nextDonationAppointment.tr(), '15 جانفي 2026'),
         ],
       ),
     );
@@ -361,9 +364,9 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          _buildInfoRow('فصيلة الدم', bloodType),
-          _buildInfoRow('تاريخ الطلب', requestDate),
-          _buildInfoRow('آخر أجل', deadline),
+          _buildInfoRow(AppStrings.bloodType.tr(), bloodType),
+          _buildInfoRow(AppStrings.requestDate.tr(), requestDate),
+          _buildInfoRow(AppStrings.deadline.tr(), deadline),
           _buildInfoRow(hospital, location),
           const SizedBox(height: 20),
           Row(
@@ -412,9 +415,9 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
-              child: const Text(
-                'قبول الطلب',
-                style: TextStyle(
+              child: Text(
+                AppStrings.acceptRequest.tr(),
+                style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
