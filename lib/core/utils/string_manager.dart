@@ -147,6 +147,22 @@ class AppStrings {
   static const String serverError = 'server_error';
   static const String defaultError = 'default_error';
 
+  // Validation errors
+  static const String usernameRequired = 'username_required';
+  static const String usernameInvalid = 'username_invalid';
+  static const String fullNameRequired = 'full_name_required';
+  static const String phoneRequired = 'phone_required';
+  static const String phoneInvalid = 'phone_invalid';
+  static const String passwordRequired = 'password_required';
+  static const String passwordInvalid = 'password_invalid';
+  static const String dateRequired = 'date_required';
+  static const String dateInvalid = 'date_invalid';
+  static const String genderRequired = 'gender_required';
+  static const String genderInvalid = 'gender_invalid';
+  static const String cityRequired = 'city_required';
+  static const String bloodTypeRequired = 'blood_type_required';
+  static const String termsRequired = 'terms_required';
+
   // Info
   static const String aboutApp = 'about_app';
   static const String privacyPolicy = 'privacy_policy';

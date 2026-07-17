@@ -337,10 +337,10 @@ void main() {
 
         expect(find.text('المعلومات الشخصية'), findsOneWidget);
 
-        final step2Fields = find.byType(TextFormField);
-        await tester.enterText(step2Fields.at(0), '1990-01-01');
-        await tester.enterText(step2Fields.at(1), 'ذكر');
-        await tester.enterText(step2Fields.at(2), '123456789');
+        await tester.enterText(
+            find.widgetWithText(TextFormField, 'تاريخ الميلاد'), '1990-01-01');
+        await tester.enterText(
+            find.widgetWithText(TextFormField, 'الجنس'), 'ذكر');
 
         final bloodTypeDropdown = find.byType(DropdownButtonFormField<String>);
         await tester.tap(bloodTypeDropdown);
@@ -348,8 +348,8 @@ void main() {
         await tester.tap(find.text('O+').last);
         await tester.pumpAndSettle();
 
-        await tester.enterText(step2Fields.at(3), '50');
-        await tester.enterText(step2Fields.at(4), 'الجزائر');
+        await tester.enterText(
+            find.widgetWithText(TextFormField, 'الولاية'), 'الجزائر');
 
         await tester.ensureVisible(
           find.widgetWithText(ElevatedButton, 'التالي'),

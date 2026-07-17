@@ -1,11 +1,51 @@
 import 'string_manager.dart';
 
+class ValidationKeys {
+  ValidationKeys._();
+
+  static const String usernameRequired = AppStrings.usernameRequired;
+  static const String usernameInvalid = AppStrings.usernameInvalid;
+  static const String fullNameRequired = AppStrings.fullNameRequired;
+  static const String phoneRequired = AppStrings.phoneRequired;
+  static const String phoneInvalid = AppStrings.phoneInvalid;
+  static const String passwordRequired = AppStrings.passwordRequired;
+  static const String passwordInvalid = AppStrings.passwordInvalid;
+  static const String dateRequired = AppStrings.dateRequired;
+  static const String dateInvalid = AppStrings.dateInvalid;
+  static const String genderRequired = AppStrings.genderRequired;
+  static const String genderInvalid = AppStrings.genderInvalid;
+  static const String cityRequired = AppStrings.cityRequired;
+  static const String bloodTypeRequired = AppStrings.bloodTypeRequired;
+  static const String termsRequired = AppStrings.termsRequired;
+}
+
 class ErrorMessages {
   ErrorMessages._();
 
   static String getMessage(String key) {
     return _arabicMessages[key] ?? AppStrings.defaultError;
   }
+
+  static String getValidationMessage(String key) {
+    return _validationMessages[key] ?? _arabicMessages[key] ?? '';
+  }
+
+  static const Map<String, String> _validationMessages = {
+    ValidationKeys.usernameRequired: 'يرجى إدخال اسم المستخدم',
+    ValidationKeys.usernameInvalid: 'يجب أن يكون اسم المستخدم 3 أحرف على الأقل',
+    ValidationKeys.fullNameRequired: 'يرجى إدخال الاسم الكامل',
+    ValidationKeys.phoneRequired: 'يرجى إدخال رقم الجوال',
+    ValidationKeys.phoneInvalid: 'صيغة رقم الجوال غير صحيحة (0XXXXXXXXX)',
+    ValidationKeys.passwordRequired: 'يرجى إدخال كلمة المرور',
+    ValidationKeys.passwordInvalid: 'يجب أن تكون كلمة المرور 8 أحرف على الأقل',
+    ValidationKeys.dateRequired: 'يرجى إدخال تاريخ الميلاد',
+    ValidationKeys.dateInvalid: 'صيغة التاريخ غير صحيحة (YYYY-MM-DD)',
+    ValidationKeys.genderRequired: 'يرجى اختيار الجنس',
+    ValidationKeys.genderInvalid: 'يجب أن يكون الجنس ذكر أو أنثى',
+    ValidationKeys.cityRequired: 'يرجى إدخال الولاية',
+    ValidationKeys.bloodTypeRequired: 'يرجى اختيار فصيلة الدم',
+    ValidationKeys.termsRequired: 'يجب الموافقة على الشروط والأحكام',
+  };
 
   static const Map<String, String> _arabicMessages = {
     // Auth errors

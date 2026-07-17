@@ -28,6 +28,16 @@
 - No comments unless asked. No emojis in code.
 - Prefer `const` constructors. Use `equatable` for BLoC states/events. Use `freezed` for data models/DTOs (immutable + generated fromJson/toJson).
 
+## No Hardcoded Values in Views (MANDATORY)
+- **Never** put literal strings, ints, or doubles inside presentation/pages or widgets. No magic numbers, no inline text, no raw hex colors.
+- Centralize every literal in dedicated files under `lib/core/`:
+  - UI text / labels / messages → `lib/core/constants/app_strings.dart` (localization-ready).
+  - Sizes, spacing, radii, durations → `lib/core/constants/app_dimensions.dart`.
+  - Colors → theme / `lib/core/theme/app_colors.dart` (never inline `Color(0x...)` in a page).
+  - Keys, routes, API paths, config → their own `lib/core/constants/` files.
+- Views reference the constant, never the literal. One source of truth per value.
+- Applies to all `presentation/pages/` and widget files. Enum-like fixed sets go in domain, not the view.
+
 ## Architecture — Clean Architecture (3 layers) + BLoC
 
 ### Dependency rule

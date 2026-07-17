@@ -9,6 +9,7 @@ import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
+import '../../../../core/validators/validators.dart';
 import '../../../../injection_container.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../bloc/auth_bloc.dart';
@@ -23,6 +24,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final _formKey = GlobalKey<FormState>();
   int _currentStep = 1;
   bool _agreeToTerms = false;
 
@@ -55,6 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void _nextStep() {
+    if (!_formKey.currentState!.validate()) return;
     if (_currentStep < 3) {
       setState(() => _currentStep++);
     } else {
@@ -64,15 +67,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void _dispatchSignup() {
+    if (!_formKey.currentState!.validate()) return;
     final params = SignupParams(
       username: _usernameController.text.trim(),
       fullName: _fullNameController.text.trim(),
       password: _passwordController.text,
       phone: _phoneController.text.trim(),
-      dateOfBirth: DateTime.tryParse(_dobController.text) ?? DateTime(2000),
-      gender: _genderController.text.trim().toLowerCase() == 'ذكر'
-          ? 'male'
-          : 'female',
+      dateOfBirth: DateTime.tryParse(_dobController.text.trim()) ?? DateTime(2000),
+      gender: _genderController.text.trim() == 'ذكر' ? 'male' : 'female',
       bloodType: _bloodTypeController.text.trim(),
       city: _cityController.text.trim(),
       nationalId: _nationalIdController.text.trim().isEmpty
@@ -105,80 +107,83 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppPadding.p20,
                     ),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: AppSize.s20),
-                        Image.asset(
-                          ImageAssets.icon6,
-                          width: AppSize.s76,
-                          height: AppSize.s76,
-                          errorBuilder: (_, __, ___) => Icon(
-                            Icons.bloodtype_outlined,
-                            color: ColorManager.primary,
-                            size: AppSize.s76,
-                          ),
-                        ),
-                        const SizedBox(height: AppSize.s10),
-                        Text(
-                          'إنشاء حساب',
-                          style: getBoldStyle(
-                            fontSize: FontSize.s24,
-                            color: ColorManager.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: AppSize.s5),
-                        Text(
-                          _getStepTitle(),
-                          style: getRegularStyle(
-                            fontSize: FontSize.s14,
-                            color: ColorManager.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: AppSize.s20),
-                        _buildStepIndicator(),
-                        const SizedBox(height: AppSize.s20),
-                        _buildCurrentStepView(),
-                        const SizedBox(height: AppSize.s20),
-                        ElevatedButton(
-                          onPressed: _currentStep == 3 && !_agreeToTerms
-                              ? null
-                              : _nextStep,
-                          child: Text(
-                            _currentStep == 3 ? 'إنشاء حساب' : 'التالي',
-                          ),
-                        ),
-                        if (_currentStep == 1) ...[
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
                           const SizedBox(height: AppSize.s20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'لديك حساب بالفعل؟ ',
-                                style: getRegularStyle(
-                                  fontSize: FontSize.s12,
-                                  color: ColorManager.textMuted,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () => Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const LoginFormScreen(),
-                                  ),
-                                ),
-                                child: Text(
-                                  'تسجيل الدخول',
-                                  style: getBoldStyle(
-                                    fontSize: FontSize.s12,
-                                    color: ColorManager.primary,
-                                  ),
-                                ),
-                              ),
-                            ],
+                          Image.asset(
+                            ImageAssets.icon6,
+                            width: AppSize.s76,
+                            height: AppSize.s76,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.bloodtype_outlined,
+                              color: ColorManager.primary,
+                              size: AppSize.s76,
+                            ),
                           ),
+                          const SizedBox(height: AppSize.s10),
+                          Text(
+                            'إنشاء حساب',
+                            style: getBoldStyle(
+                              fontSize: FontSize.s24,
+                              color: ColorManager.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: AppSize.s5),
+                          Text(
+                            _getStepTitle(),
+                            style: getRegularStyle(
+                              fontSize: FontSize.s14,
+                              color: ColorManager.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: AppSize.s20),
+                          _buildStepIndicator(),
+                          const SizedBox(height: AppSize.s20),
+                          _buildCurrentStepView(),
+                          const SizedBox(height: AppSize.s20),
+                          ElevatedButton(
+                            onPressed: (_currentStep == 3 && !_agreeToTerms)
+                                ? null
+                                : _nextStep,
+                            child: Text(
+                              _currentStep == 3 ? 'إنشاء حساب' : 'التالي',
+                            ),
+                          ),
+                          if (_currentStep == 1) ...[
+                            const SizedBox(height: AppSize.s20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'لديك حساب بالفعل؟ ',
+                                  style: getRegularStyle(
+                                    fontSize: FontSize.s12,
+                                    color: ColorManager.textMuted,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () => Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const LoginFormScreen(),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'تسجيل الدخول',
+                                    style: getBoldStyle(
+                                      fontSize: FontSize.s12,
+                                      color: ColorManager.primary,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                          const SizedBox(height: AppSize.s20),
                         ],
-                        const SizedBox(height: AppSize.s20),
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -265,12 +270,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
           hintText: 'الاسم الكامل',
           prefixIcon: Icons.person_outline,
           controller: _fullNameController,
+          validator: validateFullName,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
           hintText: 'اسم المستخدم',
           prefixIcon: Icons.alternate_email,
           controller: _usernameController,
+          validator: validateUsername,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
@@ -278,6 +285,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           prefixIcon: Icons.phone_outlined,
           controller: _phoneController,
           keyboardType: TextInputType.phone,
+          validator: validatePhone,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
@@ -285,6 +293,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           prefixIcon: Icons.lock_outline,
           isPassword: true,
           controller: _passwordController,
+          validator: validatePassword,
         ),
       ],
     );
@@ -298,12 +307,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
           prefixIcon: Icons.calendar_today_outlined,
           controller: _dobController,
           keyboardType: TextInputType.datetime,
+          validator: validateDate,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
           hintText: 'الجنس',
           prefixIcon: Icons.person_outline,
           controller: _genderController,
+          validator: validateGender,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
@@ -318,9 +329,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
             prefixIcon: Icon(Icons.opacity),
           ),
           items: const ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
-              .map((type) => DropdownMenuItem(value: type, child: Text(type)))
+              .map((type) => DropdownMenuItem(
+                    value: type,
+                    child: Text(type),
+                  ))
               .toList(),
           onChanged: (v) => _bloodTypeController.text = v ?? '',
+          validator: (v) => (_bloodTypeController.text.isEmpty)
+              ? validateRequired(null, '')
+              : null,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
@@ -334,6 +351,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           hintText: 'الولاية',
           prefixIcon: Icons.location_city_outlined,
           controller: _cityController,
+          validator: validateCity,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
@@ -398,7 +416,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           onAction: () {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
+              MaterialPageRoute(
+                builder: (_) => const RoleSelectionScreen(),
+              ),
               (route) => false,
             );
           },

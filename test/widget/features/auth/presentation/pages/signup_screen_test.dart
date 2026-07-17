@@ -24,14 +24,9 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(SignupParams(
-      username: 'fallback',
-      fullName: 'fallback',
-      password: 'fallback',
-      phone: '0000',
-      dateOfBirth: DateTime(2000),
-      gender: 'male',
-      bloodType: 'O+',
-      city: 'fallback',
+      username: 'fallback', fullName: 'fallback', password: 'fallback',
+      phone: '0000', dateOfBirth: DateTime(2000), gender: 'male',
+      bloodType: 'O+', city: 'fallback',
     ));
     registerFallbackValue(LoginParams(username: 'fallback', password: 'fallback'));
     registerFallbackValue(NoParams());
@@ -41,11 +36,8 @@ void main() {
   setUp(() {
     sl.reset();
     sl.registerFactory(() => AuthBloc(
-          loginWithUsernamePassword: sl(),
-          signupWithUsernamePassword: sl(),
-          signOutUseCase: sl(),
-          getCurrentSession: sl(),
-          updateUserRole: sl(),
+          loginWithUsernamePassword: sl(), signupWithUsernamePassword: sl(),
+          signOutUseCase: sl(), getCurrentSession: sl(), updateUserRole: sl(),
         ));
     sl.registerLazySingleton<LoginWithUsernamePassword>(() => MockLoginWithUsernamePassword());
     sl.registerLazySingleton<SignupWithUsernamePassword>(() => MockSignupWithUsernamePassword());
@@ -53,6 +45,14 @@ void main() {
     sl.registerLazySingleton<GetCurrentSession>(() => MockGetCurrentSession());
     sl.registerLazySingleton<UpdateUserRole>(() => MockUpdateUserRole());
   });
+
+  Future<void> fillStep1(WidgetTester tester) async {
+    final fields = find.byType(TextFormField);
+    await tester.enterText(fields.at(0), 'Test User');
+    await tester.enterText(fields.at(1), 'testuser1');
+    await tester.enterText(fields.at(2), '0555123456');
+    await tester.enterText(fields.at(3), 'password1234');
+  }
 
   testWidgets('renders step 1 with account info fields', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: SignUpScreen()));
@@ -70,11 +70,10 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: SignUpScreen()));
     await tester.pump();
 
-    await tester.scrollUntilVisible(
-      find.text('التالي'),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await fillStep1(tester);
+
+    await tester.scrollUntilVisible(find.text('التالي'), 200,
+        scrollable: find.byType(Scrollable).first);
     await tester.tap(find.text('التالي'));
     await tester.pump();
 
@@ -88,18 +87,29 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: SignUpScreen()));
     await tester.pump();
 
-    await tester.scrollUntilVisible(
-      find.text('التالي'),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await fillStep1(tester);
+
+    await tester.scrollUntilVisible(find.text('التالي'), 200,
+        scrollable: find.byType(Scrollable).first);
     await tester.tap(find.text('التالي'));
     await tester.pump();
-    await tester.scrollUntilVisible(
-      find.text('التالي'),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
+
+    await tester.enterText(find.widgetWithText(TextFormField, 'تاريخ الميلاد'), '2000-01-01');
+    await tester.enterText(find.widgetWithText(TextFormField, 'الجنس'), 'ذكر');
+
+    await tester.scrollUntilVisible(find.byType(DropdownButtonFormField<String>), 400,
+        scrollable: find.byType(Scrollable).first);
+    await tester.tap(find.byType(DropdownButtonFormField<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('O+').last);
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.widgetWithText(TextFormField, 'الولاية'), 400,
+        scrollable: find.byType(Scrollable).first);
+    await tester.enterText(find.widgetWithText(TextFormField, 'الولاية'), 'الجزائر');
+
+    await tester.scrollUntilVisible(find.text('التالي'), 400,
+        scrollable: find.byType(Scrollable).first);
     await tester.tap(find.text('التالي'));
     await tester.pump();
 
