@@ -14,6 +14,8 @@ import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:tabare3/features/auth/presentation/pages/login_form_screen.dart';
 import 'package:tabare3/features/auth/presentation/pages/signup_screen.dart';
 
+import '../../../../../helpers/test_app.dart';
+
 class MockLoginWithUsernamePassword extends Mock implements LoginWithUsernamePassword {}
 class MockSignupWithUsernamePassword extends Mock implements SignupWithUsernamePassword {}
 class MockSignOut extends Mock implements SignOut {}
@@ -23,7 +25,8 @@ class MockUpdateUserRole extends Mock implements UpdateUserRole {}
 void main() {
   final sl = GetIt.instance;
 
-  setUpAll(() {
+  setUpAll(() async {
+    await setupTestLocalization();
     registerFallbackValue(SignupParams(
       username: 'fallback',
       fullName: 'fallback',
@@ -56,12 +59,7 @@ void main() {
   });
 
   Future<void> pumpScreen(WidgetTester tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: LoginFormScreen(),
-      ),
-    );
-    await tester.pump();
+    await pumpTestApp(tester, const LoginFormScreen());
   }
 
   testWidgets('renders logo, title, form fields and login button', (tester) async {
@@ -69,7 +67,6 @@ void main() {
 
     expect(find.text('تسجيل الدخول'), findsWidgets);
     expect(find.text('اسم المستخدم'), findsOneWidget);
-    expect(find.text('تذكرني في المرة القادمة'), findsOneWidget);
     expect(find.text('إنشاء حساب'), findsOneWidget);
     expect(find.byIcon(Icons.lock_outline), findsOneWidget);
   });

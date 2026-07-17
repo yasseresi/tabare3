@@ -15,7 +15,7 @@ import 'package:tabare3/features/auth/presentation/pages/welcome_screen.dart';
 import 'package:tabare3/features/auth/presentation/pages/login_form_screen.dart';
 import 'package:tabare3/features/auth/presentation/pages/signup_screen.dart';
 
-import '../../../helpers/test_app.dart';
+import '../../../../../helpers/test_app.dart';
 
 class MockLogin extends Mock implements LoginWithUsernamePassword {}
 class MockSignup extends Mock implements SignupWithUsernamePassword {}
@@ -26,7 +26,8 @@ class MockRole extends Mock implements UpdateUserRole {}
 void main() {
   final sl = GetIt.instance;
 
-  setUpAll(() {
+  setUpAll(() async {
+    await setupTestLocalization();
     registerFallbackValue(SignupParams(
       username: 'f', fullName: 'f', password: 'f', phone: '0000',
       dateOfBirth: DateTime(2000), gender: 'male', bloodType: 'O+', city: 'f',

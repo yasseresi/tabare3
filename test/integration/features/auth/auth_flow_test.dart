@@ -30,6 +30,8 @@ import 'package:tabare3/features/requester_home/presentation/pages/requester_hom
 import 'package:tabare3/features/splash/presentation/pages/splash_screen.dart';
 import 'package:tabare3/main.dart';
 
+import '../../../helpers/test_app.dart';
+
 class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
 
 class MockNetworkInfo extends Mock implements NetworkInfo {}
@@ -108,7 +110,8 @@ void main() {
   late MockAuthRemoteDataSource mockDataSource;
   late MockNetworkInfo mockNetworkInfo;
 
-  setUpAll(() {
+  setUpAll(() async {
+    await setupTestLocalization();
     registerFallbackValue(
       SignupParams(
         username: 'fallback',
@@ -140,7 +143,7 @@ void main() {
   });
 
   Future<void> pumpApp(WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(wrapWithLocalization(const MyApp()));
     await tester.pump();
   }
 

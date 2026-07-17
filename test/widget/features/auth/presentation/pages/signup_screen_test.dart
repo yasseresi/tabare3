@@ -13,6 +13,8 @@ import 'package:tabare3/features/auth/domain/usecases/update_user_role.dart';
 import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:tabare3/features/auth/presentation/pages/signup_screen.dart';
 
+import '../../../../../helpers/test_app.dart';
+
 class MockLoginWithUsernamePassword extends Mock implements LoginWithUsernamePassword {}
 class MockSignupWithUsernamePassword extends Mock implements SignupWithUsernamePassword {}
 class MockSignOut extends Mock implements SignOut {}
@@ -22,7 +24,8 @@ class MockUpdateUserRole extends Mock implements UpdateUserRole {}
 void main() {
   final sl = GetIt.instance;
 
-  setUpAll(() {
+  setUpAll(() async {
+    await setupTestLocalization();
     registerFallbackValue(SignupParams(
       username: 'fallback', fullName: 'fallback', password: 'fallback',
       phone: '0000', dateOfBirth: DateTime(2000), gender: 'male',
@@ -56,8 +59,7 @@ void main() {
   }
 
   testWidgets('renders step 1 with account info fields', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: SignUpScreen()));
-    await tester.pump();
+    await pumpTestApp(tester, const SignUpScreen());
 
     expect(find.text('إنشاء حساب'), findsOneWidget);
     expect(find.text('معلومات الحساب'), findsOneWidget);
@@ -68,8 +70,7 @@ void main() {
   });
 
   testWidgets('advances to step 2 when tapping next', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: SignUpScreen()));
-    await tester.pump();
+    await pumpTestApp(tester, const SignUpScreen());
 
     await fillStep1(tester);
 
@@ -85,8 +86,7 @@ void main() {
   });
 
   testWidgets('advances to step 3 and shows terms', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: SignUpScreen()));
-    await tester.pump();
+    await pumpTestApp(tester, const SignUpScreen());
 
     await fillStep1(tester);
 
