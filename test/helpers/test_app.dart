@@ -1,12 +1,34 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-/// Must run once before pumping any localized widget in tests.
-/// Call in setUpAll().
+class MapAssetLoader extends AssetLoader {
+  final Map<String, dynamic> translations;
+  const MapAssetLoader(this.translations);
+
+  @override
+  Future<Map<String, dynamic>?> load(String path, Locale locale) async {
+    return translations;
+  }
+}
+
+late Map<String, dynamic> _testTranslations;
+
+/// Call in setUpAll() — mocks SharedPreferences and loads translation JSON.
+/// Do NOT call EasyLocalization.ensureInitialized() here — it creates a
+/// singleton that leaks between tests. Each test's EasyLocalization widget
+/// handles its own initialization when pumped.
 Future<void> setupTestLocalization() async {
   TestWidgetsFlutterBinding.ensureInitialized();
-  await EasyLocalization.ensureInitialized();
+  SharedPreferences.setMockInitialValues({});
+
+  final file = File('assets/translations/ar.json');
+  final jsonString = await file.readAsString();
+  _testTranslations = json.decode(jsonString);
 }
 
 /// Wraps [home] in EasyLocalization + MaterialApp with Arabic translations
@@ -15,6 +37,7 @@ Widget buildTestApp(Widget home) {
   return EasyLocalization(
     supportedLocales: const [Locale('ar'), Locale('en')],
     path: 'assets/translations',
+    assetLoader: MapAssetLoader(_testTranslations),
     fallbackLocale: const Locale('ar'),
     startLocale: const Locale('ar'),
     useOnlyLangCode: true,
@@ -41,6 +64,7 @@ Widget wrapWithLocalization(Widget child) {
   return EasyLocalization(
     supportedLocales: const [Locale('ar'), Locale('en')],
     path: 'assets/translations',
+    assetLoader: MapAssetLoader(_testTranslations),
     fallbackLocale: const Locale('ar'),
     startLocale: const Locale('ar'),
     useOnlyLangCode: true,
