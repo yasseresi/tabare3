@@ -1,5 +1,6 @@
 class AppConstants {
   static const int splashDelay = 2;
+  static const int splashDelayUnauthenticated = 3;
   static const int sliderAnimationTime = 300;
   static const int toastDuration = 3;
   static const int paginationLimit = 10;

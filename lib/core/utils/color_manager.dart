@@ -28,6 +28,10 @@ class ColorManager {
   static Color surfaceWarm = const Color(0xffFCF9F8);
   static Color surfaceAlt = const Color(0xffF2F2F2);
 
+  // Progress
+  static Color progressTrack = const Color(0xffE5E2E1);
+  static Color progressFill = const Color(0xffC0392B);
+
   // Semantic
   static Color error = const Color(0xffC0392B);
   static Color errorDark = const Color(0xffBA1A1A);

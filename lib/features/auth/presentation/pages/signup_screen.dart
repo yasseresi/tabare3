@@ -235,41 +235,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildCircle(1),
-        _buildLine(),
-        _buildCircle(2),
-        _buildLine(),
-        _buildCircle(3),
+        _buildEllipse(1),
+        SizedBox(width: AppSize.s8),
+        _buildEllipse(2),
+        SizedBox(width: AppSize.s8),
+        _buildEllipse(3),
       ],
     );
   }
 
-  Widget _buildCircle(int step) {
+  Widget _buildEllipse(int step) {
     final isCurrent = _currentStep == step;
+    final isCompleted = _currentStep > step;
     return Container(
-      width: AppSize.s35,
-      height: AppSize.s35,
+      width: isCurrent ? AppSize.s24 : AppSize.s10,
+      height: AppSize.s10,
       decoration: BoxDecoration(
-        color: isCurrent ? ColorManager.primary : ColorManager.surface,
-        shape: BoxShape.circle,
+        color: isCurrent
+            ? ColorManager.primary
+            : isCompleted
+                ? ColorManager.primary
+                : ColorManager.dividerGrey,
+        borderRadius: BorderRadius.circular(AppSize.s5),
       ),
-      child: Center(
-        child: Text(
-          '$step',
-          style: getBoldStyle(
-            fontSize: FontSize.s16,
-            color: isCurrent ? ColorManager.white : ColorManager.textLight,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLine() {
-    return Container(
-      width: AppSize.s40,
-      height: AppSize.s2,
-      color: ColorManager.dividerGrey,
     );
   }
 

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/utils/assets_manager.dart';
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/values_manager.dart';
 import '../../../../injection_container.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/pages/welcome_screen.dart';
@@ -17,31 +22,38 @@ class SplashScreen extends StatelessWidget {
       child: BlocListener<AuthBloc, AuthState>(
         listener: _authListener,
         child: Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: ColorManager.scaffoldBg,
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  'assets/images/logo.png',
-                  width: 180,
-                  height: 180,
+                  ImageAssets.logo,
+                  width: AppSize.s111,
+                  height: AppSize.s111,
                   errorBuilder: (context, error, stackTrace) => Icon(
                     Icons.favorite,
-                    color: Theme.of(context).primaryColor,
-                    size: 100,
+                    color: ColorManager.primary,
+                    size: AppSize.s100,
                   ),
                 ),
-                const SizedBox(height: 40),
-                SizedBox(
-                  width: 120,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: LinearProgressIndicator(
-                      minHeight: 6,
-                      backgroundColor: const Color(0xFFE0E0E0),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Theme.of(context).primaryColor,
+                const SizedBox(height: AppSize.s40),
+                Container(
+                  key: WidgetKeys.splashProgressBar,
+                  width: AppSize.s80,
+                  height: AppSize.s6,
+                  decoration: BoxDecoration(
+                    color: ColorManager.progressTrack,
+                    borderRadius: BorderRadius.circular(AppSize.s3),
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      width: AppSize.s40,
+                      height: AppSize.s6,
+                      decoration: BoxDecoration(
+                        color: ColorManager.progressFill,
+                        borderRadius: BorderRadius.circular(AppSize.s3),
                       ),
                     ),
                   ),
@@ -63,7 +75,7 @@ class SplashScreen extends StatelessWidget {
   }
 
   void _navigateToHome(BuildContext context, bool isDonor) {
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: AppConstants.splashDelay), () {
       if (context.mounted) {
         Navigator.pushAndRemoveUntil(
           context,
@@ -78,7 +90,8 @@ class SplashScreen extends StatelessWidget {
   }
 
   void _navigateToWelcome(BuildContext context) {
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: AppConstants.splashDelayUnauthenticated),
+        () {
       if (context.mounted) {
         Navigator.pushAndRemoveUntil(
           context,
