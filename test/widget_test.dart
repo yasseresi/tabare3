@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:tabare3/core/constants/widget_keys.dart';
 import 'package:tabare3/core/usecases/usecase.dart';
 import 'package:tabare3/features/auth/domain/repositories/auth_repository.dart';
 import 'package:tabare3/features/auth/domain/usecases/get_current_session.dart';
@@ -55,7 +56,7 @@ void main() {
     sl.registerLazySingleton<UpdateUserRole>(() => MockUpdateUserRole());
   });
 
-  testWidgets('SplashScreen renders logo and progress indicator', (tester) async {
+  testWidgets('SplashScreen renders logo and progress bar', (tester) async {
     when(() => sl<GetCurrentSession>().call(any()))
         .thenAnswer((_) async => const Right(null));
 
@@ -63,7 +64,7 @@ void main() {
     await tester.pump();
 
     expect(find.byType(Image), findsWidgets);
-    expect(find.byType(LinearProgressIndicator), findsOneWidget);
+    expect(find.byKey(WidgetKeys.splashProgressBar), findsOneWidget);
 
     await tester.pump(const Duration(seconds: 3));
   });

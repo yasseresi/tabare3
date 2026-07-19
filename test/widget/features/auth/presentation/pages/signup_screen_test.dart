@@ -63,7 +63,7 @@ void main() {
 
     expect(find.text('إنشاء حساب'), findsOneWidget);
     expect(find.text('معلومات الحساب'), findsOneWidget);
-    expect(find.text('الاسم الكامل'), findsOneWidget);
+    expect(find.text('الاسم واللقب'), findsOneWidget);
     expect(find.text('اسم المستخدم'), findsOneWidget);
     expect(find.text('رقم الجوال'), findsOneWidget);
     expect(find.text('التالي'), findsOneWidget);
@@ -79,7 +79,7 @@ void main() {
     await tester.tap(find.text('التالي'));
     await tester.pump();
 
-    expect(find.text('المعلومات الشخصية'), findsOneWidget);
+    expect(find.text('البيانات الشخصية'), findsOneWidget);
     expect(find.text('تاريخ الميلاد'), findsOneWidget);
     expect(find.text('فصيلة الدم'), findsOneWidget);
     expect(find.text('الوزن'), findsOneWidget);

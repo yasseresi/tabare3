@@ -302,7 +302,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byType(Dialog), findsOneWidget);
-        expect(find.byIcon(Icons.error_outline), findsOneWidget);
+        expect(find.byIcon(Icons.close), findsOneWidget);
       });
     });
 
@@ -339,7 +339,7 @@ void main() {
         await tester.tap(find.widgetWithText(ElevatedButton, 'التالي'));
         await tester.pumpAndSettle();
 
-        expect(find.text('المعلومات الشخصية'), findsOneWidget);
+        expect(find.text('البيانات الشخصية'), findsOneWidget);
 
         await tester.enterText(
             find.widgetWithText(TextFormField, 'تاريخ الميلاد'), '1990-01-01');

@@ -22,7 +22,7 @@ void main() {
     await client.dispose();
   });
 
-  group('Live Supabase Auth Integration', () {
+  group('Live Supabase Auth Integration', skip: 'Requires valid Supabase credentials', () {
     test('handle_new_user trigger creates profile on signUp', () async {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final email = 'test_live_$timestamp@example.com';
