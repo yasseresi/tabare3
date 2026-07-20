@@ -130,7 +130,7 @@ ThemeData getAppTheme() {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: ColorManager.surfaceLight,
+      fillColor: ColorManager.surface,
       contentPadding: const EdgeInsets.symmetric(
         horizontal: AppPadding.p20,
         vertical: AppPadding.p16,

@@ -56,7 +56,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                 child: SafeArea(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: AppPadding.p20,
+                      horizontal: AppPadding.p32,
                       vertical: AppPadding.p60,
                     ),
                     child: Form(
@@ -109,29 +109,26 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                             validator: validatePassword,
                           ),
                           const SizedBox(height: AppSize.s30),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: ColorManager.primary,
-                                foregroundColor: ColorManager.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppPadding.p20,
-                                  vertical: AppPadding.p18,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(AppSize.s20),
-                                ),
-                                textStyle: getMediumStyle(
-                                  fontSize: FontSize.s18,
-                                  color: ColorManager.white,
-                                ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ColorManager.primary,
+                              foregroundColor: ColorManager.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppPadding.p50,
+                                vertical: AppPadding.p18,
                               ),
-                              onPressed: () =>
-                                  _dispatchLogin(context.read<AuthBloc>()),
-                              child: Text(AppStrings.login.tr()),
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(AppSize.radiusButton),
+                              ),
+                              textStyle: getMediumStyle(
+                                fontSize: FontSize.s19,
+                                color: ColorManager.white,
+                              ),
                             ),
+                            onPressed: () =>
+                                _dispatchLogin(context.read<AuthBloc>()),
+                            child: Text(AppStrings.login.tr()),
                           ),
                           const SizedBox(height: AppSize.s5),
                           Row(
