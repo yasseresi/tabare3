@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'core/network/supabase_service.dart';
 import 'core/utils/language_manager.dart';
 import 'core/utils/route_manager.dart';
+import 'core/utils/color_manager.dart';
 import 'core/utils/theme_manager.dart';
 import 'injection_container.dart' as di;
 
@@ -37,6 +38,24 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: context.localizationDelegates,
       onGenerateRoute: RouteGenerator.getRoute,
       initialRoute: Routes.splashRoute,
+      builder: (context, child) {
+        return ColoredBox(
+          color: ColorManager.white,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  ColorManager.welcomeGradientStart,
+                  ColorManager.welcomeGradientEnd,
+                ],
+              ),
+            ),
+            child: child,
+          ),
+        );
+      },
     );
   }
 }

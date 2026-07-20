@@ -22,7 +22,7 @@ class ColorManager {
   static Color white = const Color(0xffFFFFFF);
 
   // Backgrounds
-  static Color scaffoldBg = const Color(0xffFFFFFF);
+  static Color scaffoldBg = Colors.transparent;
   static Color surfaceLight = const Color(0xffF9FAFB);
   static Color surface = const Color(0xffF3F4F6);
   static Color surfaceWarm = const Color(0xffFCF9F8);

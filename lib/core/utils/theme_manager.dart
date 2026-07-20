@@ -16,7 +16,7 @@ ThemeData getAppTheme() {
       seedColor: ColorManager.primary,
       primary: ColorManager.primary,
       secondary: ColorManager.secondary,
-      surface: ColorManager.scaffoldBg,
+      surface: ColorManager.white,
       onSurface: ColorManager.black,
       error: ColorManager.error,
     ),
