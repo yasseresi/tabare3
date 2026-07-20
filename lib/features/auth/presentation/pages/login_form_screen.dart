@@ -49,9 +49,8 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
           return LoadingOverlay(
             visible: state is AuthLoading,
             message: AppStrings.loggingIn.tr(),
-            child: Scaffold(
-              backgroundColor: ColorManager.white,
-              body: Directionality(
+              child: Scaffold(
+                body: Directionality(
                 textDirection: TextDirection.rtl,
                 child: SafeArea(
                   child: SingleChildScrollView(
@@ -87,8 +86,10 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                           const SizedBox(height: AppSize.s15),
                           Text(
                             AppStrings.login.tr(),
-                            style: getBoldStyle(
+                            style: TextStyle(
+                              fontFamily: FontConstants.fontFamily,
                               fontSize: FontSize.s30,
+                              fontWeight: FontWeightManager.bold,
                               color: ColorManager.black,
                             ),
                           ),
@@ -113,16 +114,23 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: ColorManager.primary,
                               foregroundColor: ColorManager.white,
+                              minimumSize: const Size(
+                                AppSize.s220,
+                                AppSize.s56,
+                              ),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: AppPadding.p50,
                                 vertical: AppPadding.p18,
                               ),
                               shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(AppSize.radiusButton),
+                                borderRadius: BorderRadius.circular(
+                                  AppSize.radiusButton,
+                                ),
                               ),
-                              textStyle: getMediumStyle(
+                              textStyle: TextStyle(
+                                fontFamily: FontConstants.fontFamily,
                                 fontSize: FontSize.s19,
+                                fontWeight: FontWeightManager.medium,
                                 color: ColorManager.white,
                               ),
                             ),
@@ -180,9 +188,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
           onAction: () {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
-                builder: (_) => const RoleSelectionScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
               (route) => false,
             );
           },

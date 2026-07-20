@@ -16,13 +16,15 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
             colors: [
-              ColorManager.welcomeGradientStart,
-              ColorManager.welcomeGradientEnd,
+              Color(0xFFFDB6B0),
+              Color(0xFFDFE0FE),
             ],
           ),
         ),
@@ -50,8 +52,10 @@ class WelcomeScreen extends StatelessWidget {
                     Text(
                       AppStrings.welcomeTo.tr(),
                       textAlign: TextAlign.center,
-                      style: getMediumStyle(
+                      style: TextStyle(
+                        fontFamily: FontConstants.fontFamily,
                         fontSize: FontSize.s32,
+                        fontWeight: FontWeightManager.medium,
                         color: ColorManager.welcomeText,
                       ),
                     ),
@@ -72,6 +76,7 @@ class WelcomeScreen extends StatelessWidget {
                         backgroundColor: ColorManager.primary,
                         foregroundColor: ColorManager.white,
                         elevation: AppSize.s0,
+                        minimumSize: const Size(AppSize.s120, AppSize.s50),
                         padding: const EdgeInsets.symmetric(
                           horizontal: AppPadding.p50,
                           vertical: AppPadding.p18,
@@ -81,11 +86,14 @@ class WelcomeScreen extends StatelessWidget {
                             AppSize.radiusButton,
                           ),
                         ),
-                        textStyle: getMediumStyle(
+                        textStyle: TextStyle(
+                          fontFamily: FontConstants.fontFamily,
                           fontSize: FontSize.s19,
+                          fontWeight: FontWeightManager.medium,
                           color: ColorManager.white,
                         ),
                       ),
+
                       onPressed: () {
                         Navigator.pushNamed(context, Routes.loginFormRoute);
                       },
@@ -96,21 +104,24 @@ class WelcomeScreen extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         backgroundColor: ColorManager.white,
                         foregroundColor: ColorManager.signupText,
+                        minimumSize: const Size(AppSize.s220, AppSize.s56),
                         side: BorderSide(
                           color: ColorManager.surface,
                           width: AppSize.s2,
                         ),
                         padding: const EdgeInsets.symmetric(
                           horizontal: AppPadding.p50,
-                          vertical: AppPadding.p20,
+                          vertical: AppPadding.p18,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
                             AppSize.radiusCircle,
                           ),
                         ),
-                        textStyle: getSemiBoldStyle(
+                        textStyle: TextStyle(
+                          fontFamily: FontConstants.fontFamily,
                           fontSize: FontSize.s19,
+                          fontWeight: FontWeightManager.semiBold,
                           color: ColorManager.signupText,
                         ),
                       ),

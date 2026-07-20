@@ -81,20 +81,22 @@ class RoleSelectionScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: AppSize.s20),
-                          Text(
-                            AppStrings.hadithIntro.tr(),
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.cairo(
-                              fontSize: FontSize.s18,
-                              fontWeight: FontWeightManager.bold,
-                              color: ColorManager.textSecondary,
-                            ),
-                          ),
+                      Text(
+                        AppStrings.hadithIntro.tr(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: FontConstants.fontFamily,
+                          fontSize: FontSize.s18,
+                          fontWeight: FontWeightManager.bold,
+                          color: ColorManager.textSecondary,
+                        ),
+                      ),
                           const SizedBox(height: AppSize.s10),
                           Text(
                             '«${AppStrings.hadithRelief.tr()}»',
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.cairo(
+                            style: TextStyle(
+                              fontFamily: FontConstants.fontFamily,
                               fontSize: FontSize.s14,
                               fontWeight: FontWeightManager.semiBold,
                               color: ColorManager.textSecondary,
@@ -102,13 +104,15 @@ class RoleSelectionScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: AppSize.s24),
-                          Text(
-                            AppStrings.areYou.tr(),
-                            style: getBoldStyle(
-                              fontSize: FontSize.s20,
-                              color: ColorManager.textPrimary,
-                            ),
-                          ),
+                      Text(
+                        AppStrings.areYou.tr(),
+                        style: TextStyle(
+                          fontFamily: FontConstants.fontFamily,
+                          fontSize: FontSize.s20,
+                          fontWeight: FontWeightManager.bold,
+                          color: ColorManager.textPrimary,
+                        ),
+                      ),
                           const SizedBox(height: AppSize.s24),
                           SizedBox(
                             width: 220,
