@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../injection_container.dart';
+import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/splash/presentation/pages/splash_screen.dart';
 import '../../features/auth/presentation/pages/role_selection_screen.dart';
 import '../../features/auth/presentation/pages/welcome_screen.dart';
@@ -60,7 +63,12 @@ class RouteGenerator {
       case Routes.loginFormRoute:
         return MaterialPageRoute(builder: (_) => const LoginFormScreen());
       case Routes.signupRoute:
-        return MaterialPageRoute(builder: (_) => const SignUpScreen());
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<AuthBloc>(),
+            child: const SignUpScreen(),
+          ),
+        );
 
       // Requester
       case Routes.requesterHomeRoute:
