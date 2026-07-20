@@ -12,7 +12,6 @@ import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../../../core/validators/validators.dart';
-import '../../../../injection_container.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../bloc/auth_bloc.dart';
 import 'login_form_screen.dart';
@@ -111,110 +110,106 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<AuthBloc>(),
-      child: BlocConsumer<AuthBloc, AuthState>(
-        listener: _authListener,
-        builder: (context, state) {
-          return LoadingOverlay(
-            visible: state is AuthLoading,
-            message: AppStrings.signingUp.tr(),
-            child: Scaffold(
-              backgroundColor: ColorManager.white,
-              body: Directionality(
-                textDirection: TextDirection.rtl,
-                child: SafeArea(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppPadding.p20,
-                    ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          const SizedBox(height: AppSize.s20),
-                          Image.asset(
-                            ImageAssets.icon6,
-                            width: AppSize.s76,
-                            height: AppSize.s76,
-                            errorBuilder: (_, __, ___) => Icon(
-                              Icons.bloodtype_outlined,
-                              color: ColorManager.primary,
-                              size: AppSize.s76,
-                            ),
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: _authListener,
+      builder: (context, state) {
+        return LoadingOverlay(
+          visible: state is AuthLoading,
+          message: AppStrings.signingUp.tr(),
+          child: Scaffold(
+            body: Directionality(
+              textDirection: TextDirection.rtl,
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppPadding.p20,
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        const SizedBox(height: AppSize.s20),
+                        Image.asset(
+                          ImageAssets.icon6,
+                          width: AppSize.s76,
+                          height: AppSize.s76,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.bloodtype_outlined,
+                            color: ColorManager.primary,
+                            size: AppSize.s76,
                           ),
-                          const SizedBox(height: AppSize.s10),
-                          Text(
-                            AppStrings.signup.tr(),
-                            style: getBoldStyle(
-                              fontSize: FontSize.s24,
-                              color: ColorManager.textPrimary,
-                            ),
+                        ),
+                        const SizedBox(height: AppSize.s10),
+                        Text(
+                          AppStrings.signup.tr(),
+                          style: getBoldStyle(
+                            fontSize: FontSize.s24,
+                            color: ColorManager.textPrimary,
                           ),
-                          const SizedBox(height: AppSize.s5),
-                          Text(
-                            _getStepTitle(),
-                            style: getRegularStyle(
-                              fontSize: FontSize.s14,
-                              color: ColorManager.textSecondary,
-                            ),
+                        ),
+                        const SizedBox(height: AppSize.s5),
+                        Text(
+                          _getStepTitle(),
+                          style: getRegularStyle(
+                            fontSize: FontSize.s14,
+                            color: ColorManager.textSecondary,
                           ),
-                          const SizedBox(height: AppSize.s20),
-                          _buildStepIndicator(),
-                          const SizedBox(height: AppSize.s20),
-                          _buildCurrentStepView(),
-                          const SizedBox(height: AppSize.s20),
-                          ElevatedButton(
-                            onPressed: (_currentStep == 3 && !_agreeToTerms)
-                                ? null
-                                : _nextStep,
-                            child: Text(
-                              _currentStep == 3
-                                  ? AppStrings.signup.tr()
-                                  : AppStrings.next.tr(),
-                            ),
+                        ),
+                        const SizedBox(height: AppSize.s20),
+                        _buildStepIndicator(),
+                        const SizedBox(height: AppSize.s20),
+                        _buildCurrentStepView(),
+                        const SizedBox(height: AppSize.s20),
+                        ElevatedButton(
+                          onPressed: (_currentStep == 3 && !_agreeToTerms)
+                              ? null
+                              : _nextStep,
+                          child: Text(
+                            _currentStep == 3
+                                ? AppStrings.signup.tr()
+                                : AppStrings.next.tr(),
                           ),
-                          if (_currentStep == 1) ...[
-                            const SizedBox(height: AppSize.s20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  '${AppStrings.hasAccount.tr()} ',
-                                  style: getRegularStyle(
+                        ),
+                        if (_currentStep == 1) ...[
+                          const SizedBox(height: AppSize.s20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '${AppStrings.hasAccount.tr()} ',
+                                style: getRegularStyle(
+                                  fontSize: FontSize.s12,
+                                  color: ColorManager.textMuted,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () => Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const LoginFormScreen(),
+                                  ),
+                                ),
+                                child: Text(
+                                  AppStrings.login.tr(),
+                                  style: getBoldStyle(
                                     fontSize: FontSize.s12,
-                                    color: ColorManager.textMuted,
+                                    color: ColorManager.primary,
                                   ),
                                 ),
-                                GestureDetector(
-                                  onTap: () => Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const LoginFormScreen(),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    AppStrings.login.tr(),
-                                    style: getBoldStyle(
-                                      fontSize: FontSize.s12,
-                                      color: ColorManager.primary,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                          const SizedBox(height: AppSize.s20),
+                              ),
+                            ],
+                          ),
                         ],
-                      ),
+                        const SizedBox(height: AppSize.s20),
+                      ],
                     ),
                   ),
                 ),
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -235,29 +230,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildEllipse(1),
-        SizedBox(width: AppSize.s8),
-        _buildEllipse(2),
-        SizedBox(width: AppSize.s8),
-        _buildEllipse(3),
+        _buildCircle(1),
+        _buildLine(),
+        _buildCircle(2),
+        _buildLine(),
+        _buildCircle(3),
       ],
     );
   }
 
-  Widget _buildEllipse(int step) {
+  Widget _buildCircle(int step) {
     final isCurrent = _currentStep == step;
-    final isCompleted = _currentStep > step;
     return Container(
-      width: isCurrent ? AppSize.s24 : AppSize.s10,
-      height: AppSize.s10,
+      width: AppSize.s35,
+      height: AppSize.s35,
       decoration: BoxDecoration(
-        color: isCurrent
-            ? ColorManager.primary
-            : isCompleted
-                ? ColorManager.primary
-                : ColorManager.dividerGrey,
-        borderRadius: BorderRadius.circular(AppSize.s5),
+        color: isCurrent ? ColorManager.primary : ColorManager.dividerGrey,
+        shape: BoxShape.circle,
       ),
+      child: Center(
+        child: Text(
+          '$step',
+          style: TextStyle(
+            color: isCurrent ? ColorManager.white : ColorManager.textMuted,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLine() {
+    return Container(
+      width: AppSize.s40,
+      height: AppSize.s2,
+      color: ColorManager.dividerGrey,
     );
   }
 
@@ -341,10 +348,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             prefixIcon: const Icon(Icons.person_outline),
           ),
           items: [
-            DropdownMenuItem(
-              value: 'male',
-              child: Text(AppStrings.male.tr()),
-            ),
+            DropdownMenuItem(value: 'male', child: Text(AppStrings.male.tr())),
             DropdownMenuItem(
               value: 'female',
               child: Text(AppStrings.female.tr()),
@@ -365,10 +369,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             prefixIcon: const Icon(Icons.opacity),
           ),
           items: const ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
-              .map((type) => DropdownMenuItem(
-                    value: type,
-                    child: Text(type),
-                  ))
+              .map((type) => DropdownMenuItem(value: type, child: Text(type)))
               .toList(),
           onChanged: (v) => _bloodTypeController.text = v ?? '',
           validator: (v) => (_bloodTypeController.text.isEmpty)
@@ -452,9 +453,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           onAction: () {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
-                builder: (_) => const RoleSelectionScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
               (route) => false,
             );
           },
