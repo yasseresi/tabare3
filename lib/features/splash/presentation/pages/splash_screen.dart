@@ -46,14 +46,21 @@ class SplashScreen extends StatelessWidget {
                     color: ColorManager.progressTrack,
                     borderRadius: BorderRadius.circular(AppSize.s3),
                   ),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Container(
-                      width: AppSize.s40,
-                      height: AppSize.s6,
-                      decoration: BoxDecoration(
-                        color: ColorManager.progressFill,
-                        borderRadius: BorderRadius.circular(AppSize.s3),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(seconds: AppConstants.splashDelay),
+                    curve: Curves.easeInOut,
+                    builder: (context, value, _) => Align(
+                      alignment: Alignment.centerLeft,
+                      child: FractionallySizedBox(
+                        widthFactor: value,
+                        child: Container(
+                          height: AppSize.s6,
+                          decoration: BoxDecoration(
+                            color: ColorManager.progressFill,
+                            borderRadius: BorderRadius.circular(AppSize.s3),
+                          ),
+                        ),
                       ),
                     ),
                   ),
