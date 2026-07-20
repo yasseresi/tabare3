@@ -84,7 +84,6 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Directionality(
         textDirection: TextDirection.rtl,
         child: SafeArea(

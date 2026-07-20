@@ -23,7 +23,6 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: _buildBody(),
       bottomNavigationBar: _buildBottomNav(),
     );

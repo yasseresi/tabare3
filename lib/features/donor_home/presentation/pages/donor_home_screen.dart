@@ -22,7 +22,6 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: _buildBody(),
       bottomNavigationBar: _buildBottomNav(),
     );

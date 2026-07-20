@@ -183,7 +183,6 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Directionality(
         textDirection: TextDirection.rtl,
         child: SafeArea(

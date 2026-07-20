@@ -18,7 +18,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: SafeArea(
           child: Column(
             children: [
