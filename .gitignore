@@ -18,6 +18,7 @@ migrate_working_dir/
 *.iws
 *.md
 .idea/
+tasks/
 
 
 # The .vscode folder contains launch configuration and tasks you configure in
