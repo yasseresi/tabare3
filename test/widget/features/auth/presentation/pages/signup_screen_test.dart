@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
@@ -49,6 +50,11 @@ void main() {
     sl.registerLazySingleton<UpdateUserRole>(() => MockUpdateUserRole());
   });
 
+  Widget signUpUnderTest() => BlocProvider(
+        create: (_) => sl<AuthBloc>(),
+        child: const SignUpScreen(),
+      );
+
   Future<void> fillStep1(WidgetTester tester) async {
     final fields = find.byType(TextFormField);
     await tester.enterText(fields.at(0), 'Test User');
@@ -59,7 +65,7 @@ void main() {
   }
 
   testWidgets('renders step 1 with account info fields', (tester) async {
-    await pumpTestApp(tester, const SignUpScreen());
+    await pumpTestApp(tester, signUpUnderTest());
 
     expect(find.text('إنشاء حساب'), findsOneWidget);
     expect(find.text('معلومات الحساب'), findsOneWidget);
@@ -70,7 +76,7 @@ void main() {
   });
 
   testWidgets('advances to step 2 when tapping next', (tester) async {
-    await pumpTestApp(tester, const SignUpScreen());
+    await pumpTestApp(tester, signUpUnderTest());
 
     await fillStep1(tester);
 
@@ -86,7 +92,7 @@ void main() {
   });
 
   testWidgets('advances to step 3 and shows terms', (tester) async {
-    await pumpTestApp(tester, const SignUpScreen());
+    await pumpTestApp(tester, signUpUnderTest());
 
     await fillStep1(tester);
 

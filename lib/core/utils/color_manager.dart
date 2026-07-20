@@ -48,4 +48,10 @@ class ColorManager {
   // Accent
   static Color brown = const Color(0xff59413D);
   static Color brownGrey = const Color(0xff665C5C);
+
+  // Welcome screen
+  static Color welcomeText = const Color(0xff5A5A5A);
+  static Color signupText = const Color(0xff820605);
+  static Color welcomeGradientStart = const Color(0x40FDB6B0);
+  static Color welcomeGradientEnd = const Color(0x40DFE0FE);
 }

@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:tabare3/core/utils/route_manager.dart';
+
 class MapAssetLoader extends AssetLoader {
   final Map<String, dynamic> translations;
   const MapAssetLoader(this.translations);
@@ -46,6 +48,7 @@ Widget buildTestApp(Widget home) {
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
+        onGenerateRoute: RouteGenerator.getRoute,
         home: home,
       ),
     ),

@@ -8,6 +8,7 @@ import '../../../../core/presentation/widgets/loading_overlay.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
+import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
@@ -15,7 +16,6 @@ import '../../../../core/validators/validators.dart';
 import '../../../../injection_container.dart';
 import '../bloc/auth_bloc.dart';
 import 'role_selection_screen.dart';
-import 'signup_screen.dart';
 
 class LoginFormScreen extends StatefulWidget {
   const LoginFormScreen({super.key});
@@ -142,11 +142,9 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () => Navigator.push(
+                                onTap: () => Navigator.pushNamed(
                                   context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const SignUpScreen(),
-                                  ),
+                                  Routes.signupRoute,
                                 ),
                                 child: Text(
                                   AppStrings.signup.tr(),
