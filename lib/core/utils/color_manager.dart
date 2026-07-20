@@ -52,6 +52,6 @@ class ColorManager {
   // Welcome screen
   static Color welcomeText = const Color(0xff5A5A5A);
   static Color signupText = const Color(0xff820605);
-  static Color welcomeGradientStart = const Color(0x40FDB6B0);
-  static Color welcomeGradientEnd = const Color(0x40DFE0FE);
+  static Color welcomeGradientStart = const Color(0xFFFDB6B0);
+  static Color welcomeGradientEnd = const Color(0xFFDFE0FE);
 }

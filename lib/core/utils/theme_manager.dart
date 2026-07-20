@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'color_manager.dart';
 import 'font_manager.dart';
 import 'styles_manager.dart';
 import 'values_manager.dart';
 
 ThemeData getAppTheme() {
-  return ThemeData(
+  final baseTheme = ThemeData(
     useMaterial3: true,
+    fontFamily: GoogleFonts.cairo().fontFamily,
     primaryColor: ColorManager.primary,
     primaryColorDark: ColorManager.primaryDark,
     primaryColorLight: ColorManager.primaryLight,
@@ -180,8 +182,9 @@ ThemeData getAppTheme() {
     switchTheme: SwitchThemeData(
       thumbColor: WidgetStateProperty.all(ColorManager.white),
       trackColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected))
+        if (states.contains(WidgetState.selected)) {
           return ColorManager.secondary;
+        }
         return ColorManager.dividerGrey;
       }),
     ),
@@ -197,5 +200,10 @@ ThemeData getAppTheme() {
       type: BottomNavigationBarType.fixed,
       elevation: AppSize.s8,
     ),
+  );
+
+  return baseTheme.copyWith(
+    textTheme: GoogleFonts.cairoTextTheme(baseTheme.textTheme),
+    primaryTextTheme: GoogleFonts.cairoTextTheme(baseTheme.primaryTextTheme),
   );
 }
