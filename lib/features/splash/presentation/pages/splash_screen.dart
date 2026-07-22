@@ -51,7 +51,7 @@ class SplashScreen extends StatelessWidget {
                     duration: const Duration(seconds: AppConstants.splashDelay),
                     curve: Curves.easeInOut,
                     builder: (context, value, _) => Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: Alignment.centerRight,
                       child: FractionallySizedBox(
                         widthFactor: value,
                         child: Container(

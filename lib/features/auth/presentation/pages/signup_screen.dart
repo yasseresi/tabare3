@@ -252,8 +252,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: Text(
           '$step',
           style: TextStyle(
+            fontFamily: FontConstants.fontFamily,
             color: isCurrent ? ColorManager.white : ColorManager.textMuted,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeightManager.bold,
           ),
         ),
       ),

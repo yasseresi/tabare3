@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/presentation/widgets/app_dialog.dart';
 import '../../../../core/utils/assets_manager.dart';
@@ -141,6 +140,7 @@ class RoleSelectionScreen extends StatelessWidget {
                               child: Text(
                                 AppStrings.iAmDonor.tr(),
                                 style: const TextStyle(
+                                  fontFamily: FontConstants.fontFamily,
                                   fontSize: FontSize.s18,
                                   fontWeight: FontWeightManager.bold,
                                 ),
