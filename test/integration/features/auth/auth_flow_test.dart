@@ -352,7 +352,8 @@ void main() {
         await tester.pumpAndSettle();
 
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'الولاية'), 'الجزائر');
+            find.widgetWithText(TextFormField, 'ابحث عن الولاية...'),
+            'الجزائر');
 
         await tester.ensureVisible(
           find.widgetWithText(ElevatedButton, 'التالي'),

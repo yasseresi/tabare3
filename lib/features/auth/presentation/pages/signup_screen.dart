@@ -1,10 +1,12 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/presentation/widgets/app_dialog.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
 import '../../../../core/presentation/widgets/loading_overlay.dart';
+import '../../../../core/presentation/widgets/searchable_wilaya_field.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
@@ -269,6 +271,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
+  Widget _buildSvgPrefixIcon(String assetPath) {
+    return Padding(
+      padding: const EdgeInsets.all(AppPadding.p14),
+      child: SvgPicture.asset(
+        assetPath,
+        width: AppSize.s20,
+        height: AppSize.s20,
+      ),
+    );
+  }
+
   Widget _buildCurrentStepView() {
     switch (_currentStep) {
       case 1:
@@ -287,21 +300,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
       children: [
         AppTextField(
           hintText: AppStrings.fullName.tr(),
-          prefixIcon: Icons.person_outline,
+          prefixSvg: SvgAssets.person,
           controller: _fullNameController,
           validator: validateFullName,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
           hintText: AppStrings.username.tr(),
-          prefixIcon: Icons.alternate_email,
+          prefixSvg: SvgAssets.person,
           controller: _usernameController,
           validator: validateUsername,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
           hintText: AppStrings.phoneNumber.tr(),
-          prefixIcon: Icons.phone_outlined,
+          prefixSvg: SvgAssets.call,
           controller: _phoneController,
           keyboardType: TextInputType.phone,
           validator: validatePhone,
@@ -309,7 +322,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         const SizedBox(height: AppSize.s15),
         AppTextField(
           hintText: AppStrings.password.tr(),
-          prefixIcon: Icons.lock_outline,
+          prefixSvg: SvgAssets.password,
+          obscureSvg: SvgAssets.hidden,
           isPassword: true,
           controller: _passwordController,
           validator: validatePassword,
@@ -317,7 +331,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         const SizedBox(height: AppSize.s15),
         AppTextField(
           hintText: AppStrings.passwordConfirm.tr(),
-          prefixIcon: Icons.lock_outline,
+          prefixSvg: SvgAssets.password,
+          obscureSvg: SvgAssets.hidden,
           isPassword: true,
           controller: _passwordConfirmController,
           validator: (v) =>
@@ -335,7 +350,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: AbsorbPointer(
             child: AppTextField(
               hintText: AppStrings.dateOfBirth.tr(),
-              prefixIcon: Icons.calendar_today_outlined,
+              prefixSvg: SvgAssets.calendarDate,
               controller: _dobController,
               validator: (v) => validateDate(v),
             ),
@@ -346,7 +361,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           initialValue: _genderValue,
           decoration: InputDecoration(
             hintText: AppStrings.gender.tr(),
-            prefixIcon: const Icon(Icons.person_outline),
+            prefixIcon: _buildSvgPrefixIcon(SvgAssets.person),
           ),
           items: [
             DropdownMenuItem(value: 'male', child: Text(AppStrings.male.tr())),
@@ -360,14 +375,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
         const SizedBox(height: AppSize.s15),
         AppTextField(
           hintText: AppStrings.nationalId.tr(),
-          prefixIcon: Icons.badge_outlined,
+          prefixSvg: SvgAssets.idSerialNumber,
           controller: _nationalIdController,
         ),
         const SizedBox(height: AppSize.s15),
         DropdownButtonFormField<String>(
           decoration: InputDecoration(
             hintText: AppStrings.bloodType.tr(),
-            prefixIcon: const Icon(Icons.opacity),
+            prefixIcon: _buildSvgPrefixIcon(SvgAssets.bloodType),
           ),
           items: const ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
               .map((type) => DropdownMenuItem(value: type, child: Text(type)))
@@ -380,21 +395,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
         const SizedBox(height: AppSize.s15),
         AppTextField(
           hintText: AppStrings.weight.tr(),
-          prefixIcon: Icons.monitor_weight_outlined,
+          prefixSvg: SvgAssets.weight,
           controller: _weightController,
           keyboardType: TextInputType.number,
         ),
         const SizedBox(height: AppSize.s15),
-        AppTextField(
-          hintText: AppStrings.governorate.tr(),
-          prefixIcon: Icons.location_city_outlined,
+        SearchableWilayaField(
           controller: _cityController,
           validator: validateCity,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
           hintText: AppStrings.chronicDiseases.tr(),
-          prefixIcon: Icons.coronavirus_outlined,
+          prefixSvg: SvgAssets.illnesses,
           controller: _chronicDiseasesController,
           isMultiline: true,
         ),

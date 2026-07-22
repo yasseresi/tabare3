@@ -1,3 +1,4 @@
+import '../constants/algerian_wilayas.dart';
 import '../utils/error_messages.dart';
 
 bool isUsernameValid(String? username) =>
@@ -101,6 +102,9 @@ String? validatePasswordConfirmation(String? value, String originalPassword) {
 String? validateCity(String? value) {
   if (!isRequired(value)) {
     return ErrorMessages.getValidationMessage(ValidationKeys.cityRequired);
+  }
+  if (!isValidWilaya(value)) {
+    return ErrorMessages.getValidationMessage(ValidationKeys.cityInvalid);
   }
   return null;
 }

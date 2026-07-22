@@ -111,9 +111,15 @@ void main() {
     await tester.tap(find.text('O+').last);
     await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(find.widgetWithText(TextFormField, 'الولاية'), 400,
-        scrollable: find.byType(Scrollable).first);
-    await tester.enterText(find.widgetWithText(TextFormField, 'الولاية'), 'الجزائر');
+    await tester.scrollUntilVisible(
+      find.widgetWithText(TextFormField, 'ابحث عن الولاية...'),
+      400,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'ابحث عن الولاية...'),
+      'الجزائر',
+    );
 
     await tester.scrollUntilVisible(find.text('التالي'), 400,
         scrollable: find.byType(Scrollable).first);
@@ -123,5 +129,52 @@ void main() {
     expect(find.text('الشروط والأحكام'), findsOneWidget);
     expect(find.text('أوافق على الشروط والأحكام'), findsOneWidget);
     expect(find.text('إنشاء حساب'), findsWidgets);
+  });
+
+  testWidgets('selects wilaya from searchable dropdown in step 2',
+      (tester) async {
+    await pumpTestApp(tester, signUpUnderTest());
+
+    await fillStep1(tester);
+
+    await tester.scrollUntilVisible(
+      find.text('التالي'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('التالي'));
+    await tester.pump();
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'تاريخ الميلاد'),
+      '2000-01-01',
+    );
+
+    await tester.scrollUntilVisible(
+      find.widgetWithText(DropdownButtonFormField<String>, 'فصيلة الدم'),
+      400,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(
+      find.widgetWithText(DropdownButtonFormField<String>, 'فصيلة الدم'),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('O+').last);
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.widgetWithText(TextFormField, 'ابحث عن الولاية...'),
+      400,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'ابحث عن الولاية...'),
+      'وهر',
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('وهران').last);
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(TextFormField, 'وهران'), findsOneWidget);
   });
 }

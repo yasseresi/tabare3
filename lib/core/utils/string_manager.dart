@@ -58,6 +58,7 @@ class AppStrings {
   static const String weight = 'weight';
   static const String bloodType = 'blood_type';
   static const String governorate = 'governorate';
+  static const String searchWilaya = 'search_wilaya';
   static const String acceptTerms = 'accept_terms';
 
   // Navigation
@@ -134,6 +135,7 @@ class AppStrings {
   static const String profileUpdated = 'profile_updated';
   static const String editSuccess = 'edit_success';
   static const String confirmLogout = 'confirm_logout';
+  static const String confirmLogoutMessage = 'confirm_logout_message';
   static const String confirmCancelRequest = 'confirm_cancel_request';
   static const String confirmAcceptRequest = 'confirm_accept_request';
 
@@ -175,6 +177,7 @@ class AppStrings {
   static const String genderRequired = 'gender_required';
   static const String genderInvalid = 'gender_invalid';
   static const String cityRequired = 'city_required';
+  static const String cityInvalid = 'city_invalid';
   static const String bloodTypeRequired = 'blood_type_required';
   static const String termsRequired = 'terms_required';
   static const String passwordConfirmRequired = 'password_confirm_required';
@@ -290,8 +293,6 @@ class AppStrings {
   static const String aboutUs = 'about_us';
   static const String privacyPolicyLabel = 'privacy_policy_label';
   static const String appValues = 'app_values';
-  static const String logoutMessage = 'logout_message';
-  static const String logoutSeeYou = 'logout_see_you';
   static const String fullNameValue = 'full_name_value';
 
   // Donor card

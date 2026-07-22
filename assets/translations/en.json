@@ -54,6 +54,8 @@
   "weight": "Weight",
   "blood_type": "Blood type",
   "governorate": "Governorate",
+  "search_wilaya": "Search for governorate...",
+  "city_invalid": "Please select a valid governorate",
   "accept_terms": "I agree to the terms and conditions",
 
   "home": "Home",

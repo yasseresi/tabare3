@@ -15,6 +15,7 @@ class ValidationKeys {
   static const String genderRequired = AppStrings.genderRequired;
   static const String genderInvalid = AppStrings.genderInvalid;
   static const String cityRequired = AppStrings.cityRequired;
+  static const String cityInvalid = AppStrings.cityInvalid;
   static const String bloodTypeRequired = AppStrings.bloodTypeRequired;
   static const String termsRequired = AppStrings.termsRequired;
   static const String passwordConfirmRequired = AppStrings.passwordConfirmRequired;
@@ -45,6 +46,7 @@ class ErrorMessages {
     ValidationKeys.genderRequired: 'يرجى اختيار الجنس',
     ValidationKeys.genderInvalid: 'يجب أن يكون الجنس ذكر أو أنثى',
     ValidationKeys.cityRequired: 'يرجى إدخال الولاية',
+    ValidationKeys.cityInvalid: 'يرجى اختيار ولاية صحيحة',
     ValidationKeys.bloodTypeRequired: 'يرجى اختيار فصيلة الدم',
     ValidationKeys.termsRequired: 'يجب الموافقة على الشروط والأحكام',
     ValidationKeys.passwordConfirmRequired: 'يرجى تأكيد كلمة المرور',
