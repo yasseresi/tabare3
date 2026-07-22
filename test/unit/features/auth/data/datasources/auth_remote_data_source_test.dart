@@ -2,10 +2,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:tabare3/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:tabare3/features/auth/data/models/user_model.dart';
 import 'package:tabare3/features/auth/domain/repositories/auth_repository.dart';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
+
+class MockGoTrueClient extends Mock implements GoTrueClient {}
 
 const testUserJson = {
   'id': 'user-123',
@@ -19,16 +22,18 @@ const testUserJson = {
 
 void main() {
   setUpAll(() {
-    registerFallbackValue(SignupParams(
-      username: 'fallback',
-      fullName: 'fallback',
-      password: 'fallback',
-      phone: '0000',
-      dateOfBirth: DateTime(2000),
-      gender: 'male',
-      bloodType: 'O+',
-      city: 'fallback',
-    ));
+    registerFallbackValue(
+      SignupParams(
+        username: 'fallback',
+        fullName: 'fallback',
+        password: 'fallback',
+        phone: '0000',
+        dateOfBirth: DateTime(2000),
+        gender: 'male',
+        bloodType: 'O+',
+        city: 'fallback',
+      ),
+    );
   });
 
   test('UserModel.fromJson creates correct model', () {
@@ -50,5 +55,20 @@ void main() {
     expect(entity.username, model.username);
     expect(entity.fullName, model.fullName);
     expect(entity.bloodType, model.bloodType);
+  });
+
+  group('AuthRemoteDataSourceImpl.signOut', () {
+    test('invokes Supabase auth.signOut so the session is invalidated',
+        () async {
+      final client = MockSupabaseClient();
+      final auth = MockGoTrueClient();
+      when(() => client.auth).thenReturn(auth);
+      when(() => auth.signOut()).thenAnswer((_) async {});
+
+      final dataSource = AuthRemoteDataSourceImpl(client: client);
+      await dataSource.signOut();
+
+      verify(() => auth.signOut()).called(1);
+    });
   });
 }
