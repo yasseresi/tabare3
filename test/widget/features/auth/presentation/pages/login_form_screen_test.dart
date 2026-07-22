@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
@@ -16,10 +17,16 @@ import 'package:tabare3/features/auth/presentation/pages/signup_screen.dart';
 
 import '../../../../../helpers/test_app.dart';
 
-class MockLoginWithUsernamePassword extends Mock implements LoginWithUsernamePassword {}
-class MockSignupWithUsernamePassword extends Mock implements SignupWithUsernamePassword {}
+class MockLoginWithUsernamePassword extends Mock
+    implements LoginWithUsernamePassword {}
+
+class MockSignupWithUsernamePassword extends Mock
+    implements SignupWithUsernamePassword {}
+
 class MockSignOut extends Mock implements SignOut {}
+
 class MockGetCurrentSession extends Mock implements GetCurrentSession {}
+
 class MockUpdateUserRole extends Mock implements UpdateUserRole {}
 
 void main() {
@@ -27,32 +34,44 @@ void main() {
 
   setUpAll(() async {
     await setupTestLocalization();
-    registerFallbackValue(SignupParams(
-      username: 'fallback',
-      fullName: 'fallback',
-      password: 'fallback',
-      phone: '0000',
-      dateOfBirth: DateTime(2000),
-      gender: 'male',
-      bloodType: 'O+',
-      city: 'fallback',
-    ));
-    registerFallbackValue(LoginParams(username: 'fallback', password: 'fallback'));
+    registerFallbackValue(
+      SignupParams(
+        username: 'fallback',
+        fullName: 'fallback',
+        password: 'fallback',
+        phone: '0000',
+        dateOfBirth: DateTime(2000),
+        gender: 'male',
+        bloodType: 'O+',
+        city: 'fallback',
+      ),
+    );
+    registerFallbackValue(
+      LoginParams(username: 'fallback', password: 'fallback'),
+    );
     registerFallbackValue(NoParams());
-    registerFallbackValue(const UpdateRoleParams(isDonor: false, isRecipient: false));
+    registerFallbackValue(
+      const UpdateRoleParams(isDonor: false, isRecipient: false),
+    );
   });
 
   setUp(() {
     sl.reset();
-    sl.registerFactory(() => AuthBloc(
-          loginWithUsernamePassword: sl(),
-          signupWithUsernamePassword: sl(),
-          signOutUseCase: sl(),
-          getCurrentSession: sl(),
-          updateUserRole: sl(),
-        ));
-    sl.registerLazySingleton<LoginWithUsernamePassword>(() => MockLoginWithUsernamePassword());
-    sl.registerLazySingleton<SignupWithUsernamePassword>(() => MockSignupWithUsernamePassword());
+    sl.registerFactory(
+      () => AuthBloc(
+        loginWithUsernamePassword: sl(),
+        signupWithUsernamePassword: sl(),
+        signOutUseCase: sl(),
+        getCurrentSession: sl(),
+        updateUserRole: sl(),
+      ),
+    );
+    sl.registerLazySingleton<LoginWithUsernamePassword>(
+      () => MockLoginWithUsernamePassword(),
+    );
+    sl.registerLazySingleton<SignupWithUsernamePassword>(
+      () => MockSignupWithUsernamePassword(),
+    );
     sl.registerLazySingleton<SignOut>(() => MockSignOut());
     sl.registerLazySingleton<GetCurrentSession>(() => MockGetCurrentSession());
     sl.registerLazySingleton<UpdateUserRole>(() => MockUpdateUserRole());
@@ -62,13 +81,15 @@ void main() {
     await pumpTestApp(tester, const LoginFormScreen());
   }
 
-  testWidgets('renders logo, title, form fields and login button', (tester) async {
+  testWidgets('renders logo, title, form fields and login button', (
+    tester,
+  ) async {
     await pumpScreen(tester);
 
     expect(find.text('تسجيل الدخول'), findsWidgets);
     expect(find.text('اسم المستخدم'), findsOneWidget);
     expect(find.text('إنشاء حساب'), findsOneWidget);
-    expect(find.byIcon(Icons.lock_outline), findsOneWidget);
+    expect(find.byType(SvgPicture), findsWidgets);
   });
 
   testWidgets('tapping signup link navigates to SignUpScreen', (tester) async {

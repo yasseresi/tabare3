@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:tabare3/core/network/network_info.dart';
+import 'package:tabare3/core/presentation/widgets/app_text_field.dart';
 import 'package:tabare3/core/usecases/usecase.dart';
 import 'package:tabare3/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:tabare3/features/auth/data/models/user_model.dart';
@@ -124,7 +125,9 @@ void main() {
         city: 'fallback',
       ),
     );
-    registerFallbackValue(LoginParams(username: 'fallback', password: 'fallback'));
+    registerFallbackValue(
+      LoginParams(username: 'fallback', password: 'fallback'),
+    );
     registerFallbackValue(NoParams());
     registerFallbackValue(
       const UpdateRoleParams(isDonor: false, isRecipient: false),
@@ -342,18 +345,31 @@ void main() {
         expect(find.text('البيانات الشخصية'), findsOneWidget);
 
         await tester.enterText(
-            find.widgetWithText(TextFormField, 'تاريخ الميلاد'), '1990-01-01');
+          find.widgetWithText(TextFormField, 'تاريخ الميلاد'),
+          '1990-01-01',
+        );
 
-        final bloodTypeDropdown =
-            find.widgetWithText(DropdownButtonFormField<String>, 'فصيلة الدم');
+        final bloodTypeDropdown = find.widgetWithText(
+          DropdownButtonFormField<String>,
+          'فصيلة الدم',
+        );
         await tester.tap(bloodTypeDropdown);
         await tester.pumpAndSettle();
         await tester.tap(find.text('O+').last);
         await tester.pumpAndSettle();
 
-        await tester.enterText(
-            find.widgetWithText(TextFormField, 'ابحث عن الولاية...'),
-            'الجزائر');
+        final wilayaField = find.widgetWithText(
+          AppTextField,
+          'ابحث عن الولاية...',
+        );
+        final wilayaTextField = find.descendant(
+          of: wilayaField,
+          matching: find.byType(TextFormField),
+        );
+        await tester.enterText(wilayaTextField, 'الجزائر');
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('الجزائر').last);
+        await tester.pumpAndSettle();
 
         await tester.ensureVisible(
           find.widgetWithText(ElevatedButton, 'التالي'),

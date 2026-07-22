@@ -6,7 +6,6 @@ import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
-import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -22,10 +21,7 @@ class WelcomeScreen extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
-            colors: [
-              Color(0xFFFDB6B0),
-              Color(0xFFDFE0FE),
-            ],
+            colors: [Color(0xFFFDB6B0), Color(0xFFDFE0FE)],
           ),
         ),
         child: SafeArea(

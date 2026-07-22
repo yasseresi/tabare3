@@ -49,8 +49,8 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
           return LoadingOverlay(
             visible: state is AuthLoading,
             message: AppStrings.loggingIn.tr(),
-              child: Scaffold(
-                body: Directionality(
+            child: Scaffold(
+              body: Directionality(
                 textDirection: TextDirection.rtl,
                 child: SafeArea(
                   child: SingleChildScrollView(
@@ -96,7 +96,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                           const SizedBox(height: AppSize.s30),
                           AppTextField(
                             hintText: AppStrings.username.tr(),
-                            prefixIcon: Icons.person_outline,
+                            prefixSvg: SvgAssets.person,
                             controller: _usernameController,
                             keyboardType: TextInputType.text,
                             validator: validateUsername,
@@ -104,7 +104,8 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                           const SizedBox(height: AppSize.s16),
                           AppTextField(
                             hintText: '............',
-                            prefixIcon: Icons.lock_outline,
+                            prefixSvg: SvgAssets.password,
+                            obscureSvg: SvgAssets.hidden,
                             isPassword: true,
                             controller: _passwordController,
                             validator: validatePassword,

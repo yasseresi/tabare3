@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tabare3/core/presentation/widgets/app_text_field.dart';
+import 'package:tabare3/core/utils/assets_manager.dart';
 
 void main() {
   testWidgets('renders hint text and prefix icon', (tester) async {
@@ -88,5 +90,23 @@ void main() {
     await tester.pump();
 
     expect(validationResult, '');
+  });
+
+  testWidgets('renders SVG prefix icon when prefixSvg provided', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: AppTextField(
+            hintText: 'اسم المستخدم',
+            prefixSvg: SvgAssets.person,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('اسم المستخدم'), findsOneWidget);
+    expect(find.byType(SvgPicture), findsOneWidget);
   });
 }
