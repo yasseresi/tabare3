@@ -1,8 +1,12 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
-import 'package:tabare3/core/utils/string_manager.dart';
-import 'package:tabare3/features/auth/presentation/pages/role_selection_screen.dart';
-import 'package:tabare3/features/donor_home/presentation/pages/donor_card_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/presentation/widgets/logout_dialog.dart';
+import '../../../../core/utils/string_manager.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/pages/role_selection_screen.dart';
+import '../../../donor_home/presentation/pages/donor_card_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -16,90 +20,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _accountStatus = true;
 
   void _showLogoutDialog() {
-    showDialog(
+    showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.logout_rounded,
-                  color: Color(0xFF8B1D1D),
-                  size: 80,
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  AppStrings.logoutMessage.tr(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 15),
-                Text(
-                  AppStrings.logoutSeeYou.tr(),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B1D1D),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                    ),
-                    child: Text(
-                      AppStrings.logout.tr(),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.grey),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                    ),
-                    child: Text(
-                      AppStrings.cancel.tr(),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      barrierDismissible: false,
+      builder: (dialogContext) => LogoutDialog(
+        title: AppStrings.confirmLogout.tr(),
+        message: AppStrings.confirmLogoutMessage.tr(),
+        confirmLabel: AppStrings.logout.tr(),
+        cancelLabel: AppStrings.cancel.tr(),
+        onConfirm: () {
+          context.read<AuthBloc>().add(SignOutRequested());
+        },
+      ),
     );
   }
 
@@ -118,7 +50,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Text(
                   AppStrings.chooseLanguage.tr(),
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 _buildLanguageOption(AppStrings.arabic.tr(), true),
@@ -215,7 +150,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: _buildAccountSettings(),
                 ),
                 const SizedBox(height: 20),
-                _buildSection(title: AppStrings.aboutApp.tr(), child: _buildAboutSection()),
+                _buildSection(
+                  title: AppStrings.aboutApp.tr(),
+                  child: _buildAboutSection(),
+                ),
                 const SizedBox(height: 40),
                 // Logout Button
                 Padding(
@@ -370,7 +308,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildPersonalInfo() {
     return Column(
       children: [
-        _buildInfoRow(AppStrings.fullName.tr(), 'أحمد لوصيف', Icons.person_outline),
+        _buildInfoRow(
+          AppStrings.fullName.tr(),
+          'أحمد لوصيف',
+          Icons.person_outline,
+        ),
         const Divider(height: 30),
         _buildInfoRow(
           AppStrings.dateOfBirth.tr(),
@@ -393,7 +335,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildAccountSettings() {
     return Column(
       children: [
-        _buildInfoRow(AppStrings.phoneNumberLabel.tr(), '0676 24 41 89', Icons.phone_outlined),
+        _buildInfoRow(
+          AppStrings.phoneNumberLabel.tr(),
+          '0676 24 41 89',
+          Icons.phone_outlined,
+        ),
         const Divider(height: 30),
         _buildInfoRow(
           AppStrings.accountType.tr(),
@@ -435,7 +381,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     Text(
-                      _accountStatus ? AppStrings.accountStatusSubtitle.tr() : AppStrings.notActive.tr(),
+                      _accountStatus
+                          ? AppStrings.accountStatusSubtitle.tr()
+                          : AppStrings.notActive.tr(),
                       style: const TextStyle(color: Colors.grey, fontSize: 11),
                       textAlign: TextAlign.right,
                     ),
@@ -467,7 +415,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         _buildInfoRow(AppStrings.aboutUs.tr(), '', Icons.info_outline),
         const Divider(height: 30),
-        _buildInfoRow(AppStrings.privacyPolicyLabel.tr(), '', Icons.privacy_tip_outlined),
+        _buildInfoRow(
+          AppStrings.privacyPolicyLabel.tr(),
+          '',
+          Icons.privacy_tip_outlined,
+        ),
         const Divider(height: 30),
         _buildInfoRow(AppStrings.appValues.tr(), '', Icons.star_outline),
       ],

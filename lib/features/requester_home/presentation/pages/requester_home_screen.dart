@@ -1,7 +1,10 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tabare3/core/utils/route_manager.dart';
 import 'package:tabare3/core/utils/string_manager.dart';
+import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:tabare3/features/profile/presentation/pages/requester_profile_screen.dart';
 import 'requests_screen.dart';
 import 'create_request_screen.dart';
@@ -22,9 +25,19 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _buildBody(),
-      bottomNavigationBar: _buildBottomNav(),
+    return BlocListener<AuthBloc, AuthState>(
+      listenWhen: (previous, current) => current is Unauthenticated,
+      listener: (context, state) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          Routes.welcomeRoute,
+          (route) => false,
+        );
+      },
+      child: Scaffold(
+        body: _buildBody(),
+        bottomNavigationBar: _buildBottomNav(),
+      ),
     );
   }
 
@@ -159,7 +172,9 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      _hasRequests ? AppStrings.requestActive.tr() : AppStrings.noRequestsYou.tr(),
+                      _hasRequests
+                          ? AppStrings.requestActive.tr()
+                          : AppStrings.noRequestsYou.tr(),
                       style: TextStyle(
                         fontSize: 12,
                         color: _hasRequests ? Colors.green : Colors.red,
@@ -380,7 +395,9 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                AppStrings.bagsProvided.tr(namedArgs: {'count': '1', 'total': '3'}),
+                AppStrings.bagsProvided.tr(
+                  namedArgs: {'count': '1', 'total': '3'},
+                ),
                 style: const TextStyle(fontSize: 13, color: Colors.grey),
               ),
               Text(

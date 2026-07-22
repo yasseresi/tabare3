@@ -51,6 +51,12 @@
 ### Dependency rule
 Data → Domain ← Presentation. Domain depends on nothing. Data implements domain interfaces. Presentation consumes domain via usecases.
 
+### Logout flow
+- Dialog: `lib/core/presentation/widgets/logout_dialog.dart` (Figma: warning icon, two stacked 174px buttons — red `تسجيل الخروج` primary, gray `إلغاء` secondary).
+- Dispatch: profile screen calls `context.read<AuthBloc>().add(SignOutRequested())`; the AuthBloc in turn calls `client.auth.signOut()` (Supabase session invalidated — next launch must log in again).
+- Navigation: `DonorHomeScreen` / `RequesterHomeScreen` wrap themselves in `BlocListener<AuthBloc>` (`listenWhen: Unauthenticated`) and push to `Routes.welcomeRoute` with `pushAndRemoveUntil`.
+- `AuthBloc` is provided via the route manager for `/donor-home` and `/requester-home`; direct `MaterialPageRoute` to those screens skips the provider and breaks the listener.
+
 ### Folder structure (per feature)
 ```
 lib/features/<feature>/

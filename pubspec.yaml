@@ -60,3 +60,14 @@ flutter:
     - assets/icons/icon8.svg
     - assets/icons/icon9.svg
     - assets/icons/success_check.svg
+    - assets/icons/person.svg
+    - assets/icons/password.svg
+    - assets/icons/hidden.svg
+    - assets/icons/call.svg
+    - assets/icons/calendar_date.svg
+    - assets/icons/id_serial_number.svg
+    - assets/icons/blod_type.svg
+    - assets/icons/weight.svg
+    - assets/icons/wilaya.svg
+    - assets/icons/ilnesses.svg
+    - assets/icons/warning.svg

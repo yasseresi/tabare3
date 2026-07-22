@@ -1,7 +1,10 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tabare3/core/utils/route_manager.dart';
 import 'package:tabare3/core/utils/string_manager.dart';
+import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:tabare3/features/profile/presentation/pages/profile_screen.dart';
 import 'package:tabare3/features/requester_home/presentation/pages/notifications_screen.dart';
 import 'donor_requests_screen.dart';
@@ -21,9 +24,19 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _buildBody(),
-      bottomNavigationBar: _buildBottomNav(),
+    return BlocListener<AuthBloc, AuthState>(
+      listenWhen: (previous, current) => current is Unauthenticated,
+      listener: (context, state) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          Routes.welcomeRoute,
+          (route) => false,
+        );
+      },
+      child: Scaffold(
+        body: _buildBody(),
+        bottomNavigationBar: _buildBottomNav(),
+      ),
     );
   }
 
@@ -142,7 +155,9 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
                   deadline: '15 جانفي 2026',
                   hospital: 'مستشفى مصطفى باشا',
                   location: 'الجزائر',
-                  bagsInfo: AppStrings.bagsProvided.tr(namedArgs: {'count': '1', 'total': '3'}),
+                  bagsInfo: AppStrings.bagsProvided.tr(
+                    namedArgs: {'count': '1', 'total': '3'},
+                  ),
                   progress: 0.33,
                 ),
                 const SizedBox(height: 20),
@@ -155,7 +170,9 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
                   deadline: '15 جانفي 2026',
                   hospital: 'مستشفى مصطفى باشا',
                   location: 'الجزائر',
-                  bagsInfo: AppStrings.bagsProvided.tr(namedArgs: {'count': '1', 'total': '3'}),
+                  bagsInfo: AppStrings.bagsProvided.tr(
+                    namedArgs: {'count': '1', 'total': '3'},
+                  ),
                   progress: 0.33,
                 ),
                 const SizedBox(height: 100),
@@ -204,7 +221,9 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _isEligible ? AppStrings.eligibleNow.tr() : AppStrings.notEligibleNow.tr(),
+                        _isEligible
+                            ? AppStrings.eligibleNow.tr()
+                            : AppStrings.notEligibleNow.tr(),
                         style: TextStyle(
                           fontSize: 12,
                           color: _isEligible ? Colors.green : Colors.red,
@@ -275,7 +294,9 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
             _isEligible ? '15 جانفي 2025' : '15 جانفي 2026',
           ),
           _buildDonorInfoRow(
-            AppStrings.nextDonationAppointment.tr(), '15 جانفي 2026'),
+            AppStrings.nextDonationAppointment.tr(),
+            '15 جانفي 2026',
+          ),
         ],
       ),
     );

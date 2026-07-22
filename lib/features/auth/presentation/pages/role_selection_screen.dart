@@ -6,13 +6,12 @@ import '../../../../core/presentation/widgets/app_dialog.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
+import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../../../injection_container.dart';
 import '../bloc/auth_bloc.dart';
-import '../../../donor_home/presentation/pages/donor_home_screen.dart';
-import '../../../requester_home/presentation/pages/requester_home_screen.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
@@ -25,13 +24,9 @@ class RoleSelectionScreen extends StatelessWidget {
         listener: (context, state) {
           if (state is RoleUpdated) {
             final isDonor = state.user.isDonor;
-            Navigator.pushAndRemoveUntil(
+            Navigator.pushNamedAndRemoveUntil(
               context,
-              MaterialPageRoute(
-                builder: (_) => isDonor
-                    ? const DonorHomeScreen()
-                    : const RequesterHomeScreen(),
-              ),
+              isDonor ? Routes.donorHomeRoute : Routes.requesterHomeRoute,
               (route) => false,
             );
           } else if (state is AuthError) {
@@ -80,16 +75,16 @@ class RoleSelectionScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: AppSize.s20),
-                      Text(
-                        AppStrings.hadithIntro.tr(),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: FontConstants.fontFamily,
-                          fontSize: FontSize.s18,
-                          fontWeight: FontWeightManager.bold,
-                          color: ColorManager.textSecondary,
-                        ),
-                      ),
+                          Text(
+                            AppStrings.hadithIntro.tr(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: FontConstants.fontFamily,
+                              fontSize: FontSize.s18,
+                              fontWeight: FontWeightManager.bold,
+                              color: ColorManager.textSecondary,
+                            ),
+                          ),
                           const SizedBox(height: AppSize.s10),
                           Text(
                             '«${AppStrings.hadithRelief.tr()}»',
@@ -103,15 +98,15 @@ class RoleSelectionScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: AppSize.s24),
-                      Text(
-                        AppStrings.areYou.tr(),
-                        style: TextStyle(
-                          fontFamily: FontConstants.fontFamily,
-                          fontSize: FontSize.s20,
-                          fontWeight: FontWeightManager.bold,
-                          color: ColorManager.textPrimary,
-                        ),
-                      ),
+                          Text(
+                            AppStrings.areYou.tr(),
+                            style: TextStyle(
+                              fontFamily: FontConstants.fontFamily,
+                              fontSize: FontSize.s20,
+                              fontWeight: FontWeightManager.bold,
+                              color: ColorManager.textPrimary,
+                            ),
+                          ),
                           const SizedBox(height: AppSize.s24),
                           SizedBox(
                             width: 220,

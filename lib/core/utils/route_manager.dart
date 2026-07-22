@@ -72,7 +72,12 @@ class RouteGenerator {
 
       // Requester
       case Routes.requesterHomeRoute:
-        return MaterialPageRoute(builder: (_) => const RequesterHomeScreen());
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<AuthBloc>(),
+            child: const RequesterHomeScreen(),
+          ),
+        );
       case Routes.createRequestRoute:
         return MaterialPageRoute(builder: (_) => const CreateRequestScreen());
       case Routes.editRequestRoute:
@@ -90,7 +95,12 @@ class RouteGenerator {
 
       // Donor
       case Routes.donorHomeRoute:
-        return MaterialPageRoute(builder: (_) => const DonorHomeScreen());
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<AuthBloc>(),
+            child: const DonorHomeScreen(),
+          ),
+        );
       case Routes.donorRequestsRoute:
         return MaterialPageRoute(builder: (_) => const DonorRequestsScreen());
       case Routes.donorAppointmentsRoute:

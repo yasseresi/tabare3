@@ -23,4 +23,16 @@ class SvgAssets {
   static const String icon7 = '$iconPath/icon7.svg';
   static const String icon8 = '$iconPath/icon8.svg';
   static const String icon9 = '$iconPath/icon9.svg';
+  static const String person = '$iconPath/person.svg';
+  static const String password = '$iconPath/password.svg';
+  static const String hidden = '$iconPath/hidden.svg';
+  static const String call = '$iconPath/call.svg';
+  static const String calendarDate = '$iconPath/calendar_date.svg';
+  static const String idSerialNumber = '$iconPath/id_serial_number.svg';
+  static const String bloodType = '$iconPath/blod_type.svg';
+  static const String weight = '$iconPath/weight.svg';
+  static const String wilaya = '$iconPath/wilaya.svg';
+  static const String illnesses = '$iconPath/ilnesses.svg';
+  static const String successCheck = '$iconPath/success_check.svg';
+  static const String warning = '$iconPath/warning.svg';
 }

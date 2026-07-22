@@ -126,6 +126,7 @@
   "profile_updated": "Profile updated successfully",
   "edit_success": "Modified successfully",
   "confirm_logout": "Are you sure you want to log out?",
+  "confirm_logout_message": "Your current session will end and you will need to sign in again to access your account.",
   "confirm_cancel_request": "Are you sure you want to cancel this request?",
   "confirm_accept_request": "Are you sure you want to accept this request?",
 
@@ -231,8 +232,6 @@
   "about_us": "About us",
   "privacy_policy_label": "Privacy policy",
   "app_values": "App values",
-  "logout_message": "Are you sure you want to log out?",
-  "logout_see_you": "We look forward to seeing you again. Thank you for contributing to the blood donation community.",
   "full_name_value": "Ahmed Loucif",
 
   "drop_of_hope": "Drop of hope",
