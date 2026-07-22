@@ -96,7 +96,9 @@ class RequestsScreen extends StatelessWidget {
                     statusColor: Colors.green,
                     isCritical: true,
                     bags: '1/3',
-                    bagsText: AppStrings.bagsProvided.tr(namedArgs: {'provided': '1', 'total': '3'}),
+                    bagsText: AppStrings.bagsProvided.tr(
+                      namedArgs: {'provided': '1', 'total': '3'},
+                    ),
                     progress: 0.33,
                     showDonorsButton: true,
                   ),
@@ -108,7 +110,9 @@ class RequestsScreen extends StatelessWidget {
                     backgroundColor: const Color(0xFFFFEBEE),
                     isCritical: true,
                     bags: '3/3',
-                    bagsText: AppStrings.bagsProvided.tr(namedArgs: {'provided': '3', 'total': '3'}),
+                    bagsText: AppStrings.bagsProvided.tr(
+                      namedArgs: {'provided': '3', 'total': '3'},
+                    ),
                     progress: 1.0,
                     showDonorsButton: false,
                   ),
@@ -178,7 +182,8 @@ class RequestsScreen extends StatelessWidget {
               ),
               Row(
                 children: [
-                  if (isCritical) _buildBadge(AppStrings.veryUrgent.tr(), Colors.red),
+                  if (isCritical)
+                    _buildBadge(AppStrings.veryUrgent.tr(), Colors.red),
                   const SizedBox(width: 8),
                   _buildBadge(
                     status,

@@ -110,7 +110,10 @@ class DonorHistoryScreen extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: Text(
                   AppStrings.donorsList.tr(),
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),

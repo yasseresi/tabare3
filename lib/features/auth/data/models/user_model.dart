@@ -23,12 +23,12 @@ abstract class UserModel with _$UserModel {
 
 extension UserModelX on UserModel {
   UserEntity toEntity() => UserEntity(
-        id: id,
-        email: email,
-        username: username,
-        fullName: fullName,
-        isDonor: isDonor,
-        isRecipient: isRecipient,
-        bloodType: bloodType,
-      );
+    id: id,
+    email: email,
+    username: username,
+    fullName: fullName,
+    isDonor: isDonor,
+    isRecipient: isRecipient,
+    bloodType: bloodType,
+  );
 }

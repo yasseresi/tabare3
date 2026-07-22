@@ -32,7 +32,10 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
                 Text(
                   AppStrings.confirmCancelRequest.tr(),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 15),
                 Text(
@@ -218,7 +221,9 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
           hospital: 'مستشفى مصطفى باشا',
           patientName: 'علي بن محمد',
           deadline: '15 جانفي 2026',
-          bagsInfo: AppStrings.bagsProvided.tr(namedArgs: {'count': '1', 'total': '3'}),
+          bagsInfo: AppStrings.bagsProvided.tr(
+            namedArgs: {'count': '1', 'total': '3'},
+          ),
           progress: 0.33,
         ),
         const SizedBox(height: 20),
@@ -226,7 +231,9 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
           hospital: 'مستشفى مصطفى باشا',
           patientName: 'علي بن محمد',
           deadline: '15 جانفي 2026',
-          bagsInfo: AppStrings.bagsProvided.tr(namedArgs: {'count': '1', 'total': '3'}),
+          bagsInfo: AppStrings.bagsProvided.tr(
+            namedArgs: {'count': '1', 'total': '3'},
+          ),
           progress: 0.33,
         ),
         const SizedBox(height: 100),
@@ -312,9 +319,21 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          _buildInfoRow(AppStrings.patient.tr(), patientName, valueColor: Colors.red),
-          _buildInfoRow(AppStrings.deadline.tr(), deadline, valueColor: Colors.red),
-          _buildInfoRow(AppStrings.bloodBags.tr(), bagsInfo, valueColor: Colors.grey),
+          _buildInfoRow(
+            AppStrings.patient.tr(),
+            patientName,
+            valueColor: Colors.red,
+          ),
+          _buildInfoRow(
+            AppStrings.deadline.tr(),
+            deadline,
+            valueColor: Colors.red,
+          ),
+          _buildInfoRow(
+            AppStrings.bloodBags.tr(),
+            bagsInfo,
+            valueColor: Colors.grey,
+          ),
           const SizedBox(height: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(10),

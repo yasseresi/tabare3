@@ -127,7 +127,9 @@ class _RequesterProfileScreenState extends State<RequesterProfileScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  _isEditing ? AppStrings.saveChanges.tr() : AppStrings.edit.tr(),
+                  _isEditing
+                      ? AppStrings.saveChanges.tr()
+                      : AppStrings.edit.tr(),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -179,7 +181,8 @@ class _RequesterProfileScreenState extends State<RequesterProfileScreen> {
             _buildListItem(
               icon: Icons.person_pin_outlined,
               label: AppStrings.accountType.tr(),
-              value: '${AppStrings.iNeedBlood.tr()} / ${AppStrings.iAmDonor.tr()}',
+              value:
+                  '${AppStrings.iNeedBlood.tr()} / ${AppStrings.iAmDonor.tr()}',
               isDropdown: _isEditing,
             ),
             const Divider(height: 1, indent: 20, endIndent: 20),

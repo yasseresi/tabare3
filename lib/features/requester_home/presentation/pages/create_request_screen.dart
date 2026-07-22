@@ -277,7 +277,9 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                   child: Text(
                     AppStrings.urgencyLevel.tr(),
                     style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 15),
@@ -301,11 +303,14 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                 ),
                 const SizedBox(height: 15),
                 _buildTextField(
-                    AppStrings.hospitalNameField.tr(),
-                    Icons.local_hospital_outlined),
+                  AppStrings.hospitalNameField.tr(),
+                  Icons.local_hospital_outlined,
+                ),
                 const SizedBox(height: 15),
-                _buildTextField(AppStrings.deadlineField.tr(),
-                    Icons.calendar_today_outlined),
+                _buildTextField(
+                  AppStrings.deadlineField.tr(),
+                  Icons.calendar_today_outlined,
+                ),
                 const SizedBox(height: 15),
                 _buildTextField(
                   AppStrings.notes.tr(),

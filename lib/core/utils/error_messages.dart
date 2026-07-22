@@ -18,8 +18,10 @@ class ValidationKeys {
   static const String cityInvalid = AppStrings.cityInvalid;
   static const String bloodTypeRequired = AppStrings.bloodTypeRequired;
   static const String termsRequired = AppStrings.termsRequired;
-  static const String passwordConfirmRequired = AppStrings.passwordConfirmRequired;
-  static const String passwordConfirmMismatch = AppStrings.passwordConfirmMismatch;
+  static const String passwordConfirmRequired =
+      AppStrings.passwordConfirmRequired;
+  static const String passwordConfirmMismatch =
+      AppStrings.passwordConfirmMismatch;
 }
 
 class ErrorMessages {
@@ -57,7 +59,8 @@ class ErrorMessages {
     // Auth errors
     AppStrings.authError: 'خطأ في المصادقة',
     AppStrings.invalidLoginCredentials: 'اسم المستخدم أو كلمة المرور غير صحيحة',
-    AppStrings.userAlreadyRegistered: 'اسم المستخدم موجود بالفعل، يرجى اختيار اسم آخر',
+    AppStrings.userAlreadyRegistered:
+        'اسم المستخدم موجود بالفعل، يرجى اختيار اسم آخر',
     AppStrings.emailNotConfirmed: 'يرجى تأكيد البريد الإلكتروني أولاً',
     AppStrings.weakPassword: 'كلمة المرور ضعيفة، يجب أن تكون 6 أحرف على الأقل',
     AppStrings.invalidEmail: 'البريد الإلكتروني غير صالح',

@@ -8,7 +8,10 @@ const _fakeEmailDomain = 'tabara3.dz';
 String _usernameToEmail(String username) => '$username@$_fakeEmailDomain';
 
 abstract class AuthRemoteDataSource {
-  Future<UserModel> signIn({required String username, required String password});
+  Future<UserModel> signIn({
+    required String username,
+    required String password,
+  });
   Future<UserModel> signUp({required SignupParams params});
   Future<void> signOut();
   Future<UserModel?> getCurrentUser();

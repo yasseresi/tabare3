@@ -31,7 +31,10 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
                 Text(
                   AppStrings.confirmAcceptRequestMsg.tr(),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 15),
                 Text(
@@ -125,7 +128,10 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
                 Text(
                   AppStrings.requestAccepted.tr(),
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 15),
                 Text(
@@ -270,7 +276,9 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
           deadline: '15 جانفي 2026',
           hospital: 'مستشفى مصطفى باشا',
           location: 'الجزائر',
-          bagsInfo: AppStrings.bagsProvided.tr(namedArgs: {'count': '1', 'total': '3'}),
+          bagsInfo: AppStrings.bagsProvided.tr(
+            namedArgs: {'count': '1', 'total': '3'},
+          ),
           progress: 0.33,
         ),
         const SizedBox(height: 20),
@@ -283,7 +291,9 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
           deadline: '15 جانفي 2026',
           hospital: 'مستشفى مصطفى باشا',
           location: 'الجزائر',
-          bagsInfo: AppStrings.bagsProvided.tr(namedArgs: {'count': '1', 'total': '3'}),
+          bagsInfo: AppStrings.bagsProvided.tr(
+            namedArgs: {'count': '1', 'total': '3'},
+          ),
           progress: 0.33,
         ),
         const SizedBox(height: 100),
@@ -316,7 +326,11 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
           Text(
             AppStrings.noRequestsDescription.tr(),
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 15, color: Colors.grey, height: 1.5),
+            style: const TextStyle(
+              fontSize: 15,
+              color: Colors.grey,
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 15),
           Text(
@@ -359,7 +373,10 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
                   const SizedBox(width: 12),
                   Text(
                     AppStrings.campaignDonation.tr(),
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -367,7 +384,11 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          _buildInfoRow(AppStrings.campaignDate.tr(), '01 جانفي 2026', isCampaign: true),
+          _buildInfoRow(
+            AppStrings.campaignDate.tr(),
+            '01 جانفي 2026',
+            isCampaign: true,
+          ),
           _buildInfoRow(
             AppStrings.startTime.tr(),
             '09:00 صباحاً',

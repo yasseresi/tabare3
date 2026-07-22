@@ -8,8 +8,10 @@ part 'auth_repository.freezed.dart';
 
 @freezed
 abstract class LoginParams with _$LoginParams {
-  const factory LoginParams({required String username, required String password}) =
-      _LoginParams;
+  const factory LoginParams({
+    required String username,
+    required String password,
+  }) = _LoginParams;
 }
 
 @freezed

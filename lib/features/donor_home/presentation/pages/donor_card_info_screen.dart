@@ -34,7 +34,10 @@ class DonorCardInfoScreen extends StatelessWidget {
                         ),
                         Text(
                           AppStrings.donationLifeChance.tr(),
-                          style: const TextStyle(fontSize: 14, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
@@ -111,11 +114,31 @@ class DonorCardInfoScreen extends StatelessWidget {
                   runSpacing: 10,
                   alignment: WrapAlignment.center,
                   children: [
-                    _buildPointChip(AppStrings.bloodDonation.tr(), '+8', Colors.green),
-                    _buildPointChip(AppStrings.appointmentCommitment.tr(), '+2', Colors.green),
-                    _buildPointChip(AppStrings.cancellationLabel.tr(), '-5', Colors.red),
-                    _buildPointChip(AppStrings.urgentDonation.tr(), '+10', Colors.green),
-                    _buildPointChip(AppStrings.threeMonthsInactive.tr(), '-3', Colors.red),
+                    _buildPointChip(
+                      AppStrings.bloodDonation.tr(),
+                      '+8',
+                      Colors.green,
+                    ),
+                    _buildPointChip(
+                      AppStrings.appointmentCommitment.tr(),
+                      '+2',
+                      Colors.green,
+                    ),
+                    _buildPointChip(
+                      AppStrings.cancellationLabel.tr(),
+                      '-5',
+                      Colors.red,
+                    ),
+                    _buildPointChip(
+                      AppStrings.urgentDonation.tr(),
+                      '+10',
+                      Colors.green,
+                    ),
+                    _buildPointChip(
+                      AppStrings.threeMonthsInactive.tr(),
+                      '-3',
+                      Colors.red,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 30),
@@ -136,7 +159,10 @@ class DonorCardInfoScreen extends StatelessWidget {
                       const Divider(color: Colors.white10, height: 20),
                       _buildLevelRow(AppStrings.committedDonor.tr(), '50-90'),
                       const Divider(color: Colors.white10, height: 20),
-                      _buildLevelRow(AppStrings.distinguishedDonor.tr(), '90-120'),
+                      _buildLevelRow(
+                        AppStrings.distinguishedDonor.tr(),
+                        '90-120',
+                      ),
                       const Divider(color: Colors.white10, height: 20),
                       _buildLevelRow(AppStrings.deserveReward.tr(), '+120'),
                     ],

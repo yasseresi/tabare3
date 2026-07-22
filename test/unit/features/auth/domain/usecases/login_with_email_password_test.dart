@@ -28,26 +28,32 @@ void main() {
   );
 
   test('should return UserEntity when repository returns Right', () async {
-    when(() => mockRepository.loginWithUsernamePassword(
-          username: any(named: 'username'),
-          password: any(named: 'password'),
-        )).thenAnswer((_) async => const Right(testUser));
+    when(
+      () => mockRepository.loginWithUsernamePassword(
+        username: any(named: 'username'),
+        password: any(named: 'password'),
+      ),
+    ).thenAnswer((_) async => const Right(testUser));
 
     final result = await usecase(testParams);
 
     expect(result, const Right(testUser));
-    verify(() => mockRepository.loginWithUsernamePassword(
-          username: testParams.username,
-          password: testParams.password,
-        )).called(1);
+    verify(
+      () => mockRepository.loginWithUsernamePassword(
+        username: testParams.username,
+        password: testParams.password,
+      ),
+    ).called(1);
   });
 
   test('should return Failure when repository returns Left', () async {
     const failure = AuthFailure();
-    when(() => mockRepository.loginWithUsernamePassword(
-          username: any(named: 'username'),
-          password: any(named: 'password'),
-        )).thenAnswer((_) async => const Left(failure));
+    when(
+      () => mockRepository.loginWithUsernamePassword(
+        username: any(named: 'username'),
+        password: any(named: 'password'),
+      ),
+    ).thenAnswer((_) async => const Left(failure));
 
     final result = await usecase(testParams);
 

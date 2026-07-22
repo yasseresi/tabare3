@@ -188,7 +188,11 @@ class DonorRecordScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 15),
-          _buildInfoRow(AppStrings.patient.tr(), patient, valueColor: const Color(0xFF8B1D1D)),
+          _buildInfoRow(
+            AppStrings.patient.tr(),
+            patient,
+            valueColor: const Color(0xFF8B1D1D),
+          ),
           _buildInfoRow(
             AppStrings.donationDate.tr(),
             date,

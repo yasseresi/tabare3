@@ -31,13 +31,11 @@ class AppDialog extends StatelessWidget {
     this.onAction,
   }) : type = AppDialogType.error;
 
-  const AppDialog.loading({
-    super.key,
-    required this.title,
-  })  : message = null,
-        actionLabel = null,
-        onAction = null,
-        type = AppDialogType.loading;
+  const AppDialog.loading({super.key, required this.title})
+    : message = null,
+      actionLabel = null,
+      onAction = null,
+      type = AppDialogType.loading;
 
   @override
   Widget build(BuildContext context) {

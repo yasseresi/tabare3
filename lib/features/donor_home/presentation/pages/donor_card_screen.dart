@@ -35,7 +35,10 @@ class DonorCardScreen extends StatelessWidget {
                         ),
                         Text(
                           AppStrings.donationLifeChance.tr(),
-                          style: const TextStyle(fontSize: 14, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
@@ -198,9 +201,19 @@ class DonorCardScreen extends StatelessWidget {
                 const SizedBox(height: 15),
                 Row(
                   children: [
-                    Expanded(child: _buildBadgeCard(AppStrings.dropOfHope.tr(), '10 نقطة')),
+                    Expanded(
+                      child: _buildBadgeCard(
+                        AppStrings.dropOfHope.tr(),
+                        '10 نقطة',
+                      ),
+                    ),
                     const SizedBox(width: 15),
-                    Expanded(child: _buildBadgeCard(AppStrings.activeDonor.tr(), '50 نقطة')),
+                    Expanded(
+                      child: _buildBadgeCard(
+                        AppStrings.activeDonor.tr(),
+                        '50 نقطة',
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 30),

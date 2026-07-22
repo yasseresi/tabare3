@@ -5,19 +5,31 @@ abstract class Failure {
 }
 
 class ServerFailure extends Failure {
-  const ServerFailure([super.code = -7, super.message = 'خطأ في الخادم، يرجى المحاولة لاحقاً']);
+  const ServerFailure([
+    super.code = -7,
+    super.message = 'خطأ في الخادم، يرجى المحاولة لاحقاً',
+  ]);
 }
 
 class CacheFailure extends Failure {
-  const CacheFailure([super.code = -5, super.message = 'خطأ في التخزين المؤقت']);
+  const CacheFailure([
+    super.code = -5,
+    super.message = 'خطأ في التخزين المؤقت',
+  ]);
 }
 
 class NetworkFailure extends Failure {
-  const NetworkFailure([super.code = -6, super.message = 'لا يوجد اتصال بالإنترنت']);
+  const NetworkFailure([
+    super.code = -6,
+    super.message = 'لا يوجد اتصال بالإنترنت',
+  ]);
 }
 
 class DatabaseFailure extends Failure {
-  const DatabaseFailure([super.code = -8, super.message = 'خطأ في قاعدة البيانات']);
+  const DatabaseFailure([
+    super.code = -8,
+    super.message = 'خطأ في قاعدة البيانات',
+  ]);
 }
 
 class AuthFailure extends Failure {
@@ -25,5 +37,8 @@ class AuthFailure extends Failure {
 }
 
 class StorageFailure extends Failure {
-  const StorageFailure([super.code = -10, super.message = 'خطأ في تخزين الملفات']);
+  const StorageFailure([
+    super.code = -10,
+    super.message = 'خطأ في تخزين الملفات',
+  ]);
 }

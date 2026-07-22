@@ -11,6 +11,7 @@ import 'package:tabare3/features/auth/domain/entities/user_entity.dart';
 import 'package:tabare3/features/auth/domain/repositories/auth_repository.dart';
 
 class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
+
 class MockNetworkInfo extends Mock implements NetworkInfo {}
 
 const testUserModel = UserModel(
@@ -27,16 +28,18 @@ void main() {
   late MockNetworkInfo mockNetworkInfo;
 
   setUpAll(() {
-    registerFallbackValue(SignupParams(
-      username: 'fallback',
-      fullName: 'fallback',
-      password: 'fallback',
-      phone: '0000',
-      dateOfBirth: DateTime(2000),
-      gender: 'male',
-      bloodType: 'O+',
-      city: 'fallback',
-    ));
+    registerFallbackValue(
+      SignupParams(
+        username: 'fallback',
+        fullName: 'fallback',
+        password: 'fallback',
+        phone: '0000',
+        dateOfBirth: DateTime(2000),
+        gender: 'male',
+        bloodType: 'O+',
+        city: 'fallback',
+      ),
+    );
   });
 
   setUp(() {
@@ -51,10 +54,12 @@ void main() {
   group('loginWithUsernamePassword', () {
     test('returns Right(UserEntity) on success', () async {
       when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-      when(() => mockDataSource.signIn(
-            username: any(named: 'username'),
-            password: any(named: 'password'),
-          )).thenAnswer((_) async => testUserModel);
+      when(
+        () => mockDataSource.signIn(
+          username: any(named: 'username'),
+          password: any(named: 'password'),
+        ),
+      ).thenAnswer((_) async => testUserModel);
 
       final result = await repository.loginWithUsernamePassword(
         username: 'testuser',
@@ -80,10 +85,12 @@ void main() {
 
     test('returns Left(Failure) when datasource throws', () async {
       when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-      when(() => mockDataSource.signIn(
-            username: any(named: 'username'),
-            password: any(named: 'password'),
-          )).thenThrow(Exception('Auth failed'));
+      when(
+        () => mockDataSource.signIn(
+          username: any(named: 'username'),
+          password: any(named: 'password'),
+        ),
+      ).thenThrow(Exception('Auth failed'));
 
       final result = await repository.loginWithUsernamePassword(
         username: 'testuser',
@@ -108,10 +115,13 @@ void main() {
       );
 
       when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-      when(() => mockDataSource.signUp(params: any(named: 'params')))
-          .thenAnswer((_) async => testUserModel);
+      when(
+        () => mockDataSource.signUp(params: any(named: 'params')),
+      ).thenAnswer((_) async => testUserModel);
 
-      final result = await repository.signupWithUsernamePassword(params: params);
+      final result = await repository.signupWithUsernamePassword(
+        params: params,
+      );
 
       expect(result.isRight(), isTrue);
     });
@@ -130,7 +140,9 @@ void main() {
 
       when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => false);
 
-      final result = await repository.signupWithUsernamePassword(params: params);
+      final result = await repository.signupWithUsernamePassword(
+        params: params,
+      );
 
       expect(result, const Left(NetworkFailure()));
     });
@@ -164,7 +176,9 @@ void main() {
     });
 
     test('returns Right(UserEntity) when session exists', () async {
-      when(() => mockDataSource.getCurrentUser()).thenAnswer((_) async => testUserModel);
+      when(
+        () => mockDataSource.getCurrentUser(),
+      ).thenAnswer((_) async => testUserModel);
 
       final result = await repository.getCurrentSession();
 

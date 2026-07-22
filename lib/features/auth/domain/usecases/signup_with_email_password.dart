@@ -5,7 +5,8 @@ import '../../../../core/usecases/usecase.dart';
 import '../entities/user_entity.dart';
 import '../repositories/auth_repository.dart';
 
-class SignupWithUsernamePassword implements BaseUseCase<UserEntity, SignupParams> {
+class SignupWithUsernamePassword
+    implements BaseUseCase<UserEntity, SignupParams> {
   final AuthRepository repository;
 
   SignupWithUsernamePassword(this.repository);

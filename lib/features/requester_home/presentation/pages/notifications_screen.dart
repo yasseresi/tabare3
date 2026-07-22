@@ -111,7 +111,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               Center(
                 child: Text(
                   AppStrings.notificationsHeader.tr(),
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),

@@ -17,9 +17,13 @@ import 'package:tabare3/features/auth/presentation/pages/signup_screen.dart';
 import '../../../../../helpers/test_app.dart';
 
 class MockLogin extends Mock implements LoginWithUsernamePassword {}
+
 class MockSignup extends Mock implements SignupWithUsernamePassword {}
+
 class MockSignOut extends Mock implements SignOut {}
+
 class MockSession extends Mock implements GetCurrentSession {}
+
 class MockRole extends Mock implements UpdateUserRole {}
 
 void main() {
@@ -27,21 +31,36 @@ void main() {
 
   setUpAll(() async {
     await setupTestLocalization();
-    registerFallbackValue(SignupParams(
-      username: 'f', fullName: 'f', password: 'f', phone: '0000',
-      dateOfBirth: DateTime(2000), gender: 'male', bloodType: 'O+', city: 'f',
-    ));
+    registerFallbackValue(
+      SignupParams(
+        username: 'f',
+        fullName: 'f',
+        password: 'f',
+        phone: '0000',
+        dateOfBirth: DateTime(2000),
+        gender: 'male',
+        bloodType: 'O+',
+        city: 'f',
+      ),
+    );
     registerFallbackValue(LoginParams(username: 'f', password: 'f'));
     registerFallbackValue(NoParams());
-    registerFallbackValue(const UpdateRoleParams(isDonor: false, isRecipient: false));
+    registerFallbackValue(
+      const UpdateRoleParams(isDonor: false, isRecipient: false),
+    );
   });
 
   setUp(() {
     sl.reset();
-    sl.registerFactory(() => AuthBloc(
-          loginWithUsernamePassword: sl(), signupWithUsernamePassword: sl(),
-          signOutUseCase: sl(), getCurrentSession: sl(), updateUserRole: sl(),
-        ));
+    sl.registerFactory(
+      () => AuthBloc(
+        loginWithUsernamePassword: sl(),
+        signupWithUsernamePassword: sl(),
+        signOutUseCase: sl(),
+        getCurrentSession: sl(),
+        updateUserRole: sl(),
+      ),
+    );
     sl.registerLazySingleton<LoginWithUsernamePassword>(() => MockLogin());
     sl.registerLazySingleton<SignupWithUsernamePassword>(() => MockSignup());
     sl.registerLazySingleton<SignOut>(() => MockSignOut());
