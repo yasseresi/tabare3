@@ -213,6 +213,12 @@ class AppStrings {
   static const String accountInfo = 'account_info';
   static const String appInfo = 'app_info';
   static const String developerContact = 'developer_contact';
+  static const String aboutAppParagraph1 = 'about_app_paragraph_1';
+  static const String aboutAppParagraph2 = 'about_app_paragraph_2';
+  static const String aboutAppParagraph3 = 'about_app_paragraph_3';
+  static const String developerContactDescription =
+      'developer_contact_description';
+  static const String versionNumber = 'version_number';
 
   // Misc
   static const String male = 'male';

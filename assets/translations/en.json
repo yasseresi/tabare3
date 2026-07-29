@@ -158,6 +158,11 @@
   "account_info": "Account information",
   "app_info": "App information",
   "developer_contact": "Developer contact",
+  "about_app_paragraph_1": "The blood donation platform is a digital app that aims to facilitate communication between blood donors and patients in need. The platform provides a fast and safe way to find suitable donors, publish donation requests, and manage appointments and notifications related to donation operations.",
+  "about_app_paragraph_2": "The platform seeks to promote a culture of blood donation and contribute to saving lives by providing an easy-to-use environment that helps respond quickly to cases that need blood. It also enables users to track their donation history and manage their personal data with ease.",
+  "about_app_paragraph_3": "Every blood donation is a new chance at life, and together we can make a real difference in our community.",
+  "developer_contact_description": "For any inquiry, suggestion, or to report a problem, you can contact us and we will be happy to help you as soon as possible.",
+  "version_number": "Version {version}",
 
   "male": "Male",
   "female": "Female",
