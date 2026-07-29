@@ -7,8 +7,25 @@ insert into storage.buckets (id, name, public)
 values ('profile_pic', 'profile_pic', true)
 on conflict (id) do nothing;
 
--- 2. Enable RLS on storage.objects (idempotent if already enabled).
-alter table storage.objects enable row level security;
+-- 2. Enable RLS on storage.objects only if it is not already enabled.
+-- This avoids the "must be owner of table objects" error when the migration
+-- is executed by a non-owner role (e.g. some MCP/CLI contexts). The actual
+-- policy drop/create statements still require ownership, so this migration
+-- should be applied via the Supabase Dashboard SQL Editor or a role that owns
+-- storage.objects.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE c.relname = 'objects'
+      AND n.nspname = 'storage'
+      AND c.relrowsecurity
+  ) THEN
+    EXECUTE 'ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY';
+  END IF;
+END $$;
 
 -- 3. Policies (drop + recreate to keep migration idempotent).
 -- Anyone can view avatars (public bucket behavior).
