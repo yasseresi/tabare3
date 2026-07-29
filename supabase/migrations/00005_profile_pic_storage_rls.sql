@@ -27,12 +27,15 @@ BEGIN
   END IF;
 END $$;
 
--- 3. Policies (drop + recreate to keep migration idempotent).
--- Anyone can view avatars (public bucket behavior).
-drop policy if exists profile_pic_select_public on storage.objects;
-create policy profile_pic_select_public
-  on storage.objects for select to authenticated, anon
-  using (bucket_id = 'profile_pic');
+  -- 3. Policies (drop + recreate to keep migration idempotent).
+  -- Users can only list their own avatar objects (no broad public listing).
+  drop policy if exists profile_pic_select_public on storage.objects;
+  create policy profile_pic_select_own
+    on storage.objects for select to authenticated
+    using (
+      bucket_id = 'profile_pic'
+      and (storage.foldername(name))[1] = auth.uid()::text
+    );
 
 -- Authenticated users can upload only into their own folder: <user_id>/...
 drop policy if exists profile_pic_insert_own on storage.objects;
