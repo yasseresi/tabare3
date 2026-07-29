@@ -233,6 +233,7 @@
   "privacy_policy_label": "Privacy policy",
   "app_values": "App values",
   "full_name_value": "Ahmed Loucif",
+  "image_too_large": "Image must be less than 10 MB",
 
   "drop_of_hope": "Drop of hope",
   "committed_donor": "Committed donor",

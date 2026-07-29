@@ -20,8 +20,8 @@ import '../../features/donor_home/presentation/pages/donor_appointments_screen.d
 import '../../features/donor_home/presentation/pages/donor_card_screen.dart';
 import '../../features/donor_home/presentation/pages/donor_card_info_screen.dart';
 import '../../features/donor_home/presentation/pages/donor_record_screen.dart';
+import '../../features/profile/presentation/bloc/profile_bloc.dart';
 import '../../features/profile/presentation/pages/profile_screen.dart';
-import '../../features/profile/presentation/pages/requester_profile_screen.dart';
 
 class Routes {
   static const String splashRoute = '/';
@@ -90,7 +90,10 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const DonorHistoryScreen());
       case Routes.requesterProfileRoute:
         return MaterialPageRoute(
-          builder: (_) => const RequesterProfileScreen(),
+          builder: (_) => BlocProvider(
+            create: (_) => sl<ProfileBloc>()..add(const LoadProfile()),
+            child: const ProfileScreen(),
+          ),
         );
 
       // Donor
@@ -114,7 +117,12 @@ class RouteGenerator {
       case Routes.donorRecordRoute:
         return MaterialPageRoute(builder: (_) => const DonorRecordScreen());
       case Routes.profileRoute:
-        return MaterialPageRoute(builder: (_) => const ProfileScreen());
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<ProfileBloc>()..add(const LoadProfile()),
+            child: const ProfileScreen(),
+          ),
+        );
 
       default:
         return MaterialPageRoute(
