@@ -20,25 +20,23 @@ class AboutAppScreen extends StatelessWidget {
       textDirection: appTextDirection(context),
       child: Scaffold(
         backgroundColor: ColorManager.scaffoldBg,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: AppSize.s0,
-          leading: BackButton(color: ColorManager.textPrimary),
-        ),
         body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: AppPadding.p32),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppPadding.p10),
             child: Column(
               children: [
-                const SizedBox(height: AppSize.s20),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: BackButton(color: ColorManager.textPrimary),
+                ),
                 _buildLogoSection(),
-                const SizedBox(height: AppSize.s20),
+                const SizedBox(height: AppSize.s12),
                 _buildTitleBadge(),
                 const SizedBox(height: AppSize.s12),
-                _buildDescriptionCard(),
+                Expanded(child: _buildDescriptionCard()),
                 const SizedBox(height: AppSize.s12),
                 _buildDeveloperSection(),
-                const SizedBox(height: AppSize.s40),
+                const SizedBox(height: AppSize.s12),
               ],
             ),
           ),
@@ -101,81 +99,79 @@ class AboutAppScreen extends StatelessWidget {
       AppStrings.aboutAppParagraph2.tr(),
       AppStrings.aboutAppParagraph3.tr(),
     ];
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppPadding.p10),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(AppPadding.p30),
-        decoration: BoxDecoration(
-          color: ColorManager.white,
-          borderRadius: BorderRadius.circular(AppSize.s46),
-        ),
-        child: Column(
-          children: [
-            for (var i = 0; i < paragraphs.length; i++) ...[
-              if (i > 0) const SizedBox(height: AppSize.s15),
-              Text(
-                paragraphs[i],
-                textAlign: TextAlign.center,
-                style: getSemiBoldStyle(
-                  fontSize: FontSize.s14,
-                  color: ColorManager.textPrimary,
-                ),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppPadding.p24,
+        vertical: AppPadding.p16,
+      ),
+      decoration: BoxDecoration(
+        color: ColorManager.white,
+        borderRadius: BorderRadius.circular(AppSize.s46),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          for (var i = 0; i < paragraphs.length; i++) ...[
+            if (i > 0) const SizedBox(height: AppSize.s10),
+            Text(
+              paragraphs[i],
+              textAlign: TextAlign.center,
+              style: getSemiBoldStyle(
+                fontSize: FontSize.s13,
+                color: ColorManager.textPrimary,
               ),
-            ],
+            ),
           ],
-        ),
+        ],
       ),
     );
   }
 
   Widget _buildDeveloperSection() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppPadding.p10),
-      child: Container(
-        decoration: BoxDecoration(
-          color: ColorManager.white,
-          borderRadius: BorderRadius.circular(AppSize.s24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: AppSize.s20,
-              offset: const Offset(0, AppSize.s4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ProfileRow(
-              label: AppStrings.developerContact.tr(),
-              value: AppStrings.developerContactDescription.tr(),
-              iconData: Icons.code,
-            ),
-            Divider(
-              height: AppSize.s1,
-              color: ColorManager.dividerGrey,
-              indent: AppPadding.p20,
-              endIndent: AppPadding.p20,
-            ),
-            ProfileRow(
-              label: AppStrings.phoneNumberLabel.tr(),
-              value: AppConstants.developerPhone,
-              iconData: Icons.phone_outlined,
-            ),
-            Divider(
-              height: AppSize.s1,
-              color: ColorManager.dividerGrey,
-              indent: AppPadding.p20,
-              endIndent: AppPadding.p20,
-            ),
-            ProfileRow(
-              label: AppStrings.email.tr(),
-              value: AppConstants.developerEmail,
-              iconData: Icons.email_outlined,
-            ),
-          ],
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        color: ColorManager.white,
+        borderRadius: BorderRadius.circular(AppSize.s24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: AppSize.s20,
+            offset: const Offset(0, AppSize.s4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ProfileRow(
+            label: AppStrings.developerContact.tr(),
+            value: AppStrings.developerContactDescription.tr(),
+            iconData: Icons.code,
+          ),
+          Divider(
+            height: AppSize.s1,
+            color: ColorManager.dividerGrey,
+            indent: AppPadding.p20,
+            endIndent: AppPadding.p20,
+          ),
+          ProfileRow(
+            label: AppStrings.phoneNumberLabel.tr(),
+            value: AppConstants.developerPhone,
+            iconData: Icons.phone_outlined,
+          ),
+          Divider(
+            height: AppSize.s1,
+            color: ColorManager.dividerGrey,
+            indent: AppPadding.p20,
+            endIndent: AppPadding.p20,
+          ),
+          ProfileRow(
+            label: AppStrings.email.tr(),
+            value: AppConstants.developerEmail,
+            iconData: Icons.email_outlined,
+          ),
+        ],
       ),
     );
   }
