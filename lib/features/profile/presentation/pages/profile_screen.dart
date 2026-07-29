@@ -213,14 +213,12 @@ class _ProfileContent extends StatelessWidget {
           label: AppStrings.phoneNumberLabel.tr(),
           value: profile.phone,
           iconData: Icons.phone_outlined,
-          onTap: isEditing
-              ? () => _editField(
-                  context,
-                  AppStrings.phoneNumberLabel.tr(),
-                  profile.phone,
-                  (v) => _updateProfile(context, phone: v),
-                )
-              : null,
+          onTap: _editTap(
+            context,
+            AppStrings.phoneNumberLabel.tr(),
+            profile.phone,
+            (v) => _updateProfile(context, phone: v),
+          ),
         ),
         _Divider(),
         ProfileRow(
@@ -253,56 +251,48 @@ class _ProfileContent extends StatelessWidget {
           label: AppStrings.dateOfBirth.tr(),
           value: profile.dateOfBirth,
           iconData: Icons.calendar_today_outlined,
-          onTap: isEditing
-              ? () => _editField(
-                  context,
-                  AppStrings.dateOfBirth.tr(),
-                  profile.dateOfBirth,
-                  (v) => _updateProfile(context, dateOfBirth: v),
-                )
-              : null,
+          onTap: _editTap(
+            context,
+            AppStrings.dateOfBirth.tr(),
+            profile.dateOfBirth,
+            (v) => _updateProfile(context, dateOfBirth: v),
+          ),
         ),
         _Divider(),
         ProfileRow(
           label: AppStrings.gender.tr(),
           value: _genderLabel(profile.gender),
           iconData: Icons.person_outline,
-          onTap: isEditing
-              ? () => _editField(
-                  context,
-                  AppStrings.gender.tr(),
-                  profile.gender,
-                  (v) => _updateProfile(context, gender: v),
-                )
-              : null,
+          onTap: _editTap(
+            context,
+            AppStrings.gender.tr(),
+            profile.gender,
+            (v) => _updateProfile(context, gender: v),
+          ),
         ),
         _Divider(),
         ProfileRow(
           label: AppStrings.nationalId.tr(),
           value: profile.nationalId ?? '',
           iconData: Icons.badge_outlined,
-          onTap: isEditing
-              ? () => _editField(
-                  context,
-                  AppStrings.nationalId.tr(),
-                  profile.nationalId ?? '',
-                  (v) => _updateProfile(context, nationalId: v),
-                )
-              : null,
+          onTap: _editTap(
+            context,
+            AppStrings.nationalId.tr(),
+            profile.nationalId ?? '',
+            (v) => _updateProfile(context, nationalId: v),
+          ),
         ),
         _Divider(),
         ProfileRow(
           label: AppStrings.bloodType.tr(),
           value: profile.bloodType,
           iconData: Icons.opacity,
-          onTap: isEditing
-              ? () => _editField(
-                  context,
-                  AppStrings.bloodType.tr(),
-                  profile.bloodType,
-                  (v) => _updateProfile(context, bloodType: v),
-                )
-              : null,
+          onTap: _editTap(
+            context,
+            AppStrings.bloodType.tr(),
+            profile.bloodType,
+            (v) => _updateProfile(context, bloodType: v),
+          ),
         ),
         _Divider(),
         ProfileRow(
@@ -311,42 +301,36 @@ class _ProfileContent extends StatelessWidget {
               ? '${profile.weight} ${AppStrings.kg.tr()}'
               : '',
           iconData: Icons.monitor_weight_outlined,
-          onTap: isEditing
-              ? () => _editField(
-                  context,
-                  AppStrings.weight.tr(),
-                  profile.weight?.toString() ?? '',
-                  (v) => _updateProfile(context, weight: double.tryParse(v)),
-                )
-              : null,
+          onTap: _editTap(
+            context,
+            AppStrings.weight.tr(),
+            profile.weight?.toString() ?? '',
+            (v) => _updateProfile(context, weight: double.tryParse(v)),
+          ),
         ),
         _Divider(),
         ProfileRow(
           label: AppStrings.governorate.tr(),
           value: profile.city,
           iconData: Icons.location_on_outlined,
-          onTap: isEditing
-              ? () => _editField(
-                  context,
-                  AppStrings.governorate.tr(),
-                  profile.city,
-                  (v) => _updateProfile(context, city: v),
-                )
-              : null,
+          onTap: _editTap(
+            context,
+            AppStrings.governorate.tr(),
+            profile.city,
+            (v) => _updateProfile(context, city: v),
+          ),
         ),
         _Divider(),
         ProfileRow(
           label: AppStrings.chronicDiseases.tr(),
           value: profile.chronicDiseases ?? '/',
           iconData: Icons.healing_outlined,
-          onTap: isEditing
-              ? () => _editField(
-                  context,
-                  AppStrings.chronicDiseases.tr(),
-                  profile.chronicDiseases ?? '',
-                  (v) => _updateProfile(context, chronicDiseases: v),
-                )
-              : null,
+          onTap: _editTap(
+            context,
+            AppStrings.chronicDiseases.tr(),
+            profile.chronicDiseases ?? '',
+            (v) => _updateProfile(context, chronicDiseases: v),
+          ),
         ),
       ],
     );
@@ -376,6 +360,16 @@ class _ProfileContent extends StatelessWidget {
       ],
     );
   }
+
+  VoidCallback? _editTap(
+    BuildContext context,
+    String label,
+    String initialValue,
+    void Function(String) onSaved,
+  ) =>
+      isEditing
+          ? () => _editField(context, label, initialValue, onSaved)
+          : null;
 
   String _roleLabel(ProfileEntity profile) {
     if (profile.isDonor) return AppStrings.iAmDonor.tr();
@@ -511,8 +505,8 @@ class _ProfileContent extends StatelessWidget {
               ),
               const SizedBox(height: AppSize.s30),
               SizedBox(
-                width: 220,
-                height: 50,
+                width: AppSize.s220,
+                height: AppSize.s50,
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(sheetContext);
@@ -528,8 +522,8 @@ class _ProfileContent extends StatelessWidget {
               ),
               const SizedBox(height: AppSize.s10),
               SizedBox(
-                width: 220,
-                height: 50,
+                width: AppSize.s220,
+                height: AppSize.s50,
                 child: TextButton(
                   onPressed: () {
                     Navigator.pop(sheetContext);

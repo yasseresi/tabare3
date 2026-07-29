@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
@@ -63,21 +62,17 @@ class ProfileSection extends StatelessWidget {
 class ProfileRow extends StatelessWidget {
   final String label;
   final String value;
-  final String? iconSvg;
   final IconData? iconData;
   final Widget? trailing;
   final VoidCallback? onTap;
-  final bool isMultiline;
 
   const ProfileRow({
     super.key,
     required this.label,
     required this.value,
-    this.iconSvg,
     this.iconData,
     this.trailing,
     this.onTap,
-    this.isMultiline = false,
   });
 
   @override
@@ -120,17 +115,7 @@ class ProfileRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSize.s10),
-            if (iconSvg != null)
-              SvgPicture.asset(
-                iconSvg!,
-                width: AppSize.s20,
-                height: AppSize.s20,
-                colorFilter: ColorFilter.mode(
-                  ColorManager.textSecondary,
-                  BlendMode.srcIn,
-                ),
-              )
-            else if (iconData != null)
+            if (iconData != null)
               Icon(
                 iconData,
                 size: AppSize.s20,
