@@ -21,6 +21,7 @@ import '../../features/donor_home/presentation/pages/donor_card_screen.dart';
 import '../../features/donor_home/presentation/pages/donor_card_info_screen.dart';
 import '../../features/donor_home/presentation/pages/donor_record_screen.dart';
 import '../../features/profile/presentation/bloc/profile_bloc.dart';
+import '../../features/profile/presentation/pages/about_app_screen.dart';
 import '../../features/profile/presentation/pages/profile_screen.dart';
 
 class Routes {
@@ -47,6 +48,7 @@ class Routes {
   static const String donorCardInfoRoute = '/donor-card-info';
   static const String donorRecordRoute = '/donor-record';
   static const String profileRoute = '/profile';
+  static const String aboutAppRoute = '/about-app';
 }
 
 class RouteGenerator {
@@ -123,6 +125,8 @@ class RouteGenerator {
             child: const ProfileScreen(),
           ),
         );
+      case Routes.aboutAppRoute:
+        return MaterialPageRoute(builder: (_) => const AboutAppScreen());
 
       default:
         return MaterialPageRoute(
