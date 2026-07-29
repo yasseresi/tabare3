@@ -44,13 +44,16 @@ Future<void> _pumpDialog(
 
 void main() {
   group('LogoutDialog', () {
-    testWidgets('renders title, message, warning icon and both action labels',
-        (tester) async {
+    testWidgets('renders title, message, warning icon and both action labels', (
+      tester,
+    ) async {
       await _pumpDialog(tester, onConfirm: () {}, onCancel: () {});
 
       expect(find.text('تأكيد تسجيل الخروج'), findsOneWidget);
       expect(
-        find.text('سيتم إنهاء جلستك الحالية وستحتاج إلى تسجيل الدخول مرة أخرى.'),
+        find.text(
+          'سيتم إنهاء جلستك الحالية وستحتاج إلى تسجيل الدخول مرة أخرى.',
+        ),
         findsOneWidget,
       );
       expect(find.text('تسجيل الخروج'), findsOneWidget);
@@ -58,18 +61,13 @@ void main() {
       expect(find.byType(SvgPicture), findsOneWidget);
     });
 
-    testWidgets('uses stable widget keys for confirm and cancel buttons',
-        (tester) async {
+    testWidgets('uses stable widget keys for confirm and cancel buttons', (
+      tester,
+    ) async {
       await _pumpDialog(tester, onConfirm: () {}, onCancel: () {});
 
-      expect(
-        find.byKey(WidgetKeys.logoutDialogConfirmButton),
-        findsOneWidget,
-      );
-      expect(
-        find.byKey(WidgetKeys.logoutDialogCancelButton),
-        findsOneWidget,
-      );
+      expect(find.byKey(WidgetKeys.logoutDialogConfirmButton), findsOneWidget);
+      expect(find.byKey(WidgetKeys.logoutDialogCancelButton), findsOneWidget);
     });
 
     testWidgets('confirm button invokes onConfirm callback', (tester) async {
@@ -86,24 +84,27 @@ void main() {
       expect(confirmed, isTrue);
     });
 
-    testWidgets('cancel button invokes onCancel callback and dismisses dialog',
-        (tester) async {
-      var cancelled = false;
-      await _pumpDialog(
-        tester,
-        onConfirm: () {},
-        onCancel: () => cancelled = true,
-      );
+    testWidgets(
+      'cancel button invokes onCancel callback and dismisses dialog',
+      (tester) async {
+        var cancelled = false;
+        await _pumpDialog(
+          tester,
+          onConfirm: () {},
+          onCancel: () => cancelled = true,
+        );
 
-      await tester.tap(find.byKey(WidgetKeys.logoutDialogCancelButton));
-      await tester.pumpAndSettle();
+        await tester.tap(find.byKey(WidgetKeys.logoutDialogCancelButton));
+        await tester.pumpAndSettle();
 
-      expect(cancelled, isTrue);
-      expect(find.byType(LogoutDialog), findsNothing);
-    });
+        expect(cancelled, isTrue);
+        expect(find.byType(LogoutDialog), findsNothing);
+      },
+    );
 
-    testWidgets('confirm button dismisses the dialog after invoking callback',
-        (tester) async {
+    testWidgets('confirm button dismisses the dialog after invoking callback', (
+      tester,
+    ) async {
       await _pumpDialog(tester, onConfirm: () {}, onCancel: () {});
 
       await tester.tap(find.byKey(WidgetKeys.logoutDialogConfirmButton));

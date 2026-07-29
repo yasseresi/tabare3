@@ -58,17 +58,19 @@ void main() {
   });
 
   group('AuthRemoteDataSourceImpl.signOut', () {
-    test('invokes Supabase auth.signOut so the session is invalidated',
-        () async {
-      final client = MockSupabaseClient();
-      final auth = MockGoTrueClient();
-      when(() => client.auth).thenReturn(auth);
-      when(() => auth.signOut()).thenAnswer((_) async {});
+    test(
+      'invokes Supabase auth.signOut so the session is invalidated',
+      () async {
+        final client = MockSupabaseClient();
+        final auth = MockGoTrueClient();
+        when(() => client.auth).thenReturn(auth);
+        when(() => auth.signOut()).thenAnswer((_) async {});
 
-      final dataSource = AuthRemoteDataSourceImpl(client: client);
-      await dataSource.signOut();
+        final dataSource = AuthRemoteDataSourceImpl(client: client);
+        await dataSource.signOut();
 
-      verify(() => auth.signOut()).called(1);
-    });
+        verify(() => auth.signOut()).called(1);
+      },
+    );
   });
 }
