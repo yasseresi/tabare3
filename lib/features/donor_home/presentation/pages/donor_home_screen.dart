@@ -5,8 +5,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tabare3/core/utils/route_manager.dart';
 import 'package:tabare3/core/utils/string_manager.dart';
 import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:tabare3/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:tabare3/features/profile/presentation/pages/profile_screen.dart';
 import 'package:tabare3/features/requester_home/presentation/pages/notifications_screen.dart';
+import 'package:tabare3/injection_container.dart';
 import 'donor_requests_screen.dart';
 import 'donor_appointments_screen.dart';
 import 'donor_record_screen.dart';
@@ -51,7 +53,10 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
       case 3:
         return const DonorRecordScreen();
       case 4:
-        return const ProfileScreen();
+        return BlocProvider(
+          create: (_) => sl<ProfileBloc>()..add(const LoadProfile()),
+          child: const ProfileScreen(),
+        );
       default:
         return _buildHomeView();
     }
