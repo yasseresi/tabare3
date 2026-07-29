@@ -15,6 +15,7 @@ import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/profile_entity.dart';
 import '../bloc/profile_bloc.dart';
+import '../widgets/profile_field_editors.dart';
 import '../widgets/profile_widgets.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -23,7 +24,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Directionality(
-      textDirection: TextDirection.rtl,
+      textDirection: appTextDirection(context),
       child: Scaffold(
         backgroundColor: ColorManager.scaffoldBg,
         body: SafeArea(
@@ -249,26 +250,28 @@ class _ProfileContent extends StatelessWidget {
       children: [
         ProfileRow(
           label: AppStrings.dateOfBirth.tr(),
-          value: profile.dateOfBirth,
+          value: _formatDate(context, profile.dateOfBirth),
           iconData: Icons.calendar_today_outlined,
-          onTap: _editTap(
-            context,
-            AppStrings.dateOfBirth.tr(),
-            profile.dateOfBirth,
-            (v) => _updateProfile(context, dateOfBirth: v),
-          ),
+          onTap: isEditing
+              ? () => ProfileFieldEditors.pickDateOfBirth(
+                  context,
+                  profile.dateOfBirth,
+                  (v) => _updateProfile(context, dateOfBirth: v),
+                )
+              : null,
         ),
         _Divider(),
         ProfileRow(
           label: AppStrings.gender.tr(),
           value: _genderLabel(profile.gender),
           iconData: Icons.person_outline,
-          onTap: _editTap(
-            context,
-            AppStrings.gender.tr(),
-            profile.gender,
-            (v) => _updateProfile(context, gender: v),
-          ),
+          onTap: isEditing
+              ? () => ProfileFieldEditors.pickGender(
+                  context,
+                  profile.gender,
+                  (v) => _updateProfile(context, gender: v),
+                )
+              : null,
         ),
         _Divider(),
         ProfileRow(
@@ -287,12 +290,13 @@ class _ProfileContent extends StatelessWidget {
           label: AppStrings.bloodType.tr(),
           value: profile.bloodType,
           iconData: Icons.opacity,
-          onTap: _editTap(
-            context,
-            AppStrings.bloodType.tr(),
-            profile.bloodType,
-            (v) => _updateProfile(context, bloodType: v),
-          ),
+          onTap: isEditing
+              ? () => ProfileFieldEditors.pickBloodType(
+                  context,
+                  profile.bloodType,
+                  (v) => _updateProfile(context, bloodType: v),
+                )
+              : null,
         ),
         _Divider(),
         ProfileRow(
@@ -301,24 +305,26 @@ class _ProfileContent extends StatelessWidget {
               ? '${profile.weight} ${AppStrings.kg.tr()}'
               : '',
           iconData: Icons.monitor_weight_outlined,
-          onTap: _editTap(
-            context,
-            AppStrings.weight.tr(),
-            profile.weight?.toString() ?? '',
-            (v) => _updateProfile(context, weight: double.tryParse(v)),
-          ),
+          onTap: isEditing
+              ? () => ProfileFieldEditors.pickWeight(
+                  context,
+                  profile.weight,
+                  (v) => _updateProfile(context, weight: v),
+                )
+              : null,
         ),
         _Divider(),
         ProfileRow(
           label: AppStrings.governorate.tr(),
           value: profile.city,
           iconData: Icons.location_on_outlined,
-          onTap: _editTap(
-            context,
-            AppStrings.governorate.tr(),
-            profile.city,
-            (v) => _updateProfile(context, city: v),
-          ),
+          onTap: isEditing
+              ? () => ProfileFieldEditors.pickWilaya(
+                  context,
+                  profile.city,
+                  (v) => _updateProfile(context, city: v),
+                )
+              : null,
         ),
         _Divider(),
         ProfileRow(
@@ -349,6 +355,7 @@ class _ProfileContent extends StatelessWidget {
             size: AppSize.s16,
             color: ColorManager.textSecondary,
           ),
+          onTap: () => Navigator.pushNamed(context, Routes.aboutAppRoute),
         ),
         _Divider(),
         ProfileRow(
@@ -379,6 +386,12 @@ class _ProfileContent extends StatelessWidget {
 
   String _genderLabel(String gender) {
     return gender == 'female' ? AppStrings.female.tr() : AppStrings.male.tr();
+  }
+
+  String _formatDate(BuildContext context, String rawDate) {
+    final parsed = DateTime.tryParse(rawDate);
+    if (parsed == null) return rawDate;
+    return DateFormat.yMMMMd(context.locale.toString()).format(parsed);
   }
 
   void _updateProfile(
@@ -429,7 +442,7 @@ class _ProfileContent extends StatelessWidget {
           top: AppPadding.p20,
         ),
         child: Directionality(
-          textDirection: TextDirection.rtl,
+          textDirection: appTextDirection(context),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -443,7 +456,6 @@ class _ProfileContent extends StatelessWidget {
               const SizedBox(height: AppSize.s16),
               TextField(
                 controller: controller,
-                textAlign: TextAlign.right,
                 decoration: InputDecoration(
                   hintText: label,
                   border: OutlineInputBorder(
@@ -474,7 +486,7 @@ class _ProfileContent extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       builder: (sheetContext) => Directionality(
-        textDirection: TextDirection.rtl,
+        textDirection: appTextDirection(context),
         child: Padding(
           padding: const EdgeInsets.all(AppPadding.p24),
           child: Column(
