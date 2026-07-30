@@ -19,6 +19,22 @@ import 'features/counter/domain/repositories/counter_repository.dart';
 import 'features/counter/domain/usecases/get_counter.dart';
 import 'features/counter/domain/usecases/increment_counter.dart';
 import 'features/counter/presentation/bloc/counter_bloc.dart';
+import 'features/donor_home/data/datasources/donor_feed_remote_data_source.dart';
+import 'features/donor_home/data/datasources/donor_card_remote_data_source.dart';
+import 'features/donor_home/data/repositories/donor_card_repository_impl.dart';
+import 'features/donor_home/data/repositories/donor_feed_repository_impl.dart';
+import 'features/donor_home/domain/repositories/donor_card_repository.dart';
+import 'features/donor_home/domain/repositories/donor_feed_repository.dart';
+import 'features/donor_home/domain/usecases/donor_feed_usecases.dart';
+import 'features/donor_home/domain/usecases/get_donor_card.dart';
+import 'features/donor_home/presentation/bloc/donor_card_bloc.dart';
+import 'features/donor_home/presentation/bloc/donor_feed_bloc.dart';
+import 'features/notifications/data/datasources/notification_remote_data_source.dart';
+import 'features/notifications/data/repositories/notification_repository_impl.dart';
+import 'features/notifications/domain/repositories/notification_repository.dart';
+import 'features/notifications/domain/usecases/get_notifications.dart';
+import 'features/notifications/domain/usecases/mark_notification_as_read.dart';
+import 'features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'features/profile/data/datasources/profile_local_data_source.dart';
 import 'features/profile/data/datasources/profile_local_data_source_impl.dart';
 import 'features/profile/data/datasources/profile_remote_data_source.dart';
@@ -30,6 +46,12 @@ import 'features/profile/domain/usecases/get_profile.dart';
 import 'features/profile/domain/usecases/update_profile.dart';
 import 'features/profile/domain/usecases/upload_avatar.dart';
 import 'features/profile/presentation/bloc/profile_bloc.dart';
+import 'features/requester_home/data/datasources/request_remote_data_source.dart';
+import 'features/requester_home/data/repositories/request_repository_impl.dart';
+import 'features/requester_home/domain/repositories/request_repository.dart';
+import 'features/requester_home/domain/usecases/request_usecases.dart';
+import 'features/requester_home/presentation/bloc/request_bloc.dart';
+import 'features/requester_home/presentation/bloc/request_detail_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -38,6 +60,103 @@ Future<void> init() async {
   await initCounter();
   await initAuth();
   await initProfile();
+  await initRequesterHome();
+  await initNotifications();
+  await initDonorHome();
+}
+
+Future<void> initDonorHome() async {
+  sl.registerFactory(() => DonorCardBloc(getDonorCard: sl()));
+  sl.registerFactory(
+    () => DonorFeedBloc(
+      getFeed: sl(),
+      getRecords: sl(),
+      acceptRequest: sl(),
+      cancelAppointment: sl(),
+      redeemRequestQr: sl(),
+      redeemCampaignQr: sl(),
+      setAvailability: sl(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetDonorFeed(sl()));
+  sl.registerLazySingleton(() => GetDonorAvailability(sl()));
+  sl.registerLazySingleton(() => SetDonorAvailability(sl()));
+  sl.registerLazySingleton(() => GetCompatibleDonationRequests(sl()));
+  sl.registerLazySingleton(() => GetAvailableCampaigns(sl()));
+  sl.registerLazySingleton(() => GetDonationAppointments(sl()));
+  sl.registerLazySingleton(() => GetDonationRecords(sl()));
+  sl.registerLazySingleton(() => AcceptBloodRequest(sl()));
+  sl.registerLazySingleton(() => CancelDonationAppointment(sl()));
+  sl.registerLazySingleton(() => RedeemRequestDonation(sl()));
+  sl.registerLazySingleton(() => RedeemCampaignDonation(sl()));
+  sl.registerLazySingleton(() => GetDonorCard(sl()));
+  sl.registerLazySingleton<DonorCardRepository>(
+    () => DonorCardRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<DonorCardRemoteDataSource>(
+    () => DonorCardRemoteDataSourceImpl(client: sl()),
+  );
+  sl.registerLazySingleton<DonorFeedRepository>(
+    () => DonorFeedRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<DonorFeedRemoteDataSource>(
+    () => DonorFeedRemoteDataSourceImpl(client: sl()),
+  );
+}
+
+Future<void> initNotifications() async {
+  sl.registerFactory(
+    () =>
+        NotificationsBloc(getNotifications: sl(), markNotificationAsRead: sl()),
+  );
+  sl.registerLazySingleton(() => GetNotifications(sl()));
+  sl.registerLazySingleton(() => MarkNotificationAsRead(sl()));
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(client: sl()),
+  );
+}
+
+Future<void> initRequesterHome() async {
+  sl.registerFactory(
+    () => RequestBloc(
+      getRequests: sl(),
+      getHospitals: sl(),
+      createRequest: sl(),
+      updateRequest: sl(),
+      cancelRequest: sl(),
+    ),
+  );
+  sl.registerFactory(
+    () => RequestDetailBloc(
+      getDonors: sl(),
+      getCompatibleDonors: sl(),
+      getInvitations: sl(),
+      inviteDonor: sl(),
+      issueQr: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton(() => GetRecipientRequests(sl()));
+  sl.registerLazySingleton(() => GetRecipientRequest(sl()));
+  sl.registerLazySingleton(() => GetHospitals(sl()));
+  sl.registerLazySingleton(() => CreateRecipientRequest(sl()));
+  sl.registerLazySingleton(() => UpdateRecipientRequest(sl()));
+  sl.registerLazySingleton(() => CancelRecipientRequest(sl()));
+  sl.registerLazySingleton(() => GetRequestDonors(sl()));
+  sl.registerLazySingleton(() => GetCompatibleDonors(sl()));
+  sl.registerLazySingleton(() => GetRequestInvitations(sl()));
+  sl.registerLazySingleton(() => InviteCompatibleDonor(sl()));
+  sl.registerLazySingleton(() => IssueRequestQr(sl()));
+
+  sl.registerLazySingleton<RequestRepository>(
+    () => RequestRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<RequestRemoteDataSource>(
+    () => RequestRemoteDataSourceImpl(client: sl()),
+  );
 }
 
 Future<void> initProfile() async {
