@@ -27,8 +27,8 @@ const List<String> kBloodTypes = [
 
 TextDirection appTextDirection(BuildContext context) =>
     context.locale.languageCode == arabic
-        ? TextDirection.rtl
-        : TextDirection.ltr;
+    ? TextDirection.rtl
+    : TextDirection.ltr;
 
 /// Per-field editors used by the profile screen while in edit mode.
 class ProfileFieldEditors {
@@ -151,8 +151,9 @@ class ProfileFieldEditors {
                     ChoiceChip(
                       label: Text(type),
                       selected: type == currentValue,
-                      selectedColor:
-                          ColorManager.primaryDark.withValues(alpha: 0.15),
+                      selectedColor: ColorManager.primaryDark.withValues(
+                        alpha: 0.15,
+                      ),
                       labelStyle: getSemiBoldStyle(
                         fontSize: FontSize.s16,
                         color: type == currentValue

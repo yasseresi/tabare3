@@ -12,6 +12,7 @@ import 'package:tabare3/features/profile/domain/usecases/update_profile.dart';
 import 'package:tabare3/features/profile/domain/usecases/upload_avatar.dart';
 import 'package:tabare3/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:tabare3/features/profile/presentation/pages/profile_screen.dart';
+import 'package:tabare3/features/profile/presentation/pages/requester_profile_screen.dart';
 
 import '../../../../../helpers/test_app.dart';
 
@@ -104,6 +105,35 @@ void main() {
       expect(find.text('البيانات الشخصية'), findsOneWidget);
       expect(find.text('معلومات الحساب'), findsOneWidget);
     });
+
+    testWidgets(
+      'receiver profile uses the shared profile details without a donor card',
+      (tester) async {
+        final recipientProfile = profile.copyWith(
+          isDonor: false,
+          isRecipient: true,
+        );
+        when(
+          () => getProfile.call(any()),
+        ).thenAnswer((_) async => Right(recipientProfile));
+
+        await tester.pumpWidget(
+          buildTestApp(
+            BlocProvider(
+              create: (_) => buildProfileBloc(),
+              child: const RequesterProfileScreen(),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('أحمد اختبار'), findsOneWidget);
+        expect(find.text('test@example.com'), findsOneWidget);
+        expect(find.text('معلومات الحساب'), findsOneWidget);
+        expect(find.text('البيانات الشخصية'), findsOneWidget);
+        expect(find.text('بطاقة المتبرع'), findsNothing);
+      },
+    );
 
     testWidgets('tapping edit button shows save changes button', (
       tester,

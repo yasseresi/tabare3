@@ -7,6 +7,15 @@ const _fakeEmailDomain = 'tabara3.dz';
 
 String _usernameToEmail(String username) => '$username@$_fakeEmailDomain';
 
+Map<String, dynamic> buildRoleUpdatePayload({
+  required bool isDonor,
+  required bool isRecipient,
+}) => {
+  'is_donor': isDonor,
+  'is_recipient': isRecipient,
+  'active_mode': isDonor ? 'donor' : 'recipient',
+};
+
 abstract class AuthRemoteDataSource {
   Future<UserModel> signIn({
     required String username,
@@ -68,11 +77,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final userId = client.auth.currentUser!.id;
     final response = await client
         .from('users')
-        .update({
-          'is_donor': isDonor,
-          'is_recipient': isRecipient,
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
-        })
+        .update(
+          buildRoleUpdatePayload(isDonor: isDonor, isRecipient: isRecipient),
+        )
         .eq('id', userId)
         .select()
         .single();

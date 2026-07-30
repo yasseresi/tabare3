@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:tabare3/core/error/failures.dart';
 import 'package:tabare3/core/network/network_info.dart';
 import 'package:tabare3/core/presentation/widgets/app_text_field.dart';
 import 'package:tabare3/core/usecases/usecase.dart';
@@ -26,7 +28,9 @@ import 'package:tabare3/features/counter/domain/repositories/counter_repository.
 import 'package:tabare3/features/counter/domain/usecases/get_counter.dart';
 import 'package:tabare3/features/counter/domain/usecases/increment_counter.dart';
 import 'package:tabare3/features/counter/presentation/bloc/counter_bloc.dart';
+import 'package:tabare3/features/donor_home/presentation/bloc/donor_feed_bloc.dart';
 import 'package:tabare3/features/donor_home/presentation/pages/donor_home_screen.dart';
+import 'package:tabare3/features/requester_home/presentation/bloc/request_bloc.dart';
 import 'package:tabare3/features/requester_home/presentation/pages/requester_home_screen.dart';
 import 'package:tabare3/features/splash/presentation/pages/splash_screen.dart';
 import 'package:tabare3/main.dart';
@@ -36,6 +40,12 @@ import '../../../helpers/test_app.dart';
 class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
 
 class MockNetworkInfo extends Mock implements NetworkInfo {}
+
+class MockDonorFeedBloc extends MockBloc<DonorFeedEvent, DonorFeedState>
+    implements DonorFeedBloc {}
+
+class MockRequestBloc extends MockBloc<RequestEvent, RequestState>
+    implements RequestBloc {}
 
 const testDonorModel = UserModel(
   id: 'user-123',
@@ -104,6 +114,18 @@ void registerAllDependencies({
   sl.registerFactory(
     () => CounterBloc(getCounter: sl(), incrementCounter: sl()),
   );
+  sl.registerFactory<DonorFeedBloc>(() {
+    final bloc = MockDonorFeedBloc();
+    when(() => bloc.state).thenReturn(const DonorFeedError(ServerFailure()));
+    return bloc;
+  });
+  sl.registerFactory<RequestBloc>(() {
+    final bloc = MockRequestBloc();
+    when(
+      () => bloc.state,
+    ).thenReturn(const RequestState(status: RequestViewStatus.empty));
+    return bloc;
+  });
 }
 
 void main() {

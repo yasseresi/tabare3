@@ -5,6 +5,24 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/profile_model.dart';
 import 'profile_remote_data_source.dart';
 
+const profileSelectColumns =
+    'id,email,username,full_name,phone,date_of_birth,gender,national_id,'
+    'blood_type,weight,city,chronic_diseases,avatar_url,is_donor,is_recipient,'
+    'is_active:is_available_for_donation';
+
+Map<String, dynamic> buildProfileUpdatePayload(ProfileModel profile) => {
+  'username': profile.username,
+  'phone': profile.phone,
+  'date_of_birth': profile.dateOfBirth,
+  'gender': profile.gender,
+  'blood_type': profile.bloodType,
+  'weight': profile.weight,
+  'city': profile.city,
+  'chronic_diseases': profile.chronicDiseases,
+  'avatar_url': profile.avatarUrl,
+  'is_available_for_donation': profile.isActive,
+};
+
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   final SupabaseClient client;
 
@@ -16,7 +34,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   Future<ProfileModel> getProfile() async {
     final response = await client
         .from('users')
-        .select()
+        .select(profileSelectColumns)
         .eq('id', _userId)
         .single();
 
@@ -27,9 +45,9 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   Future<ProfileModel> updateProfile(ProfileModel profile) async {
     final response = await client
         .from('users')
-        .update(_toUpdateMap(profile))
+        .update(buildProfileUpdatePayload(profile))
         .eq('id', _userId)
-        .select()
+        .select(profileSelectColumns)
         .single();
 
     return ProfileModel.fromJson(response);
@@ -45,10 +63,10 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
         .update({
           'is_donor': isDonor,
           'is_recipient': isRecipient,
-          'updated_at': DateTime.now().toUtc().toIso8601String(),
+          'active_mode': isDonor ? 'donor' : 'recipient',
         })
         .eq('id', _userId)
-        .select()
+        .select(profileSelectColumns)
         .single();
 
     return ProfileModel.fromJson(response);
@@ -71,19 +89,4 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
 
     return client.storage.from('profile_pic').getPublicUrl(path);
   }
-
-  Map<String, dynamic> _toUpdateMap(ProfileModel profile) => {
-    'full_name': profile.fullName,
-    'phone': profile.phone,
-    'date_of_birth': profile.dateOfBirth,
-    'gender': profile.gender,
-    'national_id': profile.nationalId,
-    'blood_type': profile.bloodType,
-    'weight': profile.weight,
-    'city': profile.city,
-    'chronic_diseases': profile.chronicDiseases,
-    'avatar_url': profile.avatarUrl,
-    'is_active': profile.isActive,
-    'updated_at': DateTime.now().toUtc().toIso8601String(),
-  };
 }

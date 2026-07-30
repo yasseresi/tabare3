@@ -46,6 +46,7 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(NoParams());
+    registerFallbackValue(profile);
     registerFallbackValue(
       const ChangeRoleParams(isDonor: false, isRecipient: false),
     );
@@ -171,6 +172,67 @@ void main() {
         const ChangeRoleRequested(isDonor: false, isRecipient: true),
       ),
       expect: () => [const ProfileLoading(), isA<ProfileRoleChanged>()],
+    );
+  });
+
+  group('AvatarSelected', () {
+    blocTest<ProfileBloc, ProfileState>(
+      'waits for avatar upload and profile save before emitting the result',
+      build: () {
+        const avatarUrl = 'https://example.com/avatar.png';
+        final updatedProfile = profile.copyWith(avatarUrl: avatarUrl);
+        when(
+          () => uploadAvatar('/tmp/avatar.png'),
+        ).thenAnswer((_) async => const Right(avatarUrl));
+        when(
+          () => updateProfile(updatedProfile),
+        ).thenAnswer((_) async => Right(updatedProfile));
+        return buildBloc();
+      },
+      seed: () => const ProfileLoaded(profile: profile, isEditing: true),
+      act: (bloc) => bloc.add(const AvatarSelected('/tmp/avatar.png')),
+      expect: () => [
+        const ProfileLoaded(
+          profile: profile,
+          isEditing: true,
+          pendingAvatarPath: '/tmp/avatar.png',
+        ),
+        ProfileLoaded(
+          profile: profile.copyWith(
+            avatarUrl: 'https://example.com/avatar.png',
+          ),
+          isEditing: true,
+        ),
+      ],
+      verify: (_) {
+        verify(() => uploadAvatar('/tmp/avatar.png')).called(1);
+        verify(
+          () => updateProfile(
+            profile.copyWith(avatarUrl: 'https://example.com/avatar.png'),
+          ),
+        ).called(1);
+      },
+    );
+
+    blocTest<ProfileBloc, ProfileState>(
+      'emits an error and does not save when avatar upload fails',
+      build: () {
+        when(
+          () => uploadAvatar('/tmp/avatar.png'),
+        ).thenAnswer((_) async => const Left(ServerFailure()));
+        return buildBloc();
+      },
+      seed: () => const ProfileLoaded(profile: profile, isEditing: false),
+      act: (bloc) => bloc.add(const AvatarSelected('/tmp/avatar.png')),
+      expect: () => [
+        const ProfileLoaded(
+          profile: profile,
+          isEditing: false,
+          pendingAvatarPath: '/tmp/avatar.png',
+        ),
+        isA<ProfileError>(),
+      ],
+      verify: (_) => verifyNever(() => updateProfile(any())),
     );
   });
 }
