@@ -1,79 +1,187 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
-import 'package:tabare3/core/utils/string_manager.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart' as intl;
+
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/values_manager.dart';
+import '../../domain/entities/blood_request_entity.dart';
+import '../bloc/request_bloc.dart';
 
 class EditRequestScreen extends StatefulWidget {
-  const EditRequestScreen({super.key});
+  final BloodRequestEntity request;
+
+  const EditRequestScreen({super.key, required this.request});
 
   @override
   State<EditRequestScreen> createState() => _EditRequestScreenState();
 }
 
 class _EditRequestScreenState extends State<EditRequestScreen> {
-  String _selectedUrgency = AppStrings.veryUrgent;
-  bool _requestStatus = true;
+  late final TextEditingController _unitsController;
+  late final TextEditingController _notesController;
+  late String _hospitalId;
+  late String _bloodType;
+  late RequestPriority _priority;
+  DateTime? _neededBy;
 
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF4CAF50),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.check, color: Colors.white, size: 50),
-                ),
-                const SizedBox(height: 25),
-                Text(
-                  AppStrings.editSuccess.tr(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 18, color: Colors.grey),
-                ),
-                const SizedBox(height: 10),
-                Image.asset(
-                  'assets/images/icon6.png',
-                  height: 60,
-                  fit: BoxFit.contain,
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: 200,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B1D1D),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+  @override
+  void initState() {
+    super.initState();
+    _hospitalId = widget.request.hospital.id;
+    _bloodType = widget.request.bloodType;
+    _priority = widget.request.priority;
+    _neededBy = widget.request.neededBy;
+    _unitsController = TextEditingController(
+      text: widget.request.unitsNeeded.toString(),
+    );
+    _notesController = TextEditingController(text: widget.request.notes);
+  }
+
+  @override
+  void dispose() {
+    _unitsController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<RequestBloc, RequestState>(
+      listenWhen: (previous, current) => previous.status != current.status,
+      listener: (context, state) {
+        if (state.status == RequestViewStatus.success) {
+          Navigator.maybePop(context);
+        } else if (state.status == RequestViewStatus.failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage ?? AppStrings.defaultError.tr()),
+            ),
+          );
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(title: Text(AppStrings.editRequest.tr())),
+          body: Directionality(
+            textDirection: TextDirection.rtl,
+            child: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(AppPadding.p20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildBanner(context),
+                    const SizedBox(height: AppSize.s24),
+                    _buildPrioritySelector(),
+                    const SizedBox(height: AppSize.s16),
+                    DropdownButtonFormField<String>(
+                      key: WidgetKeys.requestHospitalField,
+                      initialValue: _hospitalId,
+                      isExpanded: true,
+                      decoration: InputDecoration(
+                        hintText: AppStrings.selectHospital.tr(),
+                        suffixIcon: const Icon(Icons.local_hospital_outlined),
+                      ),
+                      items: state.hospitals
+                          .map(
+                            (hospital) => DropdownMenuItem(
+                              value: hospital.id,
+                              child: Text(
+                                hospital.nameAr,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => _hospitalId = value);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: AppSize.s16),
+                    DropdownButtonFormField<String>(
+                      key: WidgetKeys.requestBloodTypeField,
+                      initialValue: _bloodType,
+                      decoration: InputDecoration(
+                        hintText: AppStrings.selectBloodType.tr(),
+                        suffixIcon: const Icon(Icons.bloodtype_outlined),
+                      ),
+                      items: supportedBloodTypes
+                          .map(
+                            (bloodType) => DropdownMenuItem(
+                              value: bloodType,
+                              child: Text(bloodType),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => _bloodType = value);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: AppSize.s16),
+                    TextField(
+                      key: WidgetKeys.requestUnitsField,
+                      controller: _unitsController,
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.right,
+                      decoration: InputDecoration(
+                        hintText: AppStrings.bagsRequired.tr(),
+                        suffixIcon: const Icon(Icons.bloodtype_outlined),
                       ),
                     ),
-                    child: Text(
-                      AppStrings.homePage.tr(),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                    const SizedBox(height: AppSize.s16),
+                    _buildDeadlineField(context),
+                    const SizedBox(height: AppSize.s16),
+                    TextField(
+                      key: WidgetKeys.requestNotesField,
+                      controller: _notesController,
+                      maxLines: AppSize.s4.toInt(),
+                      textAlign: TextAlign.right,
+                      decoration: InputDecoration(
+                        hintText: AppStrings.notes.tr(),
+                        suffixIcon: const Icon(Icons.notes_outlined),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: AppSize.s24),
+                    ElevatedButton(
+                      key: WidgetKeys.requestEditSaveButton,
+                      onPressed: state.status == RequestViewStatus.submitting
+                          ? null
+                          : _submit,
+                      child: state.status == RequestViewStatus.submitting
+                          ? SizedBox(
+                              width: AppSize.s24,
+                              height: AppSize.s24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: AppSize.s2,
+                                color: ColorManager.white,
+                              ),
+                            )
+                          : Text(AppStrings.saveChanges.tr()),
+                    ),
+                    const SizedBox(height: AppSize.s12),
+                    OutlinedButton(
+                      key: WidgetKeys.requestCancelButton,
+                      onPressed: state.status == RequestViewStatus.submitting
+                          ? null
+                          : _showCancellationDialog,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: ColorManager.error,
+                        side: BorderSide(color: ColorManager.error),
+                      ),
+                      child: Text(AppStrings.cancelRequest.tr()),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         );
@@ -81,308 +189,196 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Directionality(
-        textDirection: TextDirection.rtl,
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-                _buildHeader(context),
-                const SizedBox(height: 30),
-                _buildBanner(),
-                const SizedBox(height: 30),
-                Center(
-                  child: Text(
-                    AppStrings.urgencyLevel.tr(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildUrgencyBadge(AppStrings.veryUrgent, Colors.red),
-                    const SizedBox(width: 15),
-                    _buildUrgencyBadge(AppStrings.urgent, Colors.orange),
-                    const SizedBox(width: 15),
-                    _buildUrgencyBadge(AppStrings.normal, Colors.green),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                _buildTextField(AppStrings.bagsRequired.tr(), Icons.tag),
-                const SizedBox(height: 15),
-                _buildTextField(
-                  AppStrings.governorate.tr(),
-                  Icons.map_outlined,
-                  isDropdown: true,
-                ),
-                const SizedBox(height: 15),
-                _buildTextField(
-                  AppStrings.hospitalNameField.tr(),
-                  Icons.local_hospital_outlined,
-                ),
-                const SizedBox(height: 15),
-                _buildTextField(
-                  AppStrings.deadlineField.tr(),
-                  Icons.calendar_today_outlined,
-                ),
-                const SizedBox(height: 15),
-                _buildTextField(
-                  AppStrings.notes.tr(),
-                  Icons.sticky_note_2_outlined,
-                  isMultiline: true,
-                ),
-                const SizedBox(height: 30),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Switch(
-                        value: _requestStatus,
-                        onChanged: (value) {
-                          setState(() {
-                            _requestStatus = value;
-                          });
-                        },
-                        activeColor: Colors.green,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            AppStrings.requestStatus.tr(),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                          Text(
-                            _requestStatus
-                                ? AppStrings.activeOrClosed.tr()
-                                : AppStrings.notActive.tr(),
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 55,
-                        child: ElevatedButton(
-                          onPressed: _showSuccessDialog,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF8B1D1D),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          child: Text(
-                            AppStrings.save.tr(),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: SizedBox(
-                        height: 55,
-                        child: OutlinedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFFEEEEEE)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          child: Text(
-                            AppStrings.cancel.tr(),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 40),
-              ],
-            ),
-          ),
+  Widget _buildBanner(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppPadding.p20),
+      decoration: BoxDecoration(
+        color: ColorManager.primaryDark,
+        borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
+      ),
+      child: Text(
+        AppStrings.editRequestBanner.tr(),
+        textAlign: TextAlign.center,
+        style: Theme.of(
+          context,
+        ).textTheme.titleLarge?.copyWith(color: ColorManager.white),
+      ),
+    );
+  }
+
+  Widget _buildPrioritySelector() {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: AppSize.s8,
+      runSpacing: AppSize.s8,
+      children: RequestPriority.values.map((priority) {
+        final color = _priorityColor(priority);
+        return ChoiceChip(
+          selected: _priority == priority,
+          onSelected: (_) => setState(() => _priority = priority),
+          label: Text(_priorityLabel(priority).tr()),
+          avatar: Icon(Icons.circle, size: AppSize.s8, color: color),
+          selectedColor: color.withValues(alpha: AppOpacity.muted),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildDeadlineField(BuildContext context) {
+    final label = _neededBy == null
+        ? AppStrings.optionalDeadline.tr()
+        : intl.DateFormat(
+            AppConstants.requestDateFormat,
+          ).format(_neededBy!.toLocal());
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppPadding.p16,
+        vertical: AppPadding.p4,
+      ),
+      tileColor: ColorManager.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSize.radiusLarge),
+      ),
+      title: Text(label),
+      trailing: const Icon(Icons.calendar_today_outlined),
+      onTap: () => _pickDeadline(context),
+    );
+  }
+
+  Future<void> _pickDeadline(BuildContext context) async {
+    final now = DateTime.now();
+    final firstDate = now.add(
+      const Duration(days: AppConstants.requestCalendarStartOffsetDays),
+    );
+    final selected = await showDatePicker(
+      context: context,
+      initialDate: _neededBy ?? firstDate,
+      firstDate: firstDate,
+      lastDate: now.add(
+        const Duration(days: AppConstants.requestCalendarRangeDays),
+      ),
+    );
+    if (selected != null && mounted) {
+      setState(() => _neededBy = selected);
+    }
+  }
+
+  void _submit() {
+    final units = int.tryParse(_unitsController.text.trim());
+    if (units == null || units <= AppSize.s0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.requiredRequestFields.tr())),
+      );
+      return;
+    }
+
+    context.read<RequestBloc>().add(
+      RequestUpdateSubmitted(
+        requestId: widget.request.id,
+        draft: RequestDraft(
+          hospitalId: _hospitalId,
+          bloodType: _bloodType,
+          priority: _priority,
+          unitsNeeded: units,
+          neededBy: _neededBy,
+          notes: _notesController.text.trim(),
         ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Future<void> _showCancellationDialog() async {
+    final reason = await showDialog<String>(
+      context: context,
+      builder: (_) => const _CancellationDialog(),
+    );
+
+    if (reason != null && mounted) {
+      context.read<RequestBloc>().add(
+        RequestCancelSubmitted(requestId: widget.request.id, reason: reason),
+      );
+    }
+  }
+}
+
+class _CancellationDialog extends StatefulWidget {
+  const _CancellationDialog();
+
+  @override
+  State<_CancellationDialog> createState() => _CancellationDialogState();
+}
+
+class _CancellationDialogState extends State<_CancellationDialog> {
+  final _reasonController = TextEditingController();
+  String? _validationMessage;
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(AppStrings.cancelRequest.tr()),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              AppStrings.welcomeUser.tr(),
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+              AppStrings.confirmCancelRequest.tr(),
+              textAlign: TextAlign.right,
             ),
-            Text(
-              AppStrings.editRequestSubtitle.tr(),
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            const SizedBox(height: AppSize.s16),
+            TextField(
+              key: WidgetKeys.requestCancelReasonField,
+              controller: _reasonController,
+              maxLines: AppSize.s3.toInt(),
+              textAlign: TextAlign.right,
+              decoration: InputDecoration(
+                labelText: AppStrings.cancellationReason.tr(),
+                errorText: _validationMessage,
+              ),
             ),
           ],
         ),
-        GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: Color(0xFFF5F5F5),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: Colors.black,
-              size: 20,
-            ),
-          ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(AppStrings.cancel.tr()),
+        ),
+        ElevatedButton(
+          key: WidgetKeys.requestCancelConfirmButton,
+          onPressed: _confirm,
+          child: Text(AppStrings.confirm.tr()),
         ),
       ],
     );
   }
 
-  Widget _buildBanner() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF8B1D1D),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppStrings.editRequestBanner.tr(),
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  AppStrings.requestFormDescription.tr(),
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Colors.white70,
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          const Icon(Icons.bloodtype, color: Colors.white, size: 60),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUrgencyBadge(String key, Color color) {
-    bool isSelected = _selectedUrgency == key;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedUrgency = key),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? color : Colors.grey[300]!,
-            width: 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.circle, size: 8, color: color),
-            const SizedBox(width: 8),
-            Text(
-              key.tr(),
-              style: TextStyle(
-                color: isSelected ? color : Colors.grey,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(
-    String hint,
-    IconData icon, {
-    bool isMultiline = false,
-    bool isDropdown = false,
-  }) {
-    return TextField(
-      maxLines: isMultiline ? 4 : 1,
-      readOnly: isDropdown,
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Colors.grey),
-        prefixIcon: isDropdown
-            ? const Icon(Icons.keyboard_arrow_down, color: Colors.grey)
-            : null,
-        suffixIcon: Icon(icon, color: Colors.grey),
-        filled: true,
-        fillColor: const Color(0xFFF5F5F5),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide.none,
-        ),
-      ),
-    );
+  void _confirm() {
+    final reason = _reasonController.text.trim();
+    if (reason.isEmpty) {
+      setState(
+        () => _validationMessage = AppStrings.cancellationReasonRequired.tr(),
+      );
+      return;
+    }
+    Navigator.pop(context, reason);
   }
 }
+
+String _priorityLabel(RequestPriority priority) => switch (priority) {
+  RequestPriority.normal => AppStrings.normal,
+  RequestPriority.semiUrgent => AppStrings.semiUrgent,
+  RequestPriority.urgent => AppStrings.veryUrgent,
+};
+
+Color _priorityColor(RequestPriority priority) => switch (priority) {
+  RequestPriority.normal => ColorManager.success,
+  RequestPriority.semiUrgent => ColorManager.warning,
+  RequestPriority.urgent => ColorManager.error,
+};

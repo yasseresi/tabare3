@@ -1,9 +1,21 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
-import 'package:tabare3/core/utils/string_manager.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart' as intl;
+
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/route_manager.dart';
+import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/values_manager.dart';
+import '../../domain/entities/blood_request_entity.dart';
+import '../bloc/request_bloc.dart';
 
 class CreateRequestScreen extends StatefulWidget {
   final VoidCallback? onSuccess;
+
   const CreateRequestScreen({super.key, this.onSuccess});
 
   @override
@@ -11,425 +23,410 @@ class CreateRequestScreen extends StatefulWidget {
 }
 
 class _CreateRequestScreenState extends State<CreateRequestScreen> {
-  String _selectedUrgency = AppStrings.normal;
+  final _unitsController = TextEditingController();
+  final _notesController = TextEditingController();
+  String? _hospitalId;
+  String? _bloodType;
+  DateTime? _neededBy;
+  RequestPriority _priority = RequestPriority.normal;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showBeforeDialog();
+      if (mounted) _showProfileNotice();
     });
   }
 
-  void _showBeforeDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.warning_rounded, color: Colors.red, size: 80),
-                const SizedBox(height: 20),
-                Text(
-                  AppStrings.profileDataTitle.tr(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(height: 15),
-                Text(
-                  AppStrings.profileDataNotice.tr(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B1D1D),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                    ),
-                    child: Text(
-                      AppStrings.confirm.tr(),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                    ),
-                    child: Text(
-                      AppStrings.updateProfile.tr(),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF4CAF50),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.check, color: Colors.white, size: 50),
-                ),
-                const SizedBox(height: 25),
-                Text(
-                  AppStrings.requestCreated.tr(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 18, color: Colors.grey),
-                ),
-                const SizedBox(height: 10),
-                Image.asset(
-                  'assets/images/icon6.png',
-                  height: 60,
-                  fit: BoxFit.contain,
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: 200,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      if (widget.onSuccess != null) {
-                        widget.onSuccess!();
-                      } else {
-                        Navigator.pop(context);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B1D1D),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: Text(
-                      AppStrings.myRequests.tr(),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+  @override
+  void dispose() {
+    _unitsController.dispose();
+    _notesController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Directionality(
-        textDirection: TextDirection.rtl,
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return BlocConsumer<RequestBloc, RequestState>(
+      listenWhen: (previous, current) =>
+          previous.status != current.status &&
+          current.status != RequestViewStatus.loading,
+      listener: (context, state) {
+        if (state.status == RequestViewStatus.success) {
+          _showSuccessDialog();
+        } else if (state.status == RequestViewStatus.failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage ?? AppStrings.defaultError.tr()),
+            ),
+          );
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          body: Directionality(
+            textDirection: TextDirection.rtl,
+            child: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(AppPadding.p20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    _buildHeader(context),
+                    const SizedBox(height: AppSize.s24),
+                    _buildBanner(context),
+                    const SizedBox(height: AppSize.s24),
+                    Text(
+                      AppStrings.urgencyLevel.tr(),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: AppSize.s12),
+                    _buildPrioritySelector(),
+                    const SizedBox(height: AppSize.s24),
+                    _buildHospitalField(state),
+                    const SizedBox(height: AppSize.s16),
+                    _buildBloodTypeField(),
+                    const SizedBox(height: AppSize.s16),
+                    TextField(
+                      key: WidgetKeys.requestUnitsField,
+                      controller: _unitsController,
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.right,
+                      decoration: InputDecoration(
+                        hintText: AppStrings.bagsRequired.tr(),
+                        suffixIcon: const Icon(Icons.bloodtype_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: AppSize.s16),
+                    _buildDeadlineField(context),
+                    const SizedBox(height: AppSize.s16),
+                    TextField(
+                      key: WidgetKeys.requestNotesField,
+                      controller: _notesController,
+                      maxLines: AppSize.s4.toInt(),
+                      textAlign: TextAlign.right,
+                      decoration: InputDecoration(
+                        hintText: AppStrings.notes.tr(),
+                        suffixIcon: const Icon(Icons.notes_outlined),
+                      ),
+                    ),
+                    if (state.hospitals.isEmpty &&
+                        state.status != RequestViewStatus.loading) ...[
+                      const SizedBox(height: AppSize.s12),
+                      Text(
+                        AppStrings.noVerifiedHospitals.tr(),
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: ColorManager.error,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: AppSize.s24),
+                    Row(
                       children: [
-                        Text(
-                          AppStrings.welcomeUser.tr(),
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                        Expanded(
+                          child: ElevatedButton(
+                            key: WidgetKeys.requestSubmitButton,
+                            onPressed:
+                                state.status == RequestViewStatus.submitting ||
+                                    state.hospitals.isEmpty
+                                ? null
+                                : _submit,
+                            child: state.status == RequestViewStatus.submitting
+                                ? SizedBox(
+                                    width: AppSize.s24,
+                                    height: AppSize.s24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: AppSize.s2,
+                                      color: ColorManager.white,
+                                    ),
+                                  )
+                                : Text(AppStrings.next.tr()),
                           ),
                         ),
-                        Text(
-                          AppStrings.getWellSoon.tr(),
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
+                        const SizedBox(width: AppSize.s12),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: _clear,
+                            child: Text(AppStrings.clearFields.tr()),
                           ),
                         ),
                       ],
                     ),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF5F5F5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.notifications_none_rounded,
-                        color: Colors.black,
-                      ),
-                    ),
                   ],
                 ),
-                const SizedBox(height: 30),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF8B1D1D),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              AppStrings.createRequestBanner.tr(),
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              AppStrings.requestFormDescription.tr(),
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: Colors.white70,
-                                height: 1.4,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Image.asset(
-                        'assets/images/icon7.png',
-                        height: 80,
-                        fit: BoxFit.contain,
-                        filterQuality: FilterQuality.high,
-                      ),
-                    ],
-                  ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppStrings.welcomeUser.tr(),
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        Text(
+          AppStrings.getWellSoon.tr(),
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBanner(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppPadding.p20),
+      decoration: BoxDecoration(
+        color: ColorManager.primaryDark,
+        borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppStrings.createRequestBanner.tr(),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(color: ColorManager.white),
                 ),
-                const SizedBox(height: 30),
-                Center(
-                  child: Text(
-                    AppStrings.urgencyLevel.tr(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                const SizedBox(height: AppSize.s8),
+                Text(
+                  AppStrings.requestFormDescription.tr(),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: ColorManager.white),
                 ),
-                const SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildUrgencyBadge(AppStrings.veryUrgent, Colors.red),
-                    const SizedBox(width: 15),
-                    _buildUrgencyBadge(AppStrings.urgent, Colors.orange),
-                    const SizedBox(width: 15),
-                    _buildUrgencyBadge(AppStrings.normal, Colors.green),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                _buildTextField(AppStrings.bagsRequired.tr(), Icons.tag),
-                const SizedBox(height: 15),
-                _buildTextField(
-                  AppStrings.governorate.tr(),
-                  Icons.map_outlined,
-                  isDropdown: true,
-                ),
-                const SizedBox(height: 15),
-                _buildTextField(
-                  AppStrings.hospitalNameField.tr(),
-                  Icons.local_hospital_outlined,
-                ),
-                const SizedBox(height: 15),
-                _buildTextField(
-                  AppStrings.deadlineField.tr(),
-                  Icons.calendar_today_outlined,
-                ),
-                const SizedBox(height: 15),
-                _buildTextField(
-                  AppStrings.notes.tr(),
-                  Icons.sticky_note_2_outlined,
-                  isMultiline: true,
-                ),
-                const SizedBox(height: 30),
-                Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 55,
-                        child: ElevatedButton(
-                          onPressed: _showSuccessDialog,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF8B1D1D),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          child: Text(
-                            AppStrings.next.tr(),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: SizedBox(
-                        height: 55,
-                        child: OutlinedButton(
-                          onPressed: () {},
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFFEEEEEE)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          child: Text(
-                            AppStrings.clearFields.tr(),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 40),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildUrgencyBadge(String key, Color color) {
-    bool isSelected = _selectedUrgency == key;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedUrgency = key),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? color : Colors.grey[300]!,
-            width: 1,
+          const SizedBox(width: AppSize.s12),
+          Icon(
+            Icons.volunteer_activism_outlined,
+            size: AppSize.s60,
+            color: ColorManager.white,
           ),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.circle, size: 8, color: color),
-            const SizedBox(width: 8),
-            Text(
-              key.tr(),
-              style: TextStyle(
-                color: isSelected ? color : Colors.grey,
-                fontWeight: FontWeight.bold,
-              ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPrioritySelector() {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: AppSize.s8,
+      runSpacing: AppSize.s8,
+      children: RequestPriority.values.map((priority) {
+        final selected = priority == _priority;
+        final color = _priorityColor(priority);
+        return ChoiceChip(
+          selected: selected,
+          onSelected: (_) => setState(() => _priority = priority),
+          label: Text(_priorityLabel(priority).tr()),
+          avatar: Icon(Icons.circle, size: AppSize.s8, color: color),
+          selectedColor: color.withValues(alpha: AppOpacity.muted),
+          side: BorderSide(color: selected ? color : ColorManager.borderGrey),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildHospitalField(RequestState state) {
+    return DropdownButtonFormField<String>(
+      key: WidgetKeys.requestHospitalField,
+      initialValue: _hospitalId,
+      isExpanded: true,
+      decoration: InputDecoration(
+        hintText: AppStrings.selectHospital.tr(),
+        suffixIcon: const Icon(Icons.local_hospital_outlined),
+      ),
+      items: state.hospitals
+          .map(
+            (hospital) => DropdownMenuItem(
+              value: hospital.id,
+              child: Text(hospital.nameAr, overflow: TextOverflow.ellipsis),
             ),
-          ],
+          )
+          .toList(),
+      onChanged: (value) => setState(() => _hospitalId = value),
+    );
+  }
+
+  Widget _buildBloodTypeField() {
+    return DropdownButtonFormField<String>(
+      key: WidgetKeys.requestBloodTypeField,
+      initialValue: _bloodType,
+      isExpanded: true,
+      decoration: InputDecoration(
+        hintText: AppStrings.selectBloodType.tr(),
+        suffixIcon: const Icon(Icons.bloodtype_outlined),
+      ),
+      items: supportedBloodTypes
+          .map(
+            (bloodType) =>
+                DropdownMenuItem(value: bloodType, child: Text(bloodType)),
+          )
+          .toList(),
+      onChanged: (value) => setState(() => _bloodType = value),
+    );
+  }
+
+  Widget _buildDeadlineField(BuildContext context) {
+    final label = _neededBy == null
+        ? AppStrings.optionalDeadline.tr()
+        : intl.DateFormat(
+            AppConstants.requestDateFormat,
+          ).format(_neededBy!.toLocal());
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppPadding.p16,
+        vertical: AppPadding.p4,
+      ),
+      tileColor: ColorManager.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSize.radiusLarge),
+      ),
+      title: Text(label),
+      trailing: const Icon(Icons.calendar_today_outlined),
+      onTap: () => _pickDeadline(context),
+    );
+  }
+
+  Future<void> _pickDeadline(BuildContext context) async {
+    final now = DateTime.now();
+    final firstDate = now.add(
+      const Duration(days: AppConstants.requestCalendarStartOffsetDays),
+    );
+    final selected = await showDatePicker(
+      context: context,
+      initialDate: _neededBy ?? firstDate,
+      firstDate: firstDate,
+      lastDate: now.add(
+        const Duration(days: AppConstants.requestCalendarRangeDays),
+      ),
+    );
+    if (selected != null && mounted) {
+      setState(() => _neededBy = selected);
+    }
+  }
+
+  void _submit() {
+    final units = int.tryParse(_unitsController.text.trim());
+    if (_hospitalId == null ||
+        _bloodType == null ||
+        units == null ||
+        units <= AppSize.s0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.requiredRequestFields.tr())),
+      );
+      return;
+    }
+
+    context.read<RequestBloc>().add(
+      RequestCreateSubmitted(
+        RequestDraft(
+          hospitalId: _hospitalId!,
+          bloodType: _bloodType!,
+          priority: _priority,
+          unitsNeeded: units,
+          neededBy: _neededBy,
+          notes: _notesController.text.trim(),
         ),
       ),
     );
   }
 
-  Widget _buildTextField(
-    String hint,
-    IconData icon, {
-    bool isMultiline = false,
-    bool isDropdown = false,
-  }) {
-    return TextField(
-      maxLines: isMultiline ? 4 : 1,
-      readOnly: isDropdown,
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Colors.grey),
-        prefixIcon: isDropdown
-            ? const Icon(Icons.keyboard_arrow_down, color: Colors.grey)
-            : null,
-        suffixIcon: Icon(icon, color: Colors.grey),
-        filled: true,
-        fillColor: const Color(0xFFF5F5F5),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide.none,
+  void _clear() {
+    setState(() {
+      _hospitalId = null;
+      _bloodType = null;
+      _neededBy = null;
+      _priority = RequestPriority.normal;
+      _unitsController.clear();
+      _notesController.clear();
+    });
+  }
+
+  void _showProfileNotice() {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        icon: Icon(
+          Icons.warning_rounded,
+          color: ColorManager.error,
+          size: AppSize.s76,
         ),
+        title: Text(
+          AppStrings.profileDataTitle.tr(),
+          textAlign: TextAlign.center,
+        ),
+        content: Text(
+          AppStrings.profileDataNotice.tr(),
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(AppStrings.confirm.tr()),
+          ),
+          OutlinedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              Navigator.pushNamed(context, Routes.requesterProfileRoute);
+            },
+            child: Text(AppStrings.updateProfile.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSuccessDialog() {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        icon: Icon(
+          Icons.check_circle,
+          color: ColorManager.success,
+          size: AppSize.s76,
+        ),
+        content: Text(
+          AppStrings.requestCreated.tr(),
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              widget.onSuccess?.call();
+            },
+            child: Text(AppStrings.myRequests.tr()),
+          ),
+        ],
       ),
     );
   }
 }
+
+String _priorityLabel(RequestPriority priority) => switch (priority) {
+  RequestPriority.normal => AppStrings.normal,
+  RequestPriority.semiUrgent => AppStrings.semiUrgent,
+  RequestPriority.urgent => AppStrings.veryUrgent,
+};
+
+Color _priorityColor(RequestPriority priority) => switch (priority) {
+  RequestPriority.normal => ColorManager.success,
+  RequestPriority.semiUrgent => ColorManager.warning,
+  RequestPriority.urgent => ColorManager.error,
+};
