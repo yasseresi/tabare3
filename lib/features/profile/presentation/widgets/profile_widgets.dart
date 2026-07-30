@@ -66,6 +66,10 @@ class ProfileRow extends StatelessWidget {
   final Widget? trailing;
   final VoidCallback? onTap;
 
+  /// When true the value renders on its own line under the label
+  /// (used for long values like the national ID).
+  final bool stackValue;
+
   const ProfileRow({
     super.key,
     required this.label,
@@ -73,10 +77,26 @@ class ProfileRow extends StatelessWidget {
     this.iconData,
     this.trailing,
     this.onTap,
+    this.stackValue = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final labelText = Text(
+      label,
+      style: getMediumStyle(
+        fontSize: FontSize.s15,
+        color: ColorManager.textPrimary,
+      ),
+    );
+    final valueText = Text(
+      value,
+      style: getRegularStyle(
+        fontSize: FontSize.s14,
+        color: ColorManager.textSecondary,
+      ),
+    );
+
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -84,45 +104,48 @@ class ProfileRow extends StatelessWidget {
           horizontal: AppPadding.p20,
           vertical: AppPadding.p16,
         ),
-        child: Row(
-          children: [
-            if (trailing != null) trailing!,
-            const SizedBox(width: AppSize.s8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+        child: stackValue
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    label,
-                    textAlign: TextAlign.right,
-                    style: getMediumStyle(
-                      fontSize: FontSize.s15,
-                      color: ColorManager.textPrimary,
-                    ),
+                  Row(
+                    children: [
+                      if (iconData != null) ...[
+                        Icon(
+                          iconData,
+                          size: AppSize.s20,
+                          color: ColorManager.textSecondary,
+                        ),
+                        const SizedBox(width: AppSize.s10),
+                      ],
+                      labelText,
+                    ],
                   ),
                   if (value.isNotEmpty) ...[
-                    const SizedBox(height: AppSize.s4),
-                    Text(
-                      value,
-                      textAlign: TextAlign.right,
-                      style: getRegularStyle(
-                        fontSize: FontSize.s14,
-                        color: ColorManager.textSecondary,
-                      ),
+                    const SizedBox(height: AppSize.s5),
+                    valueText,
+                  ],
+                ],
+              )
+            : Row(
+                children: [
+                  if (iconData != null) ...[
+                    Icon(
+                      iconData,
+                      size: AppSize.s20,
+                      color: ColorManager.textSecondary,
                     ),
+                    const SizedBox(width: AppSize.s10),
+                  ],
+                  labelText,
+                  const Spacer(),
+                  if (value.isNotEmpty) valueText,
+                  if (trailing != null) ...[
+                    const SizedBox(width: AppSize.s8),
+                    trailing!,
                   ],
                 ],
               ),
-            ),
-            const SizedBox(width: AppSize.s10),
-            if (iconData != null)
-              Icon(
-                iconData,
-                size: AppSize.s20,
-                color: ColorManager.textSecondary,
-              ),
-          ],
-        ),
       ),
     );
   }
@@ -140,14 +163,47 @@ class AccountStatusToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ProfileRow(
-      label: AppStrings.accountStatus.tr(),
-      value: AppStrings.accountStatusSubtitle.tr(),
-      iconData: Icons.notifications_none_outlined,
-      trailing: Switch(
-        value: value,
-        onChanged: onChanged,
-        activeThumbColor: ColorManager.success,
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppPadding.p20,
+        vertical: AppPadding.p16,
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.notifications_none_outlined,
+            size: AppSize.s20,
+            color: ColorManager.textSecondary,
+          ),
+          const SizedBox(width: AppSize.s10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppStrings.accountStatus.tr(),
+                  style: getMediumStyle(
+                    fontSize: FontSize.s15,
+                    color: ColorManager.textPrimary,
+                  ),
+                ),
+                Text(
+                  AppStrings.accountStatusSubtitle.tr(),
+                  style: getRegularStyle(
+                    fontSize: FontSize.s12,
+                    color: ColorManager.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSize.s8),
+          Switch.adaptive(
+            value: value,
+            onChanged: onChanged,
+            activeTrackColor: ColorManager.success,
+          ),
+        ],
       ),
     );
   }

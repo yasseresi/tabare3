@@ -248,57 +248,54 @@ class _ProfileContent extends StatelessWidget {
     return ProfileSection(
       title: AppStrings.personalInfo.tr(),
       children: [
-        ProfileRow(
-          label: AppStrings.dateOfBirth.tr(),
-          value: _formatDate(context, profile.dateOfBirth),
-          iconData: Icons.calendar_today_outlined,
-          onTap: isEditing
-              ? () => ProfileFieldEditors.pickDateOfBirth(
-                  context,
-                  profile.dateOfBirth,
-                  (v) => _updateProfile(context, dateOfBirth: v),
-                )
-              : null,
-        ),
-        _Divider(),
-        ProfileRow(
-          label: AppStrings.gender.tr(),
-          value: _genderLabel(profile.gender),
-          iconData: Icons.person_outline,
-          onTap: isEditing
-              ? () => ProfileFieldEditors.pickGender(
-                  context,
-                  profile.gender,
-                  (v) => _updateProfile(context, gender: v),
-                )
-              : null,
-        ),
-        _Divider(),
-        ProfileRow(
-          label: AppStrings.nationalId.tr(),
-          value: profile.nationalId ?? '',
-          iconData: Icons.badge_outlined,
-          onTap: _editTap(
-            context,
-            AppStrings.nationalId.tr(),
-            profile.nationalId ?? '',
-            (v) => _updateProfile(context, nationalId: v),
+        if (isEditing) ...[
+          ProfileRow(
+            label: AppStrings.dateOfBirth.tr(),
+            value: _formatDate(context, profile.dateOfBirth),
+            iconData: Icons.calendar_today_outlined,
+            onTap: () => ProfileFieldEditors.pickDateOfBirth(
+              context,
+              profile.dateOfBirth,
+              (v) => _updateProfile(context, dateOfBirth: v),
+            ),
           ),
-        ),
-        _Divider(),
-        ProfileRow(
-          label: AppStrings.bloodType.tr(),
-          value: profile.bloodType,
-          iconData: Icons.opacity,
-          onTap: isEditing
-              ? () => ProfileFieldEditors.pickBloodType(
-                  context,
-                  profile.bloodType,
-                  (v) => _updateProfile(context, bloodType: v),
-                )
-              : null,
-        ),
-        _Divider(),
+          _Divider(),
+          ProfileRow(
+            label: AppStrings.gender.tr(),
+            value: _genderLabel(profile.gender),
+            iconData: Icons.person_outline,
+            onTap: () => ProfileFieldEditors.pickGender(
+              context,
+              profile.gender,
+              (v) => _updateProfile(context, gender: v),
+            ),
+          ),
+          _Divider(),
+          ProfileRow(
+            label: AppStrings.nationalId.tr(),
+            value: profile.nationalId ?? '',
+            iconData: Icons.badge_outlined,
+            stackValue: true,
+            onTap: _editTap(
+              context,
+              AppStrings.nationalId.tr(),
+              profile.nationalId ?? '',
+              (v) => _updateProfile(context, nationalId: v),
+            ),
+          ),
+          _Divider(),
+          ProfileRow(
+            label: AppStrings.bloodType.tr(),
+            value: profile.bloodType,
+            iconData: Icons.opacity,
+            onTap: () => ProfileFieldEditors.pickBloodType(
+              context,
+              profile.bloodType,
+              (v) => _updateProfile(context, bloodType: v),
+            ),
+          ),
+          _Divider(),
+        ],
         ProfileRow(
           label: AppStrings.weight.tr(),
           value: profile.weight != null
@@ -373,10 +370,9 @@ class _ProfileContent extends StatelessWidget {
     String label,
     String initialValue,
     void Function(String) onSaved,
-  ) =>
-      isEditing
-          ? () => _editField(context, label, initialValue, onSaved)
-          : null;
+  ) => isEditing
+      ? () => _editField(context, label, initialValue, onSaved)
+      : null;
 
   String _roleLabel(ProfileEntity profile) {
     if (profile.isDonor) return AppStrings.iAmDonor.tr();
