@@ -138,8 +138,23 @@ class ProfileRow extends StatelessWidget {
                     const SizedBox(width: AppSize.s10),
                   ],
                   labelText,
-                  const Spacer(),
-                  if (value.isNotEmpty) valueText,
+                  const SizedBox(width: AppSize.s10),
+                  Expanded(
+                    child: value.isNotEmpty
+                        ? Align(
+                            alignment: AlignmentDirectional.centerEnd,
+                            child: Text(
+                              value,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: getRegularStyle(
+                                fontSize: FontSize.s14,
+                                color: ColorManager.textSecondary,
+                              ),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                  ),
                   if (trailing != null) ...[
                     const SizedBox(width: AppSize.s8),
                     trailing!,

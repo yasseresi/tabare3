@@ -112,18 +112,18 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     );
 
     final uploadResult = await uploadAvatar(event.filePath);
-    uploadResult.fold(
+    final url = uploadResult.fold((failure) {
+      emit(ProfileError(failure: failure));
+      return null;
+    }, (url) => url);
+    if (url == null) return;
+
+    final updated = current.profile.copyWith(avatarUrl: url);
+    final saveResult = await updateProfile(updated);
+    saveResult.fold(
       (failure) => emit(ProfileError(failure: failure)),
-      (url) async {
-        final updated = current.profile.copyWith(avatarUrl: url);
-        final saveResult = await updateProfile(updated);
-        saveResult.fold(
-          (failure) => emit(ProfileError(failure: failure)),
-          (profile) => emit(
-            ProfileLoaded(profile: profile, isEditing: current.isEditing),
-          ),
-        );
-      },
+      (profile) =>
+          emit(ProfileLoaded(profile: profile, isEditing: current.isEditing)),
     );
   }
 
