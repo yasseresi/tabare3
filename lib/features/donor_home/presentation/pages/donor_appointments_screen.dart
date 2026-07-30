@@ -1,369 +1,222 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
-import 'package:tabare3/core/utils/string_manager.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class DonorAppointmentsScreen extends StatefulWidget {
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/values_manager.dart';
+import '../../domain/entities/donor_feed_entity.dart';
+import '../bloc/donor_feed_bloc.dart';
+
+class DonorAppointmentsScreen extends StatelessWidget {
   const DonorAppointmentsScreen({super.key});
-
-  @override
-  State<DonorAppointmentsScreen> createState() =>
-      _DonorAppointmentsScreenState();
-}
-
-class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
-  final bool _hasAppointments = true; // Toggle for empty state demo
-
-  void _showCancelConfirmationDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.warning_rounded, color: Colors.red, size: 80),
-                const SizedBox(height: 20),
-                Text(
-                  AppStrings.confirmCancelRequest.tr(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 15),
-                Text(
-                  AppStrings.cancelRequestNotice.tr(),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      // Handle cancellation logic here
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B1D1D),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                    ),
-                    child: Text(
-                      AppStrings.confirm.tr(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                    ),
-                    child: Text(
-                      AppStrings.cancel.tr(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20.0,
-                vertical: 20,
-              ),
-              child: Column(
-                children: [
-                  // Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppStrings.welcomeUser.tr(),
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            AppStrings.donationLifeChance.tr(),
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFF5F5F5),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.notifications_none_rounded,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
+        child: BlocBuilder<DonorFeedBloc, DonorFeedState>(
+          builder: (context, state) {
+            if (state is DonorFeedInitial || state is DonorFeedLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (state is DonorFeedError) {
+              return Center(child: Text(state.failure.message));
+            }
+            final loaded = state as DonorFeedLoaded;
+            if (loaded.feed.appointments.isEmpty) {
+              return _EmptyAppointments(
+                onRefresh: () {
+                  context.read<DonorFeedBloc>().add(const DonorFeedRequested());
+                },
+              );
+            }
+            return ListView.separated(
+              padding: const EdgeInsets.all(AppPadding.p20),
+              itemCount: loaded.feed.appointments.length,
+              separatorBuilder: (_, _) => const SizedBox(height: AppSize.s16),
+              itemBuilder: (context, index) {
+                return _AppointmentCard(
+                  appointment: loaded.feed.appointments[index],
+                  disabled: loaded.isMutating,
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _AppointmentCard extends StatelessWidget {
+  final DonorAppointmentEntity appointment;
+  final bool disabled;
+
+  const _AppointmentCard({required this.appointment, required this.disabled});
+
+  @override
+  Widget build(BuildContext context) {
+    final request = appointment.bloodRequest;
+    final campaign = appointment.campaign;
+    final title =
+        request?.hospital.nameAr ??
+        campaign?.title ??
+        AppStrings.appointments.tr();
+    final canCancel =
+        appointment.status == DonationAppointmentStatus.pending ||
+        appointment.status == DonationAppointmentStatus.confirmed;
+    return Container(
+      padding: const EdgeInsets.all(AppPadding.p20),
+      decoration: BoxDecoration(
+        color: ColorManager.white,
+        borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
+        border: Border.all(color: ColorManager.borderGrey),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    color: ColorManager.textPrimary,
+                    fontSize: AppSize.s17,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: 20),
-                  // Red Banner Card
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF8B1D1D),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                AppStrings.myAppointments.tr(),
-                                style: const TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                AppStrings.appointmentsDescription.tr(),
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.white70,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        const Icon(
-                          Icons.local_hospital_rounded,
-                          color: Colors.white,
-                          size: 60,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
+              _StatusBadge(status: appointment.status),
+            ],
+          ),
+          const SizedBox(height: AppSize.s16),
+          if (request != null)
+            _InfoRow(
+              label: AppStrings.bloodType.tr(),
+              value: request.bloodType,
             ),
-            Text(
-              AppStrings.upcomingAppointments.tr(),
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          _InfoRow(
+            label: AppStrings.scheduledAt.tr(),
+            value:
+                '${DateFormat(AppConstants.requestDateFormat).format(appointment.scheduledAt.toLocal())} '
+                '${DateFormat(AppConstants.requestTimeFormat).format(appointment.scheduledAt.toLocal())}',
+          ),
+          if (canCancel) ...[
+            const SizedBox(height: AppSize.s16),
+            OutlinedButton(
+              onPressed: disabled
+                  ? null
+                  : () => _showCancellationDialog(context, appointment.id),
+              child: Text(AppStrings.cancelRequest.tr()),
             ),
-            const SizedBox(height: 15),
-            Expanded(
-              child: _hasAppointments
-                  ? _buildAppointmentsList()
-                  : _buildEmptyState(),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showCancellationDialog(
+    BuildContext context,
+    String appointmentId,
+  ) async {
+    final controller = TextEditingController();
+    final reason = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: Text(AppStrings.cancellationReason.tr()),
+          content: TextField(
+            controller: controller,
+            textAlign: TextAlign.right,
+            decoration: InputDecoration(
+              hintText: AppStrings.cancellationReason.tr(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(AppStrings.cancel.tr()),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final value = controller.text.trim();
+                if (value.isNotEmpty) Navigator.pop(dialogContext, value);
+              },
+              child: Text(AppStrings.confirm.tr()),
             ),
           ],
         ),
       ),
     );
-  }
-
-  Widget _buildAppointmentsList() {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      children: [
-        _buildAppointmentCard(
-          hospital: 'مستشفى مصطفى باشا',
-          patientName: 'علي بن محمد',
-          deadline: '15 جانفي 2026',
-          bagsInfo: AppStrings.bagsProvided.tr(
-            namedArgs: {'count': '1', 'total': '3'},
-          ),
-          progress: 0.33,
-        ),
-        const SizedBox(height: 20),
-        _buildAppointmentCard(
-          hospital: 'مستشفى مصطفى باشا',
-          patientName: 'علي بن محمد',
-          deadline: '15 جانفي 2026',
-          bagsInfo: AppStrings.bagsProvided.tr(
-            namedArgs: {'count': '1', 'total': '3'},
-          ),
-          progress: 0.33,
-        ),
-        const SizedBox(height: 100),
-      ],
+    controller.dispose();
+    if (reason == null || !context.mounted) return;
+    context.read<DonorFeedBloc>().add(
+      DonorAppointmentCancelled(appointmentId: appointmentId, reason: reason),
     );
   }
+}
 
-  Widget _buildEmptyState() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const SizedBox(height: 40),
-          const Icon(Icons.assignment_rounded, size: 100, color: Colors.grey),
-          const SizedBox(height: 40),
-          Text(
-            AppStrings.noUpcomingAppointments.tr(),
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 15),
-          Text(
-            AppStrings.noAppointmentsDescription.tr(),
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, color: Colors.grey, height: 1.5),
-          ),
-        ],
-      ),
-    );
-  }
+class _StatusBadge extends StatelessWidget {
+  final DonationAppointmentStatus status;
 
-  Widget _buildAppointmentCard({
-    required String hospital,
-    required String patientName,
-    required String deadline,
-    required String bagsInfo,
-    required double progress,
-  }) {
+  const _StatusBadge({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    final label = switch (status) {
+      DonationAppointmentStatus.pending => AppStrings.pending.tr(),
+      DonationAppointmentStatus.confirmed => AppStrings.accepted.tr(),
+      DonationAppointmentStatus.completed => AppStrings.doneStatus.tr(),
+      DonationAppointmentStatus.cancelled => AppStrings.cancelled.tr(),
+    };
+    final color = switch (status) {
+      DonationAppointmentStatus.completed => ColorManager.success,
+      DonationAppointmentStatus.cancelled => ColorManager.error,
+      DonationAppointmentStatus.pending => ColorManager.warning,
+      DonationAppointmentStatus.confirmed => ColorManager.primaryDark,
+    };
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppPadding.p10,
+        vertical: AppPadding.p4,
       ),
-      child: Column(
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: AppOpacity.muted),
+        borderRadius: BorderRadius.circular(AppSize.radiusLarge),
+      ),
+      child: Text(label, style: TextStyle(color: color)),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _InfoRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppPadding.p4),
+      child: Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Icon(
-                    Icons.assignment_rounded,
-                    color: Colors.grey,
-                    size: 40,
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    hospital,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                width: 12,
-                height: 12,
-                decoration: const BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ],
+          Expanded(
+            child: Text(label, style: TextStyle(color: ColorManager.textMuted)),
           ),
-          const SizedBox(height: 20),
-          _buildInfoRow(
-            AppStrings.patient.tr(),
-            patientName,
-            valueColor: Colors.red,
-          ),
-          _buildInfoRow(
-            AppStrings.deadline.tr(),
-            deadline,
-            valueColor: Colors.red,
-          ),
-          _buildInfoRow(
-            AppStrings.bloodBags.tr(),
-            bagsInfo,
-            valueColor: Colors.grey,
-          ),
-          const SizedBox(height: 10),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 8,
-              backgroundColor: const Color(0xFFEEEEEE),
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                Color(0xFF8B1D1D),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: 150,
-            height: 45,
-            child: ElevatedButton(
-              onPressed: _showCancelConfirmationDialog,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[600],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-              child: Text(
-                AppStrings.cancel.tr(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                color: ColorManager.textPrimary,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -371,23 +224,47 @@ class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
       ),
     );
   }
+}
 
-  Widget _buildInfoRow(String label, String value, {Color? valueColor}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: valueColor ?? Colors.black,
+class _EmptyAppointments extends StatelessWidget {
+  final VoidCallback onRefresh;
+
+  const _EmptyAppointments({required this.onRefresh});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppPadding.p24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.event_available,
+              color: ColorManager.lightGrey,
+              size: AppSize.s80,
             ),
-          ),
-        ],
+            const SizedBox(height: AppSize.s20),
+            Text(
+              AppStrings.noUpcomingAppointments.tr(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: AppSize.s20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: AppSize.s12),
+            Text(
+              AppStrings.noAppointmentsDescription.tr(),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSize.s16),
+            TextButton(
+              onPressed: onRefresh,
+              child: Text(AppStrings.retryAgain.tr()),
+            ),
+          ],
+        ),
       ),
     );
   }

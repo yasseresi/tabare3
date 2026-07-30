@@ -2,16 +2,26 @@ import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tabare3/core/utils/route_manager.dart';
-import 'package:tabare3/core/utils/string_manager.dart';
-import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:tabare3/features/profile/presentation/bloc/profile_bloc.dart';
-import 'package:tabare3/features/profile/presentation/pages/profile_screen.dart';
-import 'package:tabare3/features/requester_home/presentation/pages/notifications_screen.dart';
-import 'package:tabare3/injection_container.dart';
-import 'donor_requests_screen.dart';
+
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/utils/assets_manager.dart';
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/route_manager.dart';
+import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/values_manager.dart';
+import '../../../../injection_container.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../profile/presentation/bloc/profile_bloc.dart';
+import '../../../profile/presentation/pages/profile_screen.dart';
+import '../../domain/entities/donor_feed_entity.dart';
+import '../bloc/donor_feed_bloc.dart';
 import 'donor_appointments_screen.dart';
 import 'donor_record_screen.dart';
+import 'donor_requests_screen.dart';
+import 'donor_qr_scanner_screen.dart';
+
+enum _DonorTab { home, requests, appointments, record, profile }
 
 class DonorHomeScreen extends StatefulWidget {
   const DonorHomeScreen({super.key});
@@ -21,8 +31,7 @@ class DonorHomeScreen extends StatefulWidget {
 }
 
 class _DonorHomeScreenState extends State<DonorHomeScreen> {
-  int _selectedIndex = 0;
-  bool _isEligible = true;
+  _DonorTab _selectedTab = _DonorTab.home;
 
   @override
   Widget build(BuildContext context) {
@@ -35,442 +44,411 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
           (route) => false,
         );
       },
-      child: Scaffold(
-        body: _buildBody(),
-        bottomNavigationBar: _buildBottomNav(),
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Scaffold(
+          body: BlocListener<DonorFeedBloc, DonorFeedState>(
+            listenWhen: (previous, current) =>
+                current is DonorFeedLoaded && current.lastMutation != null,
+            listener: (context, state) {
+              final mutation = (state as DonorFeedLoaded).lastMutation;
+              final message = switch (mutation) {
+                DonorFeedMutation.requestAccepted =>
+                  AppStrings.requestAccepted.tr(),
+                DonorFeedMutation.appointmentCancelled =>
+                  AppStrings.appointmentCancelled.tr(),
+                DonorFeedMutation.donationRecorded =>
+                  AppStrings.donationRecorded.tr(),
+                DonorFeedMutation.availabilityChanged =>
+                  AppStrings.availabilityUpdated.tr(),
+                null => AppStrings.doneStatus.tr(),
+              };
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(message)));
+            },
+            child: _buildBody(),
+          ),
+          bottomNavigationBar: _BottomNavigation(
+            selectedTab: _selectedTab,
+            onSelected: (tab) => setState(() => _selectedTab = tab),
+            onRedeem: () => _showRedeemDialog(context),
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildBody() {
-    switch (_selectedIndex) {
-      case 0:
-        return _buildHomeView();
-      case 1:
-        return const DonorRequestsScreen();
-      case 2:
-        return const DonorAppointmentsScreen();
-      case 3:
-        return const DonorRecordScreen();
-      case 4:
-        return BlocProvider(
-          create: (_) => sl<ProfileBloc>()..add(const LoadProfile()),
-          child: const ProfileScreen(),
-        );
-      default:
-        return _buildHomeView();
-    }
+    return switch (_selectedTab) {
+      _DonorTab.home => const _DonorOverview(),
+      _DonorTab.requests => const DonorRequestsScreen(),
+      _DonorTab.appointments => const DonorAppointmentsScreen(),
+      _DonorTab.record => const DonorRecordScreen(),
+      _DonorTab.profile => BlocProvider(
+        create: (_) => sl<ProfileBloc>()..add(const LoadProfile()),
+        child: const ProfileScreen(),
+      ),
+    };
   }
 
-  Widget _buildHomeView() {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-                // Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppStrings.welcomeUser.tr(),
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Text(
-                          AppStrings.donationLifeChance.tr(),
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
+  Future<void> _showRedeemDialog(BuildContext context) async {
+    final controller = TextEditingController();
+    final selection = await showDialog<_QrRedemption>(
+      context: context,
+      builder: (dialogContext) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: Text(AppStrings.redeemQr.tr()),
+          content: TextField(
+            controller: controller,
+            textAlign: TextAlign.right,
+            decoration: InputDecoration(
+              hintText: AppStrings.requestQrToken.tr(),
+              prefixIcon: IconButton(
+                onPressed: () async {
+                  final token = await Navigator.push<String>(
+                    dialogContext,
+                    MaterialPageRoute(
+                      builder: (_) => const DonorQrScannerScreen(),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const NotificationsScreen(),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFF5F5F5),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.notifications_none_rounded,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                // Donor Stats Card
-                _buildDonorStatsCard(),
-                const SizedBox(height: 30),
-                // Nearby Requests Section Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      AppStrings.latestNearbyRequests.tr(),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _selectedIndex = 1;
-                        });
-                      },
-                      child: Text(
-                        AppStrings.seeAll.tr(),
-                        style: TextStyle(color: Color(0xFF8B1D1D)),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                // Request Cards
-                _buildRequestCard(
-                  name: 'علي بن محمد',
-                  urgency: AppStrings.veryUrgent.tr(),
-                  urgencyColor: Colors.red,
-                  bloodType: 'O+',
-                  requestDate: '01 جانفي 2026',
-                  deadline: '15 جانفي 2026',
-                  hospital: 'مستشفى مصطفى باشا',
-                  location: 'الجزائر',
-                  bagsInfo: AppStrings.bagsProvided.tr(
-                    namedArgs: {'count': '1', 'total': '3'},
-                  ),
-                  progress: 0.33,
-                ),
-                const SizedBox(height: 20),
-                _buildRequestCard(
-                  name: 'علي بن محمد',
-                  urgency: AppStrings.urgent.tr(),
-                  urgencyColor: Colors.orange,
-                  bloodType: 'O+',
-                  requestDate: '01 جانفي 2026',
-                  deadline: '15 جانفي 2026',
-                  hospital: 'مستشفى مصطفى باشا',
-                  location: 'الجزائر',
-                  bagsInfo: AppStrings.bagsProvided.tr(
-                    namedArgs: {'count': '1', 'total': '3'},
-                  ),
-                  progress: 0.33,
-                ),
-                const SizedBox(height: 100),
-              ],
+                  );
+                  if (token != null) controller.text = token;
+                },
+                icon: const Icon(Icons.qr_code_scanner),
+              ),
             ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(AppStrings.cancel.tr()),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(
+                  dialogContext,
+                  _QrRedemption(
+                    token: controller.text,
+                    source: DonationSource.request,
+                  ),
+                );
+              },
+              child: Text(AppStrings.requestQrToken.tr()),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(
+                  dialogContext,
+                  _QrRedemption(
+                    token: controller.text,
+                    source: DonationSource.campaign,
+                  ),
+                );
+              },
+              child: Text(AppStrings.campaignQrToken.tr()),
+            ),
+          ],
         ),
       ),
     );
+    controller.dispose();
+    if (selection == null || !context.mounted) return;
+    final token = selection.token.trim();
+    if (token.isEmpty) return;
+    final bloc = context.read<DonorFeedBloc>();
+    switch (selection.source) {
+      case DonationSource.request:
+        bloc.add(DonorRequestQrRedeemed(token));
+        break;
+      case DonationSource.campaign:
+        bloc.add(DonorCampaignQrRedeemed(token));
+        break;
+    }
   }
+}
 
-  Widget _buildDonorStatsCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              GestureDetector(
-                onTap: () => setState(() => _isEligible = !_isEligible),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _isEligible
-                        ? const Color(0xFFE8F5E9)
-                        : const Color(0xFFFFEBEE),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _isEligible
-                            ? AppStrings.eligibleNow.tr()
-                            : AppStrings.notEligibleNow.tr(),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: _isEligible ? Colors.green : Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.circle,
-                        size: 8,
-                        color: _isEligible ? Colors.green : Colors.red,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppStrings.hadithIntro.tr(),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF8B1D1D),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      AppStrings.hadithRelief.tr(),
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey,
-                        height: 1.4,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                flex: 1,
-                child: Image.asset(
-                  'assets/images/demo.png',
-                  height: 100,
-                  errorBuilder: (context, error, stackTrace) => const Icon(
-                    Icons.bloodtype,
-                    color: Color(0xFF8B1D1D),
-                    size: 80,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          _buildDonorInfoRow(AppStrings.totalDonations.tr(), '12'),
-          _buildDonorInfoRow(AppStrings.requestsNearYou.tr(), '14'),
-          _buildDonorInfoRow(
-            AppStrings.lastDonation.tr(),
-            _isEligible ? '15 جانفي 2025' : '15 جانفي 2026',
-          ),
-          _buildDonorInfoRow(
-            AppStrings.nextDonationAppointment.tr(),
-            '15 جانفي 2026',
-          ),
-        ],
-      ),
-    );
-  }
+class _DonorOverview extends StatelessWidget {
+  const _DonorOverview();
 
-  Widget _buildDonorInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRequestCard({
-    required String name,
-    required String urgency,
-    required Color urgencyColor,
-    required String bloodType,
-    required String requestDate,
-    required String deadline,
-    required String hospital,
-    required String location,
-    required String bagsInfo,
-    required double progress,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: BlocBuilder<DonorFeedBloc, DonorFeedState>(
+        builder: (context, state) {
+          if (state is DonorFeedInitial || state is DonorFeedLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (state is DonorFeedError) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Center(
-                      child: Image.asset(
-                        'assets/images/icon8.png',
-                        width: 30,
-                        height: 30,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Text(state.failure.message),
+                  const SizedBox(height: AppSize.s12),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<DonorFeedBloc>().add(
+                        const DonorFeedRequested(),
+                      );
+                    },
+                    child: Text(AppStrings.retryAgain.tr()),
                   ),
                 ],
               ),
-              _buildBadge(urgency, urgencyColor),
-            ],
-          ),
-          const SizedBox(height: 20),
-          _buildInfoRow(AppStrings.bloodType.tr(), bloodType),
-          _buildInfoRow(AppStrings.requestDate.tr(), requestDate),
-          _buildInfoRow(AppStrings.deadline.tr(), deadline),
-          _buildInfoRow(hospital, location),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            );
+          }
+          final feed = (state as DonorFeedLoaded).feed;
+          return RefreshIndicator(
+            onRefresh: () async {
+              context.read<DonorFeedBloc>().add(const DonorFeedRequested());
+            },
+            child: ListView(
+              padding: const EdgeInsets.all(AppPadding.p20),
+              children: [
+                _OverviewHeader(bloodType: feed.availability.bloodType),
+                const SizedBox(height: AppSize.s20),
+                _AvailabilityCard(feed: feed, disabled: state.isMutating),
+                const SizedBox(height: AppSize.s24),
+                Text(
+                  AppStrings.latestNearbyRequests.tr(),
+                  style: const TextStyle(
+                    fontSize: AppSize.s20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: AppSize.s12),
+                if (feed.compatibleRequests.isEmpty)
+                  Text(
+                    AppStrings.noRequestsDescription.tr(),
+                    textAlign: TextAlign.center,
+                  )
+                else
+                  ...feed.compatibleRequests
+                      .take(AppConstants.paginationLimit)
+                      .map(
+                        (request) => Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: AppPadding.p12,
+                          ),
+                          child: _NearbyRequestCard(request: request),
+                        ),
+                      ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _OverviewHeader extends StatelessWidget {
+  final String bloodType;
+
+  const _OverviewHeader({required this.bloodType});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                bagsInfo,
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
-              ),
-              const Text(
-                '1/3',
-                style: TextStyle(
-                  fontSize: 13,
+                AppStrings.welcomeUser.tr(),
+                style: const TextStyle(
+                  fontSize: AppSize.s20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF8B1D1D),
                 ),
+              ),
+              Text(
+                AppStrings.donationLifeChance.tr(),
+                style: TextStyle(color: ColorManager.textMuted),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 8,
-              backgroundColor: const Color(0xFFEEEEEE),
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                Color(0xFF8B1D1D),
-              ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppPadding.p14,
+            vertical: AppPadding.p8,
+          ),
+          decoration: BoxDecoration(
+            color: ColorManager.primaryDark,
+            borderRadius: BorderRadius.circular(AppSize.radiusXLarge),
+          ),
+          child: Text(
+            bloodType,
+            style: TextStyle(
+              color: ColorManager.white,
+              fontSize: AppSize.s17,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              onPressed: () {
-                // For demo, just navigate to requests tab
-                setState(() {
-                  _selectedIndex = 1;
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[600],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
+        ),
+        IconButton(
+          onPressed: () {
+            Navigator.pushNamed(context, Routes.notificationsRoute);
+          },
+          icon: const Icon(Icons.notifications_none_rounded),
+        ),
+      ],
+    );
+  }
+}
+
+class _AvailabilityCard extends StatelessWidget {
+  final DonorFeedEntity feed;
+  final bool disabled;
+
+  const _AvailabilityCard({required this.feed, required this.disabled});
+
+  @override
+  Widget build(BuildContext context) {
+    final availability = feed.availability;
+    final eligible = availability.isEligibleAt(DateTime.now());
+    final lastDonation = availability.lastDonationDate == null
+        ? AppStrings.notAvailable.tr()
+        : DateFormat(
+            AppConstants.requestDateFormat,
+          ).format(availability.lastDonationDate!.toLocal());
+    final appointment = feed.activeAppointment;
+    final nextAppointment = appointment == null
+        ? AppStrings.notAvailable.tr()
+        : DateFormat(
+            AppConstants.requestDateFormat,
+          ).format(appointment.scheduledAt.toLocal());
+    return Container(
+      padding: const EdgeInsets.all(AppPadding.p20),
+      decoration: BoxDecoration(
+        color: ColorManager.surfaceWarm,
+        borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Material(
+            color: ColorManager.surfaceWarm,
+            child: SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              value: availability.isAvailableForDonation,
+              onChanged: disabled
+                  ? null
+                  : (value) {
+                      context.read<DonorFeedBloc>().add(
+                        DonorAvailabilityChanged(value),
+                      );
+                    },
+              title: Text(AppStrings.accountStatus.tr()),
+              subtitle: Text(AppStrings.accountStatusSubtitle.tr()),
+            ),
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppPadding.p12,
+                vertical: AppPadding.p6,
+              ),
+              decoration: BoxDecoration(
+                color: (eligible ? ColorManager.success : ColorManager.error)
+                    .withValues(alpha: AppOpacity.muted),
+                borderRadius: BorderRadius.circular(AppSize.radiusXLarge),
               ),
               child: Text(
-                AppStrings.acceptRequest.tr(),
-                style: const TextStyle(
-                  color: Colors.white,
+                eligible
+                    ? AppStrings.eligibleNow.tr()
+                    : AppStrings.notEligibleNow.tr(),
+                style: TextStyle(
+                  color: eligible ? ColorManager.success : ColorManager.error,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
+          ),
+          const SizedBox(height: AppSize.s16),
+          _OverviewInfo(
+            label: AppStrings.totalDonations.tr(),
+            value: availability.totalDonationsCount.toString(),
+          ),
+          _OverviewInfo(
+            label: AppStrings.requestsNearYou.tr(),
+            value: feed.compatibleRequests.length.toString(),
+          ),
+          _OverviewInfo(
+            label: AppStrings.lastDonation.tr(),
+            value: lastDonation,
+          ),
+          _OverviewInfo(
+            label: AppStrings.nextDonationAppointment.tr(),
+            value: nextAppointment,
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildBadge(String label, Color color) {
+class _OverviewInfo extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _OverviewInfo({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppPadding.p4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(label, style: TextStyle(color: ColorManager.textMuted)),
+          ),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+}
+
+class _NearbyRequestCard extends StatelessWidget {
+  final DonorBloodRequestEntity request;
+
+  const _NearbyRequestCard({required this.request});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.all(AppPadding.p16),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(15),
+        color: ColorManager.white,
+        borderRadius: BorderRadius.circular(AppSize.radiusXLarge),
+        border: Border.all(color: ColorManager.borderGrey),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.circle, size: 6, color: color),
-          const SizedBox(width: 4),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  request.hospital.nameAr,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  request.hospital.address ?? AppStrings.location.tr(),
+                  style: TextStyle(color: ColorManager.textMuted),
+                ),
+              ],
+            ),
+          ),
           Text(
-            label,
+            request.bloodType,
             style: TextStyle(
-              fontSize: 10,
-              color: color,
+              color: ColorManager.primaryDark,
+              fontSize: AppSize.s17,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -478,95 +456,98 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
       ),
     );
   }
+}
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
-  }
+class _BottomNavigation extends StatelessWidget {
+  final _DonorTab selectedTab;
+  final ValueChanged<_DonorTab> onSelected;
+  final VoidCallback onRedeem;
 
-  Widget _buildBottomNav() {
-    return Container(
-      height: 80,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
+  const _BottomNavigation({
+    required this.selectedTab,
+    required this.onSelected,
+    required this.onRedeem,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: AppSize.s80,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNavItem('assets/icons/icon1.svg', 0),
-          _buildNavItem('assets/icons/icon2.svg', 1),
-          _buildPlusItem('assets/icons/icon9.svg', 2),
-          _buildNavItem('assets/icons/icon4.svg', 3),
-          _buildNavItem('assets/icons/icon5.svg', 4),
+          _NavigationItem(
+            asset: SvgAssets.icon1,
+            selected: selectedTab == _DonorTab.home,
+            onTap: () => onSelected(_DonorTab.home),
+          ),
+          _NavigationItem(
+            asset: SvgAssets.icon2,
+            selected: selectedTab == _DonorTab.requests,
+            onTap: () => onSelected(_DonorTab.requests),
+          ),
+          IconButton.filled(
+            onPressed: onRedeem,
+            icon: const Icon(Icons.qr_code_scanner),
+          ),
+          _NavigationItem(
+            asset: SvgAssets.icon4,
+            selected:
+                selectedTab == _DonorTab.appointments ||
+                selectedTab == _DonorTab.record,
+            onTap: () => onSelected(
+              selectedTab == _DonorTab.appointments
+                  ? _DonorTab.record
+                  : _DonorTab.appointments,
+            ),
+          ),
+          _NavigationItem(
+            asset: SvgAssets.icon5,
+            selected: selectedTab == _DonorTab.profile,
+            onTap: () => onSelected(_DonorTab.profile),
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildNavItem(String assetPath, int index) {
-    bool isSelected = _selectedIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedIndex = index),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF8B1D1D) : Colors.transparent,
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: SvgPicture.asset(
-          assetPath,
-          colorFilter: ColorFilter.mode(
-            isSelected ? Colors.white : Colors.grey,
-            BlendMode.srcIn,
-          ),
-          width: 24,
-          height: 24,
+class _NavigationItem extends StatelessWidget {
+  final String asset;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _NavigationItem({
+    required this.asset,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: onTap,
+      style: IconButton.styleFrom(
+        backgroundColor: selected
+            ? ColorManager.primaryDark
+            : ColorManager.scaffoldBg,
+      ),
+      icon: SvgPicture.asset(
+        asset,
+        width: AppSize.s26,
+        height: AppSize.s26,
+        colorFilter: ColorFilter.mode(
+          selected ? ColorManager.white : ColorManager.mediumGrey,
+          BlendMode.srcIn,
         ),
       ),
     );
   }
+}
 
-  Widget _buildPlusItem(String assetPath, int index) {
-    bool isSelected = _selectedIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedIndex = index),
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF8B1D1D) : Colors.transparent,
-          border: Border.all(
-            color: isSelected ? const Color(0xFF8B1D1D) : Colors.grey[300]!,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: SvgPicture.asset(
-          assetPath,
-          colorFilter: ColorFilter.mode(
-            isSelected ? Colors.white : Colors.grey,
-            BlendMode.srcIn,
-          ),
-          width: 24,
-          height: 24,
-        ),
-      ),
-    );
-  }
+class _QrRedemption {
+  final String token;
+  final DonationSource source;
+
+  const _QrRedemption({required this.token, required this.source});
 }

@@ -1,6 +1,13 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
-import 'package:tabare3/core/utils/string_manager.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/values_manager.dart';
+import '../../domain/entities/donor_feed_entity.dart';
+import '../bloc/donor_feed_bloc.dart';
 
 class DonorRecordScreen extends StatelessWidget {
   const DonorRecordScreen({super.key});
@@ -10,217 +17,116 @@ class DonorRecordScreen extends StatelessWidget {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20.0,
-                vertical: 20,
-              ),
-              child: Column(
-                children: [
-                  // Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppStrings.welcomeUser.tr(),
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            AppStrings.donationLifeChance.tr(),
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFF5F5F5),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.notifications_none_rounded,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  // Red Banner Card
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF8B1D1D),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                AppStrings.donationRecord.tr(),
-                                style: const TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                AppStrings.donationRecordDescription.tr(),
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.white70,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        const Icon(
-                          Icons.local_hospital_rounded,
-                          color: Colors.white,
-                          size: 60,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Text(
-              AppStrings.donationCard.tr(),
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 15),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                children: [
-                  _buildRecordCard(
-                    hospital: 'مستشفى مصطفى باشا',
-                    patient: 'علي بن محمد',
-                    date: '15 جانفي 2026',
-                    location: 'الجزائر العاصمة',
-                  ),
-                  const SizedBox(height: 20),
-                  _buildRecordCard(
-                    hospital: 'مستشفى الحراش',
-                    patient: 'فاطمة الزهراء',
-                    date: '22 جانفي 2026',
-                    location: 'البليدة',
-                  ),
-                  const SizedBox(height: 20),
-                  _buildRecordCard(
-                    hospital: 'مستشفى عين النعجة',
-                    patient: 'يوسف بن سعيد',
-                    date: '30 جانفي 2026',
-                    location: 'الجزائر العاصمة',
-                  ),
-                  const SizedBox(height: 100),
-                ],
-              ),
-            ),
-          ],
+        child: BlocBuilder<DonorFeedBloc, DonorFeedState>(
+          builder: (context, state) {
+            if (state is DonorFeedInitial || state is DonorFeedLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (state is DonorFeedError) {
+              return Center(child: Text(state.failure.message));
+            }
+            final records = (state as DonorFeedLoaded).records;
+            if (records.isEmpty) {
+              return Center(
+                child: Text(
+                  AppStrings.noDonationRecords.tr(),
+                  textAlign: TextAlign.center,
+                ),
+              );
+            }
+            return ListView.separated(
+              padding: const EdgeInsets.all(AppPadding.p20),
+              itemCount: records.length,
+              separatorBuilder: (_, _) => const SizedBox(height: AppSize.s16),
+              itemBuilder: (context, index) {
+                return _DonationRecordCard(record: records[index]);
+              },
+            );
+          },
         ),
       ),
     );
   }
+}
 
-  Widget _buildRecordCard({
-    required String hospital,
-    required String patient,
-    required String date,
-    required String location,
-  }) {
+class _DonationRecordCard extends StatelessWidget {
+  final DonationRecordEntity record;
+
+  const _DonationRecordCard({required this.record});
+
+  @override
+  Widget build(BuildContext context) {
+    final source = switch (record.source) {
+      DonationSource.request => AppStrings.bloodDonation.tr(),
+      DonationSource.campaign => AppStrings.campaignDonation.tr(),
+    };
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppPadding.p20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        color: ColorManager.white,
+        borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
+        border: Border.all(color: ColorManager.borderGrey),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.circle, color: Colors.green, size: 10),
-                  const SizedBox(width: 8),
-                  Text(
-                    AppStrings.donationSuccessful.tr(),
-                    style: const TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
-                ],
+              Icon(
+                Icons.check_circle,
+                color: ColorManager.success,
+                size: AppSize.s24,
               ),
-              const Icon(Icons.assignment_rounded, color: Colors.red, size: 30),
+              const SizedBox(width: AppSize.s8),
+              Expanded(
+                child: Text(
+                  AppStrings.donationSuccessful.tr(),
+                  style: TextStyle(
+                    color: ColorManager.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 10),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              hospital,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+          const SizedBox(height: AppSize.s16),
+          _InfoRow(label: AppStrings.record.tr(), value: source),
+          _InfoRow(
+            label: AppStrings.donationDate.tr(),
+            value: DateFormat(
+              AppConstants.requestDateFormat,
+            ).format(record.donatedAt.toLocal()),
           ),
-          const SizedBox(height: 15),
-          _buildInfoRow(
-            AppStrings.patient.tr(),
-            patient,
-            valueColor: const Color(0xFF8B1D1D),
-          ),
-          _buildInfoRow(
-            AppStrings.donationDate.tr(),
-            date,
-            valueColor: const Color(0xFF8B1D1D),
-          ),
-          _buildInfoRow(
-            AppStrings.location.tr(),
-            location,
-            valueColor: const Color(0xFF8B1D1D),
+          _InfoRow(
+            label: AppStrings.donationUnits.tr(),
+            value: record.units.toString(),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildInfoRow(String label, String value, {Color? valueColor}) {
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _InfoRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: AppPadding.p4),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+          Expanded(
+            child: Text(label, style: TextStyle(color: ColorManager.textMuted)),
+          ),
           Text(
             value,
             style: TextStyle(
-              fontSize: 14,
+              color: ColorManager.primaryDark,
               fontWeight: FontWeight.bold,
-              color: valueColor ?? Colors.black,
             ),
           ),
         ],
