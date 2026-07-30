@@ -103,8 +103,9 @@ lib/features/<feature>/
 |---------|------|---------|
 | splash | `features/splash/` | Splash screen entry |
 | auth | `features/auth/` | Login, signup, role selection (donor/requester) |
-| requester_home | `features/requester_home/` | Requester dashboard, create/edit requests, notifications, history |
-| donor_home | `features/donor_home/` | Donor dashboard, requests, appointments, card, records |
+| requester_home | `features/requester_home/` | Recipient dashboard, request lifecycle, invitations, and expiring request QR |
+| donor_home | `features/donor_home/` | Donor dashboard, compatible requests, campaigns, appointments, QR redemption, card, and records |
+| notifications | `features/notifications/` | RLS-backed notification center and read-state updates |
 | profile | `features/profile/` | Profile views (donor + requester) |
 | counter | `features/counter/` | Template/scaffold feature (Clean Arch reference) |
 
