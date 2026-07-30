@@ -42,3 +42,10 @@ class StorageFailure extends Failure {
     super.message = 'خطأ في تخزين الملفات',
   ]);
 }
+
+class ValidationFailure extends Failure {
+  const ValidationFailure([
+    super.code = -11,
+    super.message = 'البيانات المدخلة غير صالحة',
+  ]);
+}

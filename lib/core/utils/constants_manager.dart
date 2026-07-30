@@ -13,7 +13,19 @@ class AppConstants {
   static const double maxWeightKg = 250;
   static const int donationIntervalDaysMale = 90;
   static const int donationIntervalDaysFemale = 120;
+  static const int requestCalendarStartOffsetDays = 1;
+  static const int requestCalendarRangeDays = 365;
+  static const String requestDateFormat = 'dd MMM yyyy';
+  static const String requestTimeFormat = 'HH:mm';
+  static const String notificationDateTimeFormat = 'yyyy/MM/dd - HH:mm';
   static const String appVersion = '1.0';
   static const String developerPhone = '0676 24 41 89';
   static const String developerEmail = 'louciftamer3@gmail.com';
+}
+
+class LocalizationArgs {
+  static const String count = 'count';
+  static const String total = 'total';
+  static const String provided = 'provided';
+  static const String time = 'time';
 }

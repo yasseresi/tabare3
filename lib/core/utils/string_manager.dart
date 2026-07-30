@@ -95,6 +95,7 @@ class AppStrings {
   static const String normal = 'normal';
   static const String urgent = 'urgent';
   static const String veryUrgent = 'very_urgent';
+  static const String semiUrgent = 'semi_urgent';
   static const String pending = 'pending';
   static const String accepted = 'accepted';
   static const String completed = 'completed';
@@ -137,6 +138,9 @@ class AppStrings {
   static const String confirmLogout = 'confirm_logout';
   static const String confirmLogoutMessage = 'confirm_logout_message';
   static const String confirmCancelRequest = 'confirm_cancel_request';
+  static const String cancellationReason = 'cancellation_reason';
+  static const String cancellationReasonRequired =
+      'cancellation_reason_required';
   static const String confirmAcceptRequest = 'confirm_accept_request';
 
   // Error messages
@@ -248,6 +252,20 @@ class AppStrings {
   static const String requestStatus = 'request_status';
   static const String activeOrClosed = 'active_or_closed';
   static const String availableDonors = 'available_donors';
+  static const String acceptedDonors = 'accepted_donors';
+  static const String noAcceptedDonors = 'no_accepted_donors';
+  static const String noCompatibleDonors = 'no_compatible_donors';
+  static const String inviteDonor = 'invite_donor';
+  static const String sentInvitations = 'sent_invitations';
+  static const String noSentInvitations = 'no_sent_invitations';
+  static const String invitationSent = 'invitation_sent';
+  static const String invitationRejected = 'invitation_rejected';
+  static const String invitationExpired = 'invitation_expired';
+  static const String requestQrTitle = 'request_qr_title';
+  static const String requestQrDescription = 'request_qr_description';
+  static const String generateRequestQr = 'generate_request_qr';
+  static const String refreshRequestQr = 'refresh_request_qr';
+  static const String qrExpiresAt = 'qr_expires_at';
   static const String bagsProvided = 'bags_provided';
   static const String searchRequests = 'search_requests';
   static const String allRequests = 'all_requests';
@@ -266,6 +284,12 @@ class AppStrings {
   static const String deadlineField = 'deadline_field';
   static const String notes = 'notes';
   static const String clearFields = 'clear_fields';
+  static const String selectHospital = 'select_hospital';
+  static const String selectBloodType = 'select_blood_type';
+  static const String noVerifiedHospitals = 'no_verified_hospitals';
+  static const String requiredRequestFields = 'required_request_fields';
+  static const String optionalDeadline = 'optional_deadline';
+  static const String bagsRatio = 'bags_ratio';
   static const String editRequestBanner = 'edit_request_banner';
   static const String editRequestSubtitle = 'edit_request_subtitle';
   static const String confirmAcceptRequestMsg = 'confirm_accept_request_msg';
@@ -337,6 +361,21 @@ class AppStrings {
   static const String donationRecordDescription = 'donation_record_description';
   static const String donationCard = 'donation_card';
   static const String cancelRequestNotice = 'cancel_request_notice';
+  static const String availableCampaigns = 'available_campaigns';
+  static const String noAvailableCampaigns = 'no_available_campaigns';
+  static const String scheduledAt = 'scheduled_at';
+  static const String donationUnits = 'donation_units';
+  static const String noDonationRecords = 'no_donation_records';
+  static const String appointmentCancelled = 'appointment_cancelled';
+  static const String donationRecorded = 'donation_recorded';
+  static const String requestQrToken = 'request_qr_token';
+  static const String campaignQrToken = 'campaign_qr_token';
+  static const String redeemQr = 'redeem_qr';
+  static const String cooldownUntil = 'cooldown_until';
+  static const String notAvailable = 'not_available';
+  static const String scanQrTitle = 'scan_qr_title';
+  static const String scanQrDescription = 'scan_qr_description';
+  static const String availabilityUpdated = 'availability_updated';
 
   // Quran & Hadith — Arabic only, never translated
   static const String quranVerse = 'quran_verse';
