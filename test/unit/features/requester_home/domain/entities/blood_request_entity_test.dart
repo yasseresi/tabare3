@@ -37,6 +37,39 @@ void main() {
     expect(request.hospital.wilayaId, 16);
   });
 
+  test('request identifies whether the patient is the requester', () {
+    final request = BloodRequestEntity(
+      id: 'request-id',
+      requestedBy: 'recipient-id',
+      hospital: const HospitalEntity(
+        id: 'hospital-id',
+        wilayaId: 16,
+        nameAr: 'مستشفى مصطفى باشا',
+        isActive: true,
+      ),
+      beneficiaryType: BeneficiaryType.other,
+      patient: const PatientEntity(
+        fullName: 'مريض مختبر',
+        nationalId: '123456789012345678',
+        bloodType: 'O-',
+        weight: 65,
+        chronicDiseases: 'لا يوجد',
+        gender: 'male',
+        dateOfBirth: '2000-01-01',
+      ),
+      bloodType: 'O-',
+      priority: RequestPriority.urgent,
+      unitsNeeded: 3,
+      unitsFulfilled: 0,
+      status: BloodRequestStatus.open,
+      createdAt: DateTime.utc(2030),
+    );
+
+    expect(request.isForSomeoneElse, isTrue);
+    expect(request.patient?.fullName, 'مريض مختبر');
+    expect(request.patient?.bloodType, request.bloodType);
+  });
+
   test('recipient donor summary exposes only privacy-safe identity fields', () {
     final donor = RequestDonorEntity(
       donorId: 'donor-id',

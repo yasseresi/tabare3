@@ -23,6 +23,7 @@
   "all": "All",
 
   "login": "Login",
+  "password_mask": "............",
   "username": "Username",
   "login_error": "Login error",
   "signing_up": "Creating account",
@@ -218,6 +219,12 @@
   "profile_data_notice": "This request data is filled automatically from your profile. Please update your data if anything has changed.",
   "create_request_banner": "Create blood donation request",
   "request_form_description": "Enter your request data accurately to help us find compatible donors for the required blood type as soon as possible.",
+  "request_beneficiary_title": "Who is this request for?",
+  "request_beneficiary_body": "Choose whether this request is for you or someone else.",
+  "request_for_self": "Request for myself",
+  "request_for_other": "Request for someone else",
+  "for_someone_else": "For someone else",
+  "patient_details_required": "Please complete the required patient details.",
   "bags_required": "Number of bags required",
   "hospital_name_field": "Hospital name",
   "deadline_field": "Deadline date",
@@ -238,6 +245,7 @@
   "donors": "Donors",
   "donors_section_description": "This section shows donors who have agreed to your request and can help provide the required blood.",
   "donors_list": "Donors list",
+  "completed_donors": "Completed",
   "donation_successful": "Donation successful",
   "location": "Location",
 
@@ -315,6 +323,6 @@
   "search_patients": "Search for a patient or hospital...",
 
   "quran_verse": "وَمَنْ أَحْيَاهَا فَكَأَنَّمَا أَحْيَا النَّاسَ جَمِيعًا",
-  "hadith_relief": "مَنْ نَفَّسَ عَنْ مُؤْمِنٍ كُرْبَةً مِنْ كُرَبِ الدُّنْيَا، نَفَّسَ اللَّهُ عَنْهُ كُرْبَةً مِنْ كُرَبِ يَوْمِ الْقِيَامَةِ",
+  "hadith_relief": "«مَنْ نَفَّسَ عَنْ مُؤْمِنٍ كُرْبَةً مِنْ كُرَبِ الدُّنْيَا، نَفَّسَ اللَّهُ عَنْهُ كُرْبَةً مِنْ كُرَبِ يَوْمِ الْقِيَامَةِ، وَمَنْ يَسَّرَ عَلَى مُعْسِرٍ، يَسَّرَ اللَّهُ عَلَيْهِ فِي الدُّنْيَا وَالْآخِرَةِ، وَمَنْ سَتَرَ مُسْلِمًا، سَتَرَهُ اللَّهُ فِي الدُّنْيَا وَالْآخِرَةِ، وَاللَّهُ فِي عَوْنِ الْعَبْدِ مَا كَانَ الْعَبْدُ فِي عَوْنِ أَخِيهِ»",
   "quran_saving_life": "مِنْ أَجْلِ ذَٰلِكَ كَتَبْنَا عَلَىٰ بَنِي إِسْرَائِيلَ أَنَّهُ مَنْ قَتَلَ نَفْسًا بِغَيْرِ نَفْسٍ أَوْ فَسَادٍ فِي الْأَرْضِ فَكَأَنَّمَا قَتَلَ النَّاسَ جَمِيعًا وَمَنْ أَحْيَاهَا فَكَأَنَّمَا أَحْيَا النَّاسَ جَمِيعًا"
 }

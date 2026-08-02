@@ -24,6 +24,16 @@ void main() {
       'id': 'request-id',
       'requested_by': 'recipient-id',
       'hospital': hospitalJson,
+      'beneficiary_type': 'self',
+      'patient': {
+        'full_name': 'صاحب الحساب',
+        'national_id': '123456789012345678',
+        'blood_type': 'A+',
+        'weight': 70,
+        'chronic_diseases': null,
+        'gender': 'male',
+        'date_of_birth': '2000-01-01',
+      },
       'blood_type': 'A+',
       'urgency': 'semi_urgent',
       'units_needed': 3,
@@ -40,12 +50,24 @@ void main() {
     expect(entity.priority, RequestPriority.semiUrgent);
     expect(entity.remainingUnits, 2);
     expect(entity.hospital.id, 'hospital-id');
+    expect(entity.beneficiaryType, BeneficiaryType.self);
+    expect(entity.patient?.fullName, 'صاحب الحساب');
   });
 
   test('request RPC payload uses backend enum and ISO timestamps', () {
     final payload = buildRequestRpcPayload(
       RequestDraft(
         hospitalId: 'hospital-id',
+        beneficiaryType: BeneficiaryType.other,
+        patient: const PatientDraft(
+          fullName: 'مريض مختبر',
+          nationalId: '123456789012345678',
+          bloodType: 'O-',
+          weight: 65,
+          chronicDiseases: 'لا يوجد',
+          gender: 'male',
+          dateOfBirth: '2000-01-01',
+        ),
         bloodType: 'O-',
         priority: RequestPriority.urgent,
         unitsNeeded: 2,
@@ -56,6 +78,14 @@ void main() {
 
     expect(payload, {
       'p_hospital_id': 'hospital-id',
+      'p_beneficiary_type': 'other',
+      'p_patient_full_name': 'مريض مختبر',
+      'p_patient_national_id': '123456789012345678',
+      'p_patient_blood_type': 'O-',
+      'p_patient_weight': 65,
+      'p_patient_chronic_diseases': 'لا يوجد',
+      'p_patient_gender': 'male',
+      'p_patient_date_of_birth': '2000-01-01',
       'p_blood_type': 'O-',
       'p_urgency': 'urgent',
       'p_units_needed': 2,

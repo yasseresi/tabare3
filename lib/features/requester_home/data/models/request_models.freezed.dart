@@ -291,9 +291,290 @@ as bool,
 
 
 /// @nodoc
+mixin _$PatientModel {
+
+@JsonKey(name: 'full_name') String get fullName;@JsonKey(name: 'national_id') String get nationalId;@JsonKey(name: 'blood_type') String get bloodType; double get weight;@JsonKey(name: 'chronic_diseases') String? get chronicDiseases; String get gender;@JsonKey(name: 'date_of_birth') String get dateOfBirth;
+/// Create a copy of PatientModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PatientModelCopyWith<PatientModel> get copyWith => _$PatientModelCopyWithImpl<PatientModel>(this as PatientModel, _$identity);
+
+  /// Serializes this PatientModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PatientModel&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.nationalId, nationalId) || other.nationalId == nationalId)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.chronicDiseases, chronicDiseases) || other.chronicDiseases == chronicDiseases)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,fullName,nationalId,bloodType,weight,chronicDiseases,gender,dateOfBirth);
+
+@override
+String toString() {
+  return 'PatientModel(fullName: $fullName, nationalId: $nationalId, bloodType: $bloodType, weight: $weight, chronicDiseases: $chronicDiseases, gender: $gender, dateOfBirth: $dateOfBirth)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PatientModelCopyWith<$Res>  {
+  factory $PatientModelCopyWith(PatientModel value, $Res Function(PatientModel) _then) = _$PatientModelCopyWithImpl;
+@useResult
+$Res call({
+@JsonKey(name: 'full_name') String fullName,@JsonKey(name: 'national_id') String nationalId,@JsonKey(name: 'blood_type') String bloodType, double weight,@JsonKey(name: 'chronic_diseases') String? chronicDiseases, String gender,@JsonKey(name: 'date_of_birth') String dateOfBirth
+});
+
+
+
+
+}
+/// @nodoc
+class _$PatientModelCopyWithImpl<$Res>
+    implements $PatientModelCopyWith<$Res> {
+  _$PatientModelCopyWithImpl(this._self, this._then);
+
+  final PatientModel _self;
+  final $Res Function(PatientModel) _then;
+
+/// Create a copy of PatientModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? fullName = null,Object? nationalId = null,Object? bloodType = null,Object? weight = null,Object? chronicDiseases = freezed,Object? gender = null,Object? dateOfBirth = null,}) {
+  return _then(_self.copyWith(
+fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
+as String,nationalId: null == nationalId ? _self.nationalId : nationalId // ignore: cast_nullable_to_non_nullable
+as String,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as String,weight: null == weight ? _self.weight : weight // ignore: cast_nullable_to_non_nullable
+as double,chronicDiseases: freezed == chronicDiseases ? _self.chronicDiseases : chronicDiseases // ignore: cast_nullable_to_non_nullable
+as String?,gender: null == gender ? _self.gender : gender // ignore: cast_nullable_to_non_nullable
+as String,dateOfBirth: null == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [PatientModel].
+extension PatientModelPatterns on PatientModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PatientModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PatientModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PatientModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _PatientModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PatientModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PatientModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'full_name')  String fullName, @JsonKey(name: 'national_id')  String nationalId, @JsonKey(name: 'blood_type')  String bloodType,  double weight, @JsonKey(name: 'chronic_diseases')  String? chronicDiseases,  String gender, @JsonKey(name: 'date_of_birth')  String dateOfBirth)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PatientModel() when $default != null:
+return $default(_that.fullName,_that.nationalId,_that.bloodType,_that.weight,_that.chronicDiseases,_that.gender,_that.dateOfBirth);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'full_name')  String fullName, @JsonKey(name: 'national_id')  String nationalId, @JsonKey(name: 'blood_type')  String bloodType,  double weight, @JsonKey(name: 'chronic_diseases')  String? chronicDiseases,  String gender, @JsonKey(name: 'date_of_birth')  String dateOfBirth)  $default,) {final _that = this;
+switch (_that) {
+case _PatientModel():
+return $default(_that.fullName,_that.nationalId,_that.bloodType,_that.weight,_that.chronicDiseases,_that.gender,_that.dateOfBirth);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'full_name')  String fullName, @JsonKey(name: 'national_id')  String nationalId, @JsonKey(name: 'blood_type')  String bloodType,  double weight, @JsonKey(name: 'chronic_diseases')  String? chronicDiseases,  String gender, @JsonKey(name: 'date_of_birth')  String dateOfBirth)?  $default,) {final _that = this;
+switch (_that) {
+case _PatientModel() when $default != null:
+return $default(_that.fullName,_that.nationalId,_that.bloodType,_that.weight,_that.chronicDiseases,_that.gender,_that.dateOfBirth);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _PatientModel extends PatientModel {
+  const _PatientModel({@JsonKey(name: 'full_name') required this.fullName, @JsonKey(name: 'national_id') required this.nationalId, @JsonKey(name: 'blood_type') required this.bloodType, required this.weight, @JsonKey(name: 'chronic_diseases') this.chronicDiseases, required this.gender, @JsonKey(name: 'date_of_birth') required this.dateOfBirth}): super._();
+  factory _PatientModel.fromJson(Map<String, dynamic> json) => _$PatientModelFromJson(json);
+
+@override@JsonKey(name: 'full_name') final  String fullName;
+@override@JsonKey(name: 'national_id') final  String nationalId;
+@override@JsonKey(name: 'blood_type') final  String bloodType;
+@override final  double weight;
+@override@JsonKey(name: 'chronic_diseases') final  String? chronicDiseases;
+@override final  String gender;
+@override@JsonKey(name: 'date_of_birth') final  String dateOfBirth;
+
+/// Create a copy of PatientModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PatientModelCopyWith<_PatientModel> get copyWith => __$PatientModelCopyWithImpl<_PatientModel>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PatientModelToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PatientModel&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.nationalId, nationalId) || other.nationalId == nationalId)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.chronicDiseases, chronicDiseases) || other.chronicDiseases == chronicDiseases)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,fullName,nationalId,bloodType,weight,chronicDiseases,gender,dateOfBirth);
+
+@override
+String toString() {
+  return 'PatientModel(fullName: $fullName, nationalId: $nationalId, bloodType: $bloodType, weight: $weight, chronicDiseases: $chronicDiseases, gender: $gender, dateOfBirth: $dateOfBirth)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PatientModelCopyWith<$Res> implements $PatientModelCopyWith<$Res> {
+  factory _$PatientModelCopyWith(_PatientModel value, $Res Function(_PatientModel) _then) = __$PatientModelCopyWithImpl;
+@override @useResult
+$Res call({
+@JsonKey(name: 'full_name') String fullName,@JsonKey(name: 'national_id') String nationalId,@JsonKey(name: 'blood_type') String bloodType, double weight,@JsonKey(name: 'chronic_diseases') String? chronicDiseases, String gender,@JsonKey(name: 'date_of_birth') String dateOfBirth
+});
+
+
+
+
+}
+/// @nodoc
+class __$PatientModelCopyWithImpl<$Res>
+    implements _$PatientModelCopyWith<$Res> {
+  __$PatientModelCopyWithImpl(this._self, this._then);
+
+  final _PatientModel _self;
+  final $Res Function(_PatientModel) _then;
+
+/// Create a copy of PatientModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? fullName = null,Object? nationalId = null,Object? bloodType = null,Object? weight = null,Object? chronicDiseases = freezed,Object? gender = null,Object? dateOfBirth = null,}) {
+  return _then(_PatientModel(
+fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
+as String,nationalId: null == nationalId ? _self.nationalId : nationalId // ignore: cast_nullable_to_non_nullable
+as String,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as String,weight: null == weight ? _self.weight : weight // ignore: cast_nullable_to_non_nullable
+as double,chronicDiseases: freezed == chronicDiseases ? _self.chronicDiseases : chronicDiseases // ignore: cast_nullable_to_non_nullable
+as String?,gender: null == gender ? _self.gender : gender // ignore: cast_nullable_to_non_nullable
+as String,dateOfBirth: null == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$BloodRequestModel {
 
- String get id;@JsonKey(name: 'requested_by') String get requestedBy; HospitalModel get hospital;@JsonKey(name: 'blood_type') String get bloodType; String get urgency;@JsonKey(name: 'units_needed') int get unitsNeeded;@JsonKey(name: 'units_fulfilled') int get unitsFulfilled; String get status;@JsonKey(name: 'needed_by') DateTime? get neededBy;@JsonKey(name: 'expires_at') DateTime? get expiresAt; String? get notes;@JsonKey(name: 'created_at') DateTime get createdAt;
+ String get id;@JsonKey(name: 'requested_by') String get requestedBy; HospitalModel get hospital;@JsonKey(name: 'beneficiary_type') String get beneficiaryType; PatientModel? get patient;@JsonKey(name: 'blood_type') String get bloodType; String get urgency;@JsonKey(name: 'units_needed') int get unitsNeeded;@JsonKey(name: 'units_fulfilled') int get unitsFulfilled; String get status;@JsonKey(name: 'needed_by') DateTime? get neededBy;@JsonKey(name: 'expires_at') DateTime? get expiresAt; String? get notes;@JsonKey(name: 'created_at') DateTime get createdAt;
 /// Create a copy of BloodRequestModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -306,16 +587,16 @@ $BloodRequestModelCopyWith<BloodRequestModel> get copyWith => _$BloodRequestMode
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BloodRequestModel&&(identical(other.id, id) || other.id == id)&&(identical(other.requestedBy, requestedBy) || other.requestedBy == requestedBy)&&(identical(other.hospital, hospital) || other.hospital == hospital)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.urgency, urgency) || other.urgency == urgency)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.unitsFulfilled, unitsFulfilled) || other.unitsFulfilled == unitsFulfilled)&&(identical(other.status, status) || other.status == status)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BloodRequestModel&&(identical(other.id, id) || other.id == id)&&(identical(other.requestedBy, requestedBy) || other.requestedBy == requestedBy)&&(identical(other.hospital, hospital) || other.hospital == hospital)&&(identical(other.beneficiaryType, beneficiaryType) || other.beneficiaryType == beneficiaryType)&&(identical(other.patient, patient) || other.patient == patient)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.urgency, urgency) || other.urgency == urgency)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.unitsFulfilled, unitsFulfilled) || other.unitsFulfilled == unitsFulfilled)&&(identical(other.status, status) || other.status == status)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,requestedBy,hospital,bloodType,urgency,unitsNeeded,unitsFulfilled,status,neededBy,expiresAt,notes,createdAt);
+int get hashCode => Object.hash(runtimeType,id,requestedBy,hospital,beneficiaryType,patient,bloodType,urgency,unitsNeeded,unitsFulfilled,status,neededBy,expiresAt,notes,createdAt);
 
 @override
 String toString() {
-  return 'BloodRequestModel(id: $id, requestedBy: $requestedBy, hospital: $hospital, bloodType: $bloodType, urgency: $urgency, unitsNeeded: $unitsNeeded, unitsFulfilled: $unitsFulfilled, status: $status, neededBy: $neededBy, expiresAt: $expiresAt, notes: $notes, createdAt: $createdAt)';
+  return 'BloodRequestModel(id: $id, requestedBy: $requestedBy, hospital: $hospital, beneficiaryType: $beneficiaryType, patient: $patient, bloodType: $bloodType, urgency: $urgency, unitsNeeded: $unitsNeeded, unitsFulfilled: $unitsFulfilled, status: $status, neededBy: $neededBy, expiresAt: $expiresAt, notes: $notes, createdAt: $createdAt)';
 }
 
 
@@ -326,11 +607,11 @@ abstract mixin class $BloodRequestModelCopyWith<$Res>  {
   factory $BloodRequestModelCopyWith(BloodRequestModel value, $Res Function(BloodRequestModel) _then) = _$BloodRequestModelCopyWithImpl;
 @useResult
 $Res call({
- String id,@JsonKey(name: 'requested_by') String requestedBy, HospitalModel hospital,@JsonKey(name: 'blood_type') String bloodType, String urgency,@JsonKey(name: 'units_needed') int unitsNeeded,@JsonKey(name: 'units_fulfilled') int unitsFulfilled, String status,@JsonKey(name: 'needed_by') DateTime? neededBy,@JsonKey(name: 'expires_at') DateTime? expiresAt, String? notes,@JsonKey(name: 'created_at') DateTime createdAt
+ String id,@JsonKey(name: 'requested_by') String requestedBy, HospitalModel hospital,@JsonKey(name: 'beneficiary_type') String beneficiaryType, PatientModel? patient,@JsonKey(name: 'blood_type') String bloodType, String urgency,@JsonKey(name: 'units_needed') int unitsNeeded,@JsonKey(name: 'units_fulfilled') int unitsFulfilled, String status,@JsonKey(name: 'needed_by') DateTime? neededBy,@JsonKey(name: 'expires_at') DateTime? expiresAt, String? notes,@JsonKey(name: 'created_at') DateTime createdAt
 });
 
 
-$HospitalModelCopyWith<$Res> get hospital;
+$HospitalModelCopyWith<$Res> get hospital;$PatientModelCopyWith<$Res>? get patient;
 
 }
 /// @nodoc
@@ -343,12 +624,14 @@ class _$BloodRequestModelCopyWithImpl<$Res>
 
 /// Create a copy of BloodRequestModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? requestedBy = null,Object? hospital = null,Object? bloodType = null,Object? urgency = null,Object? unitsNeeded = null,Object? unitsFulfilled = null,Object? status = null,Object? neededBy = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? requestedBy = null,Object? hospital = null,Object? beneficiaryType = null,Object? patient = freezed,Object? bloodType = null,Object? urgency = null,Object? unitsNeeded = null,Object? unitsFulfilled = null,Object? status = null,Object? neededBy = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? createdAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,requestedBy: null == requestedBy ? _self.requestedBy : requestedBy // ignore: cast_nullable_to_non_nullable
 as String,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
-as HospitalModel,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as HospitalModel,beneficiaryType: null == beneficiaryType ? _self.beneficiaryType : beneficiaryType // ignore: cast_nullable_to_non_nullable
+as String,patient: freezed == patient ? _self.patient : patient // ignore: cast_nullable_to_non_nullable
+as PatientModel?,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
 as String,urgency: null == urgency ? _self.urgency : urgency // ignore: cast_nullable_to_non_nullable
 as String,unitsNeeded: null == unitsNeeded ? _self.unitsNeeded : unitsNeeded // ignore: cast_nullable_to_non_nullable
 as int,unitsFulfilled: null == unitsFulfilled ? _self.unitsFulfilled : unitsFulfilled // ignore: cast_nullable_to_non_nullable
@@ -368,6 +651,18 @@ $HospitalModelCopyWith<$Res> get hospital {
   
   return $HospitalModelCopyWith<$Res>(_self.hospital, (value) {
     return _then(_self.copyWith(hospital: value));
+  });
+}/// Create a copy of BloodRequestModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PatientModelCopyWith<$Res>? get patient {
+    if (_self.patient == null) {
+    return null;
+  }
+
+  return $PatientModelCopyWith<$Res>(_self.patient!, (value) {
+    return _then(_self.copyWith(patient: value));
   });
 }
 }
@@ -451,10 +746,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'requested_by')  String requestedBy,  HospitalModel hospital, @JsonKey(name: 'blood_type')  String bloodType,  String urgency, @JsonKey(name: 'units_needed')  int unitsNeeded, @JsonKey(name: 'units_fulfilled')  int unitsFulfilled,  String status, @JsonKey(name: 'needed_by')  DateTime? neededBy, @JsonKey(name: 'expires_at')  DateTime? expiresAt,  String? notes, @JsonKey(name: 'created_at')  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'requested_by')  String requestedBy,  HospitalModel hospital, @JsonKey(name: 'beneficiary_type')  String beneficiaryType,  PatientModel? patient, @JsonKey(name: 'blood_type')  String bloodType,  String urgency, @JsonKey(name: 'units_needed')  int unitsNeeded, @JsonKey(name: 'units_fulfilled')  int unitsFulfilled,  String status, @JsonKey(name: 'needed_by')  DateTime? neededBy, @JsonKey(name: 'expires_at')  DateTime? expiresAt,  String? notes, @JsonKey(name: 'created_at')  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _BloodRequestModel() when $default != null:
-return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.urgency,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
+return $default(_that.id,_that.requestedBy,_that.hospital,_that.beneficiaryType,_that.patient,_that.bloodType,_that.urgency,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
   return orElse();
 
 }
@@ -472,10 +767,10 @@ return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'requested_by')  String requestedBy,  HospitalModel hospital, @JsonKey(name: 'blood_type')  String bloodType,  String urgency, @JsonKey(name: 'units_needed')  int unitsNeeded, @JsonKey(name: 'units_fulfilled')  int unitsFulfilled,  String status, @JsonKey(name: 'needed_by')  DateTime? neededBy, @JsonKey(name: 'expires_at')  DateTime? expiresAt,  String? notes, @JsonKey(name: 'created_at')  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'requested_by')  String requestedBy,  HospitalModel hospital, @JsonKey(name: 'beneficiary_type')  String beneficiaryType,  PatientModel? patient, @JsonKey(name: 'blood_type')  String bloodType,  String urgency, @JsonKey(name: 'units_needed')  int unitsNeeded, @JsonKey(name: 'units_fulfilled')  int unitsFulfilled,  String status, @JsonKey(name: 'needed_by')  DateTime? neededBy, @JsonKey(name: 'expires_at')  DateTime? expiresAt,  String? notes, @JsonKey(name: 'created_at')  DateTime createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _BloodRequestModel():
-return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.urgency,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
+return $default(_that.id,_that.requestedBy,_that.hospital,_that.beneficiaryType,_that.patient,_that.bloodType,_that.urgency,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -492,10 +787,10 @@ return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'requested_by')  String requestedBy,  HospitalModel hospital, @JsonKey(name: 'blood_type')  String bloodType,  String urgency, @JsonKey(name: 'units_needed')  int unitsNeeded, @JsonKey(name: 'units_fulfilled')  int unitsFulfilled,  String status, @JsonKey(name: 'needed_by')  DateTime? neededBy, @JsonKey(name: 'expires_at')  DateTime? expiresAt,  String? notes, @JsonKey(name: 'created_at')  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'requested_by')  String requestedBy,  HospitalModel hospital, @JsonKey(name: 'beneficiary_type')  String beneficiaryType,  PatientModel? patient, @JsonKey(name: 'blood_type')  String bloodType,  String urgency, @JsonKey(name: 'units_needed')  int unitsNeeded, @JsonKey(name: 'units_fulfilled')  int unitsFulfilled,  String status, @JsonKey(name: 'needed_by')  DateTime? neededBy, @JsonKey(name: 'expires_at')  DateTime? expiresAt,  String? notes, @JsonKey(name: 'created_at')  DateTime createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _BloodRequestModel() when $default != null:
-return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.urgency,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
+return $default(_that.id,_that.requestedBy,_that.hospital,_that.beneficiaryType,_that.patient,_that.bloodType,_that.urgency,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
   return null;
 
 }
@@ -507,12 +802,14 @@ return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.
 @JsonSerializable()
 
 class _BloodRequestModel extends BloodRequestModel {
-  const _BloodRequestModel({required this.id, @JsonKey(name: 'requested_by') required this.requestedBy, required this.hospital, @JsonKey(name: 'blood_type') required this.bloodType, required this.urgency, @JsonKey(name: 'units_needed') required this.unitsNeeded, @JsonKey(name: 'units_fulfilled') required this.unitsFulfilled, required this.status, @JsonKey(name: 'needed_by') this.neededBy, @JsonKey(name: 'expires_at') this.expiresAt, this.notes, @JsonKey(name: 'created_at') required this.createdAt}): super._();
+  const _BloodRequestModel({required this.id, @JsonKey(name: 'requested_by') required this.requestedBy, required this.hospital, @JsonKey(name: 'beneficiary_type') this.beneficiaryType = 'self', this.patient, @JsonKey(name: 'blood_type') required this.bloodType, required this.urgency, @JsonKey(name: 'units_needed') required this.unitsNeeded, @JsonKey(name: 'units_fulfilled') required this.unitsFulfilled, required this.status, @JsonKey(name: 'needed_by') this.neededBy, @JsonKey(name: 'expires_at') this.expiresAt, this.notes, @JsonKey(name: 'created_at') required this.createdAt}): super._();
   factory _BloodRequestModel.fromJson(Map<String, dynamic> json) => _$BloodRequestModelFromJson(json);
 
 @override final  String id;
 @override@JsonKey(name: 'requested_by') final  String requestedBy;
 @override final  HospitalModel hospital;
+@override@JsonKey(name: 'beneficiary_type') final  String beneficiaryType;
+@override final  PatientModel? patient;
 @override@JsonKey(name: 'blood_type') final  String bloodType;
 @override final  String urgency;
 @override@JsonKey(name: 'units_needed') final  int unitsNeeded;
@@ -536,16 +833,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BloodRequestModel&&(identical(other.id, id) || other.id == id)&&(identical(other.requestedBy, requestedBy) || other.requestedBy == requestedBy)&&(identical(other.hospital, hospital) || other.hospital == hospital)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.urgency, urgency) || other.urgency == urgency)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.unitsFulfilled, unitsFulfilled) || other.unitsFulfilled == unitsFulfilled)&&(identical(other.status, status) || other.status == status)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BloodRequestModel&&(identical(other.id, id) || other.id == id)&&(identical(other.requestedBy, requestedBy) || other.requestedBy == requestedBy)&&(identical(other.hospital, hospital) || other.hospital == hospital)&&(identical(other.beneficiaryType, beneficiaryType) || other.beneficiaryType == beneficiaryType)&&(identical(other.patient, patient) || other.patient == patient)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.urgency, urgency) || other.urgency == urgency)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.unitsFulfilled, unitsFulfilled) || other.unitsFulfilled == unitsFulfilled)&&(identical(other.status, status) || other.status == status)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,requestedBy,hospital,bloodType,urgency,unitsNeeded,unitsFulfilled,status,neededBy,expiresAt,notes,createdAt);
+int get hashCode => Object.hash(runtimeType,id,requestedBy,hospital,beneficiaryType,patient,bloodType,urgency,unitsNeeded,unitsFulfilled,status,neededBy,expiresAt,notes,createdAt);
 
 @override
 String toString() {
-  return 'BloodRequestModel(id: $id, requestedBy: $requestedBy, hospital: $hospital, bloodType: $bloodType, urgency: $urgency, unitsNeeded: $unitsNeeded, unitsFulfilled: $unitsFulfilled, status: $status, neededBy: $neededBy, expiresAt: $expiresAt, notes: $notes, createdAt: $createdAt)';
+  return 'BloodRequestModel(id: $id, requestedBy: $requestedBy, hospital: $hospital, beneficiaryType: $beneficiaryType, patient: $patient, bloodType: $bloodType, urgency: $urgency, unitsNeeded: $unitsNeeded, unitsFulfilled: $unitsFulfilled, status: $status, neededBy: $neededBy, expiresAt: $expiresAt, notes: $notes, createdAt: $createdAt)';
 }
 
 
@@ -556,11 +853,11 @@ abstract mixin class _$BloodRequestModelCopyWith<$Res> implements $BloodRequestM
   factory _$BloodRequestModelCopyWith(_BloodRequestModel value, $Res Function(_BloodRequestModel) _then) = __$BloodRequestModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id,@JsonKey(name: 'requested_by') String requestedBy, HospitalModel hospital,@JsonKey(name: 'blood_type') String bloodType, String urgency,@JsonKey(name: 'units_needed') int unitsNeeded,@JsonKey(name: 'units_fulfilled') int unitsFulfilled, String status,@JsonKey(name: 'needed_by') DateTime? neededBy,@JsonKey(name: 'expires_at') DateTime? expiresAt, String? notes,@JsonKey(name: 'created_at') DateTime createdAt
+ String id,@JsonKey(name: 'requested_by') String requestedBy, HospitalModel hospital,@JsonKey(name: 'beneficiary_type') String beneficiaryType, PatientModel? patient,@JsonKey(name: 'blood_type') String bloodType, String urgency,@JsonKey(name: 'units_needed') int unitsNeeded,@JsonKey(name: 'units_fulfilled') int unitsFulfilled, String status,@JsonKey(name: 'needed_by') DateTime? neededBy,@JsonKey(name: 'expires_at') DateTime? expiresAt, String? notes,@JsonKey(name: 'created_at') DateTime createdAt
 });
 
 
-@override $HospitalModelCopyWith<$Res> get hospital;
+@override $HospitalModelCopyWith<$Res> get hospital;@override $PatientModelCopyWith<$Res>? get patient;
 
 }
 /// @nodoc
@@ -573,12 +870,14 @@ class __$BloodRequestModelCopyWithImpl<$Res>
 
 /// Create a copy of BloodRequestModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? requestedBy = null,Object? hospital = null,Object? bloodType = null,Object? urgency = null,Object? unitsNeeded = null,Object? unitsFulfilled = null,Object? status = null,Object? neededBy = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? requestedBy = null,Object? hospital = null,Object? beneficiaryType = null,Object? patient = freezed,Object? bloodType = null,Object? urgency = null,Object? unitsNeeded = null,Object? unitsFulfilled = null,Object? status = null,Object? neededBy = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? createdAt = null,}) {
   return _then(_BloodRequestModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,requestedBy: null == requestedBy ? _self.requestedBy : requestedBy // ignore: cast_nullable_to_non_nullable
 as String,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
-as HospitalModel,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as HospitalModel,beneficiaryType: null == beneficiaryType ? _self.beneficiaryType : beneficiaryType // ignore: cast_nullable_to_non_nullable
+as String,patient: freezed == patient ? _self.patient : patient // ignore: cast_nullable_to_non_nullable
+as PatientModel?,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
 as String,urgency: null == urgency ? _self.urgency : urgency // ignore: cast_nullable_to_non_nullable
 as String,unitsNeeded: null == unitsNeeded ? _self.unitsNeeded : unitsNeeded // ignore: cast_nullable_to_non_nullable
 as int,unitsFulfilled: null == unitsFulfilled ? _self.unitsFulfilled : unitsFulfilled // ignore: cast_nullable_to_non_nullable
@@ -599,6 +898,18 @@ $HospitalModelCopyWith<$Res> get hospital {
   
   return $HospitalModelCopyWith<$Res>(_self.hospital, (value) {
     return _then(_self.copyWith(hospital: value));
+  });
+}/// Create a copy of BloodRequestModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PatientModelCopyWith<$Res>? get patient {
+    if (_self.patient == null) {
+    return null;
+  }
+
+  return $PatientModelCopyWith<$Res>(_self.patient!, (value) {
+    return _then(_self.copyWith(patient: value));
   });
 }
 }

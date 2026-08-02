@@ -32,6 +32,36 @@ enum RequestPriority {
   };
 }
 
+enum BeneficiaryType {
+  self,
+  other;
+
+  String get databaseValue => name;
+
+  static BeneficiaryType fromDatabase(String value) =>
+      BeneficiaryType.values.firstWhere(
+        (type) => type.name == value,
+        orElse: () => throw ArgumentError.value(
+          value,
+          'value',
+          'Unknown beneficiary type',
+        ),
+      );
+}
+
+@freezed
+abstract class PatientEntity with _$PatientEntity {
+  const factory PatientEntity({
+    required String fullName,
+    required String nationalId,
+    required String bloodType,
+    required double weight,
+    String? chronicDiseases,
+    required String gender,
+    required String dateOfBirth,
+  }) = _PatientEntity;
+}
+
 enum BloodRequestStatus {
   open,
   fulfilled,
@@ -104,6 +134,8 @@ abstract class BloodRequestEntity with _$BloodRequestEntity {
     required String id,
     required String requestedBy,
     required HospitalEntity hospital,
+    @Default(BeneficiaryType.self) BeneficiaryType beneficiaryType,
+    PatientEntity? patient,
     required String bloodType,
     required RequestPriority priority,
     required int unitsNeeded,
@@ -121,12 +153,29 @@ abstract class BloodRequestEntity with _$BloodRequestEntity {
   }
 
   bool get isActive => status == BloodRequestStatus.open;
+
+  bool get isForSomeoneElse => beneficiaryType == BeneficiaryType.other;
+}
+
+@freezed
+abstract class PatientDraft with _$PatientDraft {
+  const factory PatientDraft({
+    required String fullName,
+    required String nationalId,
+    required String bloodType,
+    required double weight,
+    String? chronicDiseases,
+    required String gender,
+    required String dateOfBirth,
+  }) = _PatientDraft;
 }
 
 @freezed
 abstract class RequestDraft with _$RequestDraft {
   const factory RequestDraft({
     required String hospitalId,
+    @Default(BeneficiaryType.self) BeneficiaryType beneficiaryType,
+    PatientDraft? patient,
     required String bloodType,
     required RequestPriority priority,
     required int unitsNeeded,

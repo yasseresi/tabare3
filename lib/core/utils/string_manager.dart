@@ -26,6 +26,7 @@ class AppStrings {
 
   // Auth
   static const String login = 'login';
+  static const String passwordMask = 'password_mask';
   static const String username = 'username';
   static const String rememberMe = 'remember_me';
   static const String loginError = 'login_error';
@@ -89,6 +90,7 @@ class AppStrings {
   static const String editRequest = 'edit_request';
   static const String requestDetails = 'request_details';
   static const String patientName = 'patient_name';
+  static const String searchPatients = 'search_patients';
   static const String hospitalName = 'hospital_name';
   static const String bagsCount = 'bags_count';
   static const String urgencyLevel = 'urgency_level';
@@ -279,6 +281,12 @@ class AppStrings {
   static const String profileDataNotice = 'profile_data_notice';
   static const String createRequestBanner = 'create_request_banner';
   static const String requestFormDescription = 'request_form_description';
+  static const String requestBeneficiaryTitle = 'request_beneficiary_title';
+  static const String requestBeneficiaryBody = 'request_beneficiary_body';
+  static const String requestForSelf = 'request_for_self';
+  static const String requestForOther = 'request_for_other';
+  static const String forSomeoneElse = 'for_someone_else';
+  static const String patientDetailsRequired = 'patient_details_required';
   static const String bagsRequired = 'bags_required';
   static const String hospitalNameField = 'hospital_name_field';
   static const String deadlineField = 'deadline_field';
@@ -300,6 +308,7 @@ class AppStrings {
   static const String donors = 'donors';
   static const String donorsSectionDescription = 'donors_section_description';
   static const String donorsList = 'donors_list';
+  static const String completedDonors = 'completed_donors';
   static const String donationSuccessful = 'donation_successful';
   static const String location = 'location';
 

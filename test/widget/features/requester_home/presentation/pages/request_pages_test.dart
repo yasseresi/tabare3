@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -112,9 +113,12 @@ void main() {
       BlocProvider(create: (_) => buildBloc(), child: const RequestsScreen()),
     );
 
-    expect(find.text('مستشفى مصطفى باشا'), findsOneWidget);
+    expect(find.text('مستشفى مصطفى باشا'), findsWidgets);
     expect(find.text('O+'), findsOneWidget);
     expect(find.text('1 / 3'), findsOneWidget);
+    expect(find.text('المتبرعين المتاحين'), findsOneWidget);
+    expect(find.text('تعديل الطلب'), findsOneWidget);
+    expect(find.text('مرحباً، أحمد'), findsOneWidget);
   });
 
   testWidgets('requester dashboard renders backend request data', (
@@ -140,12 +144,175 @@ void main() {
       ),
     );
 
+    expect(find.byType(Image), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('مستشفى لوحة التحكم'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('مستشفى لوحة التحكم'), findsOneWidget);
     expect(find.text('O+'), findsOneWidget);
     expect(find.text('1 / 3'), findsOneWidget);
   });
 
-  testWidgets('donor history links backend requests to their donor details', (
+  testWidgets('requester dashboard edits requests inside the receiver shell', (
+    tester,
+  ) async {
+    when(() => getRequests(any())).thenAnswer((_) async => Right([request]));
+    final authBloc = MockAuthBloc();
+    when(() => authBloc.state).thenReturn(AuthInitial());
+
+    await pumpTestApp(
+      tester,
+      MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => buildBloc()),
+          BlocProvider<AuthBloc>.value(value: authBloc),
+        ],
+        child: const RequesterHomeScreen(),
+      ),
+    );
+
+    await tester.scrollUntilVisible(
+      find.text('تعديل الطلب'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('تعديل الطلب'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(EditRequestScreen), findsOneWidget);
+  });
+
+  testWidgets('requester navigation keeps the Figma order and create action', (
+    tester,
+  ) async {
+    when(() => getRequests(any())).thenAnswer((_) async => Right([request]));
+    final authBloc = MockAuthBloc();
+    when(() => authBloc.state).thenReturn(AuthInitial());
+
+    await pumpTestApp(
+      tester,
+      MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => buildBloc()),
+          BlocProvider<AuthBloc>.value(value: authBloc),
+        ],
+        child: const RequesterHomeScreen(),
+      ),
+    );
+
+    final home = find.byKey(WidgetKeys.requesterNavigationHome);
+    final create = find.byKey(WidgetKeys.requesterNavigationCreate);
+    final profile = find.byKey(WidgetKeys.requesterNavigationProfile);
+
+    expect(home, findsOneWidget);
+    expect(create, findsOneWidget);
+    expect(profile, findsOneWidget);
+    expect(tester.getCenter(home).dx, lessThan(tester.getCenter(create).dx));
+    expect(tester.getCenter(create).dx, lessThan(tester.getCenter(profile).dx));
+  });
+
+  testWidgets('request edit stays inside the receiver navigation shell', (
+    tester,
+  ) async {
+    when(() => getRequests(any())).thenAnswer((_) async => Right([request]));
+    final authBloc = MockAuthBloc();
+    when(() => authBloc.state).thenReturn(AuthInitial());
+
+    await pumpTestApp(
+      tester,
+      MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => buildBloc()),
+          BlocProvider<AuthBloc>.value(value: authBloc),
+        ],
+        child: const RequesterHomeScreen(),
+      ),
+    );
+
+    await tester.tap(find.byKey(WidgetKeys.requesterNavigationRequests));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(WidgetKeys.requestEditButton));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(EditRequestScreen), findsOneWidget);
+    expect(find.byKey(WidgetKeys.requesterNavigationRequests), findsOneWidget);
+  });
+
+  testWidgets('request details delegates to the receiver navigation shell', (
+    tester,
+  ) async {
+    when(() => getRequests(any())).thenAnswer((_) async => Right([request]));
+    BloodRequestEntity? openedRequest;
+
+    await pumpTestApp(
+      tester,
+      BlocProvider(
+        create: (_) => buildBloc(),
+        child: RequestsScreen(onDetail: (value) => openedRequest = value),
+      ),
+    );
+
+    await tester.tap(find.byKey(WidgetKeys.requestDetailsButton));
+    await tester.pump();
+
+    expect(openedRequest, request);
+  });
+
+  testWidgets('create request delegates notifications to the receiver shell', (
+    tester,
+  ) async {
+    when(() => getRequests(any())).thenAnswer((_) async => Right([request]));
+    var notificationsOpened = false;
+
+    await pumpTestApp(
+      tester,
+      BlocProvider(
+        create: (_) => buildBloc(),
+        child: CreateRequestScreen(
+          onNotifications: () => notificationsOpened = true,
+        ),
+      ),
+    );
+
+    expect(
+      tester.getSize(find.byKey(WidgetKeys.requesterNotificationsButton)),
+      const Size(40, 40),
+    );
+
+    await tester.tap(find.text('تأكيد'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(WidgetKeys.requestForSelfButton));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(WidgetKeys.requesterNotificationsButton));
+    await tester.pump();
+
+    expect(notificationsOpened, isTrue);
+  });
+
+  testWidgets(
+    'create request delegates profile updates to the receiver shell',
+    (tester) async {
+      when(() => getRequests(any())).thenAnswer((_) async => Right([request]));
+      var profileOpened = false;
+
+      await pumpTestApp(
+        tester,
+        BlocProvider(
+          create: (_) => buildBloc(),
+          child: CreateRequestScreen(onProfile: () => profileOpened = true),
+        ),
+      );
+
+      await tester.tap(find.text('تحديث الملف الشخصي'));
+      await tester.pump();
+
+      expect(profileOpened, isTrue);
+    },
+  );
+
+  testWidgets('donor history renders the Figma donor completion cards', (
     tester,
   ) async {
     final donorRequest = request.copyWith(
@@ -163,8 +330,92 @@ void main() {
       ),
     );
 
+    expect(find.text('المتبرعين'), findsOneWidget);
+    expect(find.text('قائمة المتبرعين'), findsOneWidget);
+    expect(find.text('المكتملين'), findsOneWidget);
     expect(find.text('مستشفى سجل المتبرعين'), findsOneWidget);
-    expect(find.text('تفاصيل الطلب'), findsOneWidget);
+    expect(find.text('تم التبرع بنجاح'), findsOneWidget);
+  });
+
+  testWidgets(
+    'donor history delegates notifications with the Figma bell size',
+    (tester) async {
+      when(() => getRequests(any())).thenAnswer((_) async => Right([request]));
+      var notificationsOpened = false;
+
+      await pumpTestApp(
+        tester,
+        BlocProvider(
+          create: (_) => buildBloc(),
+          child: DonorHistoryScreen(
+            onNotifications: () => notificationsOpened = true,
+          ),
+        ),
+      );
+
+      expect(
+        tester.getSize(find.byKey(WidgetKeys.requesterNotificationsButton)),
+        const Size(40, 40),
+      );
+
+      await tester.tap(find.byKey(WidgetKeys.requesterNotificationsButton));
+      await tester.pump();
+
+      expect(notificationsOpened, isTrue);
+    },
+  );
+
+  testWidgets('requests screen shows beneficiary badge for third-party requests', (
+    tester,
+  ) async {
+    final otherRequest = request.copyWith(
+      beneficiaryType: BeneficiaryType.other,
+      patient: const PatientEntity(
+        fullName: 'مريض تجريبي',
+        nationalId: '1234567890',
+        bloodType: 'A+',
+        weight: 70,
+        gender: 'ذكر',
+        dateOfBirth: '1980-01-01',
+        chronicDiseases: 'سكري',
+      ),
+    );
+    when(() => getRequests(any())).thenAnswer((_) async => Right([otherRequest]));
+
+    await pumpTestApp(
+      tester,
+      BlocProvider(create: (_) => buildBloc(), child: const RequestsScreen()),
+    );
+
+    expect(find.text('لشخص آخر'), findsOneWidget);
+    expect(find.text('مريض تجريبي'), findsWidgets);
+  });
+
+  testWidgets('requests screen searches by patient name', (tester) async {
+    final otherRequest = request.copyWith(
+      beneficiaryType: BeneficiaryType.other,
+      patient: const PatientEntity(
+        fullName: 'مريض فريد',
+        nationalId: '1234567890',
+        bloodType: 'A+',
+        weight: 70,
+        gender: 'ذكر',
+        dateOfBirth: '1980-01-01',
+      ),
+    );
+    when(
+      () => getRequests(any()),
+    ).thenAnswer((_) async => Right([otherRequest]));
+
+    await pumpTestApp(
+      tester,
+      BlocProvider(create: (_) => buildBloc(), child: const RequestsScreen()),
+    );
+
+    await tester.enterText(find.byType(TextField), 'مريض فريد');
+    await tester.pump();
+
+    expect(find.text('مريض فريد'), findsWidgets);
   });
 
   testWidgets('requests screen renders the backend empty state', (
@@ -196,7 +447,14 @@ void main() {
       ),
     );
 
+    expect(find.text('بيانات الملف الشخصي'), findsOneWidget);
     await tester.tap(find.text('تأكيد'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('لمن هذا الطلب؟'), findsOneWidget);
+    expect(find.text('طلب لنفسي'), findsOneWidget);
+    expect(find.text('طلب لشخص آخر'), findsOneWidget);
+    await tester.tap(find.byKey(WidgetKeys.requestForSelfButton));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(WidgetKeys.requestHospitalField));
@@ -218,6 +476,7 @@ void main() {
         verify(() => createRequest(captureAny())).captured.single
             as RequestDraft;
     expect(captured.hospitalId, 'hospital-id');
+    expect(captured.beneficiaryType, BeneficiaryType.self);
     expect(captured.bloodType, 'O+');
     expect(captured.unitsNeeded, 2);
   });
@@ -238,6 +497,10 @@ void main() {
       ),
     );
 
+    expect(find.text('مرحباً، أحمد'), findsOneWidget);
+    expect(find.text('تعديل طلب تبرع بالدم'), findsOneWidget);
+    expect(find.text('محو'), findsOneWidget);
+
     await tester.enterText(find.byKey(WidgetKeys.requestUnitsField), '2');
     await tester.ensureVisible(find.byKey(WidgetKeys.requestEditSaveButton));
     await tester.tap(find.byKey(WidgetKeys.requestEditSaveButton));
@@ -248,6 +511,34 @@ void main() {
             as UpdateRequestParams;
     expect(captured.requestId, 'request-id');
     expect(captured.draft.unitsNeeded, 2);
+  });
+
+  testWidgets('edit request delegates notifications to the receiver shell', (
+    tester,
+  ) async {
+    when(() => getRequests(any())).thenAnswer((_) async => Right([request]));
+    var notificationsOpened = false;
+
+    await pumpTestApp(
+      tester,
+      BlocProvider(
+        create: (_) => buildBloc(),
+        child: EditRequestScreen(
+          request: request,
+          onNotifications: () => notificationsOpened = true,
+        ),
+      ),
+    );
+
+    expect(
+      tester.getSize(find.byKey(WidgetKeys.requesterNotificationsButton)),
+      const Size(40, 40),
+    );
+
+    await tester.tap(find.byKey(WidgetKeys.requesterNotificationsButton));
+    await tester.pump();
+
+    expect(notificationsOpened, isTrue);
   });
 
   testWidgets('edit request cancellation requires and submits a reason', (

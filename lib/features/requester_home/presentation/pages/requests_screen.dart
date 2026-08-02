@@ -13,10 +13,18 @@ import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/blood_request_entity.dart';
 import '../bloc/request_bloc.dart';
-import 'edit_request_screen.dart';
 
 class RequestsScreen extends StatefulWidget {
-  const RequestsScreen({super.key});
+  final VoidCallback? onNotifications;
+  final ValueChanged<BloodRequestEntity>? onEdit;
+  final ValueChanged<BloodRequestEntity>? onDetail;
+
+  const RequestsScreen({
+    super.key,
+    this.onNotifications,
+    this.onEdit,
+    this.onDetail,
+  });
 
   @override
   State<RequestsScreen> createState() => _RequestsScreenState();
@@ -35,40 +43,62 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Material(
-        color: Colors.transparent,
-        child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(AppPadding.p20),
+      child: Container(
+        decoration: BoxDecoration(
+          color: ColorManager.white,
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [
+              ColorManager.welcomeGradientStart,
+              ColorManager.welcomeGradientEnd,
+            ],
+          ),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: SafeArea(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: AppSize.s402),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      AppStrings.myRequests.tr(),
-                      textAlign: TextAlign.right,
-                      style: Theme.of(context).textTheme.titleLarge,
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppPadding.p32,
+                        AppPadding.p32,
+                        AppPadding.p32,
+                        AppPadding.p20,
+                      ),
+                      child: _RequestsHeader(
+                        onNotifications: widget.onNotifications,
+                      ),
                     ),
-                    const SizedBox(height: AppSize.s8),
-                    TextField(
-                      controller: _searchController,
-                      textAlign: TextAlign.right,
-                      onChanged: (_) => setState(() {}),
-                      decoration: InputDecoration(
-                        hintText: AppStrings.searchRequests.tr(),
-                        suffixIcon: const Icon(Icons.search),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppPadding.p10,
+                      ),
+                      child: TextField(
+                        controller: _searchController,
+                        textAlign: TextAlign.right,
+                        onChanged: (_) => setState(() {}),
+                        decoration: InputDecoration(
+                          hintText: AppStrings.searchRequests.tr(),
+                          prefixIcon: const Icon(Icons.search),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSize.s12),
+                    Expanded(
+                      child: BlocBuilder<RequestBloc, RequestState>(
+                        builder: (context, state) =>
+                            _buildContent(context, state),
                       ),
                     ),
                   ],
                 ),
               ),
-              Expanded(
-                child: BlocBuilder<RequestBloc, RequestState>(
-                  builder: (context, state) => _buildContent(context, state),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -101,7 +131,8 @@ class _RequestsScreenState extends State<RequestsScreen> {
     final requests = state.requests.where((request) {
       if (query.isEmpty) return true;
       return request.hospital.nameAr.toLowerCase().contains(query) ||
-          request.bloodType.toLowerCase().contains(query);
+          request.bloodType.toLowerCase().contains(query) ||
+          (request.patient?.fullName.toLowerCase().contains(query) ?? false);
     }).toList();
 
     if (requests.isEmpty) {
@@ -124,16 +155,66 @@ class _RequestsScreenState extends State<RequestsScreen> {
         ),
         itemCount: requests.length,
         separatorBuilder: (_, _) => const SizedBox(height: AppSize.s16),
-        itemBuilder: (context, index) => _RequestCard(request: requests[index]),
+        itemBuilder: (context, index) => _RequestCard(
+          request: requests[index],
+          onEdit: widget.onEdit,
+          onDetail: widget.onDetail,
+        ),
       ),
+    );
+  }
+}
+
+class _RequestsHeader extends StatelessWidget {
+  final VoidCallback? onNotifications;
+
+  const _RequestsHeader({this.onNotifications});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppStrings.welcomeUser.tr(),
+                style: const TextStyle(
+                  fontSize: AppSize.s18,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              Text(
+                AppStrings.getWellSoon.tr(),
+                style: TextStyle(
+                  color: ColorManager.textMuted,
+                  fontSize: AppSize.s14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Material(
+          color: ColorManager.surfaceAlt,
+          shape: const CircleBorder(),
+          child: IconButton(
+            onPressed: onNotifications,
+            icon: const Icon(Icons.notifications_none_rounded),
+          ),
+        ),
+      ],
     );
   }
 }
 
 class _RequestCard extends StatelessWidget {
   final BloodRequestEntity request;
+  final ValueChanged<BloodRequestEntity>? onEdit;
+  final ValueChanged<BloodRequestEntity>? onDetail;
 
-  const _RequestCard({required this.request});
+  const _RequestCard({required this.request, this.onEdit, this.onDetail});
 
   @override
   Widget build(BuildContext context) {
@@ -147,6 +228,7 @@ class _RequestCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: ColorManager.white,
         borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
+        border: Border.all(color: ColorManager.borderGrey),
         boxShadow: [
           BoxShadow(
             color: ColorManager.black.withValues(alpha: AppOpacity.subtle),
@@ -160,32 +242,63 @@ class _RequestCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                width: AppSize.s50,
-                height: AppSize.s50,
-                decoration: BoxDecoration(
-                  color: ColorManager.surface,
-                  borderRadius: BorderRadius.circular(AppSize.radiusLarge),
-                ),
-                child: Icon(
-                  Icons.local_hospital_outlined,
-                  color: ColorManager.primary,
-                ),
+              _StatusChip(
+                label: AppStrings.activeStatus.tr(),
+                color: ColorManager.success,
               ),
-              const SizedBox(width: AppSize.s12),
-              Expanded(
-                child: Text(
-                  request.hospital.nameAr,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
+              const SizedBox(width: AppSize.s8),
               _StatusChip(
                 label: _priorityLabel(request.priority).tr(),
                 color: _priorityColor(request.priority),
               ),
+              const SizedBox(width: AppSize.s12),
+              Expanded(
+                child: Text(
+                  request.patient?.fullName ?? request.hospital.nameAr,
+                  textAlign: TextAlign.right,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: ColorManager.nearBlack,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSize.s8),
+              Container(
+                width: AppSize.s50,
+                height: AppSize.s50,
+                decoration: BoxDecoration(
+                  color: ColorManager.surfaceLight,
+                  borderRadius: BorderRadius.circular(AppSize.radiusSmall),
+                ),
+                child: Icon(
+                  Icons.bloodtype_rounded,
+                  color: ColorManager.primary,
+                  size: AppSize.s30,
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: AppSize.s20),
+          if (request.isForSomeoneElse) ...[
+            const SizedBox(height: AppSize.s8),
+            Row(
+              children: [
+                _StatusChip(
+                  label: AppStrings.forSomeoneElse.tr(),
+                  color: ColorManager.warning,
+                ),
+                const SizedBox(width: AppSize.s8),
+                Expanded(
+                  child: Text(
+                    request.patient?.fullName ?? '',
+                    textAlign: TextAlign.right,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: ColorManager.textSecondary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          const SizedBox(height: AppSize.s16),
           _InfoRow(label: AppStrings.bloodType.tr(), value: request.bloodType),
           _InfoRow(
             label: AppStrings.requestDate.tr(),
@@ -196,19 +309,28 @@ class _RequestCard extends StatelessWidget {
               label: AppStrings.deadline.tr(),
               value: dateFormat.format(request.neededBy!.toLocal()),
             ),
+          _InfoRow(
+            label: request.hospital.nameAr,
+            value: request.hospital.wilayaId.toString(),
+          ),
           const SizedBox(height: AppSize.s16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                AppStrings.bagsProvided.tr(
-                  namedArgs: {
-                    'provided': request.unitsFulfilled.toString(),
-                    'total': request.unitsNeeded.toString(),
-                  },
+              Expanded(
+                child: Text(
+                  AppStrings.bagsProvided.tr(
+                    namedArgs: {
+                      'provided': request.unitsFulfilled.toString(),
+                      'total': request.unitsNeeded.toString(),
+                    },
+                  ),
+                  maxLines: AppConstants.statusTagMaxLines,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
-                style: Theme.of(context).textTheme.bodySmall,
               ),
+              const SizedBox(width: AppSize.s8),
               Text(
                 AppStrings.bagsRatio.tr(
                   namedArgs: {
@@ -233,35 +355,50 @@ class _RequestCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSize.s20),
-          ElevatedButton(
-            key: WidgetKeys.requestDetailsButton,
-            onPressed: () {
-              Navigator.pushNamed(
-                context,
-                Routes.requestDetailRoute,
-                arguments: request,
-              );
-            },
-            child: Text(AppStrings.requestDetails.tr()),
-          ),
-          if (request.isActive) ...[
-            const SizedBox(height: AppSize.s8),
-            OutlinedButton(
-              key: WidgetKeys.requestEditButton,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => BlocProvider.value(
-                      value: context.read<RequestBloc>(),
-                      child: EditRequestScreen(request: request),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  key: WidgetKeys.requestDetailsButton,
+                  onPressed: () {
+                    if (onDetail != null) {
+                      onDetail!(request);
+                      return;
+                    }
+                    Navigator.pushNamed(
+                      context,
+                      Routes.requestDetailRoute,
+                      arguments: request,
+                    );
+                  },
+                  child: Text(AppStrings.availableDonors.tr()),
+                ),
+              ),
+              if (request.isActive) ...[
+                const SizedBox(width: AppSize.s20),
+                Expanded(
+                  child: FilledButton(
+                    key: WidgetKeys.requestEditButton,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: ColorManager.darkGrey,
                     ),
+                    onPressed: () {
+                      if (onEdit != null) {
+                        onEdit!(request);
+                        return;
+                      }
+                      Navigator.pushNamed(
+                        context,
+                        Routes.editRequestRoute,
+                        arguments: request,
+                      );
+                    },
+                    child: Text(AppStrings.editRequest.tr()),
                   ),
-                );
-              },
-              child: Text(AppStrings.editRequest.tr()),
-            ),
-          ],
+                ),
+              ],
+            ],
+          ),
         ],
       ),
     );

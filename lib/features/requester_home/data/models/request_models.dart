@@ -32,6 +32,34 @@ abstract class HospitalModel with _$HospitalModel {
 }
 
 @freezed
+abstract class PatientModel with _$PatientModel {
+  const PatientModel._();
+
+  const factory PatientModel({
+    @JsonKey(name: 'full_name') required String fullName,
+    @JsonKey(name: 'national_id') required String nationalId,
+    @JsonKey(name: 'blood_type') required String bloodType,
+    required double weight,
+    @JsonKey(name: 'chronic_diseases') String? chronicDiseases,
+    required String gender,
+    @JsonKey(name: 'date_of_birth') required String dateOfBirth,
+  }) = _PatientModel;
+
+  factory PatientModel.fromJson(Map<String, dynamic> json) =>
+      _$PatientModelFromJson(json);
+
+  PatientEntity toEntity() => PatientEntity(
+    fullName: fullName,
+    nationalId: nationalId,
+    bloodType: bloodType,
+    weight: weight,
+    chronicDiseases: chronicDiseases,
+    gender: gender,
+    dateOfBirth: dateOfBirth,
+  );
+}
+
+@freezed
 abstract class BloodRequestModel with _$BloodRequestModel {
   const BloodRequestModel._();
 
@@ -39,6 +67,8 @@ abstract class BloodRequestModel with _$BloodRequestModel {
     required String id,
     @JsonKey(name: 'requested_by') required String requestedBy,
     required HospitalModel hospital,
+    @JsonKey(name: 'beneficiary_type') @Default('self') String beneficiaryType,
+    PatientModel? patient,
     @JsonKey(name: 'blood_type') required String bloodType,
     required String urgency,
     @JsonKey(name: 'units_needed') required int unitsNeeded,
@@ -57,6 +87,8 @@ abstract class BloodRequestModel with _$BloodRequestModel {
     id: id,
     requestedBy: requestedBy,
     hospital: hospital.toEntity(),
+    beneficiaryType: BeneficiaryType.fromDatabase(beneficiaryType),
+    patient: patient?.toEntity(),
     bloodType: bloodType,
     priority: RequestPriority.fromDatabase(urgency),
     unitsNeeded: unitsNeeded,
@@ -171,6 +203,14 @@ abstract class DirectInvitationModel with _$DirectInvitationModel {
 
 Map<String, dynamic> buildRequestRpcPayload(RequestDraft draft) => {
   'p_hospital_id': draft.hospitalId,
+  'p_beneficiary_type': draft.beneficiaryType.databaseValue,
+  'p_patient_full_name': draft.patient?.fullName,
+  'p_patient_national_id': draft.patient?.nationalId,
+  'p_patient_blood_type': draft.patient?.bloodType,
+  'p_patient_weight': draft.patient?.weight,
+  'p_patient_chronic_diseases': draft.patient?.chronicDiseases,
+  'p_patient_gender': draft.patient?.gender,
+  'p_patient_date_of_birth': draft.patient?.dateOfBirth,
   'p_blood_type': draft.bloodType,
   'p_urgency': draft.priority.databaseValue,
   'p_units_needed': draft.unitsNeeded,

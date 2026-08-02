@@ -4,8 +4,10 @@ import '../../domain/entities/blood_request_entity.dart';
 import '../models/request_models.dart';
 
 const requestSelectColumns =
-    'id,requested_by,blood_type,urgency,units_needed,units_fulfilled,status,'
+    'id,requested_by,beneficiary_type,blood_type,urgency,units_needed,units_fulfilled,status,'
     'needed_by,expires_at,notes,created_at,'
+    'patient:request_patients('
+    'full_name,national_id,blood_type,weight,chronic_diseases,gender,date_of_birth),'
     'hospital:hospitals!blood_requests_hospital_id_fkey('
     'id,wilaya_id,name_ar,name_fr,address,is_active)';
 
@@ -89,7 +91,15 @@ class RequestRemoteDataSourceImpl implements RequestRemoteDataSource {
   }) async {
     final response = await client.rpc(
       'update_blood_request',
-      params: {'p_request_id': requestId, ...buildRequestRpcPayload(draft)},
+      params: {
+        'p_request_id': requestId,
+        'p_hospital_id': draft.hospitalId,
+        'p_blood_type': draft.bloodType,
+        'p_urgency': draft.priority.databaseValue,
+        'p_units_needed': draft.unitsNeeded,
+        'p_needed_by': draft.neededBy?.toUtc().toIso8601String(),
+        'p_notes': draft.notes,
+      },
     );
     return getRequest(_extractRequestId(response));
   }

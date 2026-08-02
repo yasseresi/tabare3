@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -106,6 +107,52 @@ void main() {
     );
   });
 
+  testWidgets('shows patient details for third-party requests', (tester) async {
+    final otherRequest = request.copyWith(
+      beneficiaryType: BeneficiaryType.other,
+      patient: const PatientEntity(
+        fullName: 'مريض تفصيل',
+        nationalId: '9876543210',
+        bloodType: 'B+',
+        weight: 75,
+        gender: 'ذكر',
+        dateOfBirth: '1990-05-05',
+        chronicDiseases: 'ضغط',
+      ),
+    );
+
+    await pumpTestApp(
+      tester,
+      BlocProvider(
+        create: (_) => buildBloc(),
+        child: RequestDetailScreen(request: otherRequest),
+      ),
+    );
+
+    expect(find.text('لشخص آخر'), findsOneWidget);
+    expect(find.text('مريض تفصيل'), findsOneWidget);
+    expect(find.text('9876543210'), findsOneWidget);
+    expect(find.text('B+'), findsWidgets);
+    expect(find.textContaining('75'), findsOneWidget);
+    expect(find.text('ضغط'), findsOneWidget);
+  });
+
+  testWidgets('uses the receiver Figma page shell instead of an app bar', (
+    tester,
+  ) async {
+    await pumpTestApp(
+      tester,
+      BlocProvider(
+        create: (_) => buildBloc(),
+        child: RequestDetailScreen(request: request),
+      ),
+    );
+
+    expect(find.byType(AppBar), findsNothing);
+    expect(find.text('تفاصيل الطلب'), findsOneWidget);
+    expect(find.byType(DecoratedBox), findsWidgets);
+  });
+
   testWidgets('renders a server-issued QR and its expiry', (tester) async {
     final qr = IssuedRequestQrEntity(
       token: 'opaque-token',
@@ -121,7 +168,11 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.byKey(WidgetKeys.requestQrIssueButton));
+    await tester.dragFrom(
+      const Offset(400, 300),
+      const Offset(0, -400),
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(WidgetKeys.requestQrIssueButton));
     await tester.pumpAndSettle();
 

@@ -26,6 +26,28 @@ Map<String, dynamic> _$HospitalModelToJson(_HospitalModel instance) =>
       'is_active': instance.isActive,
     };
 
+_PatientModel _$PatientModelFromJson(Map<String, dynamic> json) =>
+    _PatientModel(
+      fullName: json['full_name'] as String,
+      nationalId: json['national_id'] as String,
+      bloodType: json['blood_type'] as String,
+      weight: (json['weight'] as num).toDouble(),
+      chronicDiseases: json['chronic_diseases'] as String?,
+      gender: json['gender'] as String,
+      dateOfBirth: json['date_of_birth'] as String,
+    );
+
+Map<String, dynamic> _$PatientModelToJson(_PatientModel instance) =>
+    <String, dynamic>{
+      'full_name': instance.fullName,
+      'national_id': instance.nationalId,
+      'blood_type': instance.bloodType,
+      'weight': instance.weight,
+      'chronic_diseases': instance.chronicDiseases,
+      'gender': instance.gender,
+      'date_of_birth': instance.dateOfBirth,
+    };
+
 _BloodRequestModel _$BloodRequestModelFromJson(Map<String, dynamic> json) =>
     _BloodRequestModel(
       id: json['id'] as String,
@@ -33,6 +55,10 @@ _BloodRequestModel _$BloodRequestModelFromJson(Map<String, dynamic> json) =>
       hospital: HospitalModel.fromJson(
         json['hospital'] as Map<String, dynamic>,
       ),
+      beneficiaryType: json['beneficiary_type'] as String? ?? 'self',
+      patient: json['patient'] == null
+          ? null
+          : PatientModel.fromJson(json['patient'] as Map<String, dynamic>),
       bloodType: json['blood_type'] as String,
       urgency: json['urgency'] as String,
       unitsNeeded: (json['units_needed'] as num).toInt(),
@@ -53,6 +79,8 @@ Map<String, dynamic> _$BloodRequestModelToJson(_BloodRequestModel instance) =>
       'id': instance.id,
       'requested_by': instance.requestedBy,
       'hospital': instance.hospital,
+      'beneficiary_type': instance.beneficiaryType,
+      'patient': instance.patient,
       'blood_type': instance.bloodType,
       'urgency': instance.urgency,
       'units_needed': instance.unitsNeeded,
