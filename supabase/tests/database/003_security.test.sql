@@ -2,7 +2,12 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(25);
+select plan(26);
+
+select ok(
+  has_table_privilege('authenticated', 'public.users', 'SELECT'),
+  'authenticated users may read their own profile through RLS'
+);
 
 select ok(
   not has_table_privilege('authenticated', 'public.users', 'UPDATE'),

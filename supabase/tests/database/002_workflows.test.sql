@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(23);
+select plan(25);
 
 select has_column(
   'public',
@@ -11,11 +11,31 @@ select has_column(
   'donation availability is independent from account state and active mode'
 );
 
+select has_column(
+  'public',
+  'blood_requests',
+  'beneficiary_type',
+  'requests identify whether they are for the requester or another patient'
+);
+select has_table(
+  'public',
+  'request_patients',
+  'private patient snapshots are separated from the public request feed'
+);
+
 select has_function(
   'public',
   'create_blood_request',
   array[
     'uuid',
+    'beneficiary_type_enum',
+    'text',
+    'text',
+    'blood_type_enum',
+    'numeric',
+    'text',
+    'text',
+    'date',
     'blood_type_enum',
     'request_urgency_enum',
     'integer',
