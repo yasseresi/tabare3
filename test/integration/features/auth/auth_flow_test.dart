@@ -227,6 +227,8 @@ void main() {
           ),
         ).thenAnswer((_) async => testDonorModel);
 
+        await tester.ensureVisible(find.text('أنا متبرع'));
+        await tester.pumpAndSettle();
         await tester.tap(find.text('أنا متبرع'));
         await tester.pumpAndSettle();
 
@@ -287,6 +289,8 @@ void main() {
           return updatedModel;
         });
 
+        await tester.ensureVisible(find.text('أحتاج دم'));
+        await tester.pumpAndSettle();
         await tester.tap(find.text('أحتاج دم'));
         await tester.pumpAndSettle();
 
@@ -364,7 +368,7 @@ void main() {
         await tester.tap(find.widgetWithText(ElevatedButton, 'التالي'));
         await tester.pumpAndSettle();
 
-        expect(find.text('البيانات الشخصية'), findsOneWidget);
+        expect(find.text('المعلومات الشخصية'), findsOneWidget);
 
         await tester.enterText(
           find.widgetWithText(TextFormField, 'تاريخ الميلاد'),
@@ -521,6 +525,8 @@ void main() {
         await tester.tap(find.text('الصفحة الرئيسية'));
         await tester.pumpAndSettle();
 
+        await tester.ensureVisible(find.text('أحتاج دم'));
+        await tester.pumpAndSettle();
         await tester.tap(find.text('أحتاج دم'));
         await tester.pumpAndSettle();
 
@@ -566,6 +572,8 @@ void main() {
         await tester.tap(find.text('الصفحة الرئيسية'));
         await tester.pumpAndSettle();
 
+        await tester.ensureVisible(find.text('أحتاج دم'));
+        await tester.pumpAndSettle();
         await tester.tap(find.text('أحتاج دم'));
         await tester.pumpAndSettle();
 

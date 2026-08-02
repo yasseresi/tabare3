@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:tabare3/core/usecases/usecase.dart';
+import 'package:tabare3/core/utils/values_manager.dart';
 import 'package:tabare3/features/auth/domain/repositories/auth_repository.dart';
 import 'package:tabare3/features/auth/domain/usecases/get_current_session.dart';
 import 'package:tabare3/features/auth/domain/usecases/login_with_email_password.dart';
@@ -91,6 +92,16 @@ void main() {
   testWidgets('renders step 1 with account info fields', (tester) async {
     await pumpTestApp(tester, signUpUnderTest());
 
+    final scrollView = tester.widget<SingleChildScrollView>(
+      find.byType(SingleChildScrollView),
+    );
+    expect(
+      scrollView.padding,
+      const EdgeInsets.symmetric(
+        horizontal: AppPadding.p20,
+        vertical: AppPadding.p60,
+      ),
+    );
     expect(find.text('إنشاء حساب'), findsOneWidget);
     expect(find.text('معلومات الحساب'), findsOneWidget);
     expect(find.text('الاسم واللقب'), findsOneWidget);
@@ -112,7 +123,7 @@ void main() {
     await tester.tap(find.text('التالي'));
     await tester.pump();
 
-    expect(find.text('البيانات الشخصية'), findsOneWidget);
+    expect(find.text('المعلومات الشخصية'), findsOneWidget);
     expect(find.text('تاريخ الميلاد'), findsOneWidget);
     expect(find.text('فصيلة الدم'), findsOneWidget);
     expect(find.text('الوزن'), findsOneWidget);
@@ -157,6 +168,9 @@ void main() {
       find.widgetWithText(TextFormField, 'ابحث عن الولاية...'),
       'الجزائر',
     );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('الجزائر').last);
+    await tester.pumpAndSettle();
 
     await tester.scrollUntilVisible(
       find.text('التالي'),
