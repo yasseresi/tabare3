@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/presentation/widgets/app_dialog.dart';
 import '../../../../core/utils/assets_manager.dart';
@@ -46,103 +47,145 @@ class RoleSelectionScreen extends StatelessWidget {
           return Scaffold(
             body: Directionality(
               textDirection: TextDirection.rtl,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppPadding.p20,
-                    vertical: AppPadding.p20,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: ColorManager.white,
+                  gradient: LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [
+                      ColorManager.welcomeGradientStart,
+                      ColorManager.welcomeGradientEnd,
+                    ],
                   ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppPadding.p24,
-                      horizontal: AppPadding.p20,
-                    ),
-                    decoration: BoxDecoration(
-                      color: ColorManager.surface,
-                      borderRadius: BorderRadius.circular(AppSize.s40),
-                    ),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Image.asset(
-                            ImageAssets.icon6,
-                            height: AppSize.s80,
-                            errorBuilder: (_, __, ___) => Icon(
-                              Icons.bloodtype_outlined,
-                              size: AppSize.s80,
-                              color: ColorManager.primary,
+                ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) => SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppPadding.p10),
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxWidth: AppSize.s330,
                             ),
-                          ),
-                          const SizedBox(height: AppSize.s20),
-                          Text(
-                            AppStrings.hadithIntro.tr(),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: FontConstants.fontFamily,
-                              fontSize: FontSize.s18,
-                              fontWeight: FontWeightManager.bold,
-                              color: ColorManager.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: AppSize.s10),
-                          Text(
-                            '«${AppStrings.hadithRelief.tr()}»',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: FontConstants.fontFamily,
-                              fontSize: FontSize.s14,
-                              fontWeight: FontWeightManager.semiBold,
-                              color: ColorManager.textSecondary,
-                              height: 1.6,
-                            ),
-                          ),
-                          const SizedBox(height: AppSize.s24),
-                          Text(
-                            AppStrings.areYou.tr(),
-                            style: TextStyle(
-                              fontFamily: FontConstants.fontFamily,
-                              fontSize: FontSize.s20,
-                              fontWeight: FontWeightManager.bold,
-                              color: ColorManager.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: AppSize.s24),
-                          SizedBox(
-                            width: 220,
-                            height: 55,
-                            child: ElevatedButton(
-                              onPressed: () => _showConfirmationDialog(context),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: ColorManager.white,
-                                foregroundColor: ColorManager.primary,
-                                elevation: AppSize.s2,
-                                shadowColor: Colors.black26,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: AppPadding.p50,
+                                horizontal: AppPadding.p20,
                               ),
-                              child: Text(AppStrings.iNeedBlood.tr()),
-                            ),
-                          ),
-                          const SizedBox(height: AppSize.s15),
-                          SizedBox(
-                            width: 220,
-                            height: 55,
-                            child: TextButton(
-                              onPressed: () =>
-                                  _selectRole(context, isDonor: true),
-                              style: TextButton.styleFrom(
-                                foregroundColor: ColorManager.textSecondary,
-                              ),
-                              child: Text(
-                                AppStrings.iAmDonor.tr(),
-                                style: const TextStyle(
-                                  fontFamily: FontConstants.fontFamily,
-                                  fontSize: FontSize.s18,
-                                  fontWeight: FontWeightManager.bold,
+                              decoration: BoxDecoration(
+                                color: ColorManager.white,
+                                borderRadius: BorderRadius.circular(
+                                  AppSize.s46_6,
                                 ),
                               ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.asset(
+                                    ImageAssets.icon6,
+                                    height: AppSize.s120,
+                                    width: AppSize.s120,
+                                    errorBuilder: (_, __, ___) => Icon(
+                                      Icons.bloodtype_outlined,
+                                      size: AppSize.s80,
+                                      color: ColorManager.primary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppPadding.p9_3),
+                                  Text(
+                                    AppStrings.hadithIntro.tr(),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: FontConstants.fontFamily,
+                                      fontSize: FontSize.s20,
+                                      fontWeight: FontWeightManager.medium,
+                                      color: ColorManager.grey,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSize.s4),
+                                  Text(
+                                    AppStrings.hadithRelief.tr(),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: FontConstants.fontFamily,
+                                      fontSize: FontSize.s20,
+                                      fontWeight: FontWeightManager.medium,
+                                      color: ColorManager.grey,
+                                      height: 1.6,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSize.s20),
+                                  Text(
+                                    AppStrings.areYou.tr(),
+                                    style: TextStyle(
+                                      fontFamily: FontConstants.fontFamily,
+                                      fontSize: FontSize.s32,
+                                      fontWeight: FontWeightManager.bold,
+                                      color: ColorManager.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppPadding.p10),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed: () =>
+                                          _showConfirmationDialog(context),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: ColorManager.white,
+                                        foregroundColor: ColorManager.primary,
+                                        elevation: AppSize.s1,
+                                        shadowColor: ColorManager.black,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: AppPadding.p9_3,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            AppSize.s9_6,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        AppStrings.iNeedBlood.tr(),
+                                        style: getBoldStyle(
+                                          fontSize: FontSize.s19,
+                                          color: ColorManager.primary,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppPadding.p9_3),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: TextButton(
+                                      onPressed: () =>
+                                          _selectRole(context, isDonor: true),
+                                      style: TextButton.styleFrom(
+                                        foregroundColor:
+                                            ColorManager.welcomeText,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: AppPadding.p9_3,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        AppStrings.iAmDonor.tr(),
+                                        style: const TextStyle(
+                                          fontFamily: FontConstants.fontFamily,
+                                          fontSize: FontSize.s19,
+                                          fontWeight: FontWeightManager.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
@@ -159,61 +202,92 @@ class RoleSelectionScreen extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: true,
+      barrierColor: ColorManager.dialogScrim,
       builder: (dialogContext) {
         return Directionality(
           textDirection: TextDirection.rtl,
           child: Dialog(
-            child: Padding(
-              padding: const EdgeInsets.all(AppPadding.p24),
+            backgroundColor: ColorManager.transparent,
+            elevation: AppSize.s0,
+            insetPadding: const EdgeInsets.symmetric(
+              horizontal: AppPadding.p20,
+            ),
+            child: Container(
+              width: AppSize.s320,
+              padding: const EdgeInsets.all(AppSize.s40),
+              decoration: BoxDecoration(
+                color: ColorManager.white,
+                borderRadius: BorderRadius.circular(AppSize.s40),
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
-                    Icons.warning_rounded,
-                    color: Colors.red,
-                    size: AppSize.s80,
+                  SvgPicture.asset(
+                    SvgAssets.warning,
+                    width: AppSize.s60,
+                    height: AppSize.s60,
                   ),
-                  const SizedBox(height: AppSize.s20),
+                  const SizedBox(height: AppSize.s10),
                   Text(
                     AppStrings.confirmRoleUpdate.tr(),
                     textAlign: TextAlign.center,
                     style: getBoldStyle(
-                      fontSize: FontSize.s20,
-                      color: ColorManager.textSecondary,
+                      fontSize: FontSize.s16,
+                      color: ColorManager.welcomeText,
                     ),
                   ),
-                  const SizedBox(height: AppSize.s15),
+                  const SizedBox(height: AppSize.s10),
                   Text(
                     AppStrings.roleSwitchWarning.tr(),
                     textAlign: TextAlign.center,
                     style: getBoldStyle(
                       fontSize: FontSize.s16,
-                      color: ColorManager.textSecondary,
+                      color: ColorManager.welcomeText,
                     ),
                   ),
-                  const SizedBox(height: AppSize.s30),
+                  const SizedBox(height: AppSize.s10),
                   SizedBox(
-                    width: 220,
-                    height: 50,
+                    width: AppSize.s174,
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(dialogContext);
                         _selectRole(context, isDonor: false, isRecipient: true);
                       },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSize.s11_6,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppSize.radiusDialogAction,
+                          ),
+                        ),
+                      ),
                       child: Text(AppStrings.confirm.tr()),
                     ),
                   ),
                   const SizedBox(height: AppSize.s10),
                   SizedBox(
-                    width: 220,
-                    height: 50,
+                    width: AppSize.s174,
                     child: TextButton(
                       onPressed: () => Navigator.pop(dialogContext),
+                      style: TextButton.styleFrom(
+                        backgroundColor: ColorManager.welcomeText,
+                        foregroundColor: ColorManager.white,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSize.s11_6,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppSize.radiusDialogAction,
+                          ),
+                        ),
+                      ),
                       child: Text(
                         AppStrings.cancel.tr(),
                         style: getSemiBoldStyle(
-                          fontSize: FontSize.s16,
-                          color: ColorManager.textSecondary,
+                          fontSize: FontSize.s14,
+                          color: ColorManager.white,
                         ),
                       ),
                     ),

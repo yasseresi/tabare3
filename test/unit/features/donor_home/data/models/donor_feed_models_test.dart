@@ -108,9 +108,20 @@ void main() {
       'hospital_id': 'hospital-1',
       'donated_at': '2030-01-10T12:00:00.000Z',
       'units': 1,
+      'blood_request': {
+        'id': 'request-1',
+        'recipient': {'full_name': 'علي بن محمد'},
+        'hospital': hospitalJson,
+      },
+      'campaign': null,
     });
 
     expect(record.toEntity().source, DonationSource.campaign);
+    expect(record.toEntity().bloodRequest?.recipientName, 'علي بن محمد');
+    expect(
+      record.toEntity().bloodRequest?.hospital.nameAr,
+      'مستشفى مصطفى باشا',
+    );
     expect(
       buildAcceptBloodRequestRpcPayload(
         requestId: 'request-1',

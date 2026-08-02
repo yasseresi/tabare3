@@ -21,6 +21,7 @@ class AppPadding {
   static const double p6 = 6.0;
   static const double p7 = 7.0;
   static const double p8 = 8.0;
+  static const double p9_3 = 9.3;
   static const double p10 = 10.0;
   static const double p12 = 12.0;
   static const double p14 = 14.0;
@@ -46,10 +47,13 @@ class AppSize {
   static const double s2 = 2.0;
   static const double s3 = 3.0;
   static const double s4 = 4.0;
+  static const double s4_8 = 4.8;
   static const double s5 = 5.0;
   static const double s6 = 6.0;
   static const double s8 = 8.0;
+  static const double s9_6 = 9.6;
   static const double s10 = 10.0;
+  static const double s11_6 = 11.6;
   static const double s12 = 12.0;
   static const double s14 = 14.0;
   static const double s15 = 15.0;
@@ -68,6 +72,7 @@ class AppSize {
   static const double s38 = 38.0;
   static const double s40 = 40.0;
   static const double s46 = 46.0;
+  static const double s46_6 = 46.6;
   static const double s48 = 48.0;
   static const double s50 = 50.0;
   static const double s52 = 52.0;
@@ -79,16 +84,21 @@ class AppSize {
   static const double s92 = 92.0;
   static const double s96 = 96.0;
   static const double s100 = 100.0;
+  static const double s104 = 104.0;
   static const double s111 = 111.0;
   static const double s120 = 120.0;
+  static const double s130 = 130.0;
   static const double s140 = 140.0;
   static const double s160 = 160.0;
+  static const double s169 = 169.0;
+  static const double s170 = 170.0;
   static const double s174 = 174.0;
   static const double s190 = 190.0;
   static const double s220 = 220.0;
   static const double s250 = 250.0;
   static const double s260 = 260.0;
   static const double s320 = 320.0;
+  static const double s330 = 330.0;
   static const double s338 = 338.0;
   static const double s382 = 382.0;
   static const double s402 = 402.0;
@@ -99,6 +109,7 @@ class AppSize {
   static const double radiusLarge = 15.0;
   static const double radiusXLarge = 20.0;
   static const double radiusButton = 23.0;
+  static const double radiusDialogAction = 17.4;
   static const double radiusXXLarge = 30.0;
   static const double radiusCircle = 9999.0;
 }

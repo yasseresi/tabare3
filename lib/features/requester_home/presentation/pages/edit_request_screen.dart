@@ -1,12 +1,15 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart' as intl;
 
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/blood_request_entity.dart';
@@ -14,8 +17,15 @@ import '../bloc/request_bloc.dart';
 
 class EditRequestScreen extends StatefulWidget {
   final BloodRequestEntity request;
+  final VoidCallback? onComplete;
+  final VoidCallback? onNotifications;
 
-  const EditRequestScreen({super.key, required this.request});
+  const EditRequestScreen({
+    super.key,
+    required this.request,
+    this.onComplete,
+    this.onNotifications,
+  });
 
   @override
   State<EditRequestScreen> createState() => _EditRequestScreenState();
@@ -55,7 +65,7 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
       listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) {
         if (state.status == RequestViewStatus.success) {
-          Navigator.maybePop(context);
+          _showSuccessDialog();
         } else if (state.status == RequestViewStatus.failure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -65,121 +75,170 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
         }
       },
       builder: (context, state) {
-        return Scaffold(
-          appBar: AppBar(title: Text(AppStrings.editRequest.tr())),
-          body: Directionality(
-            textDirection: TextDirection.rtl,
-            child: SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppPadding.p20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildBanner(context),
-                    const SizedBox(height: AppSize.s24),
-                    _buildPrioritySelector(),
-                    const SizedBox(height: AppSize.s16),
-                    DropdownButtonFormField<String>(
-                      key: WidgetKeys.requestHospitalField,
-                      initialValue: _hospitalId,
-                      isExpanded: true,
-                      decoration: InputDecoration(
-                        hintText: AppStrings.selectHospital.tr(),
-                        suffixIcon: const Icon(Icons.local_hospital_outlined),
-                      ),
-                      items: state.hospitals
-                          .map(
-                            (hospital) => DropdownMenuItem(
-                              value: hospital.id,
-                              child: Text(
-                                hospital.nameAr,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() => _hospitalId = value);
-                        }
-                      },
-                    ),
-                    const SizedBox(height: AppSize.s16),
-                    DropdownButtonFormField<String>(
-                      key: WidgetKeys.requestBloodTypeField,
-                      initialValue: _bloodType,
-                      decoration: InputDecoration(
-                        hintText: AppStrings.selectBloodType.tr(),
-                        suffixIcon: const Icon(Icons.bloodtype_outlined),
-                      ),
-                      items: supportedBloodTypes
-                          .map(
-                            (bloodType) => DropdownMenuItem(
-                              value: bloodType,
-                              child: Text(bloodType),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() => _bloodType = value);
-                        }
-                      },
-                    ),
-                    const SizedBox(height: AppSize.s16),
-                    TextField(
-                      key: WidgetKeys.requestUnitsField,
-                      controller: _unitsController,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.right,
-                      decoration: InputDecoration(
-                        hintText: AppStrings.bagsRequired.tr(),
-                        suffixIcon: const Icon(Icons.bloodtype_outlined),
-                      ),
-                    ),
-                    const SizedBox(height: AppSize.s16),
-                    _buildDeadlineField(context),
-                    const SizedBox(height: AppSize.s16),
-                    TextField(
-                      key: WidgetKeys.requestNotesField,
-                      controller: _notesController,
-                      maxLines: AppSize.s4.toInt(),
-                      textAlign: TextAlign.right,
-                      decoration: InputDecoration(
-                        hintText: AppStrings.notes.tr(),
-                        suffixIcon: const Icon(Icons.notes_outlined),
-                      ),
-                    ),
-                    const SizedBox(height: AppSize.s24),
-                    ElevatedButton(
-                      key: WidgetKeys.requestEditSaveButton,
-                      onPressed: state.status == RequestViewStatus.submitting
-                          ? null
-                          : _submit,
-                      child: state.status == RequestViewStatus.submitting
-                          ? SizedBox(
-                              width: AppSize.s24,
-                              height: AppSize.s24,
-                              child: CircularProgressIndicator(
-                                strokeWidth: AppSize.s2,
-                                color: ColorManager.white,
-                              ),
-                            )
-                          : Text(AppStrings.saveChanges.tr()),
-                    ),
-                    const SizedBox(height: AppSize.s12),
-                    OutlinedButton(
-                      key: WidgetKeys.requestCancelButton,
-                      onPressed: state.status == RequestViewStatus.submitting
-                          ? null
-                          : _showCancellationDialog,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: ColorManager.error,
-                        side: BorderSide(color: ColorManager.error),
-                      ),
-                      child: Text(AppStrings.cancelRequest.tr()),
-                    ),
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: Scaffold(
+            backgroundColor: ColorManager.transparent,
+            body: Container(
+              decoration: BoxDecoration(
+                color: ColorManager.white,
+                gradient: LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  colors: [
+                    ColorManager.welcomeGradientStart,
+                    ColorManager.welcomeGradientEnd,
                   ],
+                ),
+              ),
+              child: SafeArea(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: AppSize.s402),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppPadding.p10,
+                        vertical: AppPadding.p32,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildHeader(context),
+                          const SizedBox(height: AppSize.s46),
+                          _buildBanner(context),
+                          const SizedBox(height: AppSize.s24),
+                          Text(
+                            AppStrings.urgencyLevel.tr(),
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: AppSize.s12),
+                          _buildPrioritySelector(),
+                          const SizedBox(height: AppSize.s16),
+                          DropdownButtonFormField<String>(
+                            key: WidgetKeys.requestHospitalField,
+                            initialValue: _hospitalId,
+                            isExpanded: true,
+                            decoration: InputDecoration(
+                              hintText: AppStrings.selectHospital.tr(),
+                              suffixIcon: const Icon(
+                                Icons.local_hospital_outlined,
+                              ),
+                            ),
+                            items: state.hospitals
+                                .map(
+                                  (hospital) => DropdownMenuItem(
+                                    value: hospital.id,
+                                    child: Text(
+                                      hospital.nameAr,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() => _hospitalId = value);
+                              }
+                            },
+                          ),
+                          const SizedBox(height: AppSize.s16),
+                          DropdownButtonFormField<String>(
+                            key: WidgetKeys.requestBloodTypeField,
+                            initialValue: _bloodType,
+                            isExpanded: true,
+                            decoration: InputDecoration(
+                              hintText: AppStrings.selectBloodType.tr(),
+                              suffixIcon: const Icon(Icons.bloodtype_outlined),
+                            ),
+                            items: supportedBloodTypes
+                                .map(
+                                  (bloodType) => DropdownMenuItem(
+                                    value: bloodType,
+                                    child: Text(bloodType),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() => _bloodType = value);
+                              }
+                            },
+                          ),
+                          const SizedBox(height: AppSize.s16),
+                          TextField(
+                            key: WidgetKeys.requestUnitsField,
+                            controller: _unitsController,
+                            keyboardType: TextInputType.number,
+                            textAlign: TextAlign.right,
+                            decoration: InputDecoration(
+                              hintText: AppStrings.bagsRequired.tr(),
+                              suffixIcon: const Icon(Icons.bloodtype_outlined),
+                            ),
+                          ),
+                          const SizedBox(height: AppSize.s16),
+                          _buildDeadlineField(context),
+                          const SizedBox(height: AppSize.s16),
+                          TextField(
+                            key: WidgetKeys.requestNotesField,
+                            controller: _notesController,
+                            maxLines: AppSize.s4.toInt(),
+                            textAlign: TextAlign.right,
+                            decoration: InputDecoration(
+                              hintText: AppStrings.notes.tr(),
+                              suffixIcon: const Icon(Icons.notes_outlined),
+                            ),
+                          ),
+                          const SizedBox(height: AppSize.s24),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  key: WidgetKeys.requestEditSaveButton,
+                                  onPressed:
+                                      state.status ==
+                                          RequestViewStatus.submitting
+                                      ? null
+                                      : _submit,
+                                  child:
+                                      state.status ==
+                                          RequestViewStatus.submitting
+                                      ? SizedBox(
+                                          width: AppSize.s24,
+                                          height: AppSize.s24,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: AppSize.s2,
+                                            color: ColorManager.white,
+                                          ),
+                                        )
+                                      : Text(AppStrings.saveChanges.tr()),
+                                ),
+                              ),
+                              const SizedBox(width: AppSize.s20),
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: _clear,
+                                  child: Text(AppStrings.clearFields.tr()),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppSize.s12),
+                          TextButton(
+                            key: WidgetKeys.requestCancelButton,
+                            onPressed:
+                                state.status == RequestViewStatus.submitting
+                                ? null
+                                : _showCancellationDialog,
+                            style: TextButton.styleFrom(
+                              foregroundColor: ColorManager.error,
+                            ),
+                            child: Text(AppStrings.cancelRequest.tr()),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -189,19 +248,91 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
     );
   }
 
+  Widget _buildHeader(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppStrings.welcomeUser.tr(),
+                style: const TextStyle(
+                  fontSize: AppSize.s18,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              Text(
+                AppStrings.getWellSoon.tr(),
+                style: TextStyle(
+                  color: ColorManager.textMuted,
+                  fontSize: AppSize.s14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          key: WidgetKeys.requesterNotificationsButton,
+          onPressed:
+              widget.onNotifications ??
+              () => Navigator.pushNamed(context, Routes.notificationsRoute),
+          style: IconButton.styleFrom(
+            padding: const EdgeInsets.all(AppPadding.p8),
+            backgroundColor: ColorManager.surfaceAlt,
+            minimumSize: const Size.square(AppSize.s40),
+            maximumSize: const Size.square(AppSize.s40),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            shape: const CircleBorder(),
+          ),
+          constraints: const BoxConstraints(),
+          icon: const Icon(Icons.notifications_none_rounded, size: AppSize.s24),
+        ),
+      ],
+    );
+  }
+
   Widget _buildBanner(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppPadding.p20),
       decoration: BoxDecoration(
-        color: ColorManager.primaryDark,
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [ColorManager.primary, ColorManager.primaryDark],
+        ),
         borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
       ),
-      child: Text(
-        AppStrings.editRequestBanner.tr(),
-        textAlign: TextAlign.center,
-        style: Theme.of(
-          context,
-        ).textTheme.titleLarge?.copyWith(color: ColorManager.white),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppStrings.editRequestBanner.tr(),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(color: ColorManager.white),
+                ),
+                const SizedBox(height: AppSize.s8),
+                Text(
+                  AppStrings.requestFormDescription.tr(),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: ColorManager.white),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSize.s12),
+          Icon(
+            Icons.volunteer_activism_outlined,
+            size: AppSize.s60,
+            color: ColorManager.white,
+          ),
+        ],
       ),
     );
   }
@@ -230,18 +361,21 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
         : intl.DateFormat(
             AppConstants.requestDateFormat,
           ).format(_neededBy!.toLocal());
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: AppPadding.p16,
-        vertical: AppPadding.p4,
+    return Material(
+      color: ColorManager.transparent,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppPadding.p16,
+          vertical: AppPadding.p4,
+        ),
+        tileColor: ColorManager.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSize.radiusLarge),
+        ),
+        title: Text(label),
+        trailing: const Icon(Icons.calendar_today_outlined),
+        onTap: () => _pickDeadline(context),
       ),
-      tileColor: ColorManager.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSize.radiusLarge),
-      ),
-      title: Text(label),
-      trailing: const Icon(Icons.calendar_today_outlined),
-      onTap: () => _pickDeadline(context),
     );
   }
 
@@ -261,6 +395,92 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
     if (selected != null && mounted) {
       setState(() => _neededBy = selected);
     }
+  }
+
+  void _clear() {
+    setState(() {
+      _hospitalId = widget.request.hospital.id;
+      _bloodType = widget.request.bloodType;
+      _priority = widget.request.priority;
+      _neededBy = widget.request.neededBy;
+      _unitsController.text = widget.request.unitsNeeded.toString();
+      _notesController.text = widget.request.notes ?? '';
+    });
+  }
+
+  Future<void> _showSuccessDialog() async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: ColorManager.dialogScrim,
+      builder: (dialogContext) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: Dialog(
+          backgroundColor: ColorManager.transparent,
+          elevation: AppSize.s0,
+          insetPadding: const EdgeInsets.symmetric(horizontal: AppPadding.p20),
+          child: Container(
+            width: AppSize.s320,
+            padding: const EdgeInsets.all(AppPadding.p40),
+            decoration: BoxDecoration(
+              color: ColorManager.white,
+              borderRadius: BorderRadius.circular(AppSize.s40),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SvgPicture.asset(
+                  SvgAssets.successCheck,
+                  width: AppSize.s60,
+                  height: AppSize.s60,
+                ),
+                const SizedBox(height: AppSize.s10),
+                Text(
+                  AppStrings.editSuccess.tr(),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(dialogContext).textTheme.titleMedium
+                      ?.copyWith(
+                        color: ColorManager.welcomeText,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: AppSize.s10),
+                Image.asset(
+                  ImageAssets.icon6,
+                  width: AppSize.s76,
+                  height: AppSize.s76,
+                ),
+                const SizedBox(height: AppSize.s10),
+                SizedBox(
+                  width: AppSize.s174,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                      if (widget.onComplete != null) {
+                        widget.onComplete!();
+                      } else {
+                        Navigator.maybePop(context);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSize.s11_6,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          AppSize.radiusDialogAction,
+                        ),
+                      ),
+                    ),
+                    child: Text(AppStrings.homePage.tr()),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void _submit() {

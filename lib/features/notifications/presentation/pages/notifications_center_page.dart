@@ -42,64 +42,79 @@ class _NotificationsCenterPageState extends State<NotificationsCenterPage> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: ColorManager.white,
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppPadding.p20,
-              vertical: AppPadding.p20,
-            ),
-            child: Column(
-              children: [
-                _PageHeader(controller: _searchController),
-                const SizedBox(height: AppSize.s24),
-                Expanded(
-                  child: BlocBuilder<NotificationsBloc, NotificationsState>(
-                    builder: (context, state) {
-                      if (state is NotificationsLoading ||
-                          state is NotificationsInitial) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      if (state is NotificationsError) {
-                        return Center(child: Text(state.failure.message));
-                      }
-
-                      final loaded = state as NotificationsLoaded;
-                      if (loaded.visibleNotifications.isEmpty) {
-                        return Center(
-                          child: Text(
-                            AppStrings.noNotifications.tr(),
-                            style: TextStyle(
-                              fontSize: AppSize.s16,
-                              fontWeight: FontWeight.w600,
-                              color: ColorManager.textSecondary,
-                            ),
-                          ),
-                        );
-                      }
-
-                      return ListView.separated(
-                        itemCount: loaded.visibleNotifications.length,
-                        separatorBuilder: (_, _) =>
-                            const SizedBox(height: AppSize.s14),
-                        itemBuilder: (context, index) {
-                          final notification =
-                              loaded.visibleNotifications[index];
-                          return _NotificationCard(
-                            notification: notification,
-                            onTap: () {
-                              context.read<NotificationsBloc>().add(
-                                NotificationReadRequested(notification.id),
-                              );
-                            },
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ),
+        backgroundColor: ColorManager.transparent,
+        body: Container(
+          decoration: BoxDecoration(
+            color: ColorManager.white,
+            gradient: LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              colors: [
+                ColorManager.welcomeGradientStart,
+                ColorManager.welcomeGradientEnd,
               ],
+            ),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppPadding.p10,
+                vertical: AppPadding.p32,
+              ),
+              child: Column(
+                children: [
+                  _PageHeader(controller: _searchController),
+                  const SizedBox(height: AppSize.s24),
+                  Expanded(
+                    child: BlocBuilder<NotificationsBloc, NotificationsState>(
+                      builder: (context, state) {
+                        if (state is NotificationsLoading ||
+                            state is NotificationsInitial) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        if (state is NotificationsError) {
+                          return Center(child: Text(state.failure.message));
+                        }
+
+                        final loaded = state as NotificationsLoaded;
+                        if (loaded.visibleNotifications.isEmpty) {
+                          return Center(
+                            child: Text(
+                              AppStrings.noNotifications.tr(),
+                              style: TextStyle(
+                                fontSize: AppSize.s16,
+                                fontWeight: FontWeight.w600,
+                                color: ColorManager.textSecondary,
+                              ),
+                            ),
+                          );
+                        }
+
+                        return ListView.separated(
+                          itemCount: loaded.visibleNotifications.length,
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(height: AppSize.s14),
+                          itemBuilder: (context, index) {
+                            final notification =
+                                loaded.visibleNotifications[index];
+                            return _NotificationCard(
+                              notification: notification,
+                              onTap: () {
+                                context.read<NotificationsBloc>().add(
+                                  NotificationReadRequested(notification.id),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -141,20 +156,20 @@ class _PageHeader extends StatelessWidget {
               ],
             ),
             Container(
-              padding: const EdgeInsets.all(AppPadding.p12),
+              padding: const EdgeInsets.all(AppPadding.p8),
               decoration: BoxDecoration(
-                color: ColorManager.surfaceWarm,
-                borderRadius: BorderRadius.circular(AppSize.s18),
+                color: ColorManager.surfaceAlt,
+                borderRadius: BorderRadius.circular(AppSize.radiusCircle),
               ),
               child: Icon(
                 Icons.notifications_none_rounded,
                 color: ColorManager.primaryDark,
-                size: AppSize.s28,
+                size: AppSize.s24,
               ),
             ),
           ],
         ),
-        const SizedBox(height: AppSize.s20),
+        const SizedBox(height: AppSize.s46),
         TextField(
           controller: controller,
           textAlign: TextAlign.right,
@@ -173,18 +188,18 @@ class _PageHeader extends StatelessWidget {
               size: AppSize.s26,
             ),
             filled: true,
-            fillColor: ColorManager.surfaceLight,
+            fillColor: ColorManager.white,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppPadding.p20,
               vertical: AppPadding.p14,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSize.radiusButton),
-              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(AppSize.radiusXLarge),
+              borderSide: BorderSide(color: ColorManager.borderGrey),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSize.radiusButton),
-              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(AppSize.radiusXLarge),
+              borderSide: BorderSide(color: ColorManager.borderGrey),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSize.radiusButton),
@@ -307,13 +322,13 @@ class _NotificationLeading extends StatelessWidget {
     if (type == NotificationTypes.thankYou ||
         type == NotificationTypes.participationAccepted) {
       return Container(
-        width: AppSize.s48,
-        height: AppSize.s48,
+        width: AppSize.s40,
+        height: AppSize.s40,
         decoration: BoxDecoration(
           color: ColorManager.success,
           shape: BoxShape.circle,
         ),
-        child: Icon(Icons.check, color: ColorManager.white, size: AppSize.s30),
+        child: Icon(Icons.check, color: ColorManager.white, size: AppSize.s24),
       );
     }
 

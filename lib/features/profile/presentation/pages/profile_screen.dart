@@ -4,8 +4,11 @@ import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart' as intl;
 
+import '../../../../core/constants/widget_keys.dart';
 import '../../../../core/presentation/widgets/logout_dialog.dart';
+import '../../../../core/utils/constants_manager.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
@@ -19,7 +22,18 @@ import '../widgets/profile_field_editors.dart';
 import '../widgets/profile_widgets.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  final bool showRecipientIdentityDetails;
+  final VoidCallback? onAbout;
+  final VoidCallback? onDonorCard;
+  final VoidCallback? onNotifications;
+
+  const ProfileScreen({
+    super.key,
+    this.showRecipientIdentityDetails = true,
+    this.onAbout,
+    this.onDonorCard,
+    this.onNotifications,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,24 +41,42 @@ class ProfileScreen extends StatelessWidget {
       textDirection: appTextDirection(context),
       child: Scaffold(
         backgroundColor: ColorManager.scaffoldBg,
-        body: SafeArea(
-          child: BlocConsumer<ProfileBloc, ProfileState>(
-            listener: _profileListener,
-            builder: (context, state) {
-              if (state is ProfileLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (state is ProfileLoaded) {
-                return _ProfileContent(
-                  profile: state.profile,
-                  isEditing: state.isEditing,
-                );
-              }
-              if (state is ProfileError) {
-                return Center(child: Text(state.failure.message));
-              }
-              return const SizedBox.shrink();
-            },
+        body: Container(
+          key: WidgetKeys.profileGradientBackground,
+          decoration: BoxDecoration(
+            color: ColorManager.white,
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                ColorManager.welcomeGradientStart,
+                ColorManager.welcomeGradientEnd,
+              ],
+            ),
+          ),
+          child: SafeArea(
+            child: BlocConsumer<ProfileBloc, ProfileState>(
+              listener: _profileListener,
+              builder: (context, state) {
+                if (state is ProfileLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (state is ProfileLoaded) {
+                  return _ProfileContent(
+                    profile: state.profile,
+                    isEditing: state.isEditing,
+                    showRecipientIdentityDetails: showRecipientIdentityDetails,
+                    onAbout: onAbout,
+                    onDonorCard: onDonorCard,
+                    onNotifications: onNotifications,
+                  );
+                }
+                if (state is ProfileError) {
+                  return Center(child: Text(state.failure.message));
+                }
+                return const SizedBox.shrink();
+              },
+            ),
           ),
         ),
       ),
@@ -64,8 +96,19 @@ class ProfileScreen extends StatelessWidget {
 class _ProfileContent extends StatelessWidget {
   final ProfileEntity profile;
   final bool isEditing;
+  final bool showRecipientIdentityDetails;
+  final VoidCallback? onAbout;
+  final VoidCallback? onDonorCard;
+  final VoidCallback? onNotifications;
 
-  const _ProfileContent({required this.profile, required this.isEditing});
+  const _ProfileContent({
+    required this.profile,
+    required this.isEditing,
+    required this.showRecipientIdentityDetails,
+    required this.onAbout,
+    required this.onDonorCard,
+    required this.onNotifications,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -113,10 +156,18 @@ class _ProfileContent extends StatelessWidget {
                 ),
               ],
             ),
-            child: Icon(
-              Icons.notifications_none_outlined,
-              size: AppSize.s24,
-              color: ColorManager.textPrimary,
+            child: IconButton(
+              key: WidgetKeys.profileNotificationsButton,
+              constraints: const BoxConstraints(),
+              padding: EdgeInsets.zero,
+              onPressed:
+                  onNotifications ??
+                  () => Navigator.pushNamed(context, Routes.notificationsRoute),
+              icon: Icon(
+                Icons.notifications_none_outlined,
+                size: AppSize.s24,
+                color: ColorManager.textPrimary,
+              ),
             ),
           ),
           Column(
@@ -158,7 +209,7 @@ class _ProfileContent extends StatelessWidget {
         ),
         const SizedBox(height: AppSize.s4),
         Text(
-          profile.email,
+          profile.username,
           style: getRegularStyle(
             fontSize: FontSize.s14,
             color: ColorManager.lightGrey,
@@ -186,7 +237,9 @@ class _ProfileContent extends StatelessWidget {
           _PillButton(
             label: AppStrings.donorCard.tr(),
             icon: Icons.card_giftcard,
-            onTap: () => Navigator.pushNamed(context, Routes.donorCardRoute),
+            onTap:
+                onDonorCard ??
+                () => Navigator.pushNamed(context, Routes.donorCardRoute),
           ),
           const SizedBox(width: AppSize.s12),
           _PillButton(
@@ -248,51 +301,31 @@ class _ProfileContent extends StatelessWidget {
     return ProfileSection(
       title: AppStrings.personalInfo.tr(),
       children: [
-        if (isEditing) ...[
+        if (showRecipientIdentityDetails) ...[
           ProfileRow(
             label: AppStrings.dateOfBirth.tr(),
-            value: _formatDate(context, profile.dateOfBirth),
-            iconData: Icons.calendar_today_outlined,
-            onTap: () => ProfileFieldEditors.pickDateOfBirth(
-              context,
-              profile.dateOfBirth,
-              (v) => _updateProfile(context, dateOfBirth: v),
-            ),
+            value: _formattedBirthDate(context),
+            iconData: Icons.calendar_month_rounded,
           ),
           _Divider(),
           ProfileRow(
             label: AppStrings.gender.tr(),
-            value: _genderLabel(profile.gender),
-            iconData: Icons.person_outline,
-            onTap: () => ProfileFieldEditors.pickGender(
-              context,
-              profile.gender,
-              (v) => _updateProfile(context, gender: v),
-            ),
+            value: profile.gender == AppConstants.genderFemale
+                ? AppStrings.female.tr()
+                : AppStrings.male.tr(),
+            iconData: Icons.person_rounded,
           ),
           _Divider(),
           ProfileRow(
             label: AppStrings.nationalId.tr(),
-            value: profile.nationalId ?? '',
-            iconData: Icons.badge_outlined,
-            stackValue: true,
-            onTap: _editTap(
-              context,
-              AppStrings.nationalId.tr(),
-              profile.nationalId ?? '',
-              (v) => _updateProfile(context, nationalId: v),
-            ),
+            value: profile.nationalId ?? AppStrings.notAvailable.tr(),
+            iconData: Icons.badge_rounded,
           ),
           _Divider(),
           ProfileRow(
             label: AppStrings.bloodType.tr(),
             value: profile.bloodType,
-            iconData: Icons.opacity,
-            onTap: () => ProfileFieldEditors.pickBloodType(
-              context,
-              profile.bloodType,
-              (v) => _updateProfile(context, bloodType: v),
-            ),
+            iconData: Icons.bloodtype_rounded,
           ),
           _Divider(),
         ],
@@ -326,7 +359,7 @@ class _ProfileContent extends StatelessWidget {
         _Divider(),
         ProfileRow(
           label: AppStrings.chronicDiseases.tr(),
-          value: profile.chronicDiseases ?? '/',
+          value: profile.chronicDiseases ?? AppStrings.notAvailable.tr(),
           iconData: Icons.healing_outlined,
           onTap: _editTap(
             context,
@@ -337,6 +370,12 @@ class _ProfileContent extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _formattedBirthDate(BuildContext context) {
+    final parsed = DateTime.tryParse(profile.dateOfBirth);
+    if (parsed == null) return profile.dateOfBirth;
+    return intl.DateFormat.yMMMMd(context.locale.languageCode).format(parsed);
   }
 
   Widget _buildAppSection(BuildContext context) {
@@ -352,7 +391,9 @@ class _ProfileContent extends StatelessWidget {
             size: AppSize.s16,
             color: ColorManager.textSecondary,
           ),
-          onTap: () => Navigator.pushNamed(context, Routes.aboutAppRoute),
+          onTap:
+              onAbout ??
+              () => Navigator.pushNamed(context, Routes.aboutAppRoute),
         ),
         _Divider(),
         ProfileRow(
@@ -380,24 +421,10 @@ class _ProfileContent extends StatelessWidget {
     return '';
   }
 
-  String _genderLabel(String gender) {
-    return gender == 'female' ? AppStrings.female.tr() : AppStrings.male.tr();
-  }
-
-  String _formatDate(BuildContext context, String rawDate) {
-    final parsed = DateTime.tryParse(rawDate);
-    if (parsed == null) return rawDate;
-    return DateFormat.yMMMMd(context.locale.toString()).format(parsed);
-  }
-
   void _updateProfile(
     BuildContext context, {
     String? fullName,
     String? phone,
-    String? dateOfBirth,
-    String? gender,
-    String? nationalId,
-    String? bloodType,
     double? weight,
     String? city,
     String? chronicDiseases,
@@ -405,12 +432,6 @@ class _ProfileContent extends StatelessWidget {
     final updated = profile.copyWith(
       fullName: fullName ?? profile.fullName,
       phone: phone ?? profile.phone,
-      dateOfBirth: dateOfBirth ?? profile.dateOfBirth,
-      gender: gender ?? profile.gender,
-      nationalId: nationalId == null
-          ? profile.nationalId
-          : (nationalId.isEmpty ? null : nationalId),
-      bloodType: bloodType ?? profile.bloodType,
       weight: weight ?? profile.weight,
       city: city ?? profile.city,
       chronicDiseases: chronicDiseases == null

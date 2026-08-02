@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/widget_keys.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/values_manager.dart';
@@ -13,13 +16,29 @@ import '../../../../injection_container.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../profile/presentation/bloc/profile_bloc.dart';
 import '../../../profile/presentation/pages/requester_profile_screen.dart';
+import '../../../profile/presentation/pages/about_app_screen.dart';
+import '../../../notifications/presentation/bloc/notifications_bloc.dart';
+import '../../../notifications/presentation/pages/notifications_center_page.dart';
 import '../../domain/entities/blood_request_entity.dart';
 import '../bloc/request_bloc.dart';
+import '../bloc/request_detail_bloc.dart';
 import 'create_request_screen.dart';
 import 'donor_history_screen.dart';
+import 'edit_request_screen.dart';
+import 'request_detail_screen.dart';
 import 'requests_screen.dart';
 
-enum _RequesterTab { home, requests, create, donors, profile }
+enum _RequesterTab {
+  home,
+  requests,
+  create,
+  donors,
+  profile,
+  notifications,
+  about,
+  edit,
+  detail,
+}
 
 class RequesterHomeScreen extends StatefulWidget {
   const RequesterHomeScreen({super.key});
@@ -30,6 +49,8 @@ class RequesterHomeScreen extends StatefulWidget {
 
 class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
   _RequesterTab _selectedTab = _RequesterTab.home;
+  BloodRequestEntity? _editingRequest;
+  BloodRequestEntity? _detailRequest;
 
   @override
   Widget build(BuildContext context) {
@@ -57,24 +78,115 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
 
   Widget _buildBody() {
     return switch (_selectedTab) {
-      _RequesterTab.home => const _RequesterOverview(),
-      _RequesterTab.requests => const RequestsScreen(),
+      _RequesterTab.home => _RequesterOverview(
+        onCreate: () => setState(() => _selectedTab = _RequesterTab.create),
+        onNotifications: () =>
+            setState(() => _selectedTab = _RequesterTab.notifications),
+        onEdit: (request) {
+          setState(() {
+            _editingRequest = request;
+            _selectedTab = _RequesterTab.edit;
+          });
+        },
+        onDetail: _openDetail,
+      ),
+      _RequesterTab.requests => RequestsScreen(
+        onNotifications: () =>
+            setState(() => _selectedTab = _RequesterTab.notifications),
+        onEdit: (request) {
+          setState(() {
+            _editingRequest = request;
+            _selectedTab = _RequesterTab.edit;
+          });
+        },
+        onDetail: _openDetail,
+      ),
       _RequesterTab.create => CreateRequestScreen(
         onSuccess: () {
           setState(() => _selectedTab = _RequesterTab.requests);
         },
+        onNotifications: () =>
+            setState(() => _selectedTab = _RequesterTab.notifications),
+        onProfile: () => setState(() => _selectedTab = _RequesterTab.profile),
       ),
-      _RequesterTab.donors => const DonorHistoryScreen(),
+      _RequesterTab.donors => DonorHistoryScreen(
+        onNotifications: () =>
+            setState(() => _selectedTab = _RequesterTab.notifications),
+        onDetail: _openDetail,
+      ),
       _RequesterTab.profile => BlocProvider(
         create: (_) => sl<ProfileBloc>()..add(const LoadProfile()),
-        child: const RequesterProfileScreen(),
+        child: RequesterProfileScreen(
+          onAbout: () => setState(() => _selectedTab = _RequesterTab.about),
+          onNotifications: () =>
+              setState(() => _selectedTab = _RequesterTab.notifications),
+        ),
       ),
+      _RequesterTab.notifications => BlocProvider(
+        create: (_) => sl<NotificationsBloc>(),
+        child: const NotificationsCenterPage(),
+      ),
+      _RequesterTab.about => AboutAppScreen(
+        onBack: () => setState(() => _selectedTab = _RequesterTab.profile),
+      ),
+      _RequesterTab.edit =>
+        _editingRequest == null
+            ? RequestsScreen(
+                onNotifications: () =>
+                    setState(() => _selectedTab = _RequesterTab.notifications),
+                onDetail: _openDetail,
+              )
+            : EditRequestScreen(
+                request: _editingRequest!,
+                onComplete: () {
+                  setState(() {
+                    _editingRequest = null;
+                    _selectedTab = _RequesterTab.requests;
+                  });
+                },
+                onNotifications: () {
+                  setState(() => _selectedTab = _RequesterTab.notifications);
+                },
+              ),
+      _RequesterTab.detail =>
+        _detailRequest == null
+            ? RequestsScreen(
+                onNotifications: () =>
+                    setState(() => _selectedTab = _RequesterTab.notifications),
+                onDetail: _openDetail,
+              )
+            : BlocProvider(
+                create: (_) => sl<RequestDetailBloc>(),
+                child: RequestDetailScreen(
+                  request: _detailRequest!,
+                  onNotifications: () => setState(
+                    () => _selectedTab = _RequesterTab.notifications,
+                  ),
+                ),
+              ),
     };
+  }
+
+  void _openDetail(BloodRequestEntity request) {
+    setState(() {
+      _detailRequest = request;
+      _selectedTab = _RequesterTab.detail;
+    });
   }
 }
 
 class _RequesterOverview extends StatelessWidget {
-  const _RequesterOverview();
+  final VoidCallback onCreate;
+  final VoidCallback onNotifications;
+  final ValueChanged<BloodRequestEntity> onEdit;
+  final ValueChanged<BloodRequestEntity> onDetail;
+
+  const _RequesterOverview({
+    required this.onCreate,
+    required this.onNotifications,
+    required this.onEdit,
+    required this.onDetail,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -108,39 +220,76 @@ class _RequesterOverview extends StatelessWidget {
             onRefresh: () async {
               context.read<RequestBloc>().add(const RequestsLoadRequested());
             },
-            child: ListView(
-              padding: const EdgeInsets.all(AppPadding.p20),
-              children: [
-                const _OverviewHeader(),
-                const SizedBox(height: AppSize.s20),
-                _RequestStatsCard(requests: state.requests),
-                const SizedBox(height: AppSize.s24),
-                Text(
-                  AppStrings.myRequests.tr(),
-                  style: const TextStyle(
-                    fontSize: AppSize.s20,
-                    fontWeight: FontWeight.bold,
-                  ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: ColorManager.white,
+                gradient: LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  colors: [
+                    ColorManager.welcomeGradientStart,
+                    ColorManager.welcomeGradientEnd,
+                  ],
                 ),
-                const SizedBox(height: AppSize.s12),
-                if (state.requests.isEmpty)
-                  _EmptyOverview(
-                    onCreate: () {
-                      Navigator.pushNamed(context, Routes.createRequestRoute);
-                    },
-                  )
-                else
-                  ...state.requests
-                      .take(AppConstants.paginationLimit)
-                      .map(
-                        (request) => Padding(
-                          padding: const EdgeInsets.only(
-                            bottom: AppPadding.p12,
+              ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: AppSize.s402),
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppPadding.p10,
+                      vertical: AppPadding.p32,
+                    ),
+                    children: [
+                      _OverviewHeader(onNotifications: onNotifications),
+                      const SizedBox(height: AppSize.s20),
+                      _RequestStatsCard(requests: state.requests),
+                      const SizedBox(height: AppSize.s24),
+                      Center(
+                        child: SizedBox(
+                          width: AppSize.s174,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              onCreate();
+                            },
+                            child: Text(AppStrings.createRequest.tr()),
                           ),
-                          child: _OverviewRequestCard(request: request),
                         ),
                       ),
-              ],
+                      const SizedBox(height: AppSize.s24),
+                      Text(
+                        AppStrings.myRequests.tr(),
+                        style: const TextStyle(
+                          fontSize: AppSize.s20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: AppSize.s12),
+                      if (state.requests.isEmpty)
+                        _EmptyOverview(
+                          onCreate: () {
+                            onCreate();
+                          },
+                        )
+                      else
+                        ...state.requests
+                            .take(AppConstants.paginationLimit)
+                            .map(
+                              (request) => Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: AppPadding.p12,
+                                ),
+                                child: _OverviewRequestCard(
+                                  request: request,
+                                  onEdit: onEdit,
+                                  onDetail: onDetail,
+                                ),
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           );
         },
@@ -150,7 +299,9 @@ class _RequesterOverview extends StatelessWidget {
 }
 
 class _OverviewHeader extends StatelessWidget {
-  const _OverviewHeader();
+  final VoidCallback onNotifications;
+
+  const _OverviewHeader({required this.onNotifications});
 
   @override
   Widget build(BuildContext context) {
@@ -174,11 +325,16 @@ class _OverviewHeader extends StatelessWidget {
             ],
           ),
         ),
-        IconButton(
-          onPressed: () {
-            Navigator.pushNamed(context, Routes.notificationsRoute);
-          },
-          icon: const Icon(Icons.notifications_none_rounded),
+        Container(
+          padding: const EdgeInsets.all(AppPadding.p8),
+          decoration: BoxDecoration(
+            color: ColorManager.surfaceAlt,
+            borderRadius: BorderRadius.circular(AppSize.radiusCircle),
+          ),
+          child: IconButton(
+            onPressed: onNotifications,
+            icon: const Icon(Icons.notifications_none_rounded),
+          ),
         ),
       ],
     );
@@ -201,28 +357,113 @@ class _RequestStatsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppPadding.p20),
       decoration: BoxDecoration(
-        color: ColorManager.surfaceWarm,
+        color: ColorManager.white,
         borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
+        border: Border.all(color: ColorManager.borderGrey),
+        boxShadow: [
+          BoxShadow(
+            color: ColorManager.black.withValues(alpha: AppOpacity.subtle),
+            blurRadius: AppSize.s26,
+            offset: const Offset(AppSize.s0, AppSize.s8),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    _RequestStatusTag(requests: requests),
+                    const SizedBox(height: AppSize.s10),
+                    Text(
+                      AppStrings.hadithIntro.tr(),
+                      textAlign: TextAlign.right,
+                      style: const TextStyle(
+                        fontSize: FontSize.s24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      AppStrings.hadithBelieverAffair.tr(),
+                      maxLines: AppConstants.profileHadithMaxLines,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                        color: ColorManager.textMuted,
+                        fontSize: FontSize.s12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: AppSize.s10),
+              Image.asset(
+                ImageAssets.demo1,
+                width: AppSize.s130,
+                height: AppSize.s130,
+                fit: BoxFit.contain,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSize.s16),
+          _StatItem(
+            value: requests.length.toString(),
+            label: AppStrings.requestsCount.tr(),
+          ),
+          _StatItem(
+            value: active.toString(),
+            label: AppStrings.respondingDonors.tr(),
+          ),
+          _StatItem(
+            value: completed.toString(),
+            label: AppStrings.completedRequests.tr(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RequestStatusTag extends StatelessWidget {
+  final List<BloodRequestEntity> requests;
+
+  const _RequestStatusTag({required this.requests});
+
+  @override
+  Widget build(BuildContext context) {
+    final hasRequests = requests.isNotEmpty;
+    final color = hasRequests ? ColorManager.success : ColorManager.error;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppPadding.p12,
+        vertical: AppPadding.p6,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: AppOpacity.muted),
+        borderRadius: BorderRadius.circular(AppSize.radiusCircle),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-            child: _StatItem(
-              value: requests.length.toString(),
-              label: AppStrings.requestsCount.tr(),
+          Flexible(
+            child: Text(
+              hasRequests
+                  ? AppStrings.activeRequests.tr()
+                  : AppStrings.noRequestsDescription.tr(),
+              maxLines: AppConstants.statusTagMaxLines,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: color, fontSize: FontSize.s12),
             ),
           ),
-          Expanded(
-            child: _StatItem(
-              value: active.toString(),
-              label: AppStrings.activeRequests.tr(),
-            ),
-          ),
-          Expanded(
-            child: _StatItem(
-              value: completed.toString(),
-              label: AppStrings.completedRequests.tr(),
-            ),
+          const SizedBox(width: AppSize.s8),
+          Container(
+            width: AppSize.s8,
+            height: AppSize.s8,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
         ],
       ),
@@ -238,32 +479,50 @@ class _StatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: AppSize.s17,
-            fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppPadding.p2),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              textAlign: TextAlign.right,
+              style: const TextStyle(fontSize: AppSize.s14),
+            ),
           ),
-        ),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: ColorManager.textMuted,
-            fontSize: AppSize.s12,
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppPadding.p8,
+              vertical: AppPadding.p2,
+            ),
+            decoration: BoxDecoration(
+              color: ColorManager.surfaceLight,
+              borderRadius: BorderRadius.circular(AppSize.radiusCircle),
+            ),
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: AppSize.s12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
 class _OverviewRequestCard extends StatelessWidget {
   final BloodRequestEntity request;
+  final ValueChanged<BloodRequestEntity> onEdit;
+  final ValueChanged<BloodRequestEntity> onDetail;
 
-  const _OverviewRequestCard({required this.request});
+  const _OverviewRequestCard({
+    required this.request,
+    required this.onEdit,
+    required this.onDetail,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -323,13 +582,7 @@ class _OverviewRequestCard extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      Routes.editRequestRoute,
-                      arguments: request,
-                    );
-                  },
+                  onPressed: () => onEdit(request),
                   child: Text(AppStrings.editRequest.tr()),
                 ),
               ),
@@ -337,11 +590,7 @@ class _OverviewRequestCard extends StatelessWidget {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      Routes.requestDetailRoute,
-                      arguments: request,
-                    );
+                    onDetail(request);
                   },
                   child: Text(AppStrings.requestDetails.tr()),
                 ),
@@ -390,45 +639,60 @@ class _RequesterNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: AppSize.s80,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _NavigationItem(
-            asset: SvgAssets.icon1,
-            selected: selectedTab == _RequesterTab.home,
-            onTap: () => onSelected(_RequesterTab.home),
-          ),
-          _NavigationItem(
-            asset: SvgAssets.icon2,
-            selected: selectedTab == _RequesterTab.requests,
-            onTap: () => onSelected(_RequesterTab.requests),
-          ),
-          IconButton.filled(
-            onPressed: () => onSelected(_RequesterTab.create),
-            icon: const Icon(Icons.add),
-          ),
-          _NavigationItem(
-            asset: SvgAssets.icon4,
-            selected: selectedTab == _RequesterTab.donors,
-            onTap: () => onSelected(_RequesterTab.donors),
-          ),
-          _NavigationItem(
-            asset: SvgAssets.icon5,
-            selected: selectedTab == _RequesterTab.profile,
-            onTap: () => onSelected(_RequesterTab.profile),
-          ),
-        ],
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _NavigationItem(
+              navKey: WidgetKeys.requesterNavigationHome,
+              asset: SvgAssets.icon1,
+              selected: selectedTab == _RequesterTab.home,
+              onTap: () => onSelected(_RequesterTab.home),
+            ),
+            _NavigationItem(
+              navKey: WidgetKeys.requesterNavigationRequests,
+              asset: SvgAssets.icon2,
+              selected:
+                  selectedTab == _RequesterTab.requests ||
+                  selectedTab == _RequesterTab.edit ||
+                  selectedTab == _RequesterTab.detail,
+              onTap: () => onSelected(_RequesterTab.requests),
+            ),
+            _NavigationItem(
+              navKey: WidgetKeys.requesterNavigationCreate,
+              asset: SvgAssets.icon3,
+              selected: true,
+              onTap: () => onSelected(_RequesterTab.create),
+            ),
+            _NavigationItem(
+              asset: SvgAssets.icon4,
+              selected: selectedTab == _RequesterTab.donors,
+              onTap: () => onSelected(_RequesterTab.donors),
+            ),
+            _NavigationItem(
+              navKey: WidgetKeys.requesterNavigationProfile,
+              asset: SvgAssets.icon5,
+              selected:
+                  selectedTab == _RequesterTab.profile ||
+                  selectedTab == _RequesterTab.about,
+              onTap: () => onSelected(_RequesterTab.profile),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _NavigationItem extends StatelessWidget {
+  final Key? navKey;
   final String asset;
   final bool selected;
   final VoidCallback onTap;
 
   const _NavigationItem({
+    this.navKey,
     required this.asset,
     required this.selected,
     required this.onTap,
@@ -437,18 +701,15 @@ class _NavigationItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
+      key: navKey,
       onPressed: onTap,
-      style: IconButton.styleFrom(
-        backgroundColor: selected
-            ? ColorManager.primaryDark
-            : ColorManager.scaffoldBg,
-      ),
+      style: IconButton.styleFrom(backgroundColor: ColorManager.transparent),
       icon: SvgPicture.asset(
         asset,
-        width: AppSize.s26,
-        height: AppSize.s26,
+        width: AppSize.s35,
+        height: AppSize.s35,
         colorFilter: ColorFilter.mode(
-          selected ? ColorManager.white : ColorManager.mediumGrey,
+          selected ? ColorManager.primary : ColorManager.mediumGrey,
           BlendMode.srcIn,
         ),
       ),

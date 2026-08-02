@@ -8,19 +8,16 @@ import 'profile_remote_data_source.dart';
 const profileSelectColumns =
     'id,email,username,full_name,phone,date_of_birth,gender,national_id,'
     'blood_type,weight,city,chronic_diseases,avatar_url,is_donor,is_recipient,'
-    'is_active:is_available_for_donation';
+    'is_active';
 
 Map<String, dynamic> buildProfileUpdatePayload(ProfileModel profile) => {
   'username': profile.username,
   'phone': profile.phone,
-  'date_of_birth': profile.dateOfBirth,
-  'gender': profile.gender,
-  'blood_type': profile.bloodType,
   'weight': profile.weight,
   'city': profile.city,
   'chronic_diseases': profile.chronicDiseases,
   'avatar_url': profile.avatarUrl,
-  'is_available_for_donation': profile.isActive,
+  'is_active': profile.isActive,
 };
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {

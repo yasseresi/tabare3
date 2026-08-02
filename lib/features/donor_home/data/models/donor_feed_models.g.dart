@@ -226,6 +226,52 @@ Map<String, dynamic> _$DonorAppointmentModelToJson(
   'campaign': instance.campaign,
 };
 
+_DonationRecordRecipientModel _$DonationRecordRecipientModelFromJson(
+  Map<String, dynamic> json,
+) => _DonationRecordRecipientModel(fullName: json['full_name'] as String);
+
+Map<String, dynamic> _$DonationRecordRecipientModelToJson(
+  _DonationRecordRecipientModel instance,
+) => <String, dynamic>{'full_name': instance.fullName};
+
+_DonationRecordRequestRefModel _$DonationRecordRequestRefModelFromJson(
+  Map<String, dynamic> json,
+) => _DonationRecordRequestRefModel(
+  id: json['id'] as String,
+  recipient: DonationRecordRecipientModel.fromJson(
+    json['recipient'] as Map<String, dynamic>,
+  ),
+  hospital: DonorHospitalModel.fromJson(
+    json['hospital'] as Map<String, dynamic>,
+  ),
+);
+
+Map<String, dynamic> _$DonationRecordRequestRefModelToJson(
+  _DonationRecordRequestRefModel instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'recipient': instance.recipient,
+  'hospital': instance.hospital,
+};
+
+_DonationRecordCampaignRefModel _$DonationRecordCampaignRefModelFromJson(
+  Map<String, dynamic> json,
+) => _DonationRecordCampaignRefModel(
+  id: json['id'] as String,
+  title: json['title'] as String,
+  venueName: json['venue_name'] as String,
+  city: json['city'] as String,
+);
+
+Map<String, dynamic> _$DonationRecordCampaignRefModelToJson(
+  _DonationRecordCampaignRefModel instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'title': instance.title,
+  'venue_name': instance.venueName,
+  'city': instance.city,
+};
+
 _DonationRecordModel _$DonationRecordModelFromJson(Map<String, dynamic> json) =>
     _DonationRecordModel(
       id: json['id'] as String,
@@ -237,6 +283,16 @@ _DonationRecordModel _$DonationRecordModelFromJson(Map<String, dynamic> json) =>
       hospitalId: json['hospital_id'] as String?,
       donatedAt: DateTime.parse(json['donated_at'] as String),
       units: (json['units'] as num).toInt(),
+      bloodRequest: json['blood_request'] == null
+          ? null
+          : DonationRecordRequestRefModel.fromJson(
+              json['blood_request'] as Map<String, dynamic>,
+            ),
+      campaign: json['campaign'] == null
+          ? null
+          : DonationRecordCampaignRefModel.fromJson(
+              json['campaign'] as Map<String, dynamic>,
+            ),
     );
 
 Map<String, dynamic> _$DonationRecordModelToJson(
@@ -251,4 +307,6 @@ Map<String, dynamic> _$DonationRecordModelToJson(
   'hospital_id': instance.hospitalId,
   'donated_at': instance.donatedAt.toIso8601String(),
   'units': instance.units,
+  'blood_request': instance.bloodRequest,
+  'campaign': instance.campaign,
 };

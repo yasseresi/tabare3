@@ -233,6 +233,61 @@ abstract class DonorAppointmentModel with _$DonorAppointmentModel {
 }
 
 @freezed
+abstract class DonationRecordRecipientModel
+    with _$DonationRecordRecipientModel {
+  const factory DonationRecordRecipientModel({
+    @JsonKey(name: 'full_name') required String fullName,
+  }) = _DonationRecordRecipientModel;
+
+  factory DonationRecordRecipientModel.fromJson(Map<String, dynamic> json) =>
+      _$DonationRecordRecipientModelFromJson(json);
+}
+
+@freezed
+abstract class DonationRecordRequestRefModel
+    with _$DonationRecordRequestRefModel {
+  const DonationRecordRequestRefModel._();
+
+  const factory DonationRecordRequestRefModel({
+    required String id,
+    required DonationRecordRecipientModel recipient,
+    required DonorHospitalModel hospital,
+  }) = _DonationRecordRequestRefModel;
+
+  factory DonationRecordRequestRefModel.fromJson(Map<String, dynamic> json) =>
+      _$DonationRecordRequestRefModelFromJson(json);
+
+  DonationRecordRequestRef toEntity() => DonationRecordRequestRef(
+    id: id,
+    recipientName: recipient.fullName,
+    hospital: hospital.toEntity(),
+  );
+}
+
+@freezed
+abstract class DonationRecordCampaignRefModel
+    with _$DonationRecordCampaignRefModel {
+  const DonationRecordCampaignRefModel._();
+
+  const factory DonationRecordCampaignRefModel({
+    required String id,
+    required String title,
+    @JsonKey(name: 'venue_name') required String venueName,
+    required String city,
+  }) = _DonationRecordCampaignRefModel;
+
+  factory DonationRecordCampaignRefModel.fromJson(Map<String, dynamic> json) =>
+      _$DonationRecordCampaignRefModelFromJson(json);
+
+  DonationRecordCampaignRef toEntity() => DonationRecordCampaignRef(
+    id: id,
+    title: title,
+    venueName: venueName,
+    city: city,
+  );
+}
+
+@freezed
 abstract class DonationRecordModel with _$DonationRecordModel {
   const DonationRecordModel._();
 
@@ -246,6 +301,8 @@ abstract class DonationRecordModel with _$DonationRecordModel {
     @JsonKey(name: 'hospital_id') String? hospitalId,
     @JsonKey(name: 'donated_at') required DateTime donatedAt,
     required int units,
+    @JsonKey(name: 'blood_request') DonationRecordRequestRefModel? bloodRequest,
+    DonationRecordCampaignRefModel? campaign,
   }) = _DonationRecordModel;
 
   factory DonationRecordModel.fromJson(Map<String, dynamic> json) =>
@@ -261,6 +318,8 @@ abstract class DonationRecordModel with _$DonationRecordModel {
     hospitalId: hospitalId,
     donatedAt: donatedAt,
     units: units,
+    bloodRequest: bloodRequest?.toEntity(),
+    campaign: campaign?.toEntity(),
   );
 }
 

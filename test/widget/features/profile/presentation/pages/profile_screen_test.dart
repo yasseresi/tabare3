@@ -1,8 +1,10 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:tabare3/core/constants/widget_keys.dart';
 import 'package:tabare3/core/error/failures.dart';
 import 'package:tabare3/core/usecases/usecase.dart';
 import 'package:tabare3/features/profile/domain/entities/profile_entity.dart';
@@ -100,10 +102,64 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('أحمد اختبار'), findsOneWidget);
-      expect(find.text('test@example.com'), findsOneWidget);
+      expect(find.text('testuser'), findsOneWidget);
+      expect(find.text('test@example.com'), findsNothing);
       expect(find.text('مرحباً، أحمد'), findsOneWidget);
-      expect(find.text('البيانات الشخصية'), findsOneWidget);
+      expect(find.text('المعلومات الشخصية'), findsOneWidget);
       expect(find.text('معلومات الحساب'), findsOneWidget);
+      expect(find.text('تاريخ الميلاد'), findsOneWidget);
+      expect(find.text('الجنس'), findsOneWidget);
+      expect(find.text('رقم بطاقة التعريف الوطني'), findsOneWidget);
+      expect(find.text('فصيلة الدم'), findsOneWidget);
+    });
+
+    testWidgets('delegates the donor card to its enclosing navigation shell', (
+      tester,
+    ) async {
+      var donorCardOpened = false;
+
+      await tester.pumpWidget(
+        buildTestApp(
+          BlocProvider(
+            create: (_) => buildProfileBloc(),
+            child: ProfileScreen(onDonorCard: () => donorCardOpened = true),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('بطاقة المتبرع'));
+      await tester.pump();
+
+      expect(donorCardOpened, isTrue);
+    });
+
+    testWidgets('uses the Figma profile background and notification callback', (
+      tester,
+    ) async {
+      var notificationsOpened = false;
+
+      await tester.pumpWidget(
+        buildTestApp(
+          BlocProvider(
+            create: (_) => buildProfileBloc(),
+            child: ProfileScreen(
+              onNotifications: () => notificationsOpened = true,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final background = tester.widget<Container>(
+        find.byKey(WidgetKeys.profileGradientBackground),
+      );
+      expect((background.decoration! as BoxDecoration).gradient, isNotNull);
+
+      await tester.tap(find.byKey(WidgetKeys.profileNotificationsButton));
+      await tester.pump();
+
+      expect(notificationsOpened, isTrue);
     });
 
     testWidgets(
@@ -128,9 +184,17 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('أحمد اختبار'), findsOneWidget);
-        expect(find.text('test@example.com'), findsOneWidget);
+        expect(find.text('testuser'), findsOneWidget);
+        expect(find.text('test@example.com'), findsNothing);
         expect(find.text('معلومات الحساب'), findsOneWidget);
-        expect(find.text('البيانات الشخصية'), findsOneWidget);
+        expect(find.text('المعلومات الشخصية'), findsOneWidget);
+        expect(find.text('تاريخ الميلاد'), findsOneWidget);
+        expect(find.text('الجنس'), findsOneWidget);
+        expect(find.text('رقم بطاقة التعريف الوطني'), findsOneWidget);
+        expect(find.text('فصيلة الدم'), findsOneWidget);
+        expect(find.text('الوزن'), findsOneWidget);
+        expect(find.text('الولاية'), findsOneWidget);
+        expect(find.text('الأمراض المزمنة'), findsOneWidget);
         expect(find.text('بطاقة المتبرع'), findsNothing);
       },
     );

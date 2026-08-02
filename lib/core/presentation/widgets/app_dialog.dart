@@ -64,9 +64,22 @@ class AppDialog extends StatelessWidget {
           _buildSuccessIcon(),
           const SizedBox(height: AppSize.s10),
           _buildText(),
-          const SizedBox(height: AppSize.s10),
-          _buildLogo(),
-          const SizedBox(height: AppSize.s20),
+          if (message != null) ...[
+            const SizedBox(height: AppSize.s10),
+            Text(
+              message!,
+              textAlign: TextAlign.center,
+              style: getBoldStyle(
+                fontSize: FontSize.s16,
+                color: ColorManager.welcomeText,
+              ),
+            ),
+          ] else ...[
+            const SizedBox(height: AppSize.s10),
+            _buildLogo(),
+            const SizedBox(height: AppSize.s20),
+          ],
+          if (message != null) const SizedBox(height: AppSize.s10),
           _buildActionButton(),
         ];
       case AppDialogType.error:

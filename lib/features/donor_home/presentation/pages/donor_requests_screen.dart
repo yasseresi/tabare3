@@ -3,67 +3,174 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/donor_feed_entity.dart';
 import '../bloc/donor_feed_bloc.dart';
 
 class DonorRequestsScreen extends StatelessWidget {
-  const DonorRequestsScreen({super.key});
+  final VoidCallback? onNotifications;
+
+  const DonorRequestsScreen({super.key, this.onNotifications});
 
   @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: SafeArea(
-        child: BlocBuilder<DonorFeedBloc, DonorFeedState>(
-          builder: (context, state) {
-            if (state is DonorFeedInitial || state is DonorFeedLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (state is DonorFeedError) {
-              return _ErrorState(message: state.failure.message);
-            }
-            final loaded = state as DonorFeedLoaded;
-            return RefreshIndicator(
-              onRefresh: () async {
-                context.read<DonorFeedBloc>().add(const DonorFeedRequested());
-              },
-              child: ListView(
-                padding: const EdgeInsets.all(AppPadding.p20),
-                children: [
-                  _SectionTitle(title: AppStrings.allRequests.tr()),
-                  const SizedBox(height: AppSize.s16),
-                  if (loaded.feed.compatibleRequests.isEmpty)
-                    const _EmptyRequests()
-                  else
-                    ...loaded.feed.compatibleRequests.map(
-                      (request) => Padding(
-                        padding: const EdgeInsets.only(bottom: AppPadding.p16),
-                        child: _RequestCard(
-                          request: request,
-                          disabled: loaded.isMutating,
+      child: Container(
+        decoration: BoxDecoration(
+          color: ColorManager.white,
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [
+              ColorManager.welcomeGradientStart,
+              ColorManager.welcomeGradientEnd,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: BlocBuilder<DonorFeedBloc, DonorFeedState>(
+            builder: (context, state) {
+              if (state is DonorFeedInitial || state is DonorFeedLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (state is DonorFeedError) {
+                return _ErrorState(message: state.failure.message);
+              }
+              final loaded = state as DonorFeedLoaded;
+              return RefreshIndicator(
+                onRefresh: () async {
+                  context.read<DonorFeedBloc>().add(const DonorFeedRequested());
+                },
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: AppSize.s402),
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppPadding.p10,
+                        vertical: AppPadding.p32,
+                      ),
+                      children: [
+                        _RequestsHeader(onNotifications: onNotifications),
+                        const SizedBox(height: AppSize.s46),
+                        const _RequestsSearchField(),
+                        const SizedBox(height: AppSize.s12),
+                        _SectionTitle(title: AppStrings.allRequests.tr()),
+                        const SizedBox(height: AppSize.s16),
+                        if (loaded.feed.compatibleRequests.isEmpty)
+                          const _EmptyRequests()
+                        else
+                          ...loaded.feed.compatibleRequests.map(
+                            (request) => Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppPadding.p16,
+                              ),
+                              child: _RequestCard(
+                                request: request,
+                                disabled: loaded.isMutating,
+                              ),
+                            ),
+                          ),
+                        const SizedBox(height: AppSize.s16),
+                        _SectionTitle(
+                          title: AppStrings.availableCampaigns.tr(),
                         ),
-                      ),
+                        const SizedBox(height: AppSize.s16),
+                        if (loaded.feed.availableCampaigns.isEmpty)
+                          _EmptyMessage(
+                            message: AppStrings.noAvailableCampaigns.tr(),
+                          )
+                        else
+                          ...loaded.feed.availableCampaigns.map(
+                            (campaign) => Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppPadding.p16,
+                              ),
+                              child: _CampaignCard(campaign: campaign),
+                            ),
+                          ),
+                      ],
                     ),
-                  const SizedBox(height: AppSize.s16),
-                  _SectionTitle(title: AppStrings.availableCampaigns.tr()),
-                  const SizedBox(height: AppSize.s16),
-                  if (loaded.feed.availableCampaigns.isEmpty)
-                    _EmptyMessage(message: AppStrings.noAvailableCampaigns.tr())
-                  else
-                    ...loaded.feed.availableCampaigns.map(
-                      (campaign) => Padding(
-                        padding: const EdgeInsets.only(bottom: AppPadding.p16),
-                        child: _CampaignCard(campaign: campaign),
-                      ),
-                    ),
-                ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RequestsHeader extends StatelessWidget {
+  final VoidCallback? onNotifications;
+
+  const _RequestsHeader({this.onNotifications});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppStrings.welcomeUser.tr(),
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-            );
-          },
+              Text(
+                AppStrings.donationLifeChance.tr(),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+        IconButton(
+          key: WidgetKeys.donorNotificationsButton,
+          onPressed:
+              onNotifications ??
+              () => Navigator.pushNamed(context, Routes.notificationsRoute),
+          style: IconButton.styleFrom(
+            padding: const EdgeInsets.all(AppPadding.p8),
+            backgroundColor: ColorManager.surfaceAlt,
+            minimumSize: const Size.square(AppSize.s40),
+            maximumSize: const Size.square(AppSize.s40),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            shape: const CircleBorder(),
+          ),
+          constraints: const BoxConstraints(),
+          icon: const Icon(Icons.notifications_none_rounded, size: AppSize.s24),
+        ),
+      ],
+    );
+  }
+}
+
+class _RequestsSearchField extends StatelessWidget {
+  const _RequestsSearchField();
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      textAlign: TextAlign.right,
+      decoration: InputDecoration(
+        hintText: AppStrings.searchPatients.tr(),
+        prefixIcon: const Icon(Icons.search_rounded),
+        fillColor: ColorManager.white,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppSize.radiusXLarge),
+          borderSide: BorderSide(color: ColorManager.surfaceWarm),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppSize.radiusXLarge),
+          borderSide: BorderSide(color: ColorManager.primary),
         ),
       ),
     );
@@ -362,7 +469,50 @@ class _EmptyRequests extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _EmptyMessage(message: AppStrings.noRequestsDescription.tr());
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppPadding.p40,
+        vertical: AppPadding.p20,
+      ),
+      child: Column(
+        children: [
+          Image.asset(
+            ImageAssets.demo,
+            width: AppSize.s100,
+            height: AppSize.s100,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(height: AppSize.s10),
+          Text(
+            AppStrings.noRequestsYou.tr(),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: ColorManager.textPrimary,
+              fontSize: AppSize.s24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: AppSize.s10),
+          Text(
+            AppStrings.noRequestsDescription.tr(),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: ColorManager.textMuted,
+              fontSize: AppSize.s20,
+            ),
+          ),
+          const SizedBox(height: AppSize.s10),
+          Text(
+            AppStrings.thanksForDonating.tr(),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: ColorManager.textMuted,
+              fontSize: AppSize.s20,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

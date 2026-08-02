@@ -12,6 +12,281 @@ part of 'blood_request_entity.dart';
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
+mixin _$PatientEntity {
+
+ String get fullName; String get nationalId; String get bloodType; double get weight; String? get chronicDiseases; String get gender; String get dateOfBirth;
+/// Create a copy of PatientEntity
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PatientEntityCopyWith<PatientEntity> get copyWith => _$PatientEntityCopyWithImpl<PatientEntity>(this as PatientEntity, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PatientEntity&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.nationalId, nationalId) || other.nationalId == nationalId)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.chronicDiseases, chronicDiseases) || other.chronicDiseases == chronicDiseases)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,fullName,nationalId,bloodType,weight,chronicDiseases,gender,dateOfBirth);
+
+@override
+String toString() {
+  return 'PatientEntity(fullName: $fullName, nationalId: $nationalId, bloodType: $bloodType, weight: $weight, chronicDiseases: $chronicDiseases, gender: $gender, dateOfBirth: $dateOfBirth)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PatientEntityCopyWith<$Res>  {
+  factory $PatientEntityCopyWith(PatientEntity value, $Res Function(PatientEntity) _then) = _$PatientEntityCopyWithImpl;
+@useResult
+$Res call({
+ String fullName, String nationalId, String bloodType, double weight, String? chronicDiseases, String gender, String dateOfBirth
+});
+
+
+
+
+}
+/// @nodoc
+class _$PatientEntityCopyWithImpl<$Res>
+    implements $PatientEntityCopyWith<$Res> {
+  _$PatientEntityCopyWithImpl(this._self, this._then);
+
+  final PatientEntity _self;
+  final $Res Function(PatientEntity) _then;
+
+/// Create a copy of PatientEntity
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? fullName = null,Object? nationalId = null,Object? bloodType = null,Object? weight = null,Object? chronicDiseases = freezed,Object? gender = null,Object? dateOfBirth = null,}) {
+  return _then(_self.copyWith(
+fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
+as String,nationalId: null == nationalId ? _self.nationalId : nationalId // ignore: cast_nullable_to_non_nullable
+as String,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as String,weight: null == weight ? _self.weight : weight // ignore: cast_nullable_to_non_nullable
+as double,chronicDiseases: freezed == chronicDiseases ? _self.chronicDiseases : chronicDiseases // ignore: cast_nullable_to_non_nullable
+as String?,gender: null == gender ? _self.gender : gender // ignore: cast_nullable_to_non_nullable
+as String,dateOfBirth: null == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [PatientEntity].
+extension PatientEntityPatterns on PatientEntity {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PatientEntity value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PatientEntity() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PatientEntity value)  $default,){
+final _that = this;
+switch (_that) {
+case _PatientEntity():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PatientEntity value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PatientEntity() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String fullName,  String nationalId,  String bloodType,  double weight,  String? chronicDiseases,  String gender,  String dateOfBirth)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PatientEntity() when $default != null:
+return $default(_that.fullName,_that.nationalId,_that.bloodType,_that.weight,_that.chronicDiseases,_that.gender,_that.dateOfBirth);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String fullName,  String nationalId,  String bloodType,  double weight,  String? chronicDiseases,  String gender,  String dateOfBirth)  $default,) {final _that = this;
+switch (_that) {
+case _PatientEntity():
+return $default(_that.fullName,_that.nationalId,_that.bloodType,_that.weight,_that.chronicDiseases,_that.gender,_that.dateOfBirth);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String fullName,  String nationalId,  String bloodType,  double weight,  String? chronicDiseases,  String gender,  String dateOfBirth)?  $default,) {final _that = this;
+switch (_that) {
+case _PatientEntity() when $default != null:
+return $default(_that.fullName,_that.nationalId,_that.bloodType,_that.weight,_that.chronicDiseases,_that.gender,_that.dateOfBirth);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _PatientEntity implements PatientEntity {
+  const _PatientEntity({required this.fullName, required this.nationalId, required this.bloodType, required this.weight, this.chronicDiseases, required this.gender, required this.dateOfBirth});
+
+
+@override final  String fullName;
+@override final  String nationalId;
+@override final  String bloodType;
+@override final  double weight;
+@override final  String? chronicDiseases;
+@override final  String gender;
+@override final  String dateOfBirth;
+
+/// Create a copy of PatientEntity
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PatientEntityCopyWith<_PatientEntity> get copyWith => __$PatientEntityCopyWithImpl<_PatientEntity>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PatientEntity&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.nationalId, nationalId) || other.nationalId == nationalId)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.chronicDiseases, chronicDiseases) || other.chronicDiseases == chronicDiseases)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,fullName,nationalId,bloodType,weight,chronicDiseases,gender,dateOfBirth);
+
+@override
+String toString() {
+  return 'PatientEntity(fullName: $fullName, nationalId: $nationalId, bloodType: $bloodType, weight: $weight, chronicDiseases: $chronicDiseases, gender: $gender, dateOfBirth: $dateOfBirth)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PatientEntityCopyWith<$Res> implements $PatientEntityCopyWith<$Res> {
+  factory _$PatientEntityCopyWith(_PatientEntity value, $Res Function(_PatientEntity) _then) = __$PatientEntityCopyWithImpl;
+@override @useResult
+$Res call({
+ String fullName, String nationalId, String bloodType, double weight, String? chronicDiseases, String gender, String dateOfBirth
+});
+
+
+
+
+}
+/// @nodoc
+class __$PatientEntityCopyWithImpl<$Res>
+    implements _$PatientEntityCopyWith<$Res> {
+  __$PatientEntityCopyWithImpl(this._self, this._then);
+
+  final _PatientEntity _self;
+  final $Res Function(_PatientEntity) _then;
+
+/// Create a copy of PatientEntity
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? fullName = null,Object? nationalId = null,Object? bloodType = null,Object? weight = null,Object? chronicDiseases = freezed,Object? gender = null,Object? dateOfBirth = null,}) {
+  return _then(_PatientEntity(
+fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
+as String,nationalId: null == nationalId ? _self.nationalId : nationalId // ignore: cast_nullable_to_non_nullable
+as String,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as String,weight: null == weight ? _self.weight : weight // ignore: cast_nullable_to_non_nullable
+as double,chronicDiseases: freezed == chronicDiseases ? _self.chronicDiseases : chronicDiseases // ignore: cast_nullable_to_non_nullable
+as String?,gender: null == gender ? _self.gender : gender // ignore: cast_nullable_to_non_nullable
+as String,dateOfBirth: null == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
 mixin _$HospitalEntity {
 
  String get id; int get wilayaId; String get nameAr; String? get nameFr; String? get address; bool get isActive;
@@ -286,7 +561,7 @@ as bool,
 /// @nodoc
 mixin _$BloodRequestEntity {
 
- String get id; String get requestedBy; HospitalEntity get hospital; String get bloodType; RequestPriority get priority; int get unitsNeeded; int get unitsFulfilled; BloodRequestStatus get status; DateTime? get neededBy; DateTime? get expiresAt; String? get notes; DateTime get createdAt;
+ String get id; String get requestedBy; HospitalEntity get hospital; BeneficiaryType get beneficiaryType; PatientEntity? get patient; String get bloodType; RequestPriority get priority; int get unitsNeeded; int get unitsFulfilled; BloodRequestStatus get status; DateTime? get neededBy; DateTime? get expiresAt; String? get notes; DateTime get createdAt;
 /// Create a copy of BloodRequestEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -297,16 +572,16 @@ $BloodRequestEntityCopyWith<BloodRequestEntity> get copyWith => _$BloodRequestEn
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BloodRequestEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.requestedBy, requestedBy) || other.requestedBy == requestedBy)&&(identical(other.hospital, hospital) || other.hospital == hospital)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.unitsFulfilled, unitsFulfilled) || other.unitsFulfilled == unitsFulfilled)&&(identical(other.status, status) || other.status == status)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BloodRequestEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.requestedBy, requestedBy) || other.requestedBy == requestedBy)&&(identical(other.hospital, hospital) || other.hospital == hospital)&&(identical(other.beneficiaryType, beneficiaryType) || other.beneficiaryType == beneficiaryType)&&(identical(other.patient, patient) || other.patient == patient)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.unitsFulfilled, unitsFulfilled) || other.unitsFulfilled == unitsFulfilled)&&(identical(other.status, status) || other.status == status)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,requestedBy,hospital,bloodType,priority,unitsNeeded,unitsFulfilled,status,neededBy,expiresAt,notes,createdAt);
+int get hashCode => Object.hash(runtimeType,id,requestedBy,hospital,beneficiaryType,patient,bloodType,priority,unitsNeeded,unitsFulfilled,status,neededBy,expiresAt,notes,createdAt);
 
 @override
 String toString() {
-  return 'BloodRequestEntity(id: $id, requestedBy: $requestedBy, hospital: $hospital, bloodType: $bloodType, priority: $priority, unitsNeeded: $unitsNeeded, unitsFulfilled: $unitsFulfilled, status: $status, neededBy: $neededBy, expiresAt: $expiresAt, notes: $notes, createdAt: $createdAt)';
+  return 'BloodRequestEntity(id: $id, requestedBy: $requestedBy, hospital: $hospital, beneficiaryType: $beneficiaryType, patient: $patient, bloodType: $bloodType, priority: $priority, unitsNeeded: $unitsNeeded, unitsFulfilled: $unitsFulfilled, status: $status, neededBy: $neededBy, expiresAt: $expiresAt, notes: $notes, createdAt: $createdAt)';
 }
 
 
@@ -317,11 +592,11 @@ abstract mixin class $BloodRequestEntityCopyWith<$Res>  {
   factory $BloodRequestEntityCopyWith(BloodRequestEntity value, $Res Function(BloodRequestEntity) _then) = _$BloodRequestEntityCopyWithImpl;
 @useResult
 $Res call({
- String id, String requestedBy, HospitalEntity hospital, String bloodType, RequestPriority priority, int unitsNeeded, int unitsFulfilled, BloodRequestStatus status, DateTime? neededBy, DateTime? expiresAt, String? notes, DateTime createdAt
+ String id, String requestedBy, HospitalEntity hospital, BeneficiaryType beneficiaryType, PatientEntity? patient, String bloodType, RequestPriority priority, int unitsNeeded, int unitsFulfilled, BloodRequestStatus status, DateTime? neededBy, DateTime? expiresAt, String? notes, DateTime createdAt
 });
 
 
-$HospitalEntityCopyWith<$Res> get hospital;
+$HospitalEntityCopyWith<$Res> get hospital;$PatientEntityCopyWith<$Res>? get patient;
 
 }
 /// @nodoc
@@ -334,12 +609,14 @@ class _$BloodRequestEntityCopyWithImpl<$Res>
 
 /// Create a copy of BloodRequestEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? requestedBy = null,Object? hospital = null,Object? bloodType = null,Object? priority = null,Object? unitsNeeded = null,Object? unitsFulfilled = null,Object? status = null,Object? neededBy = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? requestedBy = null,Object? hospital = null,Object? beneficiaryType = null,Object? patient = freezed,Object? bloodType = null,Object? priority = null,Object? unitsNeeded = null,Object? unitsFulfilled = null,Object? status = null,Object? neededBy = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? createdAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,requestedBy: null == requestedBy ? _self.requestedBy : requestedBy // ignore: cast_nullable_to_non_nullable
 as String,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
-as HospitalEntity,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as HospitalEntity,beneficiaryType: null == beneficiaryType ? _self.beneficiaryType : beneficiaryType // ignore: cast_nullable_to_non_nullable
+as BeneficiaryType,patient: freezed == patient ? _self.patient : patient // ignore: cast_nullable_to_non_nullable
+as PatientEntity?,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
 as String,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
 as RequestPriority,unitsNeeded: null == unitsNeeded ? _self.unitsNeeded : unitsNeeded // ignore: cast_nullable_to_non_nullable
 as int,unitsFulfilled: null == unitsFulfilled ? _self.unitsFulfilled : unitsFulfilled // ignore: cast_nullable_to_non_nullable
@@ -359,6 +636,18 @@ $HospitalEntityCopyWith<$Res> get hospital {
   
   return $HospitalEntityCopyWith<$Res>(_self.hospital, (value) {
     return _then(_self.copyWith(hospital: value));
+  });
+}/// Create a copy of BloodRequestEntity
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PatientEntityCopyWith<$Res>? get patient {
+    if (_self.patient == null) {
+    return null;
+  }
+
+  return $PatientEntityCopyWith<$Res>(_self.patient!, (value) {
+    return _then(_self.copyWith(patient: value));
   });
 }
 }
@@ -442,10 +731,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String requestedBy,  HospitalEntity hospital,  String bloodType,  RequestPriority priority,  int unitsNeeded,  int unitsFulfilled,  BloodRequestStatus status,  DateTime? neededBy,  DateTime? expiresAt,  String? notes,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String requestedBy,  HospitalEntity hospital,  BeneficiaryType beneficiaryType,  PatientEntity? patient,  String bloodType,  RequestPriority priority,  int unitsNeeded,  int unitsFulfilled,  BloodRequestStatus status,  DateTime? neededBy,  DateTime? expiresAt,  String? notes,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _BloodRequestEntity() when $default != null:
-return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.priority,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
+return $default(_that.id,_that.requestedBy,_that.hospital,_that.beneficiaryType,_that.patient,_that.bloodType,_that.priority,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
   return orElse();
 
 }
@@ -463,10 +752,10 @@ return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String requestedBy,  HospitalEntity hospital,  String bloodType,  RequestPriority priority,  int unitsNeeded,  int unitsFulfilled,  BloodRequestStatus status,  DateTime? neededBy,  DateTime? expiresAt,  String? notes,  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String requestedBy,  HospitalEntity hospital,  BeneficiaryType beneficiaryType,  PatientEntity? patient,  String bloodType,  RequestPriority priority,  int unitsNeeded,  int unitsFulfilled,  BloodRequestStatus status,  DateTime? neededBy,  DateTime? expiresAt,  String? notes,  DateTime createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _BloodRequestEntity():
-return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.priority,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
+return $default(_that.id,_that.requestedBy,_that.hospital,_that.beneficiaryType,_that.patient,_that.bloodType,_that.priority,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -483,10 +772,10 @@ return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String requestedBy,  HospitalEntity hospital,  String bloodType,  RequestPriority priority,  int unitsNeeded,  int unitsFulfilled,  BloodRequestStatus status,  DateTime? neededBy,  DateTime? expiresAt,  String? notes,  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String requestedBy,  HospitalEntity hospital,  BeneficiaryType beneficiaryType,  PatientEntity? patient,  String bloodType,  RequestPriority priority,  int unitsNeeded,  int unitsFulfilled,  BloodRequestStatus status,  DateTime? neededBy,  DateTime? expiresAt,  String? notes,  DateTime createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _BloodRequestEntity() when $default != null:
-return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.priority,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
+return $default(_that.id,_that.requestedBy,_that.hospital,_that.beneficiaryType,_that.patient,_that.bloodType,_that.priority,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
   return null;
 
 }
@@ -498,12 +787,14 @@ return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.
 
 
 class _BloodRequestEntity extends BloodRequestEntity {
-  const _BloodRequestEntity({required this.id, required this.requestedBy, required this.hospital, required this.bloodType, required this.priority, required this.unitsNeeded, required this.unitsFulfilled, required this.status, this.neededBy, this.expiresAt, this.notes, required this.createdAt}): super._();
+  const _BloodRequestEntity({required this.id, required this.requestedBy, required this.hospital, this.beneficiaryType = BeneficiaryType.self, this.patient, required this.bloodType, required this.priority, required this.unitsNeeded, required this.unitsFulfilled, required this.status, this.neededBy, this.expiresAt, this.notes, required this.createdAt}): super._();
   
 
 @override final  String id;
 @override final  String requestedBy;
 @override final  HospitalEntity hospital;
+@override@JsonKey() final  BeneficiaryType beneficiaryType;
+@override final  PatientEntity? patient;
 @override final  String bloodType;
 @override final  RequestPriority priority;
 @override final  int unitsNeeded;
@@ -524,16 +815,16 @@ _$BloodRequestEntityCopyWith<_BloodRequestEntity> get copyWith => __$BloodReques
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BloodRequestEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.requestedBy, requestedBy) || other.requestedBy == requestedBy)&&(identical(other.hospital, hospital) || other.hospital == hospital)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.unitsFulfilled, unitsFulfilled) || other.unitsFulfilled == unitsFulfilled)&&(identical(other.status, status) || other.status == status)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BloodRequestEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.requestedBy, requestedBy) || other.requestedBy == requestedBy)&&(identical(other.hospital, hospital) || other.hospital == hospital)&&(identical(other.beneficiaryType, beneficiaryType) || other.beneficiaryType == beneficiaryType)&&(identical(other.patient, patient) || other.patient == patient)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.unitsFulfilled, unitsFulfilled) || other.unitsFulfilled == unitsFulfilled)&&(identical(other.status, status) || other.status == status)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,requestedBy,hospital,bloodType,priority,unitsNeeded,unitsFulfilled,status,neededBy,expiresAt,notes,createdAt);
+int get hashCode => Object.hash(runtimeType,id,requestedBy,hospital,beneficiaryType,patient,bloodType,priority,unitsNeeded,unitsFulfilled,status,neededBy,expiresAt,notes,createdAt);
 
 @override
 String toString() {
-  return 'BloodRequestEntity(id: $id, requestedBy: $requestedBy, hospital: $hospital, bloodType: $bloodType, priority: $priority, unitsNeeded: $unitsNeeded, unitsFulfilled: $unitsFulfilled, status: $status, neededBy: $neededBy, expiresAt: $expiresAt, notes: $notes, createdAt: $createdAt)';
+  return 'BloodRequestEntity(id: $id, requestedBy: $requestedBy, hospital: $hospital, beneficiaryType: $beneficiaryType, patient: $patient, bloodType: $bloodType, priority: $priority, unitsNeeded: $unitsNeeded, unitsFulfilled: $unitsFulfilled, status: $status, neededBy: $neededBy, expiresAt: $expiresAt, notes: $notes, createdAt: $createdAt)';
 }
 
 
@@ -544,11 +835,11 @@ abstract mixin class _$BloodRequestEntityCopyWith<$Res> implements $BloodRequest
   factory _$BloodRequestEntityCopyWith(_BloodRequestEntity value, $Res Function(_BloodRequestEntity) _then) = __$BloodRequestEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String requestedBy, HospitalEntity hospital, String bloodType, RequestPriority priority, int unitsNeeded, int unitsFulfilled, BloodRequestStatus status, DateTime? neededBy, DateTime? expiresAt, String? notes, DateTime createdAt
+ String id, String requestedBy, HospitalEntity hospital, BeneficiaryType beneficiaryType, PatientEntity? patient, String bloodType, RequestPriority priority, int unitsNeeded, int unitsFulfilled, BloodRequestStatus status, DateTime? neededBy, DateTime? expiresAt, String? notes, DateTime createdAt
 });
 
 
-@override $HospitalEntityCopyWith<$Res> get hospital;
+@override $HospitalEntityCopyWith<$Res> get hospital;@override $PatientEntityCopyWith<$Res>? get patient;
 
 }
 /// @nodoc
@@ -561,12 +852,14 @@ class __$BloodRequestEntityCopyWithImpl<$Res>
 
 /// Create a copy of BloodRequestEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? requestedBy = null,Object? hospital = null,Object? bloodType = null,Object? priority = null,Object? unitsNeeded = null,Object? unitsFulfilled = null,Object? status = null,Object? neededBy = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? requestedBy = null,Object? hospital = null,Object? beneficiaryType = null,Object? patient = freezed,Object? bloodType = null,Object? priority = null,Object? unitsNeeded = null,Object? unitsFulfilled = null,Object? status = null,Object? neededBy = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? createdAt = null,}) {
   return _then(_BloodRequestEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,requestedBy: null == requestedBy ? _self.requestedBy : requestedBy // ignore: cast_nullable_to_non_nullable
 as String,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
-as HospitalEntity,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as HospitalEntity,beneficiaryType: null == beneficiaryType ? _self.beneficiaryType : beneficiaryType // ignore: cast_nullable_to_non_nullable
+as BeneficiaryType,patient: freezed == patient ? _self.patient : patient // ignore: cast_nullable_to_non_nullable
+as PatientEntity?,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
 as String,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
 as RequestPriority,unitsNeeded: null == unitsNeeded ? _self.unitsNeeded : unitsNeeded // ignore: cast_nullable_to_non_nullable
 as int,unitsFulfilled: null == unitsFulfilled ? _self.unitsFulfilled : unitsFulfilled // ignore: cast_nullable_to_non_nullable
@@ -588,13 +881,300 @@ $HospitalEntityCopyWith<$Res> get hospital {
   return $HospitalEntityCopyWith<$Res>(_self.hospital, (value) {
     return _then(_self.copyWith(hospital: value));
   });
+}/// Create a copy of BloodRequestEntity
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PatientEntityCopyWith<$Res>? get patient {
+    if (_self.patient == null) {
+    return null;
+  }
+
+  return $PatientEntityCopyWith<$Res>(_self.patient!, (value) {
+    return _then(_self.copyWith(patient: value));
+  });
 }
+}
+
+/// @nodoc
+mixin _$PatientDraft {
+
+ String get fullName; String get nationalId; String get bloodType; double get weight; String? get chronicDiseases; String get gender; String get dateOfBirth;
+/// Create a copy of PatientDraft
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PatientDraftCopyWith<PatientDraft> get copyWith => _$PatientDraftCopyWithImpl<PatientDraft>(this as PatientDraft, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PatientDraft&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.nationalId, nationalId) || other.nationalId == nationalId)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.chronicDiseases, chronicDiseases) || other.chronicDiseases == chronicDiseases)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,fullName,nationalId,bloodType,weight,chronicDiseases,gender,dateOfBirth);
+
+@override
+String toString() {
+  return 'PatientDraft(fullName: $fullName, nationalId: $nationalId, bloodType: $bloodType, weight: $weight, chronicDiseases: $chronicDiseases, gender: $gender, dateOfBirth: $dateOfBirth)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PatientDraftCopyWith<$Res>  {
+  factory $PatientDraftCopyWith(PatientDraft value, $Res Function(PatientDraft) _then) = _$PatientDraftCopyWithImpl;
+@useResult
+$Res call({
+ String fullName, String nationalId, String bloodType, double weight, String? chronicDiseases, String gender, String dateOfBirth
+});
+
+
+
+
+}
+/// @nodoc
+class _$PatientDraftCopyWithImpl<$Res>
+    implements $PatientDraftCopyWith<$Res> {
+  _$PatientDraftCopyWithImpl(this._self, this._then);
+
+  final PatientDraft _self;
+  final $Res Function(PatientDraft) _then;
+
+/// Create a copy of PatientDraft
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? fullName = null,Object? nationalId = null,Object? bloodType = null,Object? weight = null,Object? chronicDiseases = freezed,Object? gender = null,Object? dateOfBirth = null,}) {
+  return _then(_self.copyWith(
+fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
+as String,nationalId: null == nationalId ? _self.nationalId : nationalId // ignore: cast_nullable_to_non_nullable
+as String,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as String,weight: null == weight ? _self.weight : weight // ignore: cast_nullable_to_non_nullable
+as double,chronicDiseases: freezed == chronicDiseases ? _self.chronicDiseases : chronicDiseases // ignore: cast_nullable_to_non_nullable
+as String?,gender: null == gender ? _self.gender : gender // ignore: cast_nullable_to_non_nullable
+as String,dateOfBirth: null == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [PatientDraft].
+extension PatientDraftPatterns on PatientDraft {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PatientDraft value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PatientDraft() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PatientDraft value)  $default,){
+final _that = this;
+switch (_that) {
+case _PatientDraft():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PatientDraft value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PatientDraft() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String fullName,  String nationalId,  String bloodType,  double weight,  String? chronicDiseases,  String gender,  String dateOfBirth)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PatientDraft() when $default != null:
+return $default(_that.fullName,_that.nationalId,_that.bloodType,_that.weight,_that.chronicDiseases,_that.gender,_that.dateOfBirth);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String fullName,  String nationalId,  String bloodType,  double weight,  String? chronicDiseases,  String gender,  String dateOfBirth)  $default,) {final _that = this;
+switch (_that) {
+case _PatientDraft():
+return $default(_that.fullName,_that.nationalId,_that.bloodType,_that.weight,_that.chronicDiseases,_that.gender,_that.dateOfBirth);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String fullName,  String nationalId,  String bloodType,  double weight,  String? chronicDiseases,  String gender,  String dateOfBirth)?  $default,) {final _that = this;
+switch (_that) {
+case _PatientDraft() when $default != null:
+return $default(_that.fullName,_that.nationalId,_that.bloodType,_that.weight,_that.chronicDiseases,_that.gender,_that.dateOfBirth);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _PatientDraft implements PatientDraft {
+  const _PatientDraft({required this.fullName, required this.nationalId, required this.bloodType, required this.weight, this.chronicDiseases, required this.gender, required this.dateOfBirth});
+
+
+@override final  String fullName;
+@override final  String nationalId;
+@override final  String bloodType;
+@override final  double weight;
+@override final  String? chronicDiseases;
+@override final  String gender;
+@override final  String dateOfBirth;
+
+/// Create a copy of PatientDraft
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PatientDraftCopyWith<_PatientDraft> get copyWith => __$PatientDraftCopyWithImpl<_PatientDraft>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PatientDraft&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.nationalId, nationalId) || other.nationalId == nationalId)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.weight, weight) || other.weight == weight)&&(identical(other.chronicDiseases, chronicDiseases) || other.chronicDiseases == chronicDiseases)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,fullName,nationalId,bloodType,weight,chronicDiseases,gender,dateOfBirth);
+
+@override
+String toString() {
+  return 'PatientDraft(fullName: $fullName, nationalId: $nationalId, bloodType: $bloodType, weight: $weight, chronicDiseases: $chronicDiseases, gender: $gender, dateOfBirth: $dateOfBirth)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PatientDraftCopyWith<$Res> implements $PatientDraftCopyWith<$Res> {
+  factory _$PatientDraftCopyWith(_PatientDraft value, $Res Function(_PatientDraft) _then) = __$PatientDraftCopyWithImpl;
+@override @useResult
+$Res call({
+ String fullName, String nationalId, String bloodType, double weight, String? chronicDiseases, String gender, String dateOfBirth
+});
+
+
+
+
+}
+/// @nodoc
+class __$PatientDraftCopyWithImpl<$Res>
+    implements _$PatientDraftCopyWith<$Res> {
+  __$PatientDraftCopyWithImpl(this._self, this._then);
+
+  final _PatientDraft _self;
+  final $Res Function(_PatientDraft) _then;
+
+/// Create a copy of PatientDraft
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? fullName = null,Object? nationalId = null,Object? bloodType = null,Object? weight = null,Object? chronicDiseases = freezed,Object? gender = null,Object? dateOfBirth = null,}) {
+  return _then(_PatientDraft(
+fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
+as String,nationalId: null == nationalId ? _self.nationalId : nationalId // ignore: cast_nullable_to_non_nullable
+as String,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as String,weight: null == weight ? _self.weight : weight // ignore: cast_nullable_to_non_nullable
+as double,chronicDiseases: freezed == chronicDiseases ? _self.chronicDiseases : chronicDiseases // ignore: cast_nullable_to_non_nullable
+as String?,gender: null == gender ? _self.gender : gender // ignore: cast_nullable_to_non_nullable
+as String,dateOfBirth: null == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
 }
 
 /// @nodoc
 mixin _$RequestDraft {
 
- String get hospitalId; String get bloodType; RequestPriority get priority; int get unitsNeeded; DateTime? get neededBy; String? get notes;
+ String get hospitalId; BeneficiaryType get beneficiaryType; PatientDraft? get patient; String get bloodType; RequestPriority get priority; int get unitsNeeded; DateTime? get neededBy; String? get notes;
 /// Create a copy of RequestDraft
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -605,16 +1185,16 @@ $RequestDraftCopyWith<RequestDraft> get copyWith => _$RequestDraftCopyWithImpl<R
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RequestDraft&&(identical(other.hospitalId, hospitalId) || other.hospitalId == hospitalId)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.notes, notes) || other.notes == notes));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RequestDraft&&(identical(other.hospitalId, hospitalId) || other.hospitalId == hospitalId)&&(identical(other.beneficiaryType, beneficiaryType) || other.beneficiaryType == beneficiaryType)&&(identical(other.patient, patient) || other.patient == patient)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.notes, notes) || other.notes == notes));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,hospitalId,bloodType,priority,unitsNeeded,neededBy,notes);
+int get hashCode => Object.hash(runtimeType,hospitalId,beneficiaryType,patient,bloodType,priority,unitsNeeded,neededBy,notes);
 
 @override
 String toString() {
-  return 'RequestDraft(hospitalId: $hospitalId, bloodType: $bloodType, priority: $priority, unitsNeeded: $unitsNeeded, neededBy: $neededBy, notes: $notes)';
+  return 'RequestDraft(hospitalId: $hospitalId, beneficiaryType: $beneficiaryType, patient: $patient, bloodType: $bloodType, priority: $priority, unitsNeeded: $unitsNeeded, neededBy: $neededBy, notes: $notes)';
 }
 
 
@@ -625,11 +1205,11 @@ abstract mixin class $RequestDraftCopyWith<$Res>  {
   factory $RequestDraftCopyWith(RequestDraft value, $Res Function(RequestDraft) _then) = _$RequestDraftCopyWithImpl;
 @useResult
 $Res call({
- String hospitalId, String bloodType, RequestPriority priority, int unitsNeeded, DateTime? neededBy, String? notes
+ String hospitalId, BeneficiaryType beneficiaryType, PatientDraft? patient, String bloodType, RequestPriority priority, int unitsNeeded, DateTime? neededBy, String? notes
 });
 
 
-
+$PatientDraftCopyWith<$Res>? get patient;
 
 }
 /// @nodoc
@@ -642,10 +1222,12 @@ class _$RequestDraftCopyWithImpl<$Res>
 
 /// Create a copy of RequestDraft
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? hospitalId = null,Object? bloodType = null,Object? priority = null,Object? unitsNeeded = null,Object? neededBy = freezed,Object? notes = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? hospitalId = null,Object? beneficiaryType = null,Object? patient = freezed,Object? bloodType = null,Object? priority = null,Object? unitsNeeded = null,Object? neededBy = freezed,Object? notes = freezed,}) {
   return _then(_self.copyWith(
 hospitalId: null == hospitalId ? _self.hospitalId : hospitalId // ignore: cast_nullable_to_non_nullable
-as String,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as String,beneficiaryType: null == beneficiaryType ? _self.beneficiaryType : beneficiaryType // ignore: cast_nullable_to_non_nullable
+as BeneficiaryType,patient: freezed == patient ? _self.patient : patient // ignore: cast_nullable_to_non_nullable
+as PatientDraft?,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
 as String,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
 as RequestPriority,unitsNeeded: null == unitsNeeded ? _self.unitsNeeded : unitsNeeded // ignore: cast_nullable_to_non_nullable
 as int,neededBy: freezed == neededBy ? _self.neededBy : neededBy // ignore: cast_nullable_to_non_nullable
@@ -653,7 +1235,19 @@ as DateTime?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nulla
 as String?,
   ));
 }
+/// Create a copy of RequestDraft
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PatientDraftCopyWith<$Res>? get patient {
+    if (_self.patient == null) {
+    return null;
+  }
 
+  return $PatientDraftCopyWith<$Res>(_self.patient!, (value) {
+    return _then(_self.copyWith(patient: value));
+  });
+}
 }
 
 
@@ -735,10 +1329,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String hospitalId,  String bloodType,  RequestPriority priority,  int unitsNeeded,  DateTime? neededBy,  String? notes)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String hospitalId,  BeneficiaryType beneficiaryType,  PatientDraft? patient,  String bloodType,  RequestPriority priority,  int unitsNeeded,  DateTime? neededBy,  String? notes)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RequestDraft() when $default != null:
-return $default(_that.hospitalId,_that.bloodType,_that.priority,_that.unitsNeeded,_that.neededBy,_that.notes);case _:
+return $default(_that.hospitalId,_that.beneficiaryType,_that.patient,_that.bloodType,_that.priority,_that.unitsNeeded,_that.neededBy,_that.notes);case _:
   return orElse();
 
 }
@@ -756,10 +1350,10 @@ return $default(_that.hospitalId,_that.bloodType,_that.priority,_that.unitsNeede
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String hospitalId,  String bloodType,  RequestPriority priority,  int unitsNeeded,  DateTime? neededBy,  String? notes)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String hospitalId,  BeneficiaryType beneficiaryType,  PatientDraft? patient,  String bloodType,  RequestPriority priority,  int unitsNeeded,  DateTime? neededBy,  String? notes)  $default,) {final _that = this;
 switch (_that) {
 case _RequestDraft():
-return $default(_that.hospitalId,_that.bloodType,_that.priority,_that.unitsNeeded,_that.neededBy,_that.notes);case _:
+return $default(_that.hospitalId,_that.beneficiaryType,_that.patient,_that.bloodType,_that.priority,_that.unitsNeeded,_that.neededBy,_that.notes);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -776,10 +1370,10 @@ return $default(_that.hospitalId,_that.bloodType,_that.priority,_that.unitsNeede
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String hospitalId,  String bloodType,  RequestPriority priority,  int unitsNeeded,  DateTime? neededBy,  String? notes)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String hospitalId,  BeneficiaryType beneficiaryType,  PatientDraft? patient,  String bloodType,  RequestPriority priority,  int unitsNeeded,  DateTime? neededBy,  String? notes)?  $default,) {final _that = this;
 switch (_that) {
 case _RequestDraft() when $default != null:
-return $default(_that.hospitalId,_that.bloodType,_that.priority,_that.unitsNeeded,_that.neededBy,_that.notes);case _:
+return $default(_that.hospitalId,_that.beneficiaryType,_that.patient,_that.bloodType,_that.priority,_that.unitsNeeded,_that.neededBy,_that.notes);case _:
   return null;
 
 }
@@ -791,10 +1385,12 @@ return $default(_that.hospitalId,_that.bloodType,_that.priority,_that.unitsNeede
 
 
 class _RequestDraft implements RequestDraft {
-  const _RequestDraft({required this.hospitalId, required this.bloodType, required this.priority, required this.unitsNeeded, this.neededBy, this.notes});
+  const _RequestDraft({required this.hospitalId, this.beneficiaryType = BeneficiaryType.self, this.patient, required this.bloodType, required this.priority, required this.unitsNeeded, this.neededBy, this.notes});
   
 
 @override final  String hospitalId;
+@override@JsonKey() final  BeneficiaryType beneficiaryType;
+@override final  PatientDraft? patient;
 @override final  String bloodType;
 @override final  RequestPriority priority;
 @override final  int unitsNeeded;
@@ -811,16 +1407,16 @@ _$RequestDraftCopyWith<_RequestDraft> get copyWith => __$RequestDraftCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RequestDraft&&(identical(other.hospitalId, hospitalId) || other.hospitalId == hospitalId)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.notes, notes) || other.notes == notes));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RequestDraft&&(identical(other.hospitalId, hospitalId) || other.hospitalId == hospitalId)&&(identical(other.beneficiaryType, beneficiaryType) || other.beneficiaryType == beneficiaryType)&&(identical(other.patient, patient) || other.patient == patient)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.notes, notes) || other.notes == notes));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,hospitalId,bloodType,priority,unitsNeeded,neededBy,notes);
+int get hashCode => Object.hash(runtimeType,hospitalId,beneficiaryType,patient,bloodType,priority,unitsNeeded,neededBy,notes);
 
 @override
 String toString() {
-  return 'RequestDraft(hospitalId: $hospitalId, bloodType: $bloodType, priority: $priority, unitsNeeded: $unitsNeeded, neededBy: $neededBy, notes: $notes)';
+  return 'RequestDraft(hospitalId: $hospitalId, beneficiaryType: $beneficiaryType, patient: $patient, bloodType: $bloodType, priority: $priority, unitsNeeded: $unitsNeeded, neededBy: $neededBy, notes: $notes)';
 }
 
 
@@ -831,11 +1427,11 @@ abstract mixin class _$RequestDraftCopyWith<$Res> implements $RequestDraftCopyWi
   factory _$RequestDraftCopyWith(_RequestDraft value, $Res Function(_RequestDraft) _then) = __$RequestDraftCopyWithImpl;
 @override @useResult
 $Res call({
- String hospitalId, String bloodType, RequestPriority priority, int unitsNeeded, DateTime? neededBy, String? notes
+ String hospitalId, BeneficiaryType beneficiaryType, PatientDraft? patient, String bloodType, RequestPriority priority, int unitsNeeded, DateTime? neededBy, String? notes
 });
 
 
-
+@override $PatientDraftCopyWith<$Res>? get patient;
 
 }
 /// @nodoc
@@ -848,10 +1444,12 @@ class __$RequestDraftCopyWithImpl<$Res>
 
 /// Create a copy of RequestDraft
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? hospitalId = null,Object? bloodType = null,Object? priority = null,Object? unitsNeeded = null,Object? neededBy = freezed,Object? notes = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? hospitalId = null,Object? beneficiaryType = null,Object? patient = freezed,Object? bloodType = null,Object? priority = null,Object? unitsNeeded = null,Object? neededBy = freezed,Object? notes = freezed,}) {
   return _then(_RequestDraft(
 hospitalId: null == hospitalId ? _self.hospitalId : hospitalId // ignore: cast_nullable_to_non_nullable
-as String,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as String,beneficiaryType: null == beneficiaryType ? _self.beneficiaryType : beneficiaryType // ignore: cast_nullable_to_non_nullable
+as BeneficiaryType,patient: freezed == patient ? _self.patient : patient // ignore: cast_nullable_to_non_nullable
+as PatientDraft?,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
 as String,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
 as RequestPriority,unitsNeeded: null == unitsNeeded ? _self.unitsNeeded : unitsNeeded // ignore: cast_nullable_to_non_nullable
 as int,neededBy: freezed == neededBy ? _self.neededBy : neededBy // ignore: cast_nullable_to_non_nullable
@@ -860,7 +1458,19 @@ as String?,
   ));
 }
 
+/// Create a copy of RequestDraft
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PatientDraftCopyWith<$Res>? get patient {
+    if (_self.patient == null) {
+    return null;
+  }
 
+  return $PatientDraftCopyWith<$Res>(_self.patient!, (value) {
+    return _then(_self.copyWith(patient: value));
+  });
+}
 }
 
 /// @nodoc

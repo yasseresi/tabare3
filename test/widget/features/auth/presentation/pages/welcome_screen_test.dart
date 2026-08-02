@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
@@ -74,6 +75,30 @@ void main() {
     expect(find.text('مرحباً بك في'), findsOneWidget);
     expect(find.text('تسجيل الدخول'), findsOneWidget);
     expect(find.text('إنشاء حساب'), findsOneWidget);
+  });
+
+  testWidgets('uses the Figma translucent welcome gradient on white', (
+    tester,
+  ) async {
+    await pumpTestApp(tester, const WelcomeScreen());
+
+    final background = tester.widget<Container>(
+      find
+          .byWidgetPredicate(
+            (widget) =>
+                widget is Container &&
+                widget.decoration is BoxDecoration &&
+                (widget.decoration! as BoxDecoration).gradient != null,
+          )
+          .first,
+    );
+    final decoration = background.decoration! as BoxDecoration;
+
+    expect(decoration.color, const Color(0xFFFFFFFF));
+    expect(decoration.gradient!.colors, const [
+      Color(0x40FDB6B0),
+      Color(0x40DFE0FE),
+    ]);
   });
 
   testWidgets('tapping login navigates to LoginFormScreen', (tester) async {

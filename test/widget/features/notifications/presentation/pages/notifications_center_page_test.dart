@@ -109,10 +109,28 @@ void main() {
   ) async {
     await pumpPage(tester);
 
+    expect(find.byType(DecoratedBox), findsWidgets);
     expect(find.text('الاشعارات'), findsOneWidget);
     expect(find.text('ابحث عن الاشعارات...'), findsOneWidget);
     expect(find.text('حاجة مستعجلة'), findsOneWidget);
     expect(find.text('شكراً لك'), findsOneWidget);
+    expect(
+      tester.widget<Icon>(find.byIcon(Icons.notifications_none_rounded)).size,
+      24,
+    );
+    expect(
+      tester
+          .getSize(
+            find
+                .ancestor(
+                  of: find.byIcon(Icons.check),
+                  matching: find.byType(Container),
+                )
+                .first,
+          )
+          .width,
+      40,
+    );
   });
 
   testWidgets('forces RTL layout independently of the active locale', (

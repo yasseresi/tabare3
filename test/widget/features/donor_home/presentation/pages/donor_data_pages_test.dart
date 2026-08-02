@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tabare3/core/constants/widget_keys.dart';
 import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:tabare3/features/donor_home/domain/entities/donor_feed_entity.dart';
 import 'package:tabare3/features/donor_home/domain/entities/donor_card_entity.dart';
@@ -97,6 +98,11 @@ void main() {
     hospitalId: hospital.id,
     donatedAt: DateTime.utc(2026, 7, 1),
     units: 1,
+    bloodRequest: DonationRecordRequestRef(
+      id: request.id,
+      recipientName: 'علي بن محمد',
+      hospital: hospital,
+    ),
   );
   final loadedState = DonorFeedLoaded(
     feed: DonorFeedEntity(
@@ -164,16 +170,91 @@ void main() {
     await pumpPage(tester, const DonorRequestsScreen());
 
     expect(find.text('مستشفى الاختبار المعتمد'), findsOneWidget);
+    expect(find.text('ابحث عن مريض أو مستشفى...'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('حملة الاختبار'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('حملة الاختبار'), findsOneWidget);
     expect(find.text('A+'), findsOneWidget);
+  });
+
+  testWidgets('donor request notifications stay delegated to the donor shell', (
+    tester,
+  ) async {
+    var notificationsOpened = false;
+
+    await pumpPage(
+      tester,
+      DonorRequestsScreen(onNotifications: () => notificationsOpened = true),
+    );
+
+    expect(
+      tester.getSize(find.byKey(WidgetKeys.donorNotificationsButton)),
+      const Size(40, 40),
+    );
+
+    await tester.tap(find.byKey(WidgetKeys.donorNotificationsButton));
+    await tester.pump();
+
+    expect(notificationsOpened, isTrue);
   });
 
   testWidgets('renders donor overview from backend state', (tester) async {
     await pumpPage(tester, const DonorHomeScreen());
 
+    expect(find.byType(Image), findsOneWidget);
     expect(find.text('O-'), findsOneWidget);
     expect(find.text('4'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('مستشفى الاختبار المعتمد'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('مستشفى الاختبار المعتمد'), findsOneWidget);
+  });
+
+  testWidgets('shows the Figma confirmation card after accepting a request', (
+    tester,
+  ) async {
+    whenListen(
+      bloc,
+      Stream<DonorFeedState>.fromIterable([
+        loadedState.copyWith(lastMutation: DonorFeedMutation.requestAccepted),
+      ]),
+      initialState: loadedState,
+    );
+
+    await pumpPage(tester, const DonorHomeScreen());
+
+    expect(find.text('تم قبول الطلب بنجاح'), findsOneWidget);
+    expect(
+      find.text(
+        'شكراً لك على مساهمتك الإنسانية. تم إشعار صاحب الطلب باستعدادك للتبرع، وسيتم التواصل معك عند الحاجة.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('تأكيد'), findsOneWidget);
+  });
+
+  testWidgets('donor navigation keeps the Figma order and calendar action', (
+    tester,
+  ) async {
+    await pumpPage(tester, const DonorHomeScreen());
+
+    final home = find.byKey(WidgetKeys.donorNavigationHome);
+    final calendar = find.byKey(WidgetKeys.donorNavigationAppointments);
+    final profile = find.byKey(WidgetKeys.donorNavigationProfile);
+
+    expect(home, findsOneWidget);
+    expect(calendar, findsOneWidget);
+    expect(profile, findsOneWidget);
+    expect(tester.getCenter(home).dx, lessThan(tester.getCenter(calendar).dx));
+    expect(
+      tester.getCenter(calendar).dx,
+      lessThan(tester.getCenter(profile).dx),
+    );
   });
 
   testWidgets('renders the donor appointment from backend state', (
@@ -181,15 +262,56 @@ void main() {
   ) async {
     await pumpPage(tester, const DonorAppointmentsScreen());
 
+    expect(find.text('مواعيدي'), findsOneWidget);
+    expect(find.text('المواعيد القادمة'), findsOneWidget);
     expect(find.text('مستشفى الاختبار المعتمد'), findsOneWidget);
     expect(find.text('A+'), findsOneWidget);
   });
 
-  testWidgets('renders the donation record from backend state', (tester) async {
-    await pumpPage(tester, const DonorRecordScreen());
+  testWidgets(
+    'uses the Figma confirmation card before cancelling an appointment',
+    (tester) async {
+      await pumpPage(tester, const DonorAppointmentsScreen());
 
-    expect(find.text('1'), findsWidgets);
+      await tester.ensureVisible(
+        find.byKey(WidgetKeys.appointmentCancelButton),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(WidgetKeys.appointmentCancelButton));
+      await tester.pumpAndSettle();
+
+      expect(find.text('هل أنت متأكد من إلغاء هذا الطلب؟'), findsOneWidget);
+      expect(
+        find.byKey(WidgetKeys.appointmentCancelConfirmButton),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets('renders the donation record from backend state', (tester) async {
+    var notificationsOpened = false;
+
+    await pumpPage(
+      tester,
+      DonorRecordScreen(onNotifications: () => notificationsOpened = true),
+    );
+
+    expect(find.text('سجل تبرعاتي'), findsNWidgets(2));
+    expect(find.text('مستشفى الاختبار المعتمد'), findsOneWidget);
+    expect(find.text('المريض'), findsOneWidget);
+    expect(find.text('علي بن محمد'), findsOneWidget);
+    expect(find.text('الموقع'), findsOneWidget);
+    expect(find.text('وسط الجزائر'), findsOneWidget);
     expect(find.text('01 Jul 2026'), findsOneWidget);
+    expect(
+      tester.getSize(find.byKey(WidgetKeys.donorNotificationsButton)),
+      const Size(40, 40),
+    );
+
+    await tester.tap(find.byKey(WidgetKeys.donorNotificationsButton));
+    await tester.pump();
+
+    expect(notificationsOpened, isTrue);
   });
 
   testWidgets('renders points, current level and earned badges from backend', (

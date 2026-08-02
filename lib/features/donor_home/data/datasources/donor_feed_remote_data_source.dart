@@ -31,7 +31,13 @@ const appointmentSelectColumns =
 
 const donationRecordSelectColumns =
     'id,donor_id,source,request_id,campaign_id,appointment_id,hospital_id,'
-    'donated_at,units';
+    'donated_at,units,'
+    'blood_request:blood_requests!donation_records_request_id_fkey('
+    'id,recipient:users!blood_requests_requested_by_fkey(full_name),'
+    'hospital:hospitals!blood_requests_hospital_id_fkey('
+    'id,wilaya_id,name_ar,name_fr,address,is_active)),'
+    'campaign:campaigns!donation_records_campaign_id_fkey('
+    'id,title,venue_name,city)';
 
 abstract class DonorFeedRemoteDataSource {
   Future<DonorAvailabilityModel> getAvailability();

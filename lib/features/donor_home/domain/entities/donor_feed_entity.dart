@@ -233,6 +233,25 @@ abstract class DonorAppointmentEntity with _$DonorAppointmentEntity {
 }
 
 @freezed
+abstract class DonationRecordRequestRef with _$DonationRecordRequestRef {
+  const factory DonationRecordRequestRef({
+    required String id,
+    required String recipientName,
+    required DonorHospitalEntity hospital,
+  }) = _DonationRecordRequestRef;
+}
+
+@freezed
+abstract class DonationRecordCampaignRef with _$DonationRecordCampaignRef {
+  const factory DonationRecordCampaignRef({
+    required String id,
+    required String title,
+    required String venueName,
+    required String city,
+  }) = _DonationRecordCampaignRef;
+}
+
+@freezed
 abstract class DonationRecordEntity with _$DonationRecordEntity {
   const factory DonationRecordEntity({
     required String id,
@@ -244,6 +263,8 @@ abstract class DonationRecordEntity with _$DonationRecordEntity {
     String? hospitalId,
     required DateTime donatedAt,
     required int units,
+    DonationRecordRequestRef? bloodRequest,
+    DonationRecordCampaignRef? campaign,
   }) = _DonationRecordEntity;
 }
 

@@ -56,7 +56,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppPadding.p32,
-                      vertical: AppPadding.p60,
+                      vertical: AppPadding.p100,
                     ),
                     child: Form(
                       key: _formKey,
@@ -75,8 +75,8 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                           const SizedBox(height: AppSize.s15),
                           Image.asset(
                             ImageAssets.demo1,
-                            width: 170,
-                            height: 169,
+                            width: AppSize.s170,
+                            height: AppSize.s169,
                             errorBuilder: (_, __, ___) => Icon(
                               Icons.assignment_ind_outlined,
                               color: ColorManager.primary,
@@ -103,7 +103,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
                           ),
                           const SizedBox(height: AppSize.s16),
                           AppTextField(
-                            hintText: '............',
+                            hintText: AppStrings.passwordMask.tr(),
                             prefixSvg: SvgAssets.password,
                             obscureSvg: SvgAssets.hidden,
                             isPassword: true,

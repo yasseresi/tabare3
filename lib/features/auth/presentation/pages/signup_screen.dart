@@ -121,89 +121,102 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Scaffold(
             body: Directionality(
               textDirection: TextDirection.rtl,
-              child: SafeArea(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppPadding.p20,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: ColorManager.white,
+                  gradient: LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [
+                      ColorManager.welcomeGradientStart,
+                      ColorManager.welcomeGradientEnd,
+                    ],
                   ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        const SizedBox(height: AppSize.s20),
-                        Image.asset(
-                          ImageAssets.icon6,
-                          width: AppSize.s76,
-                          height: AppSize.s76,
-                          errorBuilder: (_, __, ___) => Icon(
-                            Icons.bloodtype_outlined,
-                            color: ColorManager.primary,
-                            size: AppSize.s76,
+                ),
+                child: SafeArea(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppPadding.p20,
+                      vertical: AppPadding.p60,
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            ImageAssets.icon6,
+                            width: AppSize.s76,
+                            height: AppSize.s76,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.bloodtype_outlined,
+                              color: ColorManager.primary,
+                              size: AppSize.s76,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: AppSize.s10),
-                        Text(
-                          AppStrings.signup.tr(),
-                          style: getBoldStyle(
-                            fontSize: FontSize.s24,
-                            color: ColorManager.textPrimary,
+                          const SizedBox(height: AppSize.s10),
+                          Text(
+                            AppStrings.signup.tr(),
+                            style: getBoldStyle(
+                              fontSize: FontSize.s30,
+                              color: ColorManager.textPrimary,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: AppSize.s5),
-                        Text(
-                          _getStepTitle(),
-                          style: getRegularStyle(
-                            fontSize: FontSize.s14,
-                            color: ColorManager.textSecondary,
+                          const SizedBox(height: AppSize.s5),
+                          Text(
+                            _getStepTitle(),
+                            style: getRegularStyle(
+                              fontSize: FontSize.s14,
+                              color: ColorManager.textSecondary,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: AppSize.s20),
-                        _buildStepIndicator(),
-                        const SizedBox(height: AppSize.s20),
-                        _buildCurrentStepView(),
-                        const SizedBox(height: AppSize.s20),
-                        ElevatedButton(
-                          onPressed: (_currentStep == 3 && !_agreeToTerms)
-                              ? null
-                              : _nextStep,
-                          child: Text(
-                            _currentStep == 3
-                                ? AppStrings.signup.tr()
-                                : AppStrings.next.tr(),
-                          ),
-                        ),
-                        if (_currentStep == 1) ...[
                           const SizedBox(height: AppSize.s20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '${AppStrings.hasAccount.tr()} ',
-                                style: getRegularStyle(
-                                  fontSize: FontSize.s12,
-                                  color: ColorManager.textMuted,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () => Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const LoginFormScreen(),
-                                  ),
-                                ),
-                                child: Text(
-                                  AppStrings.login.tr(),
-                                  style: getBoldStyle(
-                                    fontSize: FontSize.s12,
-                                    color: ColorManager.primary,
-                                  ),
-                                ),
-                              ),
-                            ],
+                          _buildStepIndicator(),
+                          const SizedBox(height: AppSize.s20),
+                          _buildCurrentStepView(),
+                          const SizedBox(height: AppSize.s20),
+                          ElevatedButton(
+                            onPressed: (_currentStep == 3 && !_agreeToTerms)
+                                ? null
+                                : _nextStep,
+                            child: Text(
+                              _currentStep == 3
+                                  ? AppStrings.signup.tr()
+                                  : AppStrings.next.tr(),
+                            ),
                           ),
+                          if (_currentStep == 1) ...[
+                            const SizedBox(height: AppSize.s20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '${AppStrings.hasAccount.tr()} ',
+                                  style: getRegularStyle(
+                                    fontSize: FontSize.s12,
+                                    color: ColorManager.textMuted,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () => Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const LoginFormScreen(),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    AppStrings.login.tr(),
+                                    style: getBoldStyle(
+                                      fontSize: FontSize.s12,
+                                      color: ColorManager.primary,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                          const SizedBox(height: AppSize.s20),
                         ],
-                        const SizedBox(height: AppSize.s20),
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -461,6 +474,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
+        barrierColor: ColorManager.dialogScrim,
         builder: (_) => AppDialog.success(
           title: AppStrings.signupSuccess.tr(),
           actionLabel: AppStrings.homePage.tr(),

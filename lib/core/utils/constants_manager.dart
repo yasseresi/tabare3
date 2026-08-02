@@ -4,6 +4,8 @@ class AppConstants {
   static const int sliderAnimationTime = 300;
   static const int toastDuration = 3;
   static const int paginationLimit = 10;
+  static const int profileHadithMaxLines = 3;
+  static const int statusTagMaxLines = 1;
   static const int minPasswordLength = 8;
   static const int minDonorAge = 18;
   static const int maxDonorAge = 65;
@@ -16,6 +18,9 @@ class AppConstants {
   static const int requestCalendarStartOffsetDays = 1;
   static const int requestCalendarRangeDays = 365;
   static const String requestDateFormat = 'dd MMM yyyy';
+  static const String requestPatientDateFormat = 'yyyy-MM-dd';
+  static const String genderMale = 'male';
+  static const String genderFemale = 'female';
   static const String requestTimeFormat = 'HH:mm';
   static const String notificationDateTimeFormat = 'yyyy/MM/dd - HH:mm';
   static const String appVersion = '1.0';

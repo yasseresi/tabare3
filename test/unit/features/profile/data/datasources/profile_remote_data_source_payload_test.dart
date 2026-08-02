@@ -28,28 +28,23 @@ void main() {
     expect(payload, {
       'username': 'user',
       'phone': '0550000000',
-      'date_of_birth': '2000-01-01',
-      'gender': 'male',
-      'blood_type': 'O+',
       'weight': 72,
       'city': 'الجزائر',
       'chronic_diseases': null,
       'avatar_url': 'avatar.png',
-      'is_available_for_donation': false,
+      'is_active': false,
     });
     expect(payload, isNot(contains('full_name')));
     expect(payload, isNot(contains('national_id')));
-    expect(payload, isNot(contains('is_active')));
+    expect(payload, isNot(contains('date_of_birth')));
+    expect(payload, isNot(contains('gender')));
+    expect(payload, isNot(contains('blood_type')));
+    expect(payload, isNot(contains('is_available_for_donation')));
     expect(payload, isNot(contains('updated_at')));
   });
 
-  test(
-    'profile select aliases donation availability to the legacy model key',
-    () {
-      expect(
-        profileSelectColumns,
-        contains('is_active:is_available_for_donation'),
-      );
-    },
-  );
+  test('profile select exposes the actual account status', () {
+    expect(profileSelectColumns, contains('is_active'));
+    expect(profileSelectColumns, isNot(contains('is_available_for_donation')));
+  });
 }

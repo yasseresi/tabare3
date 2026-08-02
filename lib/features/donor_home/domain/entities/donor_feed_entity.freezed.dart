@@ -637,7 +637,7 @@ as DateTime,
 @override
 @pragma('vm:prefer-inline')
 $DonorHospitalEntityCopyWith<$Res> get hospital {
-  
+
   return $DonorHospitalEntityCopyWith<$Res>(_self.hospital, (value) {
     return _then(_self.copyWith(hospital: value));
   });
@@ -865,7 +865,7 @@ as DateTime,
 @override
 @pragma('vm:prefer-inline')
 $DonorHospitalEntityCopyWith<$Res> get hospital {
-  
+
   return $DonorHospitalEntityCopyWith<$Res>(_self.hospital, (value) {
     return _then(_self.copyWith(hospital: value));
   });
@@ -2068,9 +2068,556 @@ $DonorAppointmentCampaignRefCopyWith<$Res>? get campaign {
 }
 
 /// @nodoc
+mixin _$DonationRecordRequestRef {
+
+ String get id; String get recipientName; DonorHospitalEntity get hospital;
+/// Create a copy of DonationRecordRequestRef
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$DonationRecordRequestRefCopyWith<DonationRecordRequestRef> get copyWith => _$DonationRecordRequestRefCopyWithImpl<DonationRecordRequestRef>(this as DonationRecordRequestRef, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DonationRecordRequestRef&&(identical(other.id, id) || other.id == id)&&(identical(other.recipientName, recipientName) || other.recipientName == recipientName)&&(identical(other.hospital, hospital) || other.hospital == hospital));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,id,recipientName,hospital);
+
+@override
+String toString() {
+  return 'DonationRecordRequestRef(id: $id, recipientName: $recipientName, hospital: $hospital)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $DonationRecordRequestRefCopyWith<$Res>  {
+  factory $DonationRecordRequestRefCopyWith(DonationRecordRequestRef value, $Res Function(DonationRecordRequestRef) _then) = _$DonationRecordRequestRefCopyWithImpl;
+@useResult
+$Res call({
+ String id, String recipientName, DonorHospitalEntity hospital
+});
+
+
+$DonorHospitalEntityCopyWith<$Res> get hospital;
+
+}
+/// @nodoc
+class _$DonationRecordRequestRefCopyWithImpl<$Res>
+    implements $DonationRecordRequestRefCopyWith<$Res> {
+  _$DonationRecordRequestRefCopyWithImpl(this._self, this._then);
+
+  final DonationRecordRequestRef _self;
+  final $Res Function(DonationRecordRequestRef) _then;
+
+/// Create a copy of DonationRecordRequestRef
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? recipientName = null,Object? hospital = null,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,recipientName: null == recipientName ? _self.recipientName : recipientName // ignore: cast_nullable_to_non_nullable
+as String,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as DonorHospitalEntity,
+  ));
+}
+/// Create a copy of DonationRecordRequestRef
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$DonorHospitalEntityCopyWith<$Res> get hospital {
+
+  return $DonorHospitalEntityCopyWith<$Res>(_self.hospital, (value) {
+    return _then(_self.copyWith(hospital: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [DonationRecordRequestRef].
+extension DonationRecordRequestRefPatterns on DonationRecordRequestRef {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _DonationRecordRequestRef value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _DonationRecordRequestRef() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _DonationRecordRequestRef value)  $default,){
+final _that = this;
+switch (_that) {
+case _DonationRecordRequestRef():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _DonationRecordRequestRef value)?  $default,){
+final _that = this;
+switch (_that) {
+case _DonationRecordRequestRef() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String recipientName,  DonorHospitalEntity hospital)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _DonationRecordRequestRef() when $default != null:
+return $default(_that.id,_that.recipientName,_that.hospital);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String recipientName,  DonorHospitalEntity hospital)  $default,) {final _that = this;
+switch (_that) {
+case _DonationRecordRequestRef():
+return $default(_that.id,_that.recipientName,_that.hospital);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String recipientName,  DonorHospitalEntity hospital)?  $default,) {final _that = this;
+switch (_that) {
+case _DonationRecordRequestRef() when $default != null:
+return $default(_that.id,_that.recipientName,_that.hospital);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _DonationRecordRequestRef implements DonationRecordRequestRef {
+  const _DonationRecordRequestRef({required this.id, required this.recipientName, required this.hospital});
+
+
+@override final  String id;
+@override final  String recipientName;
+@override final  DonorHospitalEntity hospital;
+
+/// Create a copy of DonationRecordRequestRef
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$DonationRecordRequestRefCopyWith<_DonationRecordRequestRef> get copyWith => __$DonationRecordRequestRefCopyWithImpl<_DonationRecordRequestRef>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DonationRecordRequestRef&&(identical(other.id, id) || other.id == id)&&(identical(other.recipientName, recipientName) || other.recipientName == recipientName)&&(identical(other.hospital, hospital) || other.hospital == hospital));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,id,recipientName,hospital);
+
+@override
+String toString() {
+  return 'DonationRecordRequestRef(id: $id, recipientName: $recipientName, hospital: $hospital)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$DonationRecordRequestRefCopyWith<$Res> implements $DonationRecordRequestRefCopyWith<$Res> {
+  factory _$DonationRecordRequestRefCopyWith(_DonationRecordRequestRef value, $Res Function(_DonationRecordRequestRef) _then) = __$DonationRecordRequestRefCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String recipientName, DonorHospitalEntity hospital
+});
+
+
+@override $DonorHospitalEntityCopyWith<$Res> get hospital;
+
+}
+/// @nodoc
+class __$DonationRecordRequestRefCopyWithImpl<$Res>
+    implements _$DonationRecordRequestRefCopyWith<$Res> {
+  __$DonationRecordRequestRefCopyWithImpl(this._self, this._then);
+
+  final _DonationRecordRequestRef _self;
+  final $Res Function(_DonationRecordRequestRef) _then;
+
+/// Create a copy of DonationRecordRequestRef
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? recipientName = null,Object? hospital = null,}) {
+  return _then(_DonationRecordRequestRef(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,recipientName: null == recipientName ? _self.recipientName : recipientName // ignore: cast_nullable_to_non_nullable
+as String,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as DonorHospitalEntity,
+  ));
+}
+
+/// Create a copy of DonationRecordRequestRef
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$DonorHospitalEntityCopyWith<$Res> get hospital {
+
+  return $DonorHospitalEntityCopyWith<$Res>(_self.hospital, (value) {
+    return _then(_self.copyWith(hospital: value));
+  });
+}
+}
+
+/// @nodoc
+mixin _$DonationRecordCampaignRef {
+
+ String get id; String get title; String get venueName; String get city;
+/// Create a copy of DonationRecordCampaignRef
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$DonationRecordCampaignRefCopyWith<DonationRecordCampaignRef> get copyWith => _$DonationRecordCampaignRefCopyWithImpl<DonationRecordCampaignRef>(this as DonationRecordCampaignRef, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DonationRecordCampaignRef&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.venueName, venueName) || other.venueName == venueName)&&(identical(other.city, city) || other.city == city));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,id,title,venueName,city);
+
+@override
+String toString() {
+  return 'DonationRecordCampaignRef(id: $id, title: $title, venueName: $venueName, city: $city)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $DonationRecordCampaignRefCopyWith<$Res>  {
+  factory $DonationRecordCampaignRefCopyWith(DonationRecordCampaignRef value, $Res Function(DonationRecordCampaignRef) _then) = _$DonationRecordCampaignRefCopyWithImpl;
+@useResult
+$Res call({
+ String id, String title, String venueName, String city
+});
+
+
+
+
+}
+/// @nodoc
+class _$DonationRecordCampaignRefCopyWithImpl<$Res>
+    implements $DonationRecordCampaignRefCopyWith<$Res> {
+  _$DonationRecordCampaignRefCopyWithImpl(this._self, this._then);
+
+  final DonationRecordCampaignRef _self;
+  final $Res Function(DonationRecordCampaignRef) _then;
+
+/// Create a copy of DonationRecordCampaignRef
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? venueName = null,Object? city = null,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,venueName: null == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
+as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [DonationRecordCampaignRef].
+extension DonationRecordCampaignRefPatterns on DonationRecordCampaignRef {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _DonationRecordCampaignRef value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _DonationRecordCampaignRef() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _DonationRecordCampaignRef value)  $default,){
+final _that = this;
+switch (_that) {
+case _DonationRecordCampaignRef():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _DonationRecordCampaignRef value)?  $default,){
+final _that = this;
+switch (_that) {
+case _DonationRecordCampaignRef() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  String venueName,  String city)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _DonationRecordCampaignRef() when $default != null:
+return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  String venueName,  String city)  $default,) {final _that = this;
+switch (_that) {
+case _DonationRecordCampaignRef():
+return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  String venueName,  String city)?  $default,) {final _that = this;
+switch (_that) {
+case _DonationRecordCampaignRef() when $default != null:
+return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _DonationRecordCampaignRef implements DonationRecordCampaignRef {
+  const _DonationRecordCampaignRef({required this.id, required this.title, required this.venueName, required this.city});
+
+
+@override final  String id;
+@override final  String title;
+@override final  String venueName;
+@override final  String city;
+
+/// Create a copy of DonationRecordCampaignRef
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$DonationRecordCampaignRefCopyWith<_DonationRecordCampaignRef> get copyWith => __$DonationRecordCampaignRefCopyWithImpl<_DonationRecordCampaignRef>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DonationRecordCampaignRef&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.venueName, venueName) || other.venueName == venueName)&&(identical(other.city, city) || other.city == city));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,id,title,venueName,city);
+
+@override
+String toString() {
+  return 'DonationRecordCampaignRef(id: $id, title: $title, venueName: $venueName, city: $city)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$DonationRecordCampaignRefCopyWith<$Res> implements $DonationRecordCampaignRefCopyWith<$Res> {
+  factory _$DonationRecordCampaignRefCopyWith(_DonationRecordCampaignRef value, $Res Function(_DonationRecordCampaignRef) _then) = __$DonationRecordCampaignRefCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String title, String venueName, String city
+});
+
+
+
+
+}
+/// @nodoc
+class __$DonationRecordCampaignRefCopyWithImpl<$Res>
+    implements _$DonationRecordCampaignRefCopyWith<$Res> {
+  __$DonationRecordCampaignRefCopyWithImpl(this._self, this._then);
+
+  final _DonationRecordCampaignRef _self;
+  final $Res Function(_DonationRecordCampaignRef) _then;
+
+/// Create a copy of DonationRecordCampaignRef
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? venueName = null,Object? city = null,}) {
+  return _then(_DonationRecordCampaignRef(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,venueName: null == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
+as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
 mixin _$DonationRecordEntity {
 
- String get id; String get donorId; DonationSource get source; String? get requestId; String? get campaignId; String? get appointmentId; String? get hospitalId; DateTime get donatedAt; int get units;
+ String get id; String get donorId; DonationSource get source; String? get requestId; String? get campaignId; String? get appointmentId; String? get hospitalId; DateTime get donatedAt; int get units; DonationRecordRequestRef? get bloodRequest; DonationRecordCampaignRef? get campaign;
 /// Create a copy of DonationRecordEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2081,16 +2628,16 @@ $DonationRecordEntityCopyWith<DonationRecordEntity> get copyWith => _$DonationRe
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DonationRecordEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.donorId, donorId) || other.donorId == donorId)&&(identical(other.source, source) || other.source == source)&&(identical(other.requestId, requestId) || other.requestId == requestId)&&(identical(other.campaignId, campaignId) || other.campaignId == campaignId)&&(identical(other.appointmentId, appointmentId) || other.appointmentId == appointmentId)&&(identical(other.hospitalId, hospitalId) || other.hospitalId == hospitalId)&&(identical(other.donatedAt, donatedAt) || other.donatedAt == donatedAt)&&(identical(other.units, units) || other.units == units));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DonationRecordEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.donorId, donorId) || other.donorId == donorId)&&(identical(other.source, source) || other.source == source)&&(identical(other.requestId, requestId) || other.requestId == requestId)&&(identical(other.campaignId, campaignId) || other.campaignId == campaignId)&&(identical(other.appointmentId, appointmentId) || other.appointmentId == appointmentId)&&(identical(other.hospitalId, hospitalId) || other.hospitalId == hospitalId)&&(identical(other.donatedAt, donatedAt) || other.donatedAt == donatedAt)&&(identical(other.units, units) || other.units == units)&&(identical(other.bloodRequest, bloodRequest) || other.bloodRequest == bloodRequest)&&(identical(other.campaign, campaign) || other.campaign == campaign));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,donorId,source,requestId,campaignId,appointmentId,hospitalId,donatedAt,units);
+int get hashCode => Object.hash(runtimeType,id,donorId,source,requestId,campaignId,appointmentId,hospitalId,donatedAt,units,bloodRequest,campaign);
 
 @override
 String toString() {
-  return 'DonationRecordEntity(id: $id, donorId: $donorId, source: $source, requestId: $requestId, campaignId: $campaignId, appointmentId: $appointmentId, hospitalId: $hospitalId, donatedAt: $donatedAt, units: $units)';
+  return 'DonationRecordEntity(id: $id, donorId: $donorId, source: $source, requestId: $requestId, campaignId: $campaignId, appointmentId: $appointmentId, hospitalId: $hospitalId, donatedAt: $donatedAt, units: $units, bloodRequest: $bloodRequest, campaign: $campaign)';
 }
 
 
@@ -2101,11 +2648,11 @@ abstract mixin class $DonationRecordEntityCopyWith<$Res>  {
   factory $DonationRecordEntityCopyWith(DonationRecordEntity value, $Res Function(DonationRecordEntity) _then) = _$DonationRecordEntityCopyWithImpl;
 @useResult
 $Res call({
- String id, String donorId, DonationSource source, String? requestId, String? campaignId, String? appointmentId, String? hospitalId, DateTime donatedAt, int units
+ String id, String donorId, DonationSource source, String? requestId, String? campaignId, String? appointmentId, String? hospitalId, DateTime donatedAt, int units, DonationRecordRequestRef? bloodRequest, DonationRecordCampaignRef? campaign
 });
 
 
-
+$DonationRecordRequestRefCopyWith<$Res>? get bloodRequest;$DonationRecordCampaignRefCopyWith<$Res>? get campaign;
 
 }
 /// @nodoc
@@ -2118,7 +2665,7 @@ class _$DonationRecordEntityCopyWithImpl<$Res>
 
 /// Create a copy of DonationRecordEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? donorId = null,Object? source = null,Object? requestId = freezed,Object? campaignId = freezed,Object? appointmentId = freezed,Object? hospitalId = freezed,Object? donatedAt = null,Object? units = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? donorId = null,Object? source = null,Object? requestId = freezed,Object? campaignId = freezed,Object? appointmentId = freezed,Object? hospitalId = freezed,Object? donatedAt = null,Object? units = null,Object? bloodRequest = freezed,Object? campaign = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,donorId: null == donorId ? _self.donorId : donorId // ignore: cast_nullable_to_non_nullable
@@ -2129,10 +2676,36 @@ as String?,appointmentId: freezed == appointmentId ? _self.appointmentId : appoi
 as String?,hospitalId: freezed == hospitalId ? _self.hospitalId : hospitalId // ignore: cast_nullable_to_non_nullable
 as String?,donatedAt: null == donatedAt ? _self.donatedAt : donatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,units: null == units ? _self.units : units // ignore: cast_nullable_to_non_nullable
-as int,
+as int,bloodRequest: freezed == bloodRequest ? _self.bloodRequest : bloodRequest // ignore: cast_nullable_to_non_nullable
+as DonationRecordRequestRef?,campaign: freezed == campaign ? _self.campaign : campaign // ignore: cast_nullable_to_non_nullable
+as DonationRecordCampaignRef?,
   ));
 }
+/// Create a copy of DonationRecordEntity
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$DonationRecordRequestRefCopyWith<$Res>? get bloodRequest {
+    if (_self.bloodRequest == null) {
+    return null;
+  }
 
+  return $DonationRecordRequestRefCopyWith<$Res>(_self.bloodRequest!, (value) {
+    return _then(_self.copyWith(bloodRequest: value));
+  });
+}/// Create a copy of DonationRecordEntity
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$DonationRecordCampaignRefCopyWith<$Res>? get campaign {
+    if (_self.campaign == null) {
+    return null;
+  }
+
+  return $DonationRecordCampaignRefCopyWith<$Res>(_self.campaign!, (value) {
+    return _then(_self.copyWith(campaign: value));
+  });
+}
 }
 
 
@@ -2214,10 +2787,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String donorId,  DonationSource source,  String? requestId,  String? campaignId,  String? appointmentId,  String? hospitalId,  DateTime donatedAt,  int units)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String donorId,  DonationSource source,  String? requestId,  String? campaignId,  String? appointmentId,  String? hospitalId,  DateTime donatedAt,  int units,  DonationRecordRequestRef? bloodRequest,  DonationRecordCampaignRef? campaign)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DonationRecordEntity() when $default != null:
-return $default(_that.id,_that.donorId,_that.source,_that.requestId,_that.campaignId,_that.appointmentId,_that.hospitalId,_that.donatedAt,_that.units);case _:
+return $default(_that.id,_that.donorId,_that.source,_that.requestId,_that.campaignId,_that.appointmentId,_that.hospitalId,_that.donatedAt,_that.units,_that.bloodRequest,_that.campaign);case _:
   return orElse();
 
 }
@@ -2235,10 +2808,10 @@ return $default(_that.id,_that.donorId,_that.source,_that.requestId,_that.campai
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String donorId,  DonationSource source,  String? requestId,  String? campaignId,  String? appointmentId,  String? hospitalId,  DateTime donatedAt,  int units)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String donorId,  DonationSource source,  String? requestId,  String? campaignId,  String? appointmentId,  String? hospitalId,  DateTime donatedAt,  int units,  DonationRecordRequestRef? bloodRequest,  DonationRecordCampaignRef? campaign)  $default,) {final _that = this;
 switch (_that) {
 case _DonationRecordEntity():
-return $default(_that.id,_that.donorId,_that.source,_that.requestId,_that.campaignId,_that.appointmentId,_that.hospitalId,_that.donatedAt,_that.units);case _:
+return $default(_that.id,_that.donorId,_that.source,_that.requestId,_that.campaignId,_that.appointmentId,_that.hospitalId,_that.donatedAt,_that.units,_that.bloodRequest,_that.campaign);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -2255,10 +2828,10 @@ return $default(_that.id,_that.donorId,_that.source,_that.requestId,_that.campai
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String donorId,  DonationSource source,  String? requestId,  String? campaignId,  String? appointmentId,  String? hospitalId,  DateTime donatedAt,  int units)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String donorId,  DonationSource source,  String? requestId,  String? campaignId,  String? appointmentId,  String? hospitalId,  DateTime donatedAt,  int units,  DonationRecordRequestRef? bloodRequest,  DonationRecordCampaignRef? campaign)?  $default,) {final _that = this;
 switch (_that) {
 case _DonationRecordEntity() when $default != null:
-return $default(_that.id,_that.donorId,_that.source,_that.requestId,_that.campaignId,_that.appointmentId,_that.hospitalId,_that.donatedAt,_that.units);case _:
+return $default(_that.id,_that.donorId,_that.source,_that.requestId,_that.campaignId,_that.appointmentId,_that.hospitalId,_that.donatedAt,_that.units,_that.bloodRequest,_that.campaign);case _:
   return null;
 
 }
@@ -2270,7 +2843,7 @@ return $default(_that.id,_that.donorId,_that.source,_that.requestId,_that.campai
 
 
 class _DonationRecordEntity implements DonationRecordEntity {
-  const _DonationRecordEntity({required this.id, required this.donorId, required this.source, this.requestId, this.campaignId, this.appointmentId, this.hospitalId, required this.donatedAt, required this.units});
+  const _DonationRecordEntity({required this.id, required this.donorId, required this.source, this.requestId, this.campaignId, this.appointmentId, this.hospitalId, required this.donatedAt, required this.units, this.bloodRequest, this.campaign});
   
 
 @override final  String id;
@@ -2282,6 +2855,8 @@ class _DonationRecordEntity implements DonationRecordEntity {
 @override final  String? hospitalId;
 @override final  DateTime donatedAt;
 @override final  int units;
+@override final  DonationRecordRequestRef? bloodRequest;
+@override final  DonationRecordCampaignRef? campaign;
 
 /// Create a copy of DonationRecordEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -2293,16 +2868,16 @@ _$DonationRecordEntityCopyWith<_DonationRecordEntity> get copyWith => __$Donatio
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DonationRecordEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.donorId, donorId) || other.donorId == donorId)&&(identical(other.source, source) || other.source == source)&&(identical(other.requestId, requestId) || other.requestId == requestId)&&(identical(other.campaignId, campaignId) || other.campaignId == campaignId)&&(identical(other.appointmentId, appointmentId) || other.appointmentId == appointmentId)&&(identical(other.hospitalId, hospitalId) || other.hospitalId == hospitalId)&&(identical(other.donatedAt, donatedAt) || other.donatedAt == donatedAt)&&(identical(other.units, units) || other.units == units));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DonationRecordEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.donorId, donorId) || other.donorId == donorId)&&(identical(other.source, source) || other.source == source)&&(identical(other.requestId, requestId) || other.requestId == requestId)&&(identical(other.campaignId, campaignId) || other.campaignId == campaignId)&&(identical(other.appointmentId, appointmentId) || other.appointmentId == appointmentId)&&(identical(other.hospitalId, hospitalId) || other.hospitalId == hospitalId)&&(identical(other.donatedAt, donatedAt) || other.donatedAt == donatedAt)&&(identical(other.units, units) || other.units == units)&&(identical(other.bloodRequest, bloodRequest) || other.bloodRequest == bloodRequest)&&(identical(other.campaign, campaign) || other.campaign == campaign));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,donorId,source,requestId,campaignId,appointmentId,hospitalId,donatedAt,units);
+int get hashCode => Object.hash(runtimeType,id,donorId,source,requestId,campaignId,appointmentId,hospitalId,donatedAt,units,bloodRequest,campaign);
 
 @override
 String toString() {
-  return 'DonationRecordEntity(id: $id, donorId: $donorId, source: $source, requestId: $requestId, campaignId: $campaignId, appointmentId: $appointmentId, hospitalId: $hospitalId, donatedAt: $donatedAt, units: $units)';
+  return 'DonationRecordEntity(id: $id, donorId: $donorId, source: $source, requestId: $requestId, campaignId: $campaignId, appointmentId: $appointmentId, hospitalId: $hospitalId, donatedAt: $donatedAt, units: $units, bloodRequest: $bloodRequest, campaign: $campaign)';
 }
 
 
@@ -2313,11 +2888,11 @@ abstract mixin class _$DonationRecordEntityCopyWith<$Res> implements $DonationRe
   factory _$DonationRecordEntityCopyWith(_DonationRecordEntity value, $Res Function(_DonationRecordEntity) _then) = __$DonationRecordEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String donorId, DonationSource source, String? requestId, String? campaignId, String? appointmentId, String? hospitalId, DateTime donatedAt, int units
+ String id, String donorId, DonationSource source, String? requestId, String? campaignId, String? appointmentId, String? hospitalId, DateTime donatedAt, int units, DonationRecordRequestRef? bloodRequest, DonationRecordCampaignRef? campaign
 });
 
 
-
+@override $DonationRecordRequestRefCopyWith<$Res>? get bloodRequest;@override $DonationRecordCampaignRefCopyWith<$Res>? get campaign;
 
 }
 /// @nodoc
@@ -2330,7 +2905,7 @@ class __$DonationRecordEntityCopyWithImpl<$Res>
 
 /// Create a copy of DonationRecordEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? donorId = null,Object? source = null,Object? requestId = freezed,Object? campaignId = freezed,Object? appointmentId = freezed,Object? hospitalId = freezed,Object? donatedAt = null,Object? units = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? donorId = null,Object? source = null,Object? requestId = freezed,Object? campaignId = freezed,Object? appointmentId = freezed,Object? hospitalId = freezed,Object? donatedAt = null,Object? units = null,Object? bloodRequest = freezed,Object? campaign = freezed,}) {
   return _then(_DonationRecordEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,donorId: null == donorId ? _self.donorId : donorId // ignore: cast_nullable_to_non_nullable
@@ -2341,11 +2916,37 @@ as String?,appointmentId: freezed == appointmentId ? _self.appointmentId : appoi
 as String?,hospitalId: freezed == hospitalId ? _self.hospitalId : hospitalId // ignore: cast_nullable_to_non_nullable
 as String?,donatedAt: null == donatedAt ? _self.donatedAt : donatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime,units: null == units ? _self.units : units // ignore: cast_nullable_to_non_nullable
-as int,
+as int,bloodRequest: freezed == bloodRequest ? _self.bloodRequest : bloodRequest // ignore: cast_nullable_to_non_nullable
+as DonationRecordRequestRef?,campaign: freezed == campaign ? _self.campaign : campaign // ignore: cast_nullable_to_non_nullable
+as DonationRecordCampaignRef?,
   ));
 }
 
+/// Create a copy of DonationRecordEntity
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$DonationRecordRequestRefCopyWith<$Res>? get bloodRequest {
+    if (_self.bloodRequest == null) {
+    return null;
+  }
 
+  return $DonationRecordRequestRefCopyWith<$Res>(_self.bloodRequest!, (value) {
+    return _then(_self.copyWith(bloodRequest: value));
+  });
+}/// Create a copy of DonationRecordEntity
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$DonationRecordCampaignRefCopyWith<$Res>? get campaign {
+    if (_self.campaign == null) {
+    return null;
+  }
+
+  return $DonationRecordCampaignRefCopyWith<$Res>(_self.campaign!, (value) {
+    return _then(_self.copyWith(campaign: value));
+  });
+}
 }
 
 /// @nodoc

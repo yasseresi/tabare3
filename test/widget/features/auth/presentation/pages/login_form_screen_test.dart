@@ -92,6 +92,19 @@ void main() {
     expect(find.byType(SvgPicture), findsWidgets);
   });
 
+  testWidgets('uses the Figma login screen content inset', (tester) async {
+    await pumpScreen(tester);
+
+    final scrollView = tester.widget<SingleChildScrollView>(
+      find.byType(SingleChildScrollView),
+    );
+
+    expect(
+      scrollView.padding,
+      const EdgeInsets.symmetric(horizontal: 32, vertical: 100),
+    );
+  });
+
   testWidgets('tapping signup link navigates to SignUpScreen', (tester) async {
     await pumpScreen(tester);
 

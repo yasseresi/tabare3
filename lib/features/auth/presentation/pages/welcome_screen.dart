@@ -17,11 +17,15 @@ class WelcomeScreen extends StatelessWidget {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
+          color: ColorManager.white,
           gradient: LinearGradient(
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
-            colors: [Color(0xFFFDB6B0), Color(0xFFDFE0FE)],
+            colors: [
+              ColorManager.welcomeGradientStart,
+              ColorManager.welcomeGradientEnd,
+            ],
           ),
         ),
         child: SafeArea(

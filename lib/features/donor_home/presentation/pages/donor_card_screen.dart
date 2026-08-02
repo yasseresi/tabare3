@@ -13,7 +13,9 @@ import '../../domain/entities/donor_card_entity.dart';
 import '../bloc/donor_card_bloc.dart';
 
 class DonorCardScreen extends StatelessWidget {
-  const DonorCardScreen({super.key});
+  final VoidCallback? onInfo;
+
+  const DonorCardScreen({super.key, this.onInfo});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,10 @@ class DonorCardScreen extends StatelessWidget {
               if (state is DonorCardError) {
                 return _ErrorState(message: state.failure.message);
               }
-              return _DonorCardContent(card: (state as DonorCardLoaded).card);
+              return _DonorCardContent(
+                card: (state as DonorCardLoaded).card,
+                onInfo: onInfo,
+              );
             },
           ),
         ),
@@ -45,8 +50,9 @@ class DonorCardScreen extends StatelessWidget {
 
 class _DonorCardContent extends StatelessWidget {
   final DonorCardEntity card;
+  final VoidCallback? onInfo;
 
-  const _DonorCardContent({required this.card});
+  const _DonorCardContent({required this.card, this.onInfo});
 
   @override
   Widget build(BuildContext context) {
@@ -143,6 +149,10 @@ class _DonorCardContent extends StatelessWidget {
         const SizedBox(height: AppSize.s24),
         ElevatedButton(
           onPressed: () {
+            if (onInfo != null) {
+              onInfo!();
+              return;
+            }
             Navigator.pushNamed(context, Routes.donorCardInfoRoute);
           },
           style: ElevatedButton.styleFrom(

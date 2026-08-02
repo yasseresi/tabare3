@@ -1,53 +1,223 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/donor_feed_entity.dart';
 import '../bloc/donor_feed_bloc.dart';
 
 class DonorAppointmentsScreen extends StatelessWidget {
-  const DonorAppointmentsScreen({super.key});
+  final VoidCallback? onNotifications;
+
+  const DonorAppointmentsScreen({super.key, this.onNotifications});
 
   @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: SafeArea(
-        child: BlocBuilder<DonorFeedBloc, DonorFeedState>(
-          builder: (context, state) {
-            if (state is DonorFeedInitial || state is DonorFeedLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (state is DonorFeedError) {
-              return Center(child: Text(state.failure.message));
-            }
-            final loaded = state as DonorFeedLoaded;
-            if (loaded.feed.appointments.isEmpty) {
-              return _EmptyAppointments(
-                onRefresh: () {
-                  context.read<DonorFeedBloc>().add(const DonorFeedRequested());
-                },
-              );
-            }
-            return ListView.separated(
-              padding: const EdgeInsets.all(AppPadding.p20),
-              itemCount: loaded.feed.appointments.length,
-              separatorBuilder: (_, _) => const SizedBox(height: AppSize.s16),
-              itemBuilder: (context, index) {
-                return _AppointmentCard(
-                  appointment: loaded.feed.appointments[index],
-                  disabled: loaded.isMutating,
+      child: Container(
+        decoration: BoxDecoration(
+          color: ColorManager.white,
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [
+              ColorManager.welcomeGradientStart,
+              ColorManager.welcomeGradientEnd,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: BlocBuilder<DonorFeedBloc, DonorFeedState>(
+            builder: (context, state) {
+              if (state is DonorFeedInitial || state is DonorFeedLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (state is DonorFeedError) {
+                return Center(child: Text(state.failure.message));
+              }
+              final loaded = state as DonorFeedLoaded;
+              if (loaded.feed.appointments.isEmpty) {
+                return _EmptyAppointments(
+                  onRefresh: () {
+                    context.read<DonorFeedBloc>().add(
+                      const DonorFeedRequested(),
+                    );
+                  },
                 );
-              },
-            );
-          },
+              }
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: AppSize.s402),
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppPadding.p10,
+                      vertical: AppPadding.p32,
+                    ),
+                    itemCount:
+                        loaded.feed.appointments.length + AppSize.s2.toInt(),
+                    separatorBuilder: (_, index) => SizedBox(
+                      height: index == AppSize.s0.toInt()
+                          ? AppSize.s20
+                          : AppSize.s16,
+                    ),
+                    itemBuilder: (context, index) {
+                      if (index == AppSize.s0.toInt()) {
+                        return _AppointmentsHeader(
+                          onNotifications: onNotifications,
+                        );
+                      }
+                      if (index == AppSize.s1.toInt()) {
+                        return Text(
+                          AppStrings.upcomingAppointments.tr(),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: ColorManager.nearBlack,
+                            fontSize: AppSize.s16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        );
+                      }
+                      return _AppointmentCard(
+                        appointment: loaded
+                            .feed
+                            .appointments[index - AppSize.s2.toInt()],
+                        disabled: loaded.isMutating,
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ),
+    );
+  }
+}
+
+class _AppointmentsHeader extends StatelessWidget {
+  final VoidCallback? onNotifications;
+
+  const _AppointmentsHeader({this.onNotifications});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _AppointmentsTopBar(onNotifications: onNotifications),
+        const SizedBox(height: AppSize.s20),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(AppPadding.p20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              colors: [ColorManager.error, ColorManager.primaryDark],
+            ),
+            borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
+            border: Border.all(color: ColorManager.borderGrey),
+          ),
+          child: Row(
+            children: [
+              Image.asset(
+                ImageAssets.icon7,
+                width: AppSize.s130,
+                height: AppSize.s104,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(width: AppSize.s12),
+              const Expanded(child: _AppointmentsBannerCopy()),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AppointmentsTopBar extends StatelessWidget {
+  final VoidCallback? onNotifications;
+
+  const _AppointmentsTopBar({this.onNotifications});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppStrings.welcomeUser.tr(),
+                style: const TextStyle(
+                  fontSize: AppSize.s20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                AppStrings.donationLifeChance.tr(),
+                style: TextStyle(color: ColorManager.textMuted),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.all(AppPadding.p8),
+          decoration: BoxDecoration(
+            color: ColorManager.surfaceAlt,
+            borderRadius: BorderRadius.circular(AppSize.radiusXLarge),
+          ),
+          child: IconButton(
+            key: WidgetKeys.donorNotificationsButton,
+            onPressed:
+                onNotifications ??
+                () => Navigator.pushNamed(context, Routes.notificationsRoute),
+            icon: const Icon(Icons.notifications_none_rounded),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AppointmentsBannerCopy extends StatelessWidget {
+  const _AppointmentsBannerCopy();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          AppStrings.myAppointments.tr(),
+          style: TextStyle(
+            color: ColorManager.white,
+            fontSize: AppSize.s24,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: AppSize.s4),
+        Text(
+          AppStrings.appointmentsDescription.tr(),
+          textAlign: TextAlign.right,
+          style: TextStyle(
+            color: ColorManager.white,
+            fontSize: AppSize.s12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -75,12 +245,25 @@ class _AppointmentCard extends StatelessWidget {
         color: ColorManager.white,
         borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
         border: Border.all(color: ColorManager.borderGrey),
+        boxShadow: [
+          BoxShadow(
+            color: ColorManager.black.withValues(alpha: AppOpacity.subtle),
+            blurRadius: AppSize.s14,
+            offset: const Offset(AppSize.s0, AppSize.s8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
+              Image.asset(
+                ImageAssets.icon8,
+                width: AppSize.s50,
+                height: AppSize.s50,
+              ),
+              const SizedBox(width: AppSize.s16),
               Expanded(
                 child: Text(
                   title,
@@ -108,7 +291,12 @@ class _AppointmentCard extends StatelessWidget {
           ),
           if (canCancel) ...[
             const SizedBox(height: AppSize.s16),
-            OutlinedButton(
+            ElevatedButton(
+              key: WidgetKeys.appointmentCancelButton,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorManager.darkGrey,
+                foregroundColor: ColorManager.white,
+              ),
               onPressed: disabled
                   ? null
                   : () => _showCancellationDialog(context, appointment.id),
@@ -124,40 +312,84 @@ class _AppointmentCard extends StatelessWidget {
     BuildContext context,
     String appointmentId,
   ) async {
-    final controller = TextEditingController();
-    final reason = await showDialog<String>(
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => Directionality(
         textDirection: TextDirection.rtl,
-        child: AlertDialog(
-          title: Text(AppStrings.cancellationReason.tr()),
-          content: TextField(
-            controller: controller,
-            textAlign: TextAlign.right,
-            decoration: InputDecoration(
-              hintText: AppStrings.cancellationReason.tr(),
+        child: Dialog(
+          backgroundColor: ColorManager.transparent,
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: AppPadding.p20,
+            vertical: AppPadding.p40,
+          ),
+          child: Container(
+            width: AppSize.s320,
+            padding: const EdgeInsets.all(AppPadding.p40),
+            decoration: BoxDecoration(
+              color: ColorManager.white,
+              borderRadius: BorderRadius.circular(AppSize.s40),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SvgPicture.asset(
+                  SvgAssets.warning,
+                  width: AppSize.s60,
+                  height: AppSize.s60,
+                ),
+                const SizedBox(height: AppSize.s10),
+                Text(
+                  AppStrings.confirmCancelRequest.tr(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: ColorManager.darkGrey,
+                    fontSize: AppSize.s16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: AppSize.s10),
+                Text(
+                  AppStrings.cancelRequestNotice.tr(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: ColorManager.darkGrey,
+                    fontSize: AppSize.s16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: AppSize.s10),
+                SizedBox(
+                  width: AppSize.s174,
+                  child: ElevatedButton(
+                    key: WidgetKeys.appointmentCancelConfirmButton,
+                    onPressed: () => Navigator.pop(dialogContext, true),
+                    child: Text(AppStrings.confirm.tr()),
+                  ),
+                ),
+                const SizedBox(height: AppSize.s10),
+                SizedBox(
+                  width: AppSize.s174,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorManager.darkGrey,
+                      foregroundColor: ColorManager.white,
+                    ),
+                    onPressed: () => Navigator.pop(dialogContext, false),
+                    child: Text(AppStrings.cancel.tr()),
+                  ),
+                ),
+              ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(AppStrings.cancel.tr()),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final value = controller.text.trim();
-                if (value.isNotEmpty) Navigator.pop(dialogContext, value);
-              },
-              child: Text(AppStrings.confirm.tr()),
-            ),
-          ],
         ),
       ),
     );
-    controller.dispose();
-    if (reason == null || !context.mounted) return;
+    if (confirmed != true || !context.mounted) return;
     context.read<DonorFeedBloc>().add(
-      DonorAppointmentCancelled(appointmentId: appointmentId, reason: reason),
+      DonorAppointmentCancelled(
+        appointmentId: appointmentId,
+        reason: AppStrings.cancelRequestNotice.tr(),
+      ),
     );
   }
 }
