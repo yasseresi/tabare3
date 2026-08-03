@@ -50,6 +50,17 @@ class ColorManager {
   static Color navInactive = const Color(0xff5A5A5A);
   static Color headerIconBg = const Color(0xffF2F2F2);
 
+  // Cards (Figma)
+  static Color cardHeading = const Color(0xff1F2937);
+  static Color cardTitle = const Color(0xff191C1D);
+  static Color sectionTitle = const Color(0xff191C1E);
+  static Color cardValue = const Color(0xff9E1B16);
+  static Color urgencyCritical = const Color(0xffFF1300);
+  static Color urgencyUrgent = const Color(0xffF2994A);
+  static Color urgencyNormal = const Color(0xff16A34A);
+  static Color progressTrackLight = const Color(0xffEFF9FF);
+  static Color progressTrackBorder = const Color(0xffB9B9B9);
+
   // Accent
   static Color brown = const Color(0xff59413D);
   static Color brownGrey = const Color(0xff665C5C);

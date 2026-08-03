@@ -14,7 +14,9 @@ class FontWeightManager {
 }
 
 class LineHeight {
+  static const double h14 = 14.01;
   static const double h16 = 16.0;
+  static const double h19 = 19.263;
   static const double h18 = 18.0;
   static const double h20 = 20.0;
   static const double h22 = 22.0;
@@ -28,6 +30,7 @@ class LineHeight {
 class FontSize {
   static const double s10 = 10.0;
   static const double s12 = 12.0;
+  static const double s12_3 = 12.277;
   static const double s13 = 13.0;
   static const double s14 = 14.0;
   static const double s15 = 15.0;

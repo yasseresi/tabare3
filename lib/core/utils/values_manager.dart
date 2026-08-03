@@ -38,10 +38,21 @@ class AppPadding {
   static const double p50 = 50.0;
   static const double p60 = 60.0;
   static const double p100 = 100.0;
+
+  /// Figma card inner padding (`21.891`) and pill button paddings.
+  static const double pCard = 21.891;
+  static const double pPillHorizontal = 36.609;
+  static const double pPillVertical = 10.983;
+
+  /// Distance from the top of a screen to the first card, leaving room for the
+  /// floating [AppHeader].
+  static const double pHeaderOffset = 150.0;
 }
 
 class AppSize {
   static const double s0 = 0.0;
+  static const double s0_5 = 0.5;
+  static const double s0_876 = 0.876;
   static const double s1 = 1.0;
   static const double s1_5 = 1.5;
   static const double s2 = 2.0;
@@ -101,9 +112,19 @@ class AppSize {
   static const double s330 = 330.0;
   static const double s338 = 338.0;
   static const double s382 = 382.0;
+  static const double s200 = 200.0;
+  static const double s209 = 209.0;
   static const double s402 = 402.0;
 
+  // Elevation (Figma card shadows)
+  static const double blurCard = 26.268;
+  static const double blurRequestCard = 13.134;
+  static const double offsetCard = 7.005;
+
   // Border radius
+  static const double radiusProgress = 6.0;
+  static const double radiusPillButton = 14.644;
+  static const double radiusRequestCard = 28.02;
   static const double radiusSmall = 8.0;
   static const double radiusMedium = 12.0;
   static const double radiusLarge = 15.0;
