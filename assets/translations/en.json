@@ -328,5 +328,6 @@
   "view_all": "View all",
   "last_deadline": "Deadline",
   "units_progress": "{} of {} bags provided",
-  "normal_priority": "Normal"
+  "normal_priority": "Normal",
+  "no_requests_now": "No requests right now"
 }

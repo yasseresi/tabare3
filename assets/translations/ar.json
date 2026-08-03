@@ -328,5 +328,6 @@
   "view_all": "عرض الكل",
   "last_deadline": "اخر اجل",
   "units_progress": "تم توفير {} من {} أكياس",
-  "normal_priority": "عادي"
+  "normal_priority": "عادي",
+  "no_requests_now": "لا توجد طلبات حالياً"
 }

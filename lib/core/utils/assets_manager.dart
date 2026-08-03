@@ -49,4 +49,5 @@ class SvgAssets {
   static const String navHistory = '$iconPath/nav_history.svg';
   static const String navPerson = '$iconPath/nav_person.svg';
   static const String headerBell = '$iconPath/header_bell.svg';
+  static const String search = '$iconPath/search.svg';
 }

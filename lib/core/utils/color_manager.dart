@@ -60,6 +60,7 @@ class ColorManager {
   static Color urgencyNormal = const Color(0xff16A34A);
   static Color progressTrackLight = const Color(0xffEFF9FF);
   static Color progressTrackBorder = const Color(0xffB9B9B9);
+  static Color searchBorder = const Color(0xffF9EBE9);
 
   // Accent
   static Color brown = const Color(0xff59413D);
