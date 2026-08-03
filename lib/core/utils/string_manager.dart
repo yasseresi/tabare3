@@ -81,6 +81,10 @@ class AppStrings {
   static const String welcomeTo = 'welcome_to';
   static const String activeDonor = 'active_donor';
   static const String latestNearbyRequests = 'latest_nearby_requests';
+  static const String viewAll = 'view_all';
+  static const String lastDeadline = 'last_deadline';
+  static const String unitsProgress = 'units_progress';
+  static const String normalPriority = 'normal_priority';
   static const String urgentRequests = 'urgent_requests';
   static const String yourNextDonation = 'your_next_donation';
   static const String todayTip = 'today_tip';

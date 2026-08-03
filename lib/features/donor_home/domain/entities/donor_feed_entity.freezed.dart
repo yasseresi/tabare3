@@ -567,7 +567,7 @@ as int,
 /// @nodoc
 mixin _$DonorBloodRequestEntity {
 
- String get id; String get requestedBy; DonorHospitalEntity get hospital; String get bloodType; DonorRequestPriority get priority; int get unitsNeeded; int get unitsFulfilled; DonorBloodRequestStatus get status; DateTime? get neededBy; DateTime? get expiresAt; String? get notes; DateTime get createdAt;
+ String get id; String get requestedBy; String? get patientName; DonorHospitalEntity get hospital; String get bloodType; DonorRequestPriority get priority; int get unitsNeeded; int get unitsFulfilled; DonorBloodRequestStatus get status; DateTime? get neededBy; DateTime? get expiresAt; String? get notes; DateTime get createdAt;
 /// Create a copy of DonorBloodRequestEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -578,16 +578,16 @@ $DonorBloodRequestEntityCopyWith<DonorBloodRequestEntity> get copyWith => _$Dono
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DonorBloodRequestEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.requestedBy, requestedBy) || other.requestedBy == requestedBy)&&(identical(other.hospital, hospital) || other.hospital == hospital)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.unitsFulfilled, unitsFulfilled) || other.unitsFulfilled == unitsFulfilled)&&(identical(other.status, status) || other.status == status)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DonorBloodRequestEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.requestedBy, requestedBy) || other.requestedBy == requestedBy)&&(identical(other.patientName, patientName) || other.patientName == patientName)&&(identical(other.hospital, hospital) || other.hospital == hospital)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.unitsFulfilled, unitsFulfilled) || other.unitsFulfilled == unitsFulfilled)&&(identical(other.status, status) || other.status == status)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,requestedBy,hospital,bloodType,priority,unitsNeeded,unitsFulfilled,status,neededBy,expiresAt,notes,createdAt);
+int get hashCode => Object.hash(runtimeType,id,requestedBy,patientName,hospital,bloodType,priority,unitsNeeded,unitsFulfilled,status,neededBy,expiresAt,notes,createdAt);
 
 @override
 String toString() {
-  return 'DonorBloodRequestEntity(id: $id, requestedBy: $requestedBy, hospital: $hospital, bloodType: $bloodType, priority: $priority, unitsNeeded: $unitsNeeded, unitsFulfilled: $unitsFulfilled, status: $status, neededBy: $neededBy, expiresAt: $expiresAt, notes: $notes, createdAt: $createdAt)';
+  return 'DonorBloodRequestEntity(id: $id, requestedBy: $requestedBy, patientName: $patientName, hospital: $hospital, bloodType: $bloodType, priority: $priority, unitsNeeded: $unitsNeeded, unitsFulfilled: $unitsFulfilled, status: $status, neededBy: $neededBy, expiresAt: $expiresAt, notes: $notes, createdAt: $createdAt)';
 }
 
 
@@ -598,7 +598,7 @@ abstract mixin class $DonorBloodRequestEntityCopyWith<$Res>  {
   factory $DonorBloodRequestEntityCopyWith(DonorBloodRequestEntity value, $Res Function(DonorBloodRequestEntity) _then) = _$DonorBloodRequestEntityCopyWithImpl;
 @useResult
 $Res call({
- String id, String requestedBy, DonorHospitalEntity hospital, String bloodType, DonorRequestPriority priority, int unitsNeeded, int unitsFulfilled, DonorBloodRequestStatus status, DateTime? neededBy, DateTime? expiresAt, String? notes, DateTime createdAt
+ String id, String requestedBy, String? patientName, DonorHospitalEntity hospital, String bloodType, DonorRequestPriority priority, int unitsNeeded, int unitsFulfilled, DonorBloodRequestStatus status, DateTime? neededBy, DateTime? expiresAt, String? notes, DateTime createdAt
 });
 
 
@@ -615,11 +615,12 @@ class _$DonorBloodRequestEntityCopyWithImpl<$Res>
 
 /// Create a copy of DonorBloodRequestEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? requestedBy = null,Object? hospital = null,Object? bloodType = null,Object? priority = null,Object? unitsNeeded = null,Object? unitsFulfilled = null,Object? status = null,Object? neededBy = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? requestedBy = null,Object? patientName = freezed,Object? hospital = null,Object? bloodType = null,Object? priority = null,Object? unitsNeeded = null,Object? unitsFulfilled = null,Object? status = null,Object? neededBy = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? createdAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,requestedBy: null == requestedBy ? _self.requestedBy : requestedBy // ignore: cast_nullable_to_non_nullable
-as String,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as String,patientName: freezed == patientName ? _self.patientName : patientName // ignore: cast_nullable_to_non_nullable
+as String?,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
 as DonorHospitalEntity,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
 as String,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
 as DonorRequestPriority,unitsNeeded: null == unitsNeeded ? _self.unitsNeeded : unitsNeeded // ignore: cast_nullable_to_non_nullable
@@ -637,7 +638,7 @@ as DateTime,
 @override
 @pragma('vm:prefer-inline')
 $DonorHospitalEntityCopyWith<$Res> get hospital {
-
+  
   return $DonorHospitalEntityCopyWith<$Res>(_self.hospital, (value) {
     return _then(_self.copyWith(hospital: value));
   });
@@ -723,10 +724,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String requestedBy,  DonorHospitalEntity hospital,  String bloodType,  DonorRequestPriority priority,  int unitsNeeded,  int unitsFulfilled,  DonorBloodRequestStatus status,  DateTime? neededBy,  DateTime? expiresAt,  String? notes,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String requestedBy,  String? patientName,  DonorHospitalEntity hospital,  String bloodType,  DonorRequestPriority priority,  int unitsNeeded,  int unitsFulfilled,  DonorBloodRequestStatus status,  DateTime? neededBy,  DateTime? expiresAt,  String? notes,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DonorBloodRequestEntity() when $default != null:
-return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.priority,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
+return $default(_that.id,_that.requestedBy,_that.patientName,_that.hospital,_that.bloodType,_that.priority,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
   return orElse();
 
 }
@@ -744,10 +745,10 @@ return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String requestedBy,  DonorHospitalEntity hospital,  String bloodType,  DonorRequestPriority priority,  int unitsNeeded,  int unitsFulfilled,  DonorBloodRequestStatus status,  DateTime? neededBy,  DateTime? expiresAt,  String? notes,  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String requestedBy,  String? patientName,  DonorHospitalEntity hospital,  String bloodType,  DonorRequestPriority priority,  int unitsNeeded,  int unitsFulfilled,  DonorBloodRequestStatus status,  DateTime? neededBy,  DateTime? expiresAt,  String? notes,  DateTime createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _DonorBloodRequestEntity():
-return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.priority,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
+return $default(_that.id,_that.requestedBy,_that.patientName,_that.hospital,_that.bloodType,_that.priority,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -764,10 +765,10 @@ return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String requestedBy,  DonorHospitalEntity hospital,  String bloodType,  DonorRequestPriority priority,  int unitsNeeded,  int unitsFulfilled,  DonorBloodRequestStatus status,  DateTime? neededBy,  DateTime? expiresAt,  String? notes,  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String requestedBy,  String? patientName,  DonorHospitalEntity hospital,  String bloodType,  DonorRequestPriority priority,  int unitsNeeded,  int unitsFulfilled,  DonorBloodRequestStatus status,  DateTime? neededBy,  DateTime? expiresAt,  String? notes,  DateTime createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _DonorBloodRequestEntity() when $default != null:
-return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.priority,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
+return $default(_that.id,_that.requestedBy,_that.patientName,_that.hospital,_that.bloodType,_that.priority,_that.unitsNeeded,_that.unitsFulfilled,_that.status,_that.neededBy,_that.expiresAt,_that.notes,_that.createdAt);case _:
   return null;
 
 }
@@ -779,11 +780,12 @@ return $default(_that.id,_that.requestedBy,_that.hospital,_that.bloodType,_that.
 
 
 class _DonorBloodRequestEntity extends DonorBloodRequestEntity {
-  const _DonorBloodRequestEntity({required this.id, required this.requestedBy, required this.hospital, required this.bloodType, required this.priority, required this.unitsNeeded, required this.unitsFulfilled, required this.status, this.neededBy, this.expiresAt, this.notes, required this.createdAt}): super._();
+  const _DonorBloodRequestEntity({required this.id, required this.requestedBy, this.patientName, required this.hospital, required this.bloodType, required this.priority, required this.unitsNeeded, required this.unitsFulfilled, required this.status, this.neededBy, this.expiresAt, this.notes, required this.createdAt}): super._();
   
 
 @override final  String id;
 @override final  String requestedBy;
+@override final  String? patientName;
 @override final  DonorHospitalEntity hospital;
 @override final  String bloodType;
 @override final  DonorRequestPriority priority;
@@ -805,16 +807,16 @@ _$DonorBloodRequestEntityCopyWith<_DonorBloodRequestEntity> get copyWith => __$D
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DonorBloodRequestEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.requestedBy, requestedBy) || other.requestedBy == requestedBy)&&(identical(other.hospital, hospital) || other.hospital == hospital)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.unitsFulfilled, unitsFulfilled) || other.unitsFulfilled == unitsFulfilled)&&(identical(other.status, status) || other.status == status)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DonorBloodRequestEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.requestedBy, requestedBy) || other.requestedBy == requestedBy)&&(identical(other.patientName, patientName) || other.patientName == patientName)&&(identical(other.hospital, hospital) || other.hospital == hospital)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.priority, priority) || other.priority == priority)&&(identical(other.unitsNeeded, unitsNeeded) || other.unitsNeeded == unitsNeeded)&&(identical(other.unitsFulfilled, unitsFulfilled) || other.unitsFulfilled == unitsFulfilled)&&(identical(other.status, status) || other.status == status)&&(identical(other.neededBy, neededBy) || other.neededBy == neededBy)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,requestedBy,hospital,bloodType,priority,unitsNeeded,unitsFulfilled,status,neededBy,expiresAt,notes,createdAt);
+int get hashCode => Object.hash(runtimeType,id,requestedBy,patientName,hospital,bloodType,priority,unitsNeeded,unitsFulfilled,status,neededBy,expiresAt,notes,createdAt);
 
 @override
 String toString() {
-  return 'DonorBloodRequestEntity(id: $id, requestedBy: $requestedBy, hospital: $hospital, bloodType: $bloodType, priority: $priority, unitsNeeded: $unitsNeeded, unitsFulfilled: $unitsFulfilled, status: $status, neededBy: $neededBy, expiresAt: $expiresAt, notes: $notes, createdAt: $createdAt)';
+  return 'DonorBloodRequestEntity(id: $id, requestedBy: $requestedBy, patientName: $patientName, hospital: $hospital, bloodType: $bloodType, priority: $priority, unitsNeeded: $unitsNeeded, unitsFulfilled: $unitsFulfilled, status: $status, neededBy: $neededBy, expiresAt: $expiresAt, notes: $notes, createdAt: $createdAt)';
 }
 
 
@@ -825,7 +827,7 @@ abstract mixin class _$DonorBloodRequestEntityCopyWith<$Res> implements $DonorBl
   factory _$DonorBloodRequestEntityCopyWith(_DonorBloodRequestEntity value, $Res Function(_DonorBloodRequestEntity) _then) = __$DonorBloodRequestEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String requestedBy, DonorHospitalEntity hospital, String bloodType, DonorRequestPriority priority, int unitsNeeded, int unitsFulfilled, DonorBloodRequestStatus status, DateTime? neededBy, DateTime? expiresAt, String? notes, DateTime createdAt
+ String id, String requestedBy, String? patientName, DonorHospitalEntity hospital, String bloodType, DonorRequestPriority priority, int unitsNeeded, int unitsFulfilled, DonorBloodRequestStatus status, DateTime? neededBy, DateTime? expiresAt, String? notes, DateTime createdAt
 });
 
 
@@ -842,11 +844,12 @@ class __$DonorBloodRequestEntityCopyWithImpl<$Res>
 
 /// Create a copy of DonorBloodRequestEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? requestedBy = null,Object? hospital = null,Object? bloodType = null,Object? priority = null,Object? unitsNeeded = null,Object? unitsFulfilled = null,Object? status = null,Object? neededBy = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? requestedBy = null,Object? patientName = freezed,Object? hospital = null,Object? bloodType = null,Object? priority = null,Object? unitsNeeded = null,Object? unitsFulfilled = null,Object? status = null,Object? neededBy = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? createdAt = null,}) {
   return _then(_DonorBloodRequestEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,requestedBy: null == requestedBy ? _self.requestedBy : requestedBy // ignore: cast_nullable_to_non_nullable
-as String,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as String,patientName: freezed == patientName ? _self.patientName : patientName // ignore: cast_nullable_to_non_nullable
+as String?,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
 as DonorHospitalEntity,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
 as String,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
 as DonorRequestPriority,unitsNeeded: null == unitsNeeded ? _self.unitsNeeded : unitsNeeded // ignore: cast_nullable_to_non_nullable
@@ -865,7 +868,7 @@ as DateTime,
 @override
 @pragma('vm:prefer-inline')
 $DonorHospitalEntityCopyWith<$Res> get hospital {
-
+  
   return $DonorHospitalEntityCopyWith<$Res>(_self.hospital, (value) {
     return _then(_self.copyWith(hospital: value));
   });
@@ -2131,7 +2134,7 @@ as DonorHospitalEntity,
 @override
 @pragma('vm:prefer-inline')
 $DonorHospitalEntityCopyWith<$Res> get hospital {
-
+  
   return $DonorHospitalEntityCopyWith<$Res>(_self.hospital, (value) {
     return _then(_self.copyWith(hospital: value));
   });
@@ -2274,7 +2277,7 @@ return $default(_that.id,_that.recipientName,_that.hospital);case _:
 
 class _DonationRecordRequestRef implements DonationRecordRequestRef {
   const _DonationRecordRequestRef({required this.id, required this.recipientName, required this.hospital});
-
+  
 
 @override final  String id;
 @override final  String recipientName;
@@ -2341,7 +2344,7 @@ as DonorHospitalEntity,
 @override
 @pragma('vm:prefer-inline')
 $DonorHospitalEntityCopyWith<$Res> get hospital {
-
+  
   return $DonorHospitalEntityCopyWith<$Res>(_self.hospital, (value) {
     return _then(_self.copyWith(hospital: value));
   });
@@ -2547,7 +2550,7 @@ return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
 
 class _DonationRecordCampaignRef implements DonationRecordCampaignRef {
   const _DonationRecordCampaignRef({required this.id, required this.title, required this.venueName, required this.city});
-
+  
 
 @override final  String id;
 @override final  String title;

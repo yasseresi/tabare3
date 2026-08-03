@@ -5,13 +5,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/widget_keys.dart';
 import '../../../../core/presentation/widgets/app_bottom_nav.dart';
+import '../../../../core/presentation/widgets/app_card.dart';
 import '../../../../core/presentation/widgets/app_dialog.dart';
+import '../../../../core/presentation/widgets/app_gradient_background.dart';
+import '../../../../core/presentation/widgets/app_page.dart';
+import '../../../../core/presentation/widgets/app_section_header.dart';
+import '../../../../core/presentation/widgets/app_tag_pill.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
 import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../../../injection_container.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -23,6 +29,8 @@ import '../../../profile/presentation/pages/about_app_screen.dart';
 import '../../domain/entities/donor_feed_entity.dart';
 import '../bloc/donor_feed_bloc.dart';
 import '../bloc/donor_card_bloc.dart';
+import '../widgets/donor_request_actions.dart';
+import '../widgets/donor_request_card.dart';
 import 'donor_appointments_screen.dart';
 import 'donor_card_info_screen.dart';
 import 'donor_card_screen.dart';
@@ -104,7 +112,11 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
 
   Widget _buildBody() {
     return switch (_selectedTab) {
-      _DonorTab.home => _DonorOverview(onNotifications: _openNotifications),
+      _DonorTab.home => _DonorOverview(
+        onNotifications: _openNotifications,
+        onViewAllRequests: () =>
+            setState(() => _selectedTab = _DonorTab.requests),
+      ),
       _DonorTab.requests => DonorRequestsScreen(
         onNotifications: _openNotifications,
       ),
@@ -260,156 +272,83 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
 
 class _DonorOverview extends StatelessWidget {
   final VoidCallback? onNotifications;
+  final VoidCallback? onViewAllRequests;
 
-  const _DonorOverview({this.onNotifications});
+  const _DonorOverview({this.onNotifications, this.onViewAllRequests});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: ColorManager.white,
-        gradient: LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [
-            ColorManager.welcomeGradientStart,
-            ColorManager.welcomeGradientEnd,
-          ],
-        ),
-      ),
-      child: SafeArea(
-        child: BlocBuilder<DonorFeedBloc, DonorFeedState>(
-          builder: (context, state) {
-            if (state is DonorFeedInitial || state is DonorFeedLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (state is DonorFeedError) {
-              return Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(state.failure.message),
-                    const SizedBox(height: AppSize.s12),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.read<DonorFeedBloc>().add(
-                          const DonorFeedRequested(),
-                        );
-                      },
-                      child: Text(AppStrings.retryAgain.tr()),
-                    ),
-                  ],
-                ),
-              );
-            }
-            final feed = (state as DonorFeedLoaded).feed;
-            return RefreshIndicator(
-              onRefresh: () async {
-                context.read<DonorFeedBloc>().add(const DonorFeedRequested());
-              },
-              child: LayoutBuilder(
-                builder: (context, _) => Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: AppSize.s402),
-                    child: ListView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppPadding.p10,
-                        vertical: AppPadding.p32,
+    return BlocBuilder<DonorFeedBloc, DonorFeedState>(
+      builder: (context, state) {
+        if (state is DonorFeedInitial || state is DonorFeedLoading) {
+          return const AppGradientBackground(
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (state is DonorFeedError) {
+          return AppGradientBackground(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(state.failure.message),
+                  const SizedBox(height: AppSize.s12),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<DonorFeedBloc>().add(
+                        const DonorFeedRequested(),
+                      );
+                    },
+                    child: Text(AppStrings.retryAgain.tr()),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        final loaded = state as DonorFeedLoaded;
+        final feed = loaded.feed;
+        return AppPage(
+          title: AppStrings.welcomeUser.tr(),
+          subtitle: AppStrings.donationLifeChance.tr(),
+          notificationsKey: WidgetKeys.donorNotificationsButton,
+          onNotifications:
+              onNotifications ??
+              () => Navigator.pushNamed(context, Routes.notificationsRoute),
+          onRefresh: () async {
+            context.read<DonorFeedBloc>().add(const DonorFeedRequested());
+          },
+          children: [
+            _AvailabilityCard(feed: feed, disabled: loaded.isMutating),
+            const SizedBox(height: AppSize.s12),
+            AppSectionHeader(
+              title: AppStrings.latestNearbyRequests.tr(),
+              actionLabel: AppStrings.viewAll.tr(),
+              onAction: onViewAllRequests,
+            ),
+            const SizedBox(height: AppSize.s10),
+            if (feed.compatibleRequests.isEmpty)
+              Text(
+                AppStrings.noRequestsDescription.tr(),
+                textAlign: TextAlign.center,
+              )
+            else
+              ...feed.compatibleRequests
+                  .take(AppConstants.paginationLimit)
+                  .map(
+                    (request) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppPadding.p15),
+                      child: DonorRequestCard(
+                        request: request,
+                        onAccept: loaded.isMutating
+                            ? null
+                            : () => acceptDonorRequest(context, request.id),
                       ),
-                      children: [
-                        _OverviewHeader(
-                          bloodType: feed.availability.bloodType,
-                          onNotifications: onNotifications,
-                        ),
-                        const SizedBox(height: AppSize.s20),
-                        _AvailabilityCard(
-                          feed: feed,
-                          disabled: state.isMutating,
-                        ),
-                        const SizedBox(height: AppSize.s24),
-                        Text(
-                          AppStrings.latestNearbyRequests.tr(),
-                          style: const TextStyle(
-                            fontSize: AppSize.s20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: AppSize.s12),
-                        if (feed.compatibleRequests.isEmpty)
-                          Text(
-                            AppStrings.noRequestsDescription.tr(),
-                            textAlign: TextAlign.center,
-                          )
-                        else
-                          ...feed.compatibleRequests
-                              .take(AppConstants.paginationLimit)
-                              .map(
-                                (request) => Padding(
-                                  padding: const EdgeInsets.only(
-                                    bottom: AppPadding.p12,
-                                  ),
-                                  child: _NearbyRequestCard(request: request),
-                                ),
-                              ),
-                      ],
                     ),
                   ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _OverviewHeader extends StatelessWidget {
-  final String bloodType;
-  final VoidCallback? onNotifications;
-
-  const _OverviewHeader({required this.bloodType, this.onNotifications});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppStrings.welcomeUser.tr(),
-                style: const TextStyle(
-                  fontSize: AppSize.s20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                AppStrings.donationLifeChance.tr(),
-                style: TextStyle(color: ColorManager.textMuted),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppPadding.p8,
-            vertical: AppPadding.p8,
-          ),
-          decoration: BoxDecoration(
-            color: ColorManager.surfaceAlt,
-            borderRadius: BorderRadius.circular(AppSize.radiusXLarge),
-          ),
-          child: IconButton(
-            key: WidgetKeys.donorNotificationsButton,
-            onPressed:
-                onNotifications ??
-                () => Navigator.pushNamed(context, Routes.notificationsRoute),
-            icon: const Icon(Icons.notifications_none_rounded),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 }
@@ -435,34 +374,23 @@ class _AvailabilityCard extends StatelessWidget {
         : DateFormat(
             AppConstants.requestDateFormat,
           ).format(appointment.scheduledAt.toLocal());
-    return Container(
-      padding: const EdgeInsets.all(AppPadding.p20),
-      decoration: BoxDecoration(
-        color: ColorManager.white,
-        borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
-        border: Border.all(color: ColorManager.borderGrey),
-        boxShadow: [
-          BoxShadow(
-            color: ColorManager.black.withValues(alpha: AppOpacity.subtle),
-            blurRadius: AppSize.s26,
-            offset: const Offset(AppSize.s0, AppSize.s8),
-          ),
-        ],
-      ),
+    final statusColor = eligible
+        ? ColorManager.success
+        : ColorManager.urgencyCritical;
+    return AppCard(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
+              SizedBox(
+                width: AppSize.s200,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: _EligibilityStatus(
-                        eligible: eligible,
+                    Semantics(
+                      button: true,
+                      child: GestureDetector(
                         onTap: disabled
                             ? null
                             : () {
@@ -472,174 +400,102 @@ class _AvailabilityCard extends StatelessWidget {
                                   ),
                                 );
                               },
+                        child: AppTagPill(
+                          label: eligible
+                              ? AppStrings.eligibleNow.tr()
+                              : AppStrings.notEligibleNow.tr(),
+                          dotColor: statusColor,
+                          background: statusColor.withValues(
+                            alpha: AppOpacity.tint,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: AppSize.s10),
                     Text(
                       AppStrings.hadithIntro.tr(),
-                      textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        fontSize: AppSize.s24,
-                        fontWeight: FontWeight.bold,
+                      style: getSemiBoldStyle(
+                        fontSize: FontSize.s24,
+                        color: ColorManager.cardHeading,
+                        lineHeight: LineHeight.h28,
                       ),
                     ),
-                    Text(
-                      AppStrings.hadithRelief.tr(),
-                      maxLines: AppConstants.profileHadithMaxLines,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        color: ColorManager.textMuted,
-                        fontSize: FontSize.s12,
+                    const SizedBox(height: AppSize.s10),
+                    Padding(
+                      padding: const EdgeInsets.only(top: AppPadding.p4),
+                      child: Text(
+                        AppStrings.hadithRelief.tr(),
+                        maxLines: AppConstants.profileHadithMaxLines,
+                        overflow: TextOverflow.ellipsis,
+                        style: getMediumStyle(
+                          fontSize: FontSize.s12,
+                          color: ColorManager.textMuted,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: AppSize.s10),
               Image.asset(
-                ImageAssets.demo1,
+                ImageAssets.hadithIllustration,
                 width: AppSize.s130,
                 height: AppSize.s130,
                 fit: BoxFit.contain,
               ),
             ],
           ),
-          const SizedBox(height: AppSize.s16),
-          _OverviewInfo(
-            label: AppStrings.bloodType.tr(),
-            value: availability.bloodType,
-          ),
-          _OverviewInfo(
+          const SizedBox(height: AppSize.s8),
+          _DonorStatRow(
             label: AppStrings.totalDonations.tr(),
             value: availability.totalDonationsCount.toString(),
           ),
-          _OverviewInfo(
+          const SizedBox(height: AppSize.s8),
+          _DonorStatRow(
             label: AppStrings.requestsNearYou.tr(),
             value: feed.compatibleRequests.length.toString(),
           ),
-          _OverviewInfo(
+          const SizedBox(height: AppSize.s8),
+          _DonorStatRow(
             label: AppStrings.lastDonation.tr(),
             value: lastDonation,
           ),
-          _OverviewInfo(
-            label: AppStrings.nextDonationAppointment.tr(),
-            value: nextAppointment,
-          ),
+          if (appointment != null) ...[
+            const SizedBox(height: AppSize.s8),
+            _DonorStatRow(
+              label: AppStrings.nextDonationAppointment.tr(),
+              value: nextAppointment,
+            ),
+          ],
         ],
       ),
     );
   }
 }
 
-class _EligibilityStatus extends StatelessWidget {
-  final bool eligible;
-  final VoidCallback? onTap;
-
-  const _EligibilityStatus({required this.eligible, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final color = eligible ? ColorManager.success : ColorManager.error;
-    return Semantics(
-      button: true,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppPadding.p12,
-            vertical: AppPadding.p6,
-          ),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: AppOpacity.muted),
-            borderRadius: BorderRadius.circular(AppSize.radiusCircle),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                eligible
-                    ? AppStrings.eligibleNow.tr()
-                    : AppStrings.notEligibleNow.tr(),
-                style: TextStyle(color: color, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(width: AppSize.s8),
-              Container(
-                width: AppSize.s8,
-                height: AppSize.s8,
-                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _OverviewInfo extends StatelessWidget {
+/// `label ……… value-chip` line on the donor profile card.
+class _DonorStatRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const _OverviewInfo({required this.label, required this.value});
+  const _DonorStatRow({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppPadding.p4),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(label, style: TextStyle(color: ColorManager.textMuted)),
-          ),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-}
-
-class _NearbyRequestCard extends StatelessWidget {
-  final DonorBloodRequestEntity request;
-
-  const _NearbyRequestCard({required this.request});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppPadding.p16),
-      decoration: BoxDecoration(
-        color: ColorManager.white,
-        borderRadius: BorderRadius.circular(AppSize.radiusXLarge),
-        border: Border.all(color: ColorManager.borderGrey),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  request.hospital.nameAr,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  request.hospital.address ?? AppStrings.location.tr(),
-                  style: TextStyle(color: ColorManager.textMuted),
-                ),
-              ],
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Flexible(
+          child: Text(
+            label,
+            style: getRegularStyle(
+              fontSize: FontSize.s14,
+              color: ColorManager.black,
+              lineHeight: LineHeight.h20,
             ),
           ),
-          Text(
-            request.bloodType,
-            style: TextStyle(
-              color: ColorManager.primaryDark,
-              fontSize: AppSize.s17,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
+        ),
+        AppTagPill.value(label: value),
+      ],
     );
   }
 }

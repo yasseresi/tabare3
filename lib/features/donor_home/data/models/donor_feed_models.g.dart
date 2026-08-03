@@ -63,6 +63,7 @@ _DonorBloodRequestModel _$DonorBloodRequestModelFromJson(
 ) => _DonorBloodRequestModel(
   id: json['id'] as String,
   requestedBy: json['requested_by'] as String,
+  patientName: json['patient_name'] as String?,
   hospital: DonorHospitalModel.fromJson(
     json['hospital'] as Map<String, dynamic>,
   ),
@@ -86,6 +87,7 @@ Map<String, dynamic> _$DonorBloodRequestModelToJson(
 ) => <String, dynamic>{
   'id': instance.id,
   'requested_by': instance.requestedBy,
+  'patient_name': instance.patientName,
   'hospital': instance.hospital,
   'blood_type': instance.bloodType,
   'urgency': instance.urgency,

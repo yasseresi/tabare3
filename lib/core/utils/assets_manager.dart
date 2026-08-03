@@ -11,6 +11,11 @@ class ImageAssets {
   static const String icon7 = '$imagePath/icon7.png';
   static const String icon8 = '$imagePath/icon8.png';
   static const String icon9 = '$imagePath/icon9.png';
+
+  /// Hadith illustration on the profile card and the patient illustration used
+  /// on every request card.
+  static const String hadithIllustration = demo;
+  static const String requestAvatar = '$imagePath/request_avatar.png';
 }
 
 class SvgAssets {

@@ -142,6 +142,7 @@ abstract class DonorBloodRequestEntity with _$DonorBloodRequestEntity {
   const factory DonorBloodRequestEntity({
     required String id,
     required String requestedBy,
+    String? patientName,
     required DonorHospitalEntity hospital,
     required String bloodType,
     required DonorRequestPriority priority,

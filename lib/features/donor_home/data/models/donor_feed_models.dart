@@ -71,6 +71,7 @@ abstract class DonorBloodRequestModel with _$DonorBloodRequestModel {
   const factory DonorBloodRequestModel({
     required String id,
     @JsonKey(name: 'requested_by') required String requestedBy,
+    @JsonKey(name: 'patient_name') String? patientName,
     required DonorHospitalModel hospital,
     @JsonKey(name: 'blood_type') required String bloodType,
     required String urgency,
@@ -89,6 +90,7 @@ abstract class DonorBloodRequestModel with _$DonorBloodRequestModel {
   DonorBloodRequestEntity toEntity() => DonorBloodRequestEntity(
     id: id,
     requestedBy: requestedBy,
+    patientName: patientName,
     hospital: hospital.toEntity(),
     bloodType: bloodType,
     priority: DonorRequestPriority.fromDatabase(urgency),

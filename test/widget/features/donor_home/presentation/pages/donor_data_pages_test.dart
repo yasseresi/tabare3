@@ -55,6 +55,7 @@ void main() {
   final request = DonorBloodRequestEntity(
     id: 'request-1',
     requestedBy: 'recipient-1',
+    patientName: 'علي بن محمد',
     hospital: hospital,
     bloodType: 'A+',
     priority: DonorRequestPriority.urgent,
@@ -204,14 +205,14 @@ void main() {
   testWidgets('renders donor overview from backend state', (tester) async {
     await pumpPage(tester, const DonorHomeScreen());
 
-    expect(find.byType(Image), findsOneWidget);
-    expect(find.text('O-'), findsOneWidget);
+    expect(find.text('مؤهل الآن'), findsOneWidget);
     expect(find.text('4'), findsOneWidget);
     await tester.scrollUntilVisible(
       find.text('مستشفى الاختبار المعتمد'),
       200,
       scrollable: find.byType(Scrollable).first,
     );
+    expect(find.text('علي بن محمد'), findsOneWidget);
     expect(find.text('مستشفى الاختبار المعتمد'), findsOneWidget);
   });
 

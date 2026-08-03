@@ -45,33 +45,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/translations/
-    - assets/images/logo.png
-    - assets/images/demo.png
-    - assets/images/demo1.png
-    - assets/images/icon6.png
-    - assets/images/icon7.png
-    - assets/images/icon8.png
-    - assets/images/icon9.png
-    - assets/images/avatar.png
-    - assets/images/reward.png
-    - assets/icons/icon1.svg
-    - assets/icons/icon2.svg
-    - assets/icons/icon3.svg
-    - assets/icons/icon4.svg
-    - assets/icons/icon5.svg
-    - assets/icons/icon6.svg
-    - assets/icons/icon7.svg
-    - assets/icons/icon8.svg
-    - assets/icons/icon9.svg
-    - assets/icons/success_check.svg
-    - assets/icons/person.svg
-    - assets/icons/password.svg
-    - assets/icons/hidden.svg
-    - assets/icons/call.svg
-    - assets/icons/calendar_date.svg
-    - assets/icons/id_serial_number.svg
-    - assets/icons/blod_type.svg
-    - assets/icons/weight.svg
-    - assets/icons/wilaya.svg
-    - assets/icons/ilnesses.svg
-    - assets/icons/warning.svg
+    - assets/images/
+    - assets/icons/
