@@ -151,8 +151,17 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final background = tester.widget<Container>(
+      expect(
         find.byKey(WidgetKeys.profileGradientBackground),
+        findsOneWidget,
+      );
+      final background = tester.widget<Container>(
+        find
+            .descendant(
+              of: find.byKey(WidgetKeys.profileGradientBackground),
+              matching: find.byType(Container),
+            )
+            .first,
       );
       expect((background.decoration! as BoxDecoration).gradient, isNotNull);
 

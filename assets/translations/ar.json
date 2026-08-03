@@ -335,5 +335,8 @@
   "status_cancelled": "ملغى",
   "status_expired": "منتهي",
   "continue_action": "متابعة",
-  "donation_completed": "تم التبرع بنجاح"
+  "donation_completed": "تم التبرع بنجاح",
+  "qr_section": "رمز QR",
+  "scan_qr_code": "امسح رمز QR",
+  "my_qr_code": "رمز QR الخاص بي"
 }

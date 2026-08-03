@@ -335,5 +335,8 @@
   "status_cancelled": "Cancelled",
   "status_expired": "Expired",
   "continue_action": "Continue",
-  "donation_completed": "Donation completed"
+  "donation_completed": "Donation completed",
+  "qr_section": "QR code",
+  "scan_qr_code": "Scan QR code",
+  "my_qr_code": "My QR code"
 }

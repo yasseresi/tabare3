@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart' as intl;
 
 import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/presentation/widgets/app_gradient_background.dart';
+import '../../../../core/presentation/widgets/app_header.dart';
 import '../../../../core/presentation/widgets/logout_dialog.dart';
 import '../../../../core/utils/constants_manager.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -26,6 +28,7 @@ class ProfileScreen extends StatelessWidget {
   final VoidCallback? onAbout;
   final VoidCallback? onDonorCard;
   final VoidCallback? onNotifications;
+  final VoidCallback? onQrCode;
 
   const ProfileScreen({
     super.key,
@@ -33,6 +36,7 @@ class ProfileScreen extends StatelessWidget {
     this.onAbout,
     this.onDonorCard,
     this.onNotifications,
+    this.onQrCode,
   });
 
   @override
@@ -41,42 +45,30 @@ class ProfileScreen extends StatelessWidget {
       textDirection: appTextDirection(context),
       child: Scaffold(
         backgroundColor: ColorManager.scaffoldBg,
-        body: Container(
+        body: AppGradientBackground(
           key: WidgetKeys.profileGradientBackground,
-          decoration: BoxDecoration(
-            color: ColorManager.white,
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [
-                ColorManager.welcomeGradientStart,
-                ColorManager.welcomeGradientEnd,
-              ],
-            ),
-          ),
-          child: SafeArea(
-            child: BlocConsumer<ProfileBloc, ProfileState>(
-              listener: _profileListener,
-              builder: (context, state) {
-                if (state is ProfileLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (state is ProfileLoaded) {
-                  return _ProfileContent(
-                    profile: state.profile,
-                    isEditing: state.isEditing,
-                    showRecipientIdentityDetails: showRecipientIdentityDetails,
-                    onAbout: onAbout,
-                    onDonorCard: onDonorCard,
-                    onNotifications: onNotifications,
-                  );
-                }
-                if (state is ProfileError) {
-                  return Center(child: Text(state.failure.message));
-                }
-                return const SizedBox.shrink();
-              },
-            ),
+          child: BlocConsumer<ProfileBloc, ProfileState>(
+            listener: _profileListener,
+            builder: (context, state) {
+              if (state is ProfileLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (state is ProfileLoaded) {
+                return _ProfileContent(
+                  profile: state.profile,
+                  isEditing: state.isEditing,
+                  showRecipientIdentityDetails: showRecipientIdentityDetails,
+                  onAbout: onAbout,
+                  onDonorCard: onDonorCard,
+                  onNotifications: onNotifications,
+                  onQrCode: onQrCode,
+                );
+              }
+              if (state is ProfileError) {
+                return Center(child: Text(state.failure.message));
+              }
+              return const SizedBox.shrink();
+            },
           ),
         ),
       ),
@@ -100,6 +92,7 @@ class _ProfileContent extends StatelessWidget {
   final VoidCallback? onAbout;
   final VoidCallback? onDonorCard;
   final VoidCallback? onNotifications;
+  final VoidCallback? onQrCode;
 
   const _ProfileContent({
     required this.profile,
@@ -108,6 +101,7 @@ class _ProfileContent extends StatelessWidget {
     required this.onAbout,
     required this.onDonorCard,
     required this.onNotifications,
+    required this.onQrCode,
   });
 
   @override
@@ -116,14 +110,16 @@ class _ProfileContent extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppPadding.p32),
       child: Column(
         children: [
-          const SizedBox(height: AppSize.s60),
           _buildHeader(context),
-          const SizedBox(height: AppSize.s24),
           _buildAvatarSection(context),
           const SizedBox(height: AppSize.s24),
           _buildAccountSection(context),
           const SizedBox(height: AppSize.s20),
           _buildPersonalSection(context),
+          if (onQrCode != null) ...[
+            const SizedBox(height: AppSize.s20),
+            _buildQrSection(context),
+          ],
           const SizedBox(height: AppSize.s20),
           _buildAppSection(context),
           const SizedBox(height: AppSize.s40),
@@ -138,60 +134,13 @@ class _ProfileContent extends StatelessWidget {
         : AppStrings.getWellSoon.tr();
     final firstName = profile.fullName.split(' ').first;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppPadding.p32),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AppPadding.p8),
-            decoration: BoxDecoration(
-              color: ColorManager.surfaceAlt,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: AppSize.s2,
-                  offset: const Offset(0, AppSize.s1),
-                ),
-              ],
-            ),
-            child: IconButton(
-              key: WidgetKeys.profileNotificationsButton,
-              constraints: const BoxConstraints(),
-              padding: EdgeInsets.zero,
-              onPressed:
-                  onNotifications ??
-                  () => Navigator.pushNamed(context, Routes.notificationsRoute),
-              icon: Icon(
-                Icons.notifications_none_outlined,
-                size: AppSize.s24,
-                color: ColorManager.textPrimary,
-              ),
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${AppStrings.welcome.tr()}، $firstName',
-                style: getBoldStyle(
-                  fontSize: FontSize.s18,
-                  color: ColorManager.textPrimary,
-                ),
-              ),
-              const SizedBox(height: AppSize.s4),
-              Text(
-                subtitle,
-                style: getSemiBoldStyle(
-                  fontSize: FontSize.s14,
-                  color: ColorManager.textMuted,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+    return AppHeader(
+      title: '${AppStrings.welcome.tr()}، $firstName',
+      subtitle: subtitle,
+      notificationsKey: WidgetKeys.profileNotificationsButton,
+      onNotifications:
+          onNotifications ??
+          () => Navigator.pushNamed(context, Routes.notificationsRoute),
     );
   }
 
@@ -376,6 +325,28 @@ class _ProfileContent extends StatelessWidget {
     final parsed = DateTime.tryParse(profile.dateOfBirth);
     if (parsed == null) return profile.dateOfBirth;
     return intl.DateFormat.yMMMMd(context.locale.languageCode).format(parsed);
+  }
+
+  Widget _buildQrSection(BuildContext context) {
+    return ProfileSection(
+      title: AppStrings.qrSection.tr(),
+      children: [
+        ProfileRow(
+          key: WidgetKeys.profileQrRow,
+          label: profile.isDonor
+              ? AppStrings.scanQrCode.tr()
+              : AppStrings.myQrCode.tr(),
+          value: '',
+          iconData: Icons.qr_code_scanner_rounded,
+          trailing: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: AppSize.s16,
+            color: ColorManager.textSecondary,
+          ),
+          onTap: onQrCode,
+        ),
+      ],
+    );
   }
 
   Widget _buildAppSection(BuildContext context) {

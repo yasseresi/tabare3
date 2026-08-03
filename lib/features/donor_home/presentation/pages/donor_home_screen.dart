@@ -130,6 +130,7 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
           onAbout: () => setState(() => _selectedTab = _DonorTab.about),
           onDonorCard: () => setState(() => _selectedTab = _DonorTab.card),
           onNotifications: _openNotifications,
+          onQrCode: () => _showRedeemDialog(context),
         ),
       ),
       _DonorTab.card => BlocProvider(

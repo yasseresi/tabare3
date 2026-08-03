@@ -87,6 +87,9 @@ class AppStrings {
   static const String normalPriority = 'normal_priority';
   static const String noRequestsNow = 'no_requests_now';
   static const String continueAction = 'continue_action';
+  static const String qrSection = 'qr_section';
+  static const String scanQrCode = 'scan_qr_code';
+  static const String myQrCode = 'my_qr_code';
   static const String donationCompleted = 'donation_completed';
   static const String statusActivated = 'status_activated';
   static const String statusCompleted = 'status_completed';
