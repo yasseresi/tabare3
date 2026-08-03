@@ -10,12 +10,14 @@ class AppInfoRow extends StatelessWidget {
   final String label;
   final String value;
   final Color? valueColor;
+  final Color? labelColor;
 
   const AppInfoRow({
     super.key,
     required this.label,
     required this.value,
     this.valueColor,
+    this.labelColor,
   });
 
   @override
@@ -28,7 +30,7 @@ class AppInfoRow extends StatelessWidget {
             label,
             style: getMediumStyle(
               fontSize: FontSize.s14,
-              color: ColorManager.navInactive,
+              color: labelColor ?? ColorManager.navInactive,
               lineHeight: LineHeight.h14,
             ),
           ),

@@ -14,11 +14,13 @@ class RequestCardDetail {
   final String label;
   final String value;
   final Color? valueColor;
+  final Color? labelColor;
 
   const RequestCardDetail({
     required this.label,
     required this.value,
     this.valueColor,
+    this.labelColor,
   });
 }
 
@@ -39,6 +41,10 @@ class RequestCard extends StatelessWidget {
   final double? progress;
   final Widget? footer;
 
+  /// Illustration beside the title. Defaults to the patient artwork used by the
+  /// request feeds; appointment and record cards pass the checklist one.
+  final String avatar;
+
   const RequestCard({
     super.key,
     required this.title,
@@ -47,6 +53,7 @@ class RequestCard extends StatelessWidget {
     this.details = const [],
     this.progress,
     this.footer,
+    this.avatar = ImageAssets.requestAvatar,
   });
 
   @override
@@ -54,7 +61,7 @@ class RequestCard extends StatelessWidget {
     return AppCard.list(
       child: Column(
         children: [
-          _TitleRow(title: title, tags: tags),
+          _TitleRow(title: title, tags: tags, avatar: avatar),
           if (banner != null) ...[
             const SizedBox(height: AppSize.s8),
             Align(alignment: AlignmentDirectional.centerStart, child: banner),
@@ -65,6 +72,7 @@ class RequestCard extends StatelessWidget {
               label: detail.label,
               value: detail.value,
               valueColor: detail.valueColor,
+              labelColor: detail.labelColor,
             ),
           ],
           if (progress != null) ...[
@@ -84,15 +92,20 @@ class RequestCard extends StatelessWidget {
 class _TitleRow extends StatelessWidget {
   final String title;
   final List<Widget> tags;
+  final String avatar;
 
-  const _TitleRow({required this.title, this.tags = const []});
+  const _TitleRow({
+    required this.title,
+    required this.avatar,
+    this.tags = const [],
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Image.asset(
-          ImageAssets.requestAvatar,
+          avatar,
           width: AppSize.s50,
           height: AppSize.s50,
           fit: BoxFit.cover,

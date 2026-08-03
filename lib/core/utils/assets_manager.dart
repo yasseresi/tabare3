@@ -16,6 +16,14 @@ class ImageAssets {
   /// on every request card.
   static const String hadithIllustration = demo;
   static const String requestAvatar = '$imagePath/request_avatar.png';
+
+  /// Illustration on the red hero banner, and the checklist avatar used on
+  /// appointment and donation-record cards.
+  static const String heroIvBag = '$imagePath/hero_iv_bag.png';
+  static const String appointmentAvatar = '$imagePath/appointment_avatar.png';
+
+  /// Blood-bag artwork used as the donation-record card avatar.
+  static const String donationAvatar = icon9;
 }
 
 class SvgAssets {

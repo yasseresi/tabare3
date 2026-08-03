@@ -86,6 +86,8 @@ class AppStrings {
   static const String unitsProgress = 'units_progress';
   static const String normalPriority = 'normal_priority';
   static const String noRequestsNow = 'no_requests_now';
+  static const String continueAction = 'continue_action';
+  static const String donationCompleted = 'donation_completed';
   static const String statusActivated = 'status_activated';
   static const String statusCompleted = 'status_completed';
   static const String statusCancelled = 'status_cancelled';

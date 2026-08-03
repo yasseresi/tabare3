@@ -333,5 +333,7 @@
   "status_activated": " مفعل",
   "status_completed": "مكتمل",
   "status_cancelled": "ملغى",
-  "status_expired": "منتهي"
+  "status_expired": "منتهي",
+  "continue_action": "متابعة",
+  "donation_completed": "تم التبرع بنجاح"
 }

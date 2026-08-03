@@ -61,6 +61,9 @@ class ColorManager {
   static Color progressTrackLight = const Color(0xffEFF9FF);
   static Color progressTrackBorder = const Color(0xffB9B9B9);
   static Color searchBorder = const Color(0xffF9EBE9);
+  static Color dialogSuccess = const Color(0xff4CAF50);
+  static Color heroGradientStart = const Color(0xffDE312D);
+  static Color heroGradientEnd = const Color(0xff891E1C);
 
   // Accent
   static Color brown = const Color(0xff59413D);

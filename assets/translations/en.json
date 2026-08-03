@@ -333,5 +333,7 @@
   "status_activated": "Active",
   "status_completed": "Completed",
   "status_cancelled": "Cancelled",
-  "status_expired": "Expired"
+  "status_expired": "Expired",
+  "continue_action": "Continue",
+  "donation_completed": "Donation completed"
 }
