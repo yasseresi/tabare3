@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 
 import '../../../../core/presentation/widgets/app_pill_button.dart';
+import '../../../../core/presentation/widgets/app_tag_pill.dart';
 import '../../../../core/presentation/widgets/request_card.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
@@ -39,8 +40,13 @@ class DonorRequestCard extends StatelessWidget {
     final deadline = request.neededBy ?? request.expiresAt;
     return RequestCard(
       title: request.patientName ?? request.hospital.nameAr,
-      urgencyLabel: donorPriorityLabel(request.priority),
-      urgencyColor: donorPriorityColor(request.priority),
+      tags: [
+        AppTagPill(
+          label: donorPriorityLabel(request.priority),
+          dotColor: donorPriorityColor(request.priority),
+          labelColor: ColorManager.navInactive,
+        ),
+      ],
       details: [
         RequestCardDetail(
           label: AppStrings.bloodType.tr(),

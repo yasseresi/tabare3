@@ -55,13 +55,15 @@ class AppTagPill extends StatelessWidget {
             ),
             const SizedBox(width: AppSize.s8),
           ],
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: getRegularStyle(
-              fontSize: FontSize.s12,
-              color: labelColor ?? ColorManager.black,
-              lineHeight: LineHeight.h16,
+          Flexible(
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: getRegularStyle(
+                fontSize: FontSize.s12,
+                color: labelColor ?? ColorManager.black,
+                lineHeight: LineHeight.h16,
+              ),
             ),
           ),
         ],

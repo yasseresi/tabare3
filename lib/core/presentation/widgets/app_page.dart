@@ -44,27 +44,30 @@ class AppPage extends StatelessWidget {
     }
 
     return AppGradientBackground(
-      child: Stack(
-        children: [
-          Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: AppSize.s402),
-              child: list,
-            ),
-          ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: AppSize.s402),
-              child: AppHeader(
-                title: title,
-                subtitle: subtitle,
-                onNotifications: onNotifications,
-                notificationsKey: notificationsKey,
+      child: Material(
+        type: MaterialType.transparency,
+        child: Stack(
+          children: [
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: AppSize.s402),
+                child: list,
               ),
             ),
-          ),
-        ],
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: AppSize.s402),
+                child: AppHeader(
+                  title: title,
+                  subtitle: subtitle,
+                  onNotifications: onNotifications,
+                  notificationsKey: notificationsKey,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

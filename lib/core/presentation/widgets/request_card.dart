@@ -8,7 +8,6 @@ import '../../utils/values_manager.dart';
 import 'app_card.dart';
 import 'app_info_row.dart';
 import 'app_progress_bar.dart';
-import 'app_tag_pill.dart';
 
 /// A single label/value line rendered inside a [RequestCard].
 class RequestCardDetail {
@@ -29,27 +28,24 @@ class RequestCardDetail {
 /// trailing action button.
 class RequestCard extends StatelessWidget {
   final String title;
-  final String? urgencyLabel;
-  final Color? urgencyColor;
+
+  /// Pills shown on the leading side of the title (status, urgency …), ordered
+  /// as they should appear from the outer edge inward.
+  final List<Widget> tags;
+
+  /// Optional row rendered directly beneath the title (e.g. a beneficiary tag).
+  final Widget? banner;
   final List<RequestCardDetail> details;
   final double? progress;
-  final String? actionLabel;
-  final VoidCallback? onAction;
-  final Color? actionColor;
-  final Key? actionKey;
   final Widget? footer;
 
   const RequestCard({
     super.key,
     required this.title,
-    this.urgencyLabel,
-    this.urgencyColor,
+    this.tags = const [],
+    this.banner,
     this.details = const [],
     this.progress,
-    this.actionLabel,
-    this.onAction,
-    this.actionColor,
-    this.actionKey,
     this.footer,
   });
 
@@ -58,11 +54,11 @@ class RequestCard extends StatelessWidget {
     return AppCard.list(
       child: Column(
         children: [
-          _TitleRow(
-            title: title,
-            urgencyLabel: urgencyLabel,
-            urgencyColor: urgencyColor,
-          ),
+          _TitleRow(title: title, tags: tags),
+          if (banner != null) ...[
+            const SizedBox(height: AppSize.s8),
+            Align(alignment: AlignmentDirectional.centerStart, child: banner),
+          ],
           for (final detail in details) ...[
             const SizedBox(height: AppSize.s18),
             AppInfoRow(
@@ -87,14 +83,9 @@ class RequestCard extends StatelessWidget {
 
 class _TitleRow extends StatelessWidget {
   final String title;
-  final String? urgencyLabel;
-  final Color? urgencyColor;
+  final List<Widget> tags;
 
-  const _TitleRow({
-    required this.title,
-    this.urgencyLabel,
-    this.urgencyColor,
-  });
+  const _TitleRow({required this.title, this.tags = const []});
 
   @override
   Widget build(BuildContext context) {
@@ -117,14 +108,7 @@ class _TitleRow extends StatelessWidget {
             ),
           ),
         ),
-        if (urgencyLabel != null) ...[
-          const SizedBox(width: AppSize.s16),
-          AppTagPill(
-            label: urgencyLabel!,
-            dotColor: urgencyColor,
-            labelColor: ColorManager.navInactive,
-          ),
-        ],
+        for (final tag in tags) ...[const SizedBox(width: AppSize.s16), tag],
       ],
     );
   }

@@ -36,11 +36,15 @@ class AppPillButton extends StatelessWidget {
             horizontal: AppPadding.pPillHorizontal,
             vertical: AppPadding.pPillVertical,
           ),
-          child: Text(
-            label,
-            style: getSemiBoldStyle(
-              fontSize: FontSize.s12_3,
-              color: ColorManager.white,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              maxLines: 1,
+              style: getSemiBoldStyle(
+                fontSize: FontSize.s12_3,
+                color: ColorManager.white,
+              ),
             ),
           ),
         ),

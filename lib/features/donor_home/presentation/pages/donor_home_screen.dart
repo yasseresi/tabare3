@@ -5,19 +5,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/widget_keys.dart';
 import '../../../../core/presentation/widgets/app_bottom_nav.dart';
-import '../../../../core/presentation/widgets/app_card.dart';
 import '../../../../core/presentation/widgets/app_dialog.dart';
 import '../../../../core/presentation/widgets/app_gradient_background.dart';
 import '../../../../core/presentation/widgets/app_page.dart';
+import '../../../../core/presentation/widgets/hadith_stats_card.dart';
 import '../../../../core/presentation/widgets/app_section_header.dart';
 import '../../../../core/presentation/widgets/app_tag_pill.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
-import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
-import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../../../injection_container.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -377,124 +375,44 @@ class _AvailabilityCard extends StatelessWidget {
     final statusColor = eligible
         ? ColorManager.success
         : ColorManager.urgencyCritical;
-    return AppCard(
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                width: AppSize.s200,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Semantics(
-                      button: true,
-                      child: GestureDetector(
-                        onTap: disabled
-                            ? null
-                            : () {
-                                context.read<DonorFeedBloc>().add(
-                                  DonorAvailabilityChanged(
-                                    !availability.isAvailableForDonation,
-                                  ),
-                                );
-                              },
-                        child: AppTagPill(
-                          label: eligible
-                              ? AppStrings.eligibleNow.tr()
-                              : AppStrings.notEligibleNow.tr(),
-                          dotColor: statusColor,
-                          background: statusColor.withValues(
-                            alpha: AppOpacity.tint,
-                          ),
-                        ),
-                      ),
+    return HadithStatsCard(
+      statusPill: Semantics(
+        button: true,
+        child: GestureDetector(
+          onTap: disabled
+              ? null
+              : () {
+                  context.read<DonorFeedBloc>().add(
+                    DonorAvailabilityChanged(
+                      !availability.isAvailableForDonation,
                     ),
-                    const SizedBox(height: AppSize.s10),
-                    Text(
-                      AppStrings.hadithIntro.tr(),
-                      style: getSemiBoldStyle(
-                        fontSize: FontSize.s24,
-                        color: ColorManager.cardHeading,
-                        lineHeight: LineHeight.h28,
-                      ),
-                    ),
-                    const SizedBox(height: AppSize.s10),
-                    Padding(
-                      padding: const EdgeInsets.only(top: AppPadding.p4),
-                      child: Text(
-                        AppStrings.hadithRelief.tr(),
-                        maxLines: AppConstants.profileHadithMaxLines,
-                        overflow: TextOverflow.ellipsis,
-                        style: getMediumStyle(
-                          fontSize: FontSize.s12,
-                          color: ColorManager.textMuted,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Image.asset(
-                ImageAssets.hadithIllustration,
-                width: AppSize.s130,
-                height: AppSize.s130,
-                fit: BoxFit.contain,
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSize.s8),
-          _DonorStatRow(
-            label: AppStrings.totalDonations.tr(),
-            value: availability.totalDonationsCount.toString(),
-          ),
-          const SizedBox(height: AppSize.s8),
-          _DonorStatRow(
-            label: AppStrings.requestsNearYou.tr(),
-            value: feed.compatibleRequests.length.toString(),
-          ),
-          const SizedBox(height: AppSize.s8),
-          _DonorStatRow(
-            label: AppStrings.lastDonation.tr(),
-            value: lastDonation,
-          ),
-          if (appointment != null) ...[
-            const SizedBox(height: AppSize.s8),
-            _DonorStatRow(
-              label: AppStrings.nextDonationAppointment.tr(),
-              value: nextAppointment,
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-/// `label ……… value-chip` line on the donor profile card.
-class _DonorStatRow extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _DonorStatRow({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Flexible(
-          child: Text(
-            label,
-            style: getRegularStyle(
-              fontSize: FontSize.s14,
-              color: ColorManager.black,
-              lineHeight: LineHeight.h20,
-            ),
+                  );
+                },
+          child: AppTagPill(
+            label: eligible
+                ? AppStrings.eligibleNow.tr()
+                : AppStrings.notEligibleNow.tr(),
+            dotColor: statusColor,
+            background: statusColor.withValues(alpha: AppOpacity.tint),
           ),
         ),
-        AppTagPill.value(label: value),
+      ),
+      hadithBody: AppStrings.hadithRelief.tr(),
+      stats: [
+        HadithStat(
+          label: AppStrings.totalDonations.tr(),
+          value: availability.totalDonationsCount.toString(),
+        ),
+        HadithStat(
+          label: AppStrings.requestsNearYou.tr(),
+          value: feed.compatibleRequests.length.toString(),
+        ),
+        HadithStat(label: AppStrings.lastDonation.tr(), value: lastDonation),
+        if (appointment != null)
+          HadithStat(
+            label: AppStrings.nextDonationAppointment.tr(),
+            value: nextAppointment,
+          ),
       ],
     );
   }
