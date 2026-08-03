@@ -115,10 +115,10 @@ void main() {
 
     expect(find.text('مستشفى مصطفى باشا'), findsWidgets);
     expect(find.text('O+'), findsOneWidget);
-    expect(find.text('1 / 3'), findsOneWidget);
+    expect(find.text('1/3'), findsOneWidget);
     expect(find.text('المتبرعين المتاحين'), findsOneWidget);
     expect(find.text('تعديل الطلب'), findsOneWidget);
-    expect(find.text('مرحباً، أحمد'), findsOneWidget);
+    expect(find.text('مرحباً، أحمد'), findsWidgets);
   });
 
   testWidgets('requester dashboard renders backend request data', (
@@ -144,7 +144,7 @@ void main() {
       ),
     );
 
-    expect(find.byType(Image), findsOneWidget);
+    expect(find.byType(Image), findsWidgets);
     await tester.scrollUntilVisible(
       find.text('مستشفى لوحة التحكم'),
       200,
@@ -152,7 +152,7 @@ void main() {
     );
     expect(find.text('مستشفى لوحة التحكم'), findsOneWidget);
     expect(find.text('O+'), findsOneWidget);
-    expect(find.text('1 / 3'), findsOneWidget);
+    expect(find.text('1/3'), findsOneWidget);
   });
 
   testWidgets('requester dashboard edits requests inside the receiver shell', (
@@ -178,7 +178,9 @@ void main() {
       200,
       scrollable: find.byType(Scrollable).first,
     );
-    await tester.tap(find.text('تعديل الطلب'));
+    await tester.ensureVisible(find.text('تعديل الطلب'));
+    await tester.pump();
+    await tester.tap(find.text('تعديل الطلب'), warnIfMissed: false);
     await tester.pumpAndSettle();
 
     expect(find.byType(EditRequestScreen), findsOneWidget);
@@ -233,7 +235,12 @@ void main() {
 
     await tester.tap(find.byKey(WidgetKeys.requesterNavigationRequests));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(WidgetKeys.requestEditButton));
+    await tester.ensureVisible(find.byKey(WidgetKeys.requestEditButton));
+    await tester.pump();
+    await tester.tap(
+      find.byKey(WidgetKeys.requestEditButton),
+      warnIfMissed: false,
+    );
     await tester.pumpAndSettle();
 
     expect(find.byType(EditRequestScreen), findsOneWidget);

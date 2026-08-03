@@ -329,5 +329,9 @@
   "last_deadline": "اخر اجل",
   "units_progress": "تم توفير {} من {} أكياس",
   "normal_priority": "عادي",
-  "no_requests_now": "لا توجد طلبات حالياً"
+  "no_requests_now": "لا توجد طلبات حالياً",
+  "status_activated": " مفعل",
+  "status_completed": "مكتمل",
+  "status_cancelled": "ملغى",
+  "status_expired": "منتهي"
 }

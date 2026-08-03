@@ -5,10 +5,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/widget_keys.dart';
 import '../../../../core/presentation/widgets/app_bottom_nav.dart';
+import '../../../../core/presentation/widgets/app_button.dart';
+import '../../../../core/presentation/widgets/app_gradient_background.dart';
+import '../../../../core/presentation/widgets/app_page.dart';
+import '../../../../core/presentation/widgets/app_section_header.dart';
+import '../../../../core/presentation/widgets/app_tag_pill.dart';
+import '../../../../core/presentation/widgets/hadith_stats_card.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
-import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/values_manager.dart';
@@ -22,6 +27,7 @@ import '../../../notifications/presentation/pages/notifications_center_page.dart
 import '../../domain/entities/blood_request_entity.dart';
 import '../bloc/request_bloc.dart';
 import '../bloc/request_detail_bloc.dart';
+import '../widgets/requester_request_card.dart';
 import 'create_request_screen.dart';
 import 'donor_history_screen.dart';
 import 'edit_request_screen.dart';
@@ -82,6 +88,7 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
         onCreate: () => setState(() => _selectedTab = _RequesterTab.create),
         onNotifications: () =>
             setState(() => _selectedTab = _RequesterTab.notifications),
+        onViewAll: () => setState(() => _selectedTab = _RequesterTab.requests),
         onEdit: (request) {
           setState(() {
             _editingRequest = request;
@@ -178,27 +185,31 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
 class _RequesterOverview extends StatelessWidget {
   final VoidCallback onCreate;
   final VoidCallback onNotifications;
+  final VoidCallback onViewAll;
   final ValueChanged<BloodRequestEntity> onEdit;
   final ValueChanged<BloodRequestEntity> onDetail;
 
   const _RequesterOverview({
     required this.onCreate,
     required this.onNotifications,
+    required this.onViewAll,
     required this.onEdit,
     required this.onDetail,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: BlocBuilder<RequestBloc, RequestState>(
-        builder: (context, state) {
-          if (state.status == RequestViewStatus.initial ||
-              state.status == RequestViewStatus.loading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (state.status == RequestViewStatus.failure) {
-            return Center(
+    return BlocBuilder<RequestBloc, RequestState>(
+      builder: (context, state) {
+        if (state.status == RequestViewStatus.initial ||
+            state.status == RequestViewStatus.loading) {
+          return const AppGradientBackground(
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (state.status == RequestViewStatus.failure) {
+          return AppGradientBackground(
+            child: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -214,129 +225,53 @@ class _RequesterOverview extends StatelessWidget {
                   ),
                 ],
               ),
-            );
-          }
-          return RefreshIndicator(
-            onRefresh: () async {
-              context.read<RequestBloc>().add(const RequestsLoadRequested());
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: ColorManager.white,
-                gradient: LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [
-                    ColorManager.welcomeGradientStart,
-                    ColorManager.welcomeGradientEnd,
-                  ],
-                ),
-              ),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: AppSize.s402),
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppPadding.p10,
-                      vertical: AppPadding.p32,
-                    ),
-                    children: [
-                      _OverviewHeader(onNotifications: onNotifications),
-                      const SizedBox(height: AppSize.s20),
-                      _RequestStatsCard(requests: state.requests),
-                      const SizedBox(height: AppSize.s24),
-                      Center(
-                        child: SizedBox(
-                          width: AppSize.s174,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              onCreate();
-                            },
-                            child: Text(AppStrings.createRequest.tr()),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: AppSize.s24),
-                      Text(
-                        AppStrings.myRequests.tr(),
-                        style: const TextStyle(
-                          fontSize: AppSize.s20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: AppSize.s12),
-                      if (state.requests.isEmpty)
-                        _EmptyOverview(
-                          onCreate: () {
-                            onCreate();
-                          },
-                        )
-                      else
-                        ...state.requests
-                            .take(AppConstants.paginationLimit)
-                            .map(
-                              (request) => Padding(
-                                padding: const EdgeInsets.only(
-                                  bottom: AppPadding.p12,
-                                ),
-                                child: _OverviewRequestCard(
-                                  request: request,
-                                  onEdit: onEdit,
-                                  onDetail: onDetail,
-                                ),
-                              ),
-                            ),
-                    ],
-                  ),
-                ),
-              ),
             ),
           );
-        },
-      ),
-    );
-  }
-}
-
-class _OverviewHeader extends StatelessWidget {
-  final VoidCallback onNotifications;
-
-  const _OverviewHeader({required this.onNotifications});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppStrings.welcomeUser.tr(),
-                style: const TextStyle(
-                  fontSize: AppSize.s20,
-                  fontWeight: FontWeight.bold,
+        }
+        final requests = state.requests;
+        return AppPage(
+          title: AppStrings.welcomeUser.tr(),
+          subtitle: AppStrings.getWellSoon.tr(),
+          onNotifications: onNotifications,
+          onRefresh: () async {
+            context.read<RequestBloc>().add(const RequestsLoadRequested());
+          },
+          children: [
+            _RequestStatsCard(requests: requests),
+            const SizedBox(height: AppSize.s12),
+            if (requests.isEmpty)
+              Center(
+                child: SizedBox(
+                  width: AppSize.s174,
+                  child: AppButton.primary(
+                    label: AppStrings.createRequest.tr(),
+                    onPressed: onCreate,
+                  ),
                 ),
+              )
+            else ...[
+              AppSectionHeader(
+                title: AppStrings.myRequests.tr(),
+                actionLabel: AppStrings.viewAll.tr(),
+                onAction: onViewAll,
               ),
-              Text(
-                AppStrings.getWellSoon.tr(),
-                style: TextStyle(color: ColorManager.textMuted),
-              ),
+              const SizedBox(height: AppSize.s10),
+              ...requests
+                  .take(AppConstants.paginationLimit)
+                  .map(
+                    (request) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppPadding.p15),
+                      child: RequesterRequestCard(
+                        request: request,
+                        ownerName: AppStrings.welcomeUser.tr(),
+                        onEdit: () => onEdit(request),
+                      ),
+                    ),
+                  ),
             ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.all(AppPadding.p8),
-          decoration: BoxDecoration(
-            color: ColorManager.surfaceAlt,
-            borderRadius: BorderRadius.circular(AppSize.radiusCircle),
-          ),
-          child: IconButton(
-            onPressed: onNotifications,
-            icon: const Icon(Icons.notifications_none_rounded),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 }
@@ -354,272 +289,31 @@ class _RequestStatsCard extends StatelessWidget {
     final completed = requests
         .where((request) => request.status == BloodRequestStatus.fulfilled)
         .length;
-    return Container(
-      padding: const EdgeInsets.all(AppPadding.p20),
-      decoration: BoxDecoration(
-        color: ColorManager.white,
-        borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
-        border: Border.all(color: ColorManager.borderGrey),
-        boxShadow: [
-          BoxShadow(
-            color: ColorManager.black.withValues(alpha: AppOpacity.subtle),
-            blurRadius: AppSize.s26,
-            offset: const Offset(AppSize.s0, AppSize.s8),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    _RequestStatusTag(requests: requests),
-                    const SizedBox(height: AppSize.s10),
-                    Text(
-                      AppStrings.hadithIntro.tr(),
-                      textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        fontSize: FontSize.s24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      AppStrings.hadithBelieverAffair.tr(),
-                      maxLines: AppConstants.profileHadithMaxLines,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        color: ColorManager.textMuted,
-                        fontSize: FontSize.s12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: AppSize.s10),
-              Image.asset(
-                ImageAssets.demo1,
-                width: AppSize.s130,
-                height: AppSize.s130,
-                fit: BoxFit.contain,
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSize.s16),
-          _StatItem(
-            value: requests.length.toString(),
-            label: AppStrings.requestsCount.tr(),
-          ),
-          _StatItem(
-            value: active.toString(),
-            label: AppStrings.respondingDonors.tr(),
-          ),
-          _StatItem(
-            value: completed.toString(),
-            label: AppStrings.completedRequests.tr(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _RequestStatusTag extends StatelessWidget {
-  final List<BloodRequestEntity> requests;
-
-  const _RequestStatusTag({required this.requests});
-
-  @override
-  Widget build(BuildContext context) {
     final hasRequests = requests.isNotEmpty;
-    final color = hasRequests ? ColorManager.success : ColorManager.error;
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppPadding.p12,
-        vertical: AppPadding.p6,
+    final statusColor = hasRequests
+        ? ColorManager.success
+        : ColorManager.urgencyCritical;
+    return HadithStatsCard(
+      statusPill: AppTagPill(
+        label: hasRequests
+            ? AppStrings.requestActive.tr()
+            : AppStrings.noRequestsYou.tr(),
+        dotColor: statusColor,
+        background: statusColor.withValues(alpha: AppOpacity.tint),
       ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: AppOpacity.muted),
-        borderRadius: BorderRadius.circular(AppSize.radiusCircle),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-            child: Text(
-              hasRequests
-                  ? AppStrings.activeRequests.tr()
-                  : AppStrings.noRequestsDescription.tr(),
-              maxLines: AppConstants.statusTagMaxLines,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: color, fontSize: FontSize.s12),
-            ),
-          ),
-          const SizedBox(width: AppSize.s8),
-          Container(
-            width: AppSize.s8,
-            height: AppSize.s8,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatItem extends StatelessWidget {
-  final String value;
-  final String label;
-
-  const _StatItem({required this.value, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppPadding.p2),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              textAlign: TextAlign.right,
-              style: const TextStyle(fontSize: AppSize.s14),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppPadding.p8,
-              vertical: AppPadding.p2,
-            ),
-            decoration: BoxDecoration(
-              color: ColorManager.surfaceLight,
-              borderRadius: BorderRadius.circular(AppSize.radiusCircle),
-            ),
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: AppSize.s12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _OverviewRequestCard extends StatelessWidget {
-  final BloodRequestEntity request;
-  final ValueChanged<BloodRequestEntity> onEdit;
-  final ValueChanged<BloodRequestEntity> onDetail;
-
-  const _OverviewRequestCard({
-    required this.request,
-    required this.onEdit,
-    required this.onDetail,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final progress = request.unitsNeeded == AppSize.s0
-        ? AppSize.s0
-        : request.unitsFulfilled / request.unitsNeeded;
-    return Container(
-      padding: const EdgeInsets.all(AppPadding.p16),
-      decoration: BoxDecoration(
-        color: ColorManager.white,
-        borderRadius: BorderRadius.circular(AppSize.radiusXLarge),
-        border: Border.all(color: ColorManager.borderGrey),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  request.hospital.nameAr,
-                  style: const TextStyle(
-                    fontSize: AppSize.s17,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Text(
-                request.bloodType,
-                style: TextStyle(
-                  color: ColorManager.primaryDark,
-                  fontSize: AppSize.s17,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSize.s12),
-          LinearProgressIndicator(
-            value: progress.clamp(AppSize.s0, AppSize.s1),
-            minHeight: AppSize.s8,
-            borderRadius: BorderRadius.circular(AppSize.radiusSmall),
-            color: ColorManager.primaryDark,
-            backgroundColor: ColorManager.progressTrack,
-          ),
-          const SizedBox(height: AppSize.s8),
-          Text(
-            AppStrings.bagsRatio.tr(
-              namedArgs: {
-                LocalizationArgs.provided: request.unitsFulfilled.toString(),
-                LocalizationArgs.total: request.unitsNeeded.toString(),
-              },
-            ),
-          ),
-          const SizedBox(height: AppSize.s12),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => onEdit(request),
-                  child: Text(AppStrings.editRequest.tr()),
-                ),
-              ),
-              const SizedBox(width: AppSize.s8),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    onDetail(request);
-                  },
-                  child: Text(AppStrings.requestDetails.tr()),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EmptyOverview extends StatelessWidget {
-  final VoidCallback onCreate;
-
-  const _EmptyOverview({required this.onCreate});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          AppStrings.noRequestsDescription.tr(),
-          textAlign: TextAlign.center,
+      hadithBody: AppStrings.hadithBelieverAffair.tr(),
+      stats: [
+        HadithStat(
+          label: AppStrings.requestsCount.tr(),
+          value: requests.length.toString(),
         ),
-        const SizedBox(height: AppSize.s16),
-        ElevatedButton(
-          onPressed: onCreate,
-          child: Text(AppStrings.createRequest.tr()),
+        HadithStat(
+          label: AppStrings.respondingDonors.tr(),
+          value: active.toString(),
+        ),
+        HadithStat(
+          label: AppStrings.completedRequests.tr(),
+          value: completed.toString(),
         ),
       ],
     );

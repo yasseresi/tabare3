@@ -329,5 +329,9 @@
   "last_deadline": "Deadline",
   "units_progress": "{} of {} bags provided",
   "normal_priority": "Normal",
-  "no_requests_now": "No requests right now"
+  "no_requests_now": "No requests right now",
+  "status_activated": "Active",
+  "status_completed": "Completed",
+  "status_cancelled": "Cancelled",
+  "status_expired": "Expired"
 }
