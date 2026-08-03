@@ -10,6 +10,19 @@ class FontWeightManager {
   static const FontWeight medium = FontWeight.w500;
   static const FontWeight semiBold = FontWeight.w600;
   static const FontWeight bold = FontWeight.w700;
+  static const FontWeight extraBold = FontWeight.w800;
+}
+
+class LineHeight {
+  static const double h16 = 16.0;
+  static const double h18 = 18.0;
+  static const double h20 = 20.0;
+  static const double h22 = 22.0;
+  static const double h24 = 24.0;
+  static const double h28 = 28.0;
+  static const double h30 = 30.0;
+  static const double h32 = 32.0;
+  static const double h45 = 45.0;
 }
 
 class FontSize {

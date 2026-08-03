@@ -1,10 +1,10 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/presentation/widgets/app_bottom_nav.dart';
 import '../../../../core/presentation/widgets/app_dialog.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
@@ -657,90 +657,43 @@ class _BottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: AppSize.s80,
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _NavigationItem(
-              navKey: WidgetKeys.donorNavigationHome,
-              asset: SvgAssets.icon1,
-              selected: selectedTab == _DonorTab.home,
-              onTap: () => onSelected(_DonorTab.home),
-            ),
-            _NavigationItem(
-              asset: SvgAssets.icon2,
-              selected: selectedTab == _DonorTab.requests,
-              onTap: () => onSelected(_DonorTab.requests),
-            ),
-            IconButton(
-              key: WidgetKeys.donorNavigationAppointments,
-              tooltip: AppStrings.appointments.tr(),
-              onPressed: () => onSelected(_DonorTab.appointments),
-              onLongPress: onRedeem,
-              style: IconButton.styleFrom(
-                backgroundColor: ColorManager.transparent,
-              ),
-              icon: Icon(
-                Icons.calendar_month_rounded,
-                size: AppSize.s35,
-                color: selectedTab == _DonorTab.appointments
-                    ? ColorManager.primary
-                    : ColorManager.mediumGrey,
-              ),
-            ),
-            _NavigationItem(
-              asset: SvgAssets.icon4,
-              selected: selectedTab == _DonorTab.record,
-              onTap: () => onSelected(_DonorTab.record),
-            ),
-            _NavigationItem(
-              navKey: WidgetKeys.donorNavigationProfile,
-              asset: SvgAssets.icon5,
-              selected:
-                  selectedTab == _DonorTab.profile ||
-                  selectedTab == _DonorTab.about ||
-                  selectedTab == _DonorTab.card ||
-                  selectedTab == _DonorTab.cardInfo,
-              onTap: () => onSelected(_DonorTab.profile),
-            ),
-          ],
+    return AppBottomNav(
+      items: [
+        AppBottomNavItem(
+          itemKey: WidgetKeys.donorNavigationHome,
+          asset: SvgAssets.navHome,
+          selected: selectedTab == _DonorTab.home,
+          onTap: () => onSelected(_DonorTab.home),
         ),
-      ),
-    );
-  }
-}
-
-class _NavigationItem extends StatelessWidget {
-  final Key? navKey;
-  final String asset;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _NavigationItem({
-    this.navKey,
-    required this.asset,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      key: navKey,
-      onPressed: onTap,
-      style: IconButton.styleFrom(backgroundColor: ColorManager.transparent),
-      icon: SvgPicture.asset(
-        asset,
-        width: AppSize.s35,
-        height: AppSize.s35,
-        colorFilter: ColorFilter.mode(
-          selected ? ColorManager.primary : ColorManager.mediumGrey,
-          BlendMode.srcIn,
+        AppBottomNavItem(
+          asset: SvgAssets.navRequests,
+          selected: selectedTab == _DonorTab.requests,
+          onTap: () => onSelected(_DonorTab.requests),
         ),
-      ),
+        AppBottomNavItem(
+          itemKey: WidgetKeys.donorNavigationAppointments,
+          asset: SvgAssets.navCalendar,
+          tooltip: AppStrings.appointments.tr(),
+          selected: selectedTab == _DonorTab.appointments,
+          onTap: () => onSelected(_DonorTab.appointments),
+          onLongPress: onRedeem,
+        ),
+        AppBottomNavItem(
+          asset: SvgAssets.navHistory,
+          selected: selectedTab == _DonorTab.record,
+          onTap: () => onSelected(_DonorTab.record),
+        ),
+        AppBottomNavItem(
+          itemKey: WidgetKeys.donorNavigationProfile,
+          asset: SvgAssets.navPerson,
+          selected:
+              selectedTab == _DonorTab.profile ||
+              selectedTab == _DonorTab.about ||
+              selectedTab == _DonorTab.card ||
+              selectedTab == _DonorTab.cardInfo,
+          onTap: () => onSelected(_DonorTab.profile),
+        ),
+      ],
     );
   }
 }

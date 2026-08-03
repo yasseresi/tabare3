@@ -35,4 +35,13 @@ class SvgAssets {
   static const String illnesses = '$iconPath/ilnesses.svg';
   static const String successCheck = '$iconPath/success_check.svg';
   static const String warning = '$iconPath/warning.svg';
+
+  // Bottom navigation + header (exported from Figma)
+  static const String navHome = '$iconPath/nav_home.svg';
+  static const String navRequests = '$iconPath/nav_requests.svg';
+  static const String navCalendar = '$iconPath/nav_calendar.svg';
+  static const String navAdd = '$iconPath/nav_add.svg';
+  static const String navHistory = '$iconPath/nav_history.svg';
+  static const String navPerson = '$iconPath/nav_person.svg';
+  static const String headerBell = '$iconPath/header_bell.svg';
 }

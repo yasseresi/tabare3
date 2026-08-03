@@ -45,6 +45,11 @@ class ColorManager {
   static Color textLight = const Color(0xff9CA3AF);
   static Color textOnPrimary = const Color(0xffFFFFFF);
 
+  // Navigation
+  static Color navActive = const Color(0xff9E2016);
+  static Color navInactive = const Color(0xff5A5A5A);
+  static Color headerIconBg = const Color(0xffF2F2F2);
+
   // Accent
   static Color brown = const Color(0xff59413D);
   static Color brownGrey = const Color(0xff665C5C);

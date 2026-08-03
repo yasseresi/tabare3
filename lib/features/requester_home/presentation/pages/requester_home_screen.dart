@@ -1,10 +1,10 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/presentation/widgets/app_bottom_nav.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
@@ -637,82 +637,43 @@ class _RequesterNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: AppSize.s80,
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _NavigationItem(
-              navKey: WidgetKeys.requesterNavigationHome,
-              asset: SvgAssets.icon1,
-              selected: selectedTab == _RequesterTab.home,
-              onTap: () => onSelected(_RequesterTab.home),
-            ),
-            _NavigationItem(
-              navKey: WidgetKeys.requesterNavigationRequests,
-              asset: SvgAssets.icon2,
-              selected:
-                  selectedTab == _RequesterTab.requests ||
-                  selectedTab == _RequesterTab.edit ||
-                  selectedTab == _RequesterTab.detail,
-              onTap: () => onSelected(_RequesterTab.requests),
-            ),
-            _NavigationItem(
-              navKey: WidgetKeys.requesterNavigationCreate,
-              asset: SvgAssets.icon3,
-              selected: true,
-              onTap: () => onSelected(_RequesterTab.create),
-            ),
-            _NavigationItem(
-              asset: SvgAssets.icon4,
-              selected: selectedTab == _RequesterTab.donors,
-              onTap: () => onSelected(_RequesterTab.donors),
-            ),
-            _NavigationItem(
-              navKey: WidgetKeys.requesterNavigationProfile,
-              asset: SvgAssets.icon5,
-              selected:
-                  selectedTab == _RequesterTab.profile ||
-                  selectedTab == _RequesterTab.about,
-              onTap: () => onSelected(_RequesterTab.profile),
-            ),
-          ],
+    return AppBottomNav(
+      items: [
+        AppBottomNavItem(
+          itemKey: WidgetKeys.requesterNavigationHome,
+          asset: SvgAssets.navHome,
+          selected: selectedTab == _RequesterTab.home,
+          onTap: () => onSelected(_RequesterTab.home),
         ),
-      ),
-    );
-  }
-}
-
-class _NavigationItem extends StatelessWidget {
-  final Key? navKey;
-  final String asset;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _NavigationItem({
-    this.navKey,
-    required this.asset,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      key: navKey,
-      onPressed: onTap,
-      style: IconButton.styleFrom(backgroundColor: ColorManager.transparent),
-      icon: SvgPicture.asset(
-        asset,
-        width: AppSize.s35,
-        height: AppSize.s35,
-        colorFilter: ColorFilter.mode(
-          selected ? ColorManager.primary : ColorManager.mediumGrey,
-          BlendMode.srcIn,
+        AppBottomNavItem(
+          itemKey: WidgetKeys.requesterNavigationRequests,
+          asset: SvgAssets.navRequests,
+          selected:
+              selectedTab == _RequesterTab.requests ||
+              selectedTab == _RequesterTab.edit ||
+              selectedTab == _RequesterTab.detail,
+          onTap: () => onSelected(_RequesterTab.requests),
         ),
-      ),
+        AppBottomNavItem(
+          itemKey: WidgetKeys.requesterNavigationCreate,
+          asset: SvgAssets.navAdd,
+          selected: selectedTab == _RequesterTab.create,
+          onTap: () => onSelected(_RequesterTab.create),
+        ),
+        AppBottomNavItem(
+          asset: SvgAssets.navHistory,
+          selected: selectedTab == _RequesterTab.donors,
+          onTap: () => onSelected(_RequesterTab.donors),
+        ),
+        AppBottomNavItem(
+          itemKey: WidgetKeys.requesterNavigationProfile,
+          asset: SvgAssets.navPerson,
+          selected:
+              selectedTab == _RequesterTab.profile ||
+              selectedTab == _RequesterTab.about,
+          onTap: () => onSelected(_RequesterTab.profile),
+        ),
+      ],
     );
   }
 }
