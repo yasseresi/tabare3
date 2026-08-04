@@ -17,6 +17,7 @@ class LineHeight {
   static const double h14 = 14.01;
   static const double h16 = 16.0;
   static const double h19 = 19.263;
+  static const double h17 = 17.4;
   static const double h18 = 18.0;
   static const double h20 = 20.0;
   static const double h22 = 22.0;

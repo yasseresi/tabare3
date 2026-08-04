@@ -15,6 +15,13 @@ class AppConstants {
   static const double maxWeightKg = 250;
   static const int donationIntervalDaysMale = 90;
   static const int donationIntervalDaysFemale = 120;
+  // Gamification point rules, shown on the donor-card guide.
+  static const int pointsNormalDonation = 8;
+  static const int pointsUrgentDonation = 10;
+  static const int pointsKeptAppointment = 2;
+  static const int pointsCancellation = -5;
+  static const int pointsInactiveThreeMonths = -3;
+
   static const int requestCalendarStartOffsetDays = 1;
   static const int requestCalendarRangeDays = 365;
   static const String requestDateFormat = 'dd MMM yyyy';

@@ -6,7 +6,7 @@ const donorCardSummarySelectColumns = 'total_points,total_donations_count';
 const donorLevelSelectColumns = 'level_number,min_points,name_ar,icon_url';
 const donorBadgeSelectColumns =
     'earned_at,badge:badges!user_badges_badge_id_fkey('
-    'id,name_ar,description_ar,icon_url)';
+    'id,name_ar,description_ar,icon_url,threshold)';
 
 abstract class DonorCardRemoteDataSource {
   Future<DonorCardModel> getDonorCard();

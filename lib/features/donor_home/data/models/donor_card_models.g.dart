@@ -42,6 +42,7 @@ _DonorBadgeModel _$DonorBadgeModelFromJson(Map<String, dynamic> json) =>
       nameAr: json['name_ar'] as String,
       descriptionAr: json['description_ar'] as String?,
       iconUrl: json['icon_url'] as String?,
+      threshold: (json['threshold'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$DonorBadgeModelToJson(_DonorBadgeModel instance) =>
@@ -50,6 +51,7 @@ Map<String, dynamic> _$DonorBadgeModelToJson(_DonorBadgeModel instance) =>
       'name_ar': instance.nameAr,
       'description_ar': instance.descriptionAr,
       'icon_url': instance.iconUrl,
+      'threshold': instance.threshold,
     };
 
 _EarnedDonorBadgeModel _$EarnedDonorBadgeModelFromJson(

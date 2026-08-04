@@ -17,6 +17,10 @@ class ImageAssets {
   static const String hadithIllustration = demo;
   static const String requestAvatar = '$imagePath/request_avatar.png';
 
+  /// Donor-card mascot and the trophy shown on each earned badge.
+  static const String donorMascot = '$imagePath/donor_mascot.png';
+  static const String badgeTrophy = '$imagePath/badge_trophy.png';
+
   /// Illustration on the red hero banner, and the checklist avatar used on
   /// appointment and donation-record cards.
   static const String heroIvBag = '$imagePath/hero_iv_bag.png';
@@ -58,4 +62,5 @@ class SvgAssets {
   static const String navPerson = '$iconPath/nav_person.svg';
   static const String headerBell = '$iconPath/header_bell.svg';
   static const String search = '$iconPath/search.svg';
+  static const String giftCard = '$iconPath/gift_card.svg';
 }

@@ -338,5 +338,6 @@
   "donation_completed": "Donation completed",
   "qr_section": "QR code",
   "scan_qr_code": "Scan QR code",
-  "my_qr_code": "My QR code"
+  "my_qr_code": "My QR code",
+  "level_progress_description": "Every donation brings you closer to a new level and increases your impact in saving lives, because continued giving deserves recognition."
 }

@@ -74,8 +74,20 @@ class ColorManager {
   static Color signupText = const Color(0xff820605);
   static Color welcomeGradientStart = const Color(0x40FDB6B0);
   static Color welcomeGradientEnd = const Color(0x40DFE0FE);
-  static Color donorCardBackground = const Color(0xFF1A1A1A);
-  static Color donorCardAccent = const Color(0xFF7C3AED);
+  // Donor card (dark purple theme)
+  static Color donorCardBackground = const Color(0xFF000000);
+  static Color donorCardGradientStart = const Color(0x3318181B);
+  static Color donorCardGradientEnd = const Color(0x339055ED);
+  static Color donorCardAccent = const Color(0xFF9055ED);
+  static Color donorCardAccentSoft = const Color(0xFF955FEA);
+  static Color donorCardDot = const Color(0xFFC084FC);
+  static Color donorCardSurface = const Color(0xFF2A2A2A);
+  static Color donorCardChipActive = const Color(0xFF413457);
+  static Color donorCardChipLabel = const Color(0xFF4B5563);
+  static Color donorCardChipBorder = const Color(0xFFE8EFF3);
+  static Color donorCardTrack = const Color(0xFFC7C7C7);
+  static Color donorCardLevelDot = const Color(0xFF9866E8);
+  static Color donorCardShadow = const Color(0xFFDBDBDB);
   static Color dialogScrim = const Color(0xB0232323);
   static Color transparent = Colors.transparent;
 }

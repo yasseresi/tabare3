@@ -45,6 +45,7 @@ abstract class DonorBadgeModel with _$DonorBadgeModel {
     @JsonKey(name: 'name_ar') required String nameAr,
     @JsonKey(name: 'description_ar') String? descriptionAr,
     @JsonKey(name: 'icon_url') String? iconUrl,
+    int? threshold,
   }) = _DonorBadgeModel;
 
   factory DonorBadgeModel.fromJson(Map<String, dynamic> json) =>
@@ -68,6 +69,7 @@ abstract class EarnedDonorBadgeModel with _$EarnedDonorBadgeModel {
     nameAr: badge.nameAr,
     descriptionAr: badge.descriptionAr,
     iconUrl: badge.iconUrl,
+    threshold: badge.threshold,
     earnedAt: earnedAt,
   );
 }

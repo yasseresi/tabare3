@@ -23,6 +23,7 @@ class AppPadding {
   static const double p8 = 8.0;
   static const double p9_3 = 9.3;
   static const double p10 = 10.0;
+  static const double p11_6 = 11.6;
   static const double p12 = 12.0;
   static const double p14 = 14.0;
   static const double p15 = 15.0;
@@ -103,11 +104,16 @@ class AppSize {
   static const double s120 = 120.0;
   static const double s130 = 130.0;
   static const double s140 = 140.0;
+  static const double s150 = 150.0;
   static const double s160 = 160.0;
+  static const double s164 = 164.0;
   static const double s169 = 169.0;
   static const double s170 = 170.0;
   static const double s174 = 174.0;
+  static const double s181 = 181.0;
   static const double s190 = 190.0;
+  static const double s200 = 200.0;
+  static const double s209 = 209.0;
   static const double s220 = 220.0;
   static const double s250 = 250.0;
   static const double s260 = 260.0;
@@ -115,25 +121,25 @@ class AppSize {
   static const double s330 = 330.0;
   static const double s338 = 338.0;
   static const double s382 = 382.0;
-  static const double s200 = 200.0;
-  static const double s209 = 209.0;
   static const double s402 = 402.0;
 
   // Elevation (Figma card shadows)
   static const double blurCard = 26.268;
   static const double blurRequestCard = 13.134;
+  static const double blurDonorCard = 81.35;
   static const double offsetCard = 7.005;
 
   // Border radius
   static const double radiusProgress = 6.0;
-  static const double radiusPillButton = 14.644;
-  static const double radiusRequestCard = 28.02;
   static const double radiusSmall = 8.0;
   static const double radiusMedium = 12.0;
   static const double radiusLarge = 15.0;
   static const double radiusXLarge = 20.0;
   static const double radiusButton = 23.0;
   static const double radiusDialogAction = 17.4;
+  static const double radiusPillButton = 14.644;
+  static const double radiusRequestCard = 28.02;
+  static const double radiusDonorCard = 32.0;
   static const double radiusXXLarge = 30.0;
   static const double radiusCircle = 9999.0;
 }

@@ -357,6 +357,7 @@ class AppStrings {
   static const String pointsCount = 'points_count';
   static const String donorCardMotivation = 'donor_card_motivation';
   static const String pointsForNextLevel = 'points_for_next_level';
+  static const String levelProgressDescription = 'level_progress_description';
   static const String earnedBadges = 'earned_badges';
   static const String whatIsDonorCard = 'what_is_donor_card';
   static const String donorCardExplanation = 'donor_card_explanation';

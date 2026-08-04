@@ -22,6 +22,9 @@ class DonorBadgeEntity extends Equatable {
   final String nameAr;
   final String? descriptionAr;
   final String? iconUrl;
+
+  /// Points threshold that unlocks the badge, shown as a chip on the card.
+  final int? threshold;
   final DateTime earnedAt;
 
   const DonorBadgeEntity({
@@ -29,11 +32,19 @@ class DonorBadgeEntity extends Equatable {
     required this.nameAr,
     this.descriptionAr,
     this.iconUrl,
+    this.threshold,
     required this.earnedAt,
   });
 
   @override
-  List<Object?> get props => [id, nameAr, descriptionAr, iconUrl, earnedAt];
+  List<Object?> get props => [
+    id,
+    nameAr,
+    descriptionAr,
+    iconUrl,
+    threshold,
+    earnedAt,
+  ];
 }
 
 class DonorCardEntity extends Equatable {

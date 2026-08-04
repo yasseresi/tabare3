@@ -553,7 +553,7 @@ as String?,
 /// @nodoc
 mixin _$DonorBadgeModel {
 
- String get id;@JsonKey(name: 'name_ar') String get nameAr;@JsonKey(name: 'description_ar') String? get descriptionAr;@JsonKey(name: 'icon_url') String? get iconUrl;
+ String get id;@JsonKey(name: 'name_ar') String get nameAr;@JsonKey(name: 'description_ar') String? get descriptionAr;@JsonKey(name: 'icon_url') String? get iconUrl; int? get threshold;
 /// Create a copy of DonorBadgeModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -566,16 +566,16 @@ $DonorBadgeModelCopyWith<DonorBadgeModel> get copyWith => _$DonorBadgeModelCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DonorBadgeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.nameAr, nameAr) || other.nameAr == nameAr)&&(identical(other.descriptionAr, descriptionAr) || other.descriptionAr == descriptionAr)&&(identical(other.iconUrl, iconUrl) || other.iconUrl == iconUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DonorBadgeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.nameAr, nameAr) || other.nameAr == nameAr)&&(identical(other.descriptionAr, descriptionAr) || other.descriptionAr == descriptionAr)&&(identical(other.iconUrl, iconUrl) || other.iconUrl == iconUrl)&&(identical(other.threshold, threshold) || other.threshold == threshold));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,nameAr,descriptionAr,iconUrl);
+int get hashCode => Object.hash(runtimeType,id,nameAr,descriptionAr,iconUrl,threshold);
 
 @override
 String toString() {
-  return 'DonorBadgeModel(id: $id, nameAr: $nameAr, descriptionAr: $descriptionAr, iconUrl: $iconUrl)';
+  return 'DonorBadgeModel(id: $id, nameAr: $nameAr, descriptionAr: $descriptionAr, iconUrl: $iconUrl, threshold: $threshold)';
 }
 
 
@@ -586,7 +586,7 @@ abstract mixin class $DonorBadgeModelCopyWith<$Res>  {
   factory $DonorBadgeModelCopyWith(DonorBadgeModel value, $Res Function(DonorBadgeModel) _then) = _$DonorBadgeModelCopyWithImpl;
 @useResult
 $Res call({
- String id,@JsonKey(name: 'name_ar') String nameAr,@JsonKey(name: 'description_ar') String? descriptionAr,@JsonKey(name: 'icon_url') String? iconUrl
+ String id,@JsonKey(name: 'name_ar') String nameAr,@JsonKey(name: 'description_ar') String? descriptionAr,@JsonKey(name: 'icon_url') String? iconUrl, int? threshold
 });
 
 
@@ -603,13 +603,14 @@ class _$DonorBadgeModelCopyWithImpl<$Res>
 
 /// Create a copy of DonorBadgeModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? nameAr = null,Object? descriptionAr = freezed,Object? iconUrl = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? nameAr = null,Object? descriptionAr = freezed,Object? iconUrl = freezed,Object? threshold = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,nameAr: null == nameAr ? _self.nameAr : nameAr // ignore: cast_nullable_to_non_nullable
 as String,descriptionAr: freezed == descriptionAr ? _self.descriptionAr : descriptionAr // ignore: cast_nullable_to_non_nullable
 as String?,iconUrl: freezed == iconUrl ? _self.iconUrl : iconUrl // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,threshold: freezed == threshold ? _self.threshold : threshold // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -694,10 +695,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'name_ar')  String nameAr, @JsonKey(name: 'description_ar')  String? descriptionAr, @JsonKey(name: 'icon_url')  String? iconUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'name_ar')  String nameAr, @JsonKey(name: 'description_ar')  String? descriptionAr, @JsonKey(name: 'icon_url')  String? iconUrl,  int? threshold)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DonorBadgeModel() when $default != null:
-return $default(_that.id,_that.nameAr,_that.descriptionAr,_that.iconUrl);case _:
+return $default(_that.id,_that.nameAr,_that.descriptionAr,_that.iconUrl,_that.threshold);case _:
   return orElse();
 
 }
@@ -715,10 +716,10 @@ return $default(_that.id,_that.nameAr,_that.descriptionAr,_that.iconUrl);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'name_ar')  String nameAr, @JsonKey(name: 'description_ar')  String? descriptionAr, @JsonKey(name: 'icon_url')  String? iconUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'name_ar')  String nameAr, @JsonKey(name: 'description_ar')  String? descriptionAr, @JsonKey(name: 'icon_url')  String? iconUrl,  int? threshold)  $default,) {final _that = this;
 switch (_that) {
 case _DonorBadgeModel():
-return $default(_that.id,_that.nameAr,_that.descriptionAr,_that.iconUrl);case _:
+return $default(_that.id,_that.nameAr,_that.descriptionAr,_that.iconUrl,_that.threshold);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -735,10 +736,10 @@ return $default(_that.id,_that.nameAr,_that.descriptionAr,_that.iconUrl);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'name_ar')  String nameAr, @JsonKey(name: 'description_ar')  String? descriptionAr, @JsonKey(name: 'icon_url')  String? iconUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'name_ar')  String nameAr, @JsonKey(name: 'description_ar')  String? descriptionAr, @JsonKey(name: 'icon_url')  String? iconUrl,  int? threshold)?  $default,) {final _that = this;
 switch (_that) {
 case _DonorBadgeModel() when $default != null:
-return $default(_that.id,_that.nameAr,_that.descriptionAr,_that.iconUrl);case _:
+return $default(_that.id,_that.nameAr,_that.descriptionAr,_that.iconUrl,_that.threshold);case _:
   return null;
 
 }
@@ -750,13 +751,14 @@ return $default(_that.id,_that.nameAr,_that.descriptionAr,_that.iconUrl);case _:
 @JsonSerializable()
 
 class _DonorBadgeModel implements DonorBadgeModel {
-  const _DonorBadgeModel({required this.id, @JsonKey(name: 'name_ar') required this.nameAr, @JsonKey(name: 'description_ar') this.descriptionAr, @JsonKey(name: 'icon_url') this.iconUrl});
+  const _DonorBadgeModel({required this.id, @JsonKey(name: 'name_ar') required this.nameAr, @JsonKey(name: 'description_ar') this.descriptionAr, @JsonKey(name: 'icon_url') this.iconUrl, this.threshold});
   factory _DonorBadgeModel.fromJson(Map<String, dynamic> json) => _$DonorBadgeModelFromJson(json);
 
 @override final  String id;
 @override@JsonKey(name: 'name_ar') final  String nameAr;
 @override@JsonKey(name: 'description_ar') final  String? descriptionAr;
 @override@JsonKey(name: 'icon_url') final  String? iconUrl;
+@override final  int? threshold;
 
 /// Create a copy of DonorBadgeModel
 /// with the given fields replaced by the non-null parameter values.
@@ -771,16 +773,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DonorBadgeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.nameAr, nameAr) || other.nameAr == nameAr)&&(identical(other.descriptionAr, descriptionAr) || other.descriptionAr == descriptionAr)&&(identical(other.iconUrl, iconUrl) || other.iconUrl == iconUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DonorBadgeModel&&(identical(other.id, id) || other.id == id)&&(identical(other.nameAr, nameAr) || other.nameAr == nameAr)&&(identical(other.descriptionAr, descriptionAr) || other.descriptionAr == descriptionAr)&&(identical(other.iconUrl, iconUrl) || other.iconUrl == iconUrl)&&(identical(other.threshold, threshold) || other.threshold == threshold));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,nameAr,descriptionAr,iconUrl);
+int get hashCode => Object.hash(runtimeType,id,nameAr,descriptionAr,iconUrl,threshold);
 
 @override
 String toString() {
-  return 'DonorBadgeModel(id: $id, nameAr: $nameAr, descriptionAr: $descriptionAr, iconUrl: $iconUrl)';
+  return 'DonorBadgeModel(id: $id, nameAr: $nameAr, descriptionAr: $descriptionAr, iconUrl: $iconUrl, threshold: $threshold)';
 }
 
 
@@ -791,7 +793,7 @@ abstract mixin class _$DonorBadgeModelCopyWith<$Res> implements $DonorBadgeModel
   factory _$DonorBadgeModelCopyWith(_DonorBadgeModel value, $Res Function(_DonorBadgeModel) _then) = __$DonorBadgeModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id,@JsonKey(name: 'name_ar') String nameAr,@JsonKey(name: 'description_ar') String? descriptionAr,@JsonKey(name: 'icon_url') String? iconUrl
+ String id,@JsonKey(name: 'name_ar') String nameAr,@JsonKey(name: 'description_ar') String? descriptionAr,@JsonKey(name: 'icon_url') String? iconUrl, int? threshold
 });
 
 
@@ -808,13 +810,14 @@ class __$DonorBadgeModelCopyWithImpl<$Res>
 
 /// Create a copy of DonorBadgeModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? nameAr = null,Object? descriptionAr = freezed,Object? iconUrl = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? nameAr = null,Object? descriptionAr = freezed,Object? iconUrl = freezed,Object? threshold = freezed,}) {
   return _then(_DonorBadgeModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,nameAr: null == nameAr ? _self.nameAr : nameAr // ignore: cast_nullable_to_non_nullable
 as String,descriptionAr: freezed == descriptionAr ? _self.descriptionAr : descriptionAr // ignore: cast_nullable_to_non_nullable
 as String?,iconUrl: freezed == iconUrl ? _self.iconUrl : iconUrl // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,threshold: freezed == threshold ? _self.threshold : threshold // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

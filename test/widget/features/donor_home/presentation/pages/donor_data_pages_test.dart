@@ -423,7 +423,14 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(
+      find.text('مستوى الدليل'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+
     expect(find.text('مستوى الدليل'), findsOneWidget);
-    expect(find.text('0'), findsOneWidget);
+    // The top level has no upper bound, so its range renders open-ended.
+    expect(find.text('+0'), findsOneWidget);
   });
 }
