@@ -1,7 +1,8 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/presentation/widgets/app_gradient_background.dart';
+import '../../../../core/presentation/widgets/app_header.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
@@ -11,6 +12,8 @@ import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../widgets/profile_widgets.dart';
 
+/// Figma `معلومات التطبيق` (node 135:547): logo + version, a pill title badge,
+/// the about paragraphs card and the developer-contact card.
 class AboutAppScreen extends StatelessWidget {
   final VoidCallback? onBack;
 
@@ -22,45 +25,43 @@ class AboutAppScreen extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: ColorManager.transparent,
-        body: Container(
-          decoration: BoxDecoration(
-            color: ColorManager.white,
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [
-                ColorManager.welcomeGradientStart,
-                ColorManager.welcomeGradientEnd,
-              ],
-            ),
-          ),
-          child: SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: AppSize.s402),
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppPadding.p10,
-                    vertical: AppPadding.p32,
+        body: AppGradientBackground(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: AppSize.s402),
+              child: ListView(
+                padding: const EdgeInsets.only(bottom: AppPadding.p100),
+                children: [
+                  if (onBack == null)
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: BackButton(color: ColorManager.textPrimary),
+                    ),
+                  AppHeader(
+                    title: AppStrings.welcomeUser.tr(),
+                    subtitle: AppStrings.donationLifeChance.tr(),
                   ),
-                  children: [
-                    if (onBack == null)
-                      Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: BackButton(color: ColorManager.textPrimary),
-                      ),
-                    const _AboutHeader(),
-                    const SizedBox(height: AppSize.s20),
-                    _buildLogoSection(),
-                    const SizedBox(height: AppSize.s20),
-                    Center(child: _buildTitleBadge()),
-                    const SizedBox(height: AppSize.s12),
-                    _buildDescriptionCard(),
-                    const SizedBox(height: AppSize.s12),
-                    _buildDeveloperSection(),
-                    const SizedBox(height: AppSize.s100),
-                  ],
-                ),
+                  // Figma floats the header and starts the content at y=150;
+                  // the inline header measures 128.
+                  const SizedBox(height: AppSize.s22),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppPadding.p10,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildLogoSection(),
+                        const SizedBox(height: AppSize.s20),
+                        Center(child: _buildTitleBadge()),
+                        const SizedBox(height: AppSize.s12),
+                        _buildDescriptionCard(),
+                        const SizedBox(height: AppSize.s12),
+                        _buildDeveloperSection(),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -76,13 +77,13 @@ class AboutAppScreen extends StatelessWidget {
           ImageAssets.logo,
           width: AppSize.s76,
           height: AppSize.s76,
+          fit: BoxFit.cover,
           errorBuilder: (_, __, ___) => Icon(
             Icons.water_drop,
             size: AppSize.s76,
             color: ColorManager.primaryDark,
           ),
         ),
-        const SizedBox(height: AppSize.s4),
         Text(
           AppStrings.versionNumber.tr(
             namedArgs: {'version': AppConstants.appVersion},
@@ -90,6 +91,7 @@ class AboutAppScreen extends StatelessWidget {
           style: getRegularStyle(
             fontSize: FontSize.s14,
             color: ColorManager.textSecondary,
+            lineHeight: LineHeight.h20,
           ),
         ),
       ],
@@ -105,13 +107,14 @@ class AboutAppScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: ColorManager.white,
         borderRadius: BorderRadius.circular(AppSize.radiusCircle),
-        border: Border.all(color: ColorManager.borderGrey),
+        border: Border.all(color: ColorManager.donorCardChipBorder),
       ),
       child: Text(
         AppStrings.appInfo.tr(),
         style: getSemiBoldStyle(
           fontSize: FontSize.s14,
-          color: ColorManager.textPrimary,
+          color: ColorManager.black,
+          lineHeight: LineHeight.h20,
         ),
       ),
     );
@@ -125,25 +128,23 @@ class AboutAppScreen extends StatelessWidget {
     ];
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppPadding.p30,
-        vertical: AppPadding.p30,
-      ),
+      padding: const EdgeInsets.all(AppPadding.p30),
       decoration: BoxDecoration(
         color: ColorManager.white,
-        borderRadius: BorderRadius.circular(AppSize.s46),
+        borderRadius: BorderRadius.circular(AppSize.radiusAboutCard),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           for (var i = 0; i < paragraphs.length; i++) ...[
-            if (i > 0) const SizedBox(height: AppSize.s10),
+            if (i > 0) const SizedBox(height: AppSize.s15),
             Text(
               paragraphs[i],
               textAlign: TextAlign.center,
               style: getSemiBoldStyle(
                 fontSize: FontSize.s14,
-                color: ColorManager.textPrimary,
+                color: ColorManager.black,
+                lineHeight: LineHeight.h20,
               ),
             ),
           ],
@@ -153,93 +154,24 @@ class AboutAppScreen extends StatelessWidget {
   }
 
   Widget _buildDeveloperSection() {
-    return Container(
-      decoration: BoxDecoration(
-        color: ColorManager.white,
-        borderRadius: BorderRadius.circular(AppSize.s24),
-        boxShadow: [
-          BoxShadow(
-            color: ColorManager.black.withValues(alpha: AppOpacity.subtle),
-            blurRadius: AppSize.s20,
-            offset: const Offset(0, AppSize.s4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          ProfileRow(
-            label: AppStrings.developerContact.tr(),
-            value: AppStrings.developerContactDescription.tr(),
-            iconData: Icons.code,
-          ),
-          Divider(
-            height: AppSize.s1,
-            color: ColorManager.dividerGrey,
-            indent: AppPadding.p20,
-            endIndent: AppPadding.p20,
-          ),
-          ProfileRow(
-            label: AppStrings.phoneNumberLabel.tr(),
-            value: AppConstants.developerPhone,
-            iconData: Icons.phone_outlined,
-          ),
-          Divider(
-            height: AppSize.s1,
-            color: ColorManager.dividerGrey,
-            indent: AppPadding.p20,
-            endIndent: AppPadding.p20,
-          ),
-          ProfileRow(
-            label: AppStrings.email.tr(),
-            value: AppConstants.developerEmail,
-            iconData: Icons.email_outlined,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AboutHeader extends StatelessWidget {
-  const _AboutHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
+    return ProfileSection(
       children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppStrings.welcomeUser.tr(),
-                style: const TextStyle(
-                  fontSize: AppSize.s18,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              Text(
-                AppStrings.donationLifeChance.tr(),
-                style: TextStyle(
-                  color: ColorManager.textMuted,
-                  fontSize: AppSize.s14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
+        ProfileRow(
+          label: AppStrings.developerContact.tr(),
+          value: AppStrings.developerContactDescription.tr(),
+          icon: SvgAssets.profileDeveloper,
+          stackValue: true,
+          centerStackedValue: true,
         ),
-        Container(
-          padding: const EdgeInsets.all(AppPadding.p8),
-          decoration: BoxDecoration(
-            color: ColorManager.surfaceAlt,
-            borderRadius: BorderRadius.circular(AppSize.radiusCircle),
-          ),
-          child: const Icon(
-            Icons.notifications_none_rounded,
-            size: AppSize.s24,
-          ),
+        ProfileRow(
+          label: AppStrings.phoneNumberLabel.tr(),
+          value: AppConstants.developerPhone,
+          icon: SvgAssets.profilePhone,
+        ),
+        ProfileRow(
+          label: AppStrings.email.tr(),
+          value: AppConstants.developerEmail,
+          icon: SvgAssets.profileEmail,
         ),
       ],
     );

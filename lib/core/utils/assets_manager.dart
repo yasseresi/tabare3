@@ -68,4 +68,33 @@ class SvgAssets {
   static const String search = '$iconPath/search.svg';
   static const String giftCard = '$iconPath/gift_card.svg';
   static const String qrScanFrame = '$iconPath/qr_scan_frame.svg';
+
+  // Profile rows (exported from Figma `Button - Mode`)
+  static const String profilePhone = '$iconPath/profile_phone.svg';
+  static const String profileAccountType =
+      '$iconPath/profile_account_type.svg';
+  static const String profileAccountStatus =
+      '$iconPath/profile_account_status.svg';
+  static const String profileBirthDate = '$iconPath/profile_birth_date.svg';
+  static const String profileGender = '$iconPath/profile_gender.svg';
+  static const String profileNationalId = '$iconPath/profile_national_id.svg';
+  static const String profileBloodType = '$iconPath/profile_blood_type.svg';
+  static const String profileWeight = '$iconPath/profile_weight.svg';
+  static const String profileWilaya = '$iconPath/profile_wilaya.svg';
+  static const String profileDiseases = '$iconPath/profile_diseases.svg';
+  static const String profileQr = '$iconPath/profile_qr.svg';
+  static const String profileInfo = '$iconPath/profile_info.svg';
+  static const String profileLogout = '$iconPath/profile_logout.svg';
+  static const String profileEdit = '$iconPath/profile_edit.svg';
+  static const String profileDeveloper = '$iconPath/profile_developer.svg';
+  static const String profileEmail = '$iconPath/profile_email.svg';
+
+  // Request form fields (exported from Figma `Form Fields`)
+  static const String requestBags = '$iconPath/request_bags.svg';
+  static const String requestHospital = '$iconPath/request_hospital.svg';
+  static const String requestNote = '$iconPath/request_note.svg';
+
+  /// 16x16 chevron drawn pointing right; rows rotate it 180° for the trailing
+  /// disclosure and 90° for the account-type dropdown.
+  static const String rowChevron = '$iconPath/row_chevron.svg';
 }

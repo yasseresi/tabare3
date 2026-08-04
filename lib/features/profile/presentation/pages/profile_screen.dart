@@ -3,15 +3,18 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart' as intl;
 
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/widget_keys.dart';
 import '../../../../core/presentation/widgets/app_gradient_background.dart';
 import '../../../../core/presentation/widgets/app_header.dart';
 import '../../../../core/presentation/widgets/logout_dialog.dart';
 import '../../../../core/utils/constants_manager.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/route_manager.dart';
@@ -111,17 +114,31 @@ class _ProfileContent extends StatelessWidget {
       child: Column(
         children: [
           _buildHeader(context),
-          _buildAvatarSection(context),
-          const SizedBox(height: AppSize.s24),
-          _buildAccountSection(context),
-          const SizedBox(height: AppSize.s20),
-          _buildPersonalSection(context),
-          if (onQrCode != null) ...[
-            const SizedBox(height: AppSize.s20),
-            _buildQrSection(context),
-          ],
-          const SizedBox(height: AppSize.s20),
-          _buildAppSection(context),
+          // Figma floats the header over the page and starts the content at
+          // y=150; the inline header measures 128.
+          const SizedBox(height: AppSize.s22),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppPadding.p10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildAvatarSection(context),
+                const SizedBox(height: AppSize.s12),
+                _buildAccountSection(context),
+                const SizedBox(height: AppSize.s12),
+                _buildPersonalSection(context),
+                // Edit mode drops the read-only QR and app-info groups.
+                if (!isEditing) ...[
+                  if (onQrCode != null) ...[
+                    const SizedBox(height: AppSize.s12),
+                    _buildQrSection(context),
+                  ],
+                  const SizedBox(height: AppSize.s12),
+                  _buildAppSection(context),
+                ],
+              ],
+            ),
+          ),
           const SizedBox(height: AppSize.s40),
         ],
       ),
@@ -154,17 +171,18 @@ class _ProfileContent extends StatelessWidget {
           style: getSemiBoldStyle(
             fontSize: FontSize.s20,
             color: ColorManager.textPrimary,
+            lineHeight: LineHeight.h28,
           ),
         ),
-        const SizedBox(height: AppSize.s4),
         Text(
           profile.username,
           style: getRegularStyle(
             fontSize: FontSize.s14,
             color: ColorManager.lightGrey,
+            lineHeight: LineHeight.h20,
           ),
         ),
-        const SizedBox(height: AppSize.s16),
+        const SizedBox(height: AppSize.s5),
         _buildActionButtons(context),
       ],
     );
@@ -172,39 +190,38 @@ class _ProfileContent extends StatelessWidget {
 
   Widget _buildActionButtons(BuildContext context) {
     if (isEditing) {
-      return _PillButton(
+      return _ProfileChip(
         label: AppStrings.saveChanges.tr(),
-        icon: Icons.check,
+        icon: SvgAssets.profileEdit,
+        iconSize: AppSize.s15,
         onTap: () => context.read<ProfileBloc>().add(SaveProfile(profile)),
       );
     }
 
-    if (profile.isDonor) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          _PillButton(
-            label: AppStrings.donorCard.tr(),
-            icon: Icons.card_giftcard,
-            onTap:
-                onDonorCard ??
-                () => Navigator.pushNamed(context, Routes.donorCardRoute),
-          ),
-          const SizedBox(width: AppSize.s12),
-          _PillButton(
-            label: AppStrings.edit.tr(),
-            icon: Icons.edit_outlined,
-            onTap: () =>
-                context.read<ProfileBloc>().add(const ToggleEditMode()),
-          ),
-        ],
-      );
-    }
-
-    return _PillButton(
+    final editChip = _ProfileChip(
       label: AppStrings.edit.tr(),
-      icon: Icons.edit_outlined,
+      icon: SvgAssets.profileEdit,
       onTap: () => context.read<ProfileBloc>().add(const ToggleEditMode()),
+    );
+
+    if (!profile.isDonor) return editChip;
+
+    // Figma renders `تعديل` on the reading side and `بطاقة المتبرع` after it.
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        editChip,
+        const SizedBox(width: AppSize.s12),
+        _ProfileChip(
+          label: AppStrings.donorCard.tr(),
+          icon: SvgAssets.giftCard,
+          iconWidth: AppSize.s16_67,
+          iconHeight: AppSize.s12_5,
+          onTap:
+              onDonorCard ??
+              () => Navigator.pushNamed(context, Routes.donorCardRoute),
+        ),
+      ],
     );
   }
 
@@ -215,7 +232,7 @@ class _ProfileContent extends StatelessWidget {
         ProfileRow(
           label: AppStrings.phoneNumberLabel.tr(),
           value: profile.phone,
-          iconData: Icons.phone_outlined,
+          icon: SvgAssets.profilePhone,
           onTap: _editTap(
             context,
             AppStrings.phoneNumberLabel.tr(),
@@ -223,20 +240,15 @@ class _ProfileContent extends StatelessWidget {
             (v) => _updateProfile(context, phone: v),
           ),
         ),
-        _Divider(),
         ProfileRow(
           label: AppStrings.accountType.tr(),
           value: _roleLabel(profile),
-          iconData: Icons.bloodtype_outlined,
+          icon: SvgAssets.profileAccountType,
           trailing: isEditing
-              ? Icon(
-                  Icons.keyboard_arrow_down,
-                  color: ColorManager.textSecondary,
-                )
+              ? const ProfileRowChevron(pointsDown: true)
               : null,
           onTap: isEditing ? () => _showRoleBottomSheet(context) : null,
         ),
-        _Divider(),
         AccountStatusToggle(
           value: profile.isActive,
           onChanged: (v) =>
@@ -250,40 +262,38 @@ class _ProfileContent extends StatelessWidget {
     return ProfileSection(
       title: AppStrings.personalInfo.tr(),
       children: [
-        if (showRecipientIdentityDetails) ...[
+        // Identity fields are read-only, so edit mode drops them entirely.
+        if (showRecipientIdentityDetails && !isEditing) ...[
           ProfileRow(
             label: AppStrings.dateOfBirth.tr(),
             value: _formattedBirthDate(context),
-            iconData: Icons.calendar_month_rounded,
+            icon: SvgAssets.profileBirthDate,
           ),
-          _Divider(),
           ProfileRow(
             label: AppStrings.gender.tr(),
             value: profile.gender == AppConstants.genderFemale
                 ? AppStrings.female.tr()
                 : AppStrings.male.tr(),
-            iconData: Icons.person_rounded,
+            icon: SvgAssets.profileGender,
           ),
-          _Divider(),
           ProfileRow(
             label: AppStrings.nationalId.tr(),
             value: profile.nationalId ?? AppStrings.notAvailable.tr(),
-            iconData: Icons.badge_rounded,
+            icon: SvgAssets.profileNationalId,
+            stackValue: true,
           ),
-          _Divider(),
           ProfileRow(
             label: AppStrings.bloodType.tr(),
             value: profile.bloodType,
-            iconData: Icons.bloodtype_rounded,
+            icon: SvgAssets.profileBloodType,
           ),
-          _Divider(),
         ],
         ProfileRow(
           label: AppStrings.weight.tr(),
           value: profile.weight != null
               ? '${profile.weight} ${AppStrings.kg.tr()}'
               : '',
-          iconData: Icons.monitor_weight_outlined,
+          icon: SvgAssets.profileWeight,
           onTap: isEditing
               ? () => ProfileFieldEditors.pickWeight(
                   context,
@@ -292,11 +302,10 @@ class _ProfileContent extends StatelessWidget {
                 )
               : null,
         ),
-        _Divider(),
         ProfileRow(
           label: AppStrings.governorate.tr(),
           value: profile.city,
-          iconData: Icons.location_on_outlined,
+          icon: SvgAssets.profileWilaya,
           onTap: isEditing
               ? () => ProfileFieldEditors.pickWilaya(
                   context,
@@ -305,11 +314,11 @@ class _ProfileContent extends StatelessWidget {
                 )
               : null,
         ),
-        _Divider(),
         ProfileRow(
           label: AppStrings.chronicDiseases.tr(),
           value: profile.chronicDiseases ?? AppStrings.notAvailable.tr(),
-          iconData: Icons.healing_outlined,
+          icon: SvgAssets.profileDiseases,
+          height: AppSize.s105,
           onTap: _editTap(
             context,
             AppStrings.chronicDiseases.tr(),
@@ -335,42 +344,33 @@ class _ProfileContent extends StatelessWidget {
           key: WidgetKeys.profileQrRow,
           label: profile.isDonor
               ? AppStrings.scanQrCode.tr()
-              : AppStrings.myQrCode.tr(),
+              : AppStrings.qrSection.tr(),
           value: '',
-          iconData: Icons.qr_code_scanner_rounded,
-          trailing: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            size: AppSize.s16,
-            color: ColorManager.textSecondary,
-          ),
+          icon: SvgAssets.profileQr,
+          trailing: const ProfileRowChevron(),
           onTap: onQrCode,
         ),
       ],
     );
   }
 
+  /// Figma renders the app-info group as a bare card with no section title.
   Widget _buildAppSection(BuildContext context) {
     return ProfileSection(
-      title: AppStrings.appInfo.tr(),
       children: [
         ProfileRow(
-          label: AppStrings.aboutApp.tr(),
+          label: AppStrings.appInfo.tr(),
           value: '',
-          iconData: Icons.info_outline,
-          trailing: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            size: AppSize.s16,
-            color: ColorManager.textSecondary,
-          ),
+          icon: SvgAssets.profileInfo,
+          trailing: const ProfileRowChevron(),
           onTap:
               onAbout ??
               () => Navigator.pushNamed(context, Routes.aboutAppRoute),
         ),
-        _Divider(),
         ProfileRow(
           label: AppStrings.logout.tr(),
           value: '',
-          iconData: Icons.logout,
+          icon: SvgAssets.profileLogout,
           onTap: () => _showLogoutDialog(context),
         ),
       ],
@@ -568,52 +568,31 @@ class _AvatarPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => _pickImage(context),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: AppSize.s96,
-            height: AppSize.s96,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: ColorManager.surface,
-              border: Border.all(color: ColorManager.white, width: AppSize.s4),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: AppSize.s2,
-                  offset: const Offset(0, AppSize.s1),
+      child: Container(
+        width: AppSize.s96,
+        height: AppSize.s96,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: ColorManager.surface,
+          border: Border.all(color: ColorManager.white, width: AppSize.s4),
+          boxShadow: [
+            BoxShadow(
+              color: ColorManager.black.withValues(alpha: AppOpacity.subtle),
+              blurRadius: AppSize.s2,
+              offset: const Offset(AppSize.s0, AppSize.s1),
+            ),
+          ],
+        ),
+        child: profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
+            ? ClipOval(
+                child: Image.network(
+                  profile.avatarUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) =>
+                      _FallbackAvatar(profile.fullName),
                 ),
-              ],
-            ),
-            child: profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
-                ? ClipOval(
-                    child: Image.network(
-                      profile.avatarUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          _FallbackAvatar(profile.fullName),
-                    ),
-                  )
-                : _FallbackAvatar(profile.fullName),
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.all(AppPadding.p6),
-              decoration: BoxDecoration(
-                color: ColorManager.primaryDark,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.camera_alt,
-                color: Colors.white,
-                size: AppSize.s18,
-              ),
-            ),
-          ),
-        ],
+              )
+            : _FallbackAvatar(profile.fullName),
       ),
     );
   }
@@ -657,15 +636,23 @@ class _FallbackAvatar extends StatelessWidget {
   }
 }
 
-class _PillButton extends StatelessWidget {
+/// Figma `Address Row > Button`: white pill with an `#E8EFF3` hairline, 17/7
+/// padding and the glyph trailing the label.
+class _ProfileChip extends StatelessWidget {
   final String label;
-  final IconData icon;
+  final String icon;
+  final double? iconSize;
+  final double? iconWidth;
+  final double? iconHeight;
   final VoidCallback onTap;
 
-  const _PillButton({
+  const _ProfileChip({
     required this.label,
     required this.icon,
     required this.onTap,
+    this.iconSize,
+    this.iconWidth,
+    this.iconHeight,
   });
 
   @override
@@ -680,7 +667,7 @@ class _PillButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: ColorManager.white,
           borderRadius: BorderRadius.circular(AppSize.radiusCircle),
-          border: Border.all(color: ColorManager.borderGrey),
+          border: Border.all(color: ColorManager.donorCardChipBorder),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -689,28 +676,25 @@ class _PillButton extends StatelessWidget {
               label,
               style: getSemiBoldStyle(
                 fontSize: FontSize.s14,
-                color: ColorManager.textPrimary,
+                color: ColorManager.black,
+                lineHeight: LineHeight.h20,
               ),
             ),
             const SizedBox(width: AppSize.s8),
-            Icon(icon, size: AppSize.s15, color: ColorManager.textPrimary),
+            SizedBox(
+              width: AppSize.s20,
+              height: AppSize.s20,
+              child: Center(
+                child: SvgPicture.asset(
+                  icon,
+                  width: iconWidth ?? iconSize ?? AppSize.s20,
+                  height: iconHeight ?? iconSize ?? AppSize.s20,
+                ),
+              ),
+            ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _Divider extends StatelessWidget {
-  const _Divider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Divider(
-      height: AppSize.s1,
-      color: ColorManager.dividerGrey,
-      indent: AppPadding.p20,
-      endIndent: AppPadding.p20,
     );
   }
 }

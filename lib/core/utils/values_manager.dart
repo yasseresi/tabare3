@@ -25,6 +25,7 @@ class AppPadding {
   static const double p9_3 = 9.3;
   static const double p9_6 = 9.583;
   static const double p10 = 10.0;
+  static const double p11 = 11.0;
   static const double p11_6 = 11.6;
   static const double p12 = 12.0;
   static const double p14 = 14.0;
@@ -33,6 +34,7 @@ class AppPadding {
   static const double p17 = 17.0;
   static const double p18 = 18.0;
   static const double p20 = 20.0;
+  static const double p21 = 21.0;
   static const double p24 = 24.0;
   static const double p28 = 28.0;
   static const double p30 = 30.0;
@@ -71,13 +73,17 @@ class AppSize {
   static const double s10 = 10.0;
   static const double s11_6 = 11.6;
   static const double s12 = 12.0;
+  static const double s12_5 = 12.503;
   static const double s14 = 14.0;
   static const double s15 = 15.0;
   static const double s16 = 16.0;
+  static const double s16_67 = 16.667;
+  static const double s16_5 = 16.5;
   static const double s17 = 17.0;
   static const double s18 = 18.0;
   static const double s20 = 20.0;
   static const double s21 = 21.0;
+  static const double s22 = 22.0;
   static const double s24 = 24.0;
   static const double s26 = 26.0;
   static const double s28 = 28.0;
@@ -85,8 +91,15 @@ class AppSize {
   static const double s32 = 32.0;
   static const double s34 = 34.0;
   static const double s35 = 35.0;
+
+  /// Signup stepper: circle diameter (`37.407`) and the connector between two
+  /// consecutive circles (`82.3` item pitch minus one circle).
+  static const double s37_4 = 37.407;
+  static const double s44_9 = 44.893;
   static const double s38 = 38.0;
   static const double s40 = 40.0;
+  static const double s41_5 = 41.5;
+  static const double s44 = 44.0;
   static const double s46 = 46.0;
   static const double s46_6 = 46.6;
   static const double s48 = 48.0;
@@ -103,8 +116,12 @@ class AppSize {
   static const double s96 = 96.0;
   static const double s100 = 100.0;
   static const double s104 = 104.0;
+  static const double s105 = 105.0;
   static const double s111 = 111.0;
   static const double s120 = 120.0;
+
+  /// Height of the multiline "chronic diseases" input on signup step 2.
+  static const double s123 = 123.0;
   static const double s130 = 130.0;
   static const double s140 = 140.0;
   static const double s150 = 150.0;
@@ -138,11 +155,15 @@ class AppSize {
   static const double radiusMedium = 12.0;
   static const double radiusLarge = 15.0;
   static const double radiusTabs = 14.375;
+
+  /// Signup inputs and the signup primary button.
+  static const double radiusField = 16.0;
   static const double radiusXLarge = 20.0;
   static const double radiusButton = 23.0;
   static const double radiusDialogAction = 17.4;
   static const double radiusPillButton = 14.644;
   static const double radiusRequestCard = 28.02;
+  static const double radiusAboutCard = 46.619;
   static const double radiusDonorCard = 32.0;
   static const double radiusXXLarge = 30.0;
   static const double radiusCircle = 9999.0;

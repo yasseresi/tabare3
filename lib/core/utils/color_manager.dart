@@ -20,6 +20,7 @@ class ColorManager {
   static Color borderGrey = const Color(0xffE1E3E4);
   static Color dividerGrey = const Color(0xffE5E5E5);
   static Color toggleTrack = const Color(0xffD1D5DB);
+  static Color toggleKnobBorder = const Color(0xffD1DBD3);
   static Color white = const Color(0xffFFFFFF);
 
   // Backgrounds
@@ -62,6 +63,15 @@ class ColorManager {
   static Color progressTrackLight = const Color(0xffEFF9FF);
   static Color progressTrackBorder = const Color(0xffB9B9B9);
   static Color searchBorder = const Color(0xffF9EBE9);
+
+  /// Request form (Figma `Tags Grid` / `FooterButtons`): the selected urgency
+  /// chip fill, the outlined `محو` button border and the filled action button.
+  static Color chipSelected = const Color(0xffFFEAE8);
+  static Color outlineButtonBorder = const Color(0xffE8EFF3);
+  static Color actionPrimary = const Color(0xffB52825);
+
+  /// Unselected donor-list tab label (`rgba(28, 29, 34, 0.5)`).
+  static Color tabInactive = const Color(0x801C1D22);
   static Color dialogSuccess = const Color(0xff4CAF50);
   static Color heroGradientStart = const Color(0xffDE312D);
   static Color heroGradientEnd = const Color(0xff891E1C);
@@ -90,5 +100,8 @@ class ColorManager {
   static Color donorCardLevelDot = const Color(0xFF9866E8);
   static Color donorCardShadow = const Color(0xFFDBDBDB);
   static Color dialogScrim = const Color(0xB0232323);
+
+  /// Numeral inside an unreached step of the signup stepper.
+  static Color stepperInactive = const Color(0xff898989);
   static Color transparent = Colors.transparent;
 }
