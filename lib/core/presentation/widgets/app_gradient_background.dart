@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../../utils/color_manager.dart';
 
-/// The warm pink → lilac wash every screen sits on. Figma paints it as a
-/// 87.18° linear gradient over a solid white base, which maps to a
-/// top-right → bottom-left [LinearGradient] on an opaque white container.
+/// The warm pink → lilac wash every screen sits on.
+///
+/// Figma paints a ~86° gradient of two 25%-opacity colours over a solid white
+/// base, so the white has to be a real layer underneath: [BoxDecoration]
+/// ignores its `color` whenever a `gradient` is set, and the app's
+/// `scaffoldBackgroundColor` is transparent, so a single decorated container
+/// would composite the wash against nothing and render it near full strength.
 class AppGradientBackground extends StatelessWidget {
   final Widget child;
 
@@ -12,19 +16,21 @@ class AppGradientBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: ColorManager.white,
-        gradient: LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [
-            ColorManager.welcomeGradientStart,
-            ColorManager.welcomeGradientEnd,
-          ],
+    return ColoredBox(
+      color: ColorManager.white,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              ColorManager.welcomeGradientStart,
+              ColorManager.welcomeGradientEnd,
+            ],
+          ),
         ),
+        child: child,
       ),
-      child: child,
     );
   }
 }
