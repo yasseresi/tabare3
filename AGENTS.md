@@ -61,7 +61,8 @@ Data → Domain ← Presentation. Domain depends on nothing. Data implements dom
 ```
 lib/features/<feature>/
   data/
-    datasources/     # remote + local data sources
+    datasources/     # abstract remote/local data source contracts (pure Dart)
+      supabase/      # Supabase implementations — the only place with SDK calls
     models/          # JSON DTOs (freezed + json_annotation, generated .g.dart/.freezed.dart)
     repositories/    # repository implementations
   domain/
@@ -73,8 +74,20 @@ lib/features/<feature>/
     bloc/            # BLoC: events, states, bloc (flutter_bloc)
 ```
 - `lib/core/` — shared: error/failures, usecases base, constants, theme, utils.
-- `lib/injection_container.dart` — get_it service locator; register per-feature in `init<Feature>()` functions.
-- `lib/main.dart` — entry point; calls `di.init()` then runs `MyApp`.
+- `lib/core/backend/` — `Backend` + `BackendErrorMapper` contracts (no vendor SDK).
+- `lib/backend/<name>/` — backend implementation; `lib/backend/active_backend.dart` selects it.
+- `lib/injection_container.dart` — get_it service locator; `init(Backend)` registers per-feature
+  graphs in `init<Feature>()` functions and delegates data source binding to the backend.
+- `lib/main.dart` — entry point; calls `activeBackend.initialize()`, `di.init(activeBackend)`, runs `MyApp`.
+
+### Backend boundary (MANDATORY)
+- `supabase_flutter` may be imported **only** under `lib/backend/supabase/` and
+  `lib/features/*/data/datasources/supabase/`. Nowhere else — not in core, DI, repositories,
+  usecases, blocs or widgets.
+- Adding a remote call = add the method to the abstract `*RemoteDataSource` contract, then
+  implement it in the backend-specific data source. Repositories depend on the contract.
+- Migrating backends = new `lib/backend/<name>/` + one impl per data source contract, then
+  change the single line in `active_backend.dart`. `test/support/fake_backend.dart` shows the shape.
 
 ### State management
 - `flutter_bloc` (Cubit/BLoC) with `equatable` states. Emit typed states; no dynamic.
