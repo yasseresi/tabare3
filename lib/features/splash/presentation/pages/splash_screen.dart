@@ -20,7 +20,9 @@ class SplashScreen extends StatelessWidget {
       child: BlocListener<AuthBloc, AuthState>(
         listener: _authListener,
         child: Scaffold(
-          backgroundColor: ColorManager.scaffoldBg,
+          // The splash is the one screen the design paints plain white rather
+          // than the gradient wash.
+          backgroundColor: ColorManager.white,
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

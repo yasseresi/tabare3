@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 
+import '../../../../core/presentation/widgets/app_gradient_background.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
@@ -14,20 +15,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          color: ColorManager.white,
-          gradient: LinearGradient(
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-            colors: [
-              ColorManager.welcomeGradientStart,
-              ColorManager.welcomeGradientEnd,
-            ],
-          ),
-        ),
+      body: AppGradientBackground(
         child: SafeArea(
           child: Directionality(
             textDirection: TextDirection.rtl,
@@ -110,8 +98,8 @@ class WelcomeScreen extends StatelessWidget {
                           width: AppSize.s2,
                         ),
                         padding: const EdgeInsets.symmetric(
-                          horizontal: AppPadding.p50,
-                          vertical: AppPadding.p18,
+                          horizontal: AppPadding.p52,
+                          vertical: AppPadding.p20,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(

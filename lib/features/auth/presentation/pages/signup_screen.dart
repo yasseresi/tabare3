@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/presentation/widgets/app_dialog.dart';
+import '../../../../core/presentation/widgets/app_gradient_background.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
 import '../../../../core/presentation/widgets/loading_overlay.dart';
 import '../../../../core/presentation/widgets/searchable_wilaya_field.dart';
@@ -121,18 +122,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Scaffold(
             body: Directionality(
               textDirection: TextDirection.rtl,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: ColorManager.white,
-                  gradient: LinearGradient(
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                    colors: [
-                      ColorManager.welcomeGradientStart,
-                      ColorManager.welcomeGradientEnd,
-                    ],
-                  ),
-                ),
+              child: AppGradientBackground(
                 child: SafeArea(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
