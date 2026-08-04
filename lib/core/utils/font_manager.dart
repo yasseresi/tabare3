@@ -36,6 +36,7 @@ class LineHeight {
 
 class FontSize {
   static const double s10 = 10.0;
+  static const double s10_5 = 10.507;
   static const double s12 = 12.0;
   static const double s12_3 = 12.277;
   static const double s13 = 13.0;

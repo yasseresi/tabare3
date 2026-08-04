@@ -48,6 +48,9 @@ class AppPadding {
 
   /// Figma card inner padding (`21.891`) and pill button paddings.
   static const double pCard = 21.891;
+
+  /// Inner padding of a notification card (Figma `20.876`).
+  static const double pNotificationCard = 20.876;
   static const double pPillHorizontal = 36.609;
   static const double pPillVertical = 10.983;
 
@@ -167,4 +170,7 @@ class AppSize {
   static const double radiusDonorCard = 32.0;
   static const double radiusXXLarge = 30.0;
   static const double radiusCircle = 9999.0;
+
+  /// Figma letter spacing on notification card copy (`0.1051`).
+  static const double letterSpacingCard = 0.1051;
 }

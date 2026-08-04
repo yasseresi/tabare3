@@ -140,6 +140,11 @@ class AppStrings {
   static const String noNotifications = 'no_notifications';
   static const String searchNotifications = 'search_notifications';
   static const String newNotification = 'new_notification';
+  static const String timeAgoNow = 'time_ago_now';
+  static const String timeAgoMinutes = 'time_ago_minutes';
+  static const String timeAgoHour = 'time_ago_hour';
+  static const String timeAgoHours = 'time_ago_hours';
+  static const String timeAgoDays = 'time_ago_days';
   static const String emergencyAlert = 'emergency_alert';
 
   // Success/Error
@@ -317,12 +322,15 @@ class AppStrings {
   static const String confirmAcceptRequestMsg = 'confirm_accept_request_msg';
   static const String acceptRequestNotice = 'accept_request_notice';
   static const String acceptRequestThanks = 'accept_request_thanks';
+  static const String requestReason = 'request_reason';
+  static const String otherRequestDescription = 'other_request_description';
 
   // Donor history / donors
   static const String donors = 'donors';
   static const String donorsSectionDescription = 'donors_section_description';
   static const String donorsList = 'donors_list';
   static const String completedDonors = 'completed_donors';
+  static const String acceptedTab = 'accepted_tab';
   static const String donationSuccessful = 'donation_successful';
   static const String location = 'location';
 
