@@ -6,12 +6,15 @@ import 'package:tabare3/features/notifications/domain/usecases/mark_notification
 import 'package:tabare3/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:tabare3/injection_container.dart';
 
+import '../support/fake_backend.dart';
+
 void main() {
   tearDown(() async {
     await sl.reset();
   });
 
   test('registers the complete notifications dependency graph', () async {
+    await initCore(const FakeBackend());
     await initNotifications();
 
     expect(sl.isRegistered<NotificationRemoteDataSource>(), isTrue);

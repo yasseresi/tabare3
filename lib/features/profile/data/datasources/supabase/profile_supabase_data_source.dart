@@ -2,13 +2,15 @@ import 'dart:io';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../models/profile_model.dart';
-import 'profile_remote_data_source.dart';
+import '../../models/profile_model.dart';
+import '../profile_remote_data_source.dart';
 
 const profileSelectColumns =
     'id,email,username,full_name,phone,date_of_birth,gender,national_id,'
     'blood_type,weight,city,chronic_diseases,avatar_url,is_donor,is_recipient,'
     'is_active';
+
+const _avatarBucket = 'profile_pic';
 
 Map<String, dynamic> buildProfileUpdatePayload(ProfileModel profile) => {
   'username': profile.username,
@@ -20,10 +22,10 @@ Map<String, dynamic> buildProfileUpdatePayload(ProfileModel profile) => {
   'is_active': profile.isActive,
 };
 
-class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
+class ProfileSupabaseDataSource implements ProfileRemoteDataSource {
   final SupabaseClient client;
 
-  ProfileRemoteDataSourceImpl({required this.client});
+  ProfileSupabaseDataSource({required this.client});
 
   String get _userId => client.auth.currentUser!.id;
 
@@ -77,13 +79,13 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     final path = '$_userId/avatar.$ext';
 
     await client.storage
-        .from('profile_pic')
+        .from(_avatarBucket)
         .uploadBinary(
           path,
           bytes,
           fileOptions: const FileOptions(upsert: true),
         );
 
-    return client.storage.from('profile_pic').getPublicUrl(path);
+    return client.storage.from(_avatarBucket).getPublicUrl(path);
   }
 }

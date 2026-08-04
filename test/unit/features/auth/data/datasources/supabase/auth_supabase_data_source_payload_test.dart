@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tabare3/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:tabare3/features/auth/data/datasources/supabase/auth_supabase_data_source.dart';
 
 void main() {
   test(

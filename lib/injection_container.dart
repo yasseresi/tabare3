@@ -1,10 +1,9 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get_it/get_it.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'core/backend/backend.dart';
+import 'core/error/error_handler.dart';
 import 'core/network/network_info.dart';
-import 'core/network/supabase_service.dart';
-import 'features/auth/data/datasources/auth_remote_data_source.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
 import 'features/auth/domain/usecases/get_current_session.dart';
@@ -19,8 +18,6 @@ import 'features/counter/domain/repositories/counter_repository.dart';
 import 'features/counter/domain/usecases/get_counter.dart';
 import 'features/counter/domain/usecases/increment_counter.dart';
 import 'features/counter/presentation/bloc/counter_bloc.dart';
-import 'features/donor_home/data/datasources/donor_feed_remote_data_source.dart';
-import 'features/donor_home/data/datasources/donor_card_remote_data_source.dart';
 import 'features/donor_home/data/repositories/donor_card_repository_impl.dart';
 import 'features/donor_home/data/repositories/donor_feed_repository_impl.dart';
 import 'features/donor_home/domain/repositories/donor_card_repository.dart';
@@ -29,7 +26,6 @@ import 'features/donor_home/domain/usecases/donor_feed_usecases.dart';
 import 'features/donor_home/domain/usecases/get_donor_card.dart';
 import 'features/donor_home/presentation/bloc/donor_card_bloc.dart';
 import 'features/donor_home/presentation/bloc/donor_feed_bloc.dart';
-import 'features/notifications/data/datasources/notification_remote_data_source.dart';
 import 'features/notifications/data/repositories/notification_repository_impl.dart';
 import 'features/notifications/domain/repositories/notification_repository.dart';
 import 'features/notifications/domain/usecases/get_notifications.dart';
@@ -37,8 +33,6 @@ import 'features/notifications/domain/usecases/mark_notification_as_read.dart';
 import 'features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'features/profile/data/datasources/profile_local_data_source.dart';
 import 'features/profile/data/datasources/profile_local_data_source_impl.dart';
-import 'features/profile/data/datasources/profile_remote_data_source.dart';
-import 'features/profile/data/datasources/profile_remote_data_source_impl.dart';
 import 'features/profile/data/repositories/profile_repository_impl.dart';
 import 'features/profile/domain/repositories/profile_repository.dart';
 import 'features/profile/domain/usecases/change_role.dart';
@@ -46,7 +40,6 @@ import 'features/profile/domain/usecases/get_profile.dart';
 import 'features/profile/domain/usecases/update_profile.dart';
 import 'features/profile/domain/usecases/upload_avatar.dart';
 import 'features/profile/presentation/bloc/profile_bloc.dart';
-import 'features/requester_home/data/datasources/request_remote_data_source.dart';
 import 'features/requester_home/data/repositories/request_repository_impl.dart';
 import 'features/requester_home/domain/repositories/request_repository.dart';
 import 'features/requester_home/domain/usecases/request_usecases.dart';
@@ -55,8 +48,12 @@ import 'features/requester_home/presentation/bloc/request_detail_bloc.dart';
 
 final sl = GetIt.instance;
 
-Future<void> init() async {
-  await initCore();
+/// Wires the whole object graph.
+///
+/// [backend] supplies every remote data source implementation, so no other file
+/// here knows which backend the app talks to.
+Future<void> init(Backend backend) async {
+  await initCore(backend);
   await initCounter();
   await initAuth();
   await initProfile();
@@ -93,14 +90,8 @@ Future<void> initDonorHome() async {
   sl.registerLazySingleton<DonorCardRepository>(
     () => DonorCardRepositoryImpl(remoteDataSource: sl()),
   );
-  sl.registerLazySingleton<DonorCardRemoteDataSource>(
-    () => DonorCardRemoteDataSourceImpl(client: sl()),
-  );
   sl.registerLazySingleton<DonorFeedRepository>(
     () => DonorFeedRepositoryImpl(remoteDataSource: sl()),
-  );
-  sl.registerLazySingleton<DonorFeedRemoteDataSource>(
-    () => DonorFeedRemoteDataSourceImpl(client: sl()),
   );
 }
 
@@ -113,9 +104,6 @@ Future<void> initNotifications() async {
   sl.registerLazySingleton(() => MarkNotificationAsRead(sl()));
   sl.registerLazySingleton<NotificationRepository>(
     () => NotificationRepositoryImpl(remoteDataSource: sl()),
-  );
-  sl.registerLazySingleton<NotificationRemoteDataSource>(
-    () => NotificationRemoteDataSourceImpl(client: sl()),
   );
 }
 
@@ -154,9 +142,6 @@ Future<void> initRequesterHome() async {
   sl.registerLazySingleton<RequestRepository>(
     () => RequestRepositoryImpl(remoteDataSource: sl()),
   );
-  sl.registerLazySingleton<RequestRemoteDataSource>(
-    () => RequestRemoteDataSourceImpl(client: sl()),
-  );
 }
 
 Future<void> initProfile() async {
@@ -177,19 +162,17 @@ Future<void> initProfile() async {
   sl.registerLazySingleton<ProfileRepository>(
     () => ProfileRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
   );
-
-  sl.registerLazySingleton<ProfileRemoteDataSource>(
-    () => ProfileRemoteDataSourceImpl(client: sl()),
-  );
   sl.registerLazySingleton<ProfileLocalDataSource>(
     () => ProfileLocalDataSourceImpl(),
   );
 }
 
-Future<void> initCore() async {
+Future<void> initCore(Backend backend) async {
   sl.registerLazySingleton<Connectivity>(() => Connectivity());
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
-  sl.registerLazySingleton<SupabaseClient>(() => SupabaseService.client);
+  sl.registerLazySingleton<Backend>(() => backend);
+  ErrorHandler.configure(backend.errorMapper);
+  await backend.registerDataSources(sl);
 }
 
 Future<void> initAuth() async {
@@ -211,10 +194,6 @@ Future<void> initAuth() async {
 
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(remoteDataSource: sl(), networkInfo: sl()),
-  );
-
-  sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(client: sl()),
   );
 }
 

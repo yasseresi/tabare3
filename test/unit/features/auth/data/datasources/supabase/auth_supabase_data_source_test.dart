@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:tabare3/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:tabare3/features/auth/data/datasources/supabase/auth_supabase_data_source.dart';
 import 'package:tabare3/features/auth/data/models/user_model.dart';
 import 'package:tabare3/features/auth/domain/repositories/auth_repository.dart';
 
@@ -57,7 +57,7 @@ void main() {
     expect(entity.bloodType, model.bloodType);
   });
 
-  group('AuthRemoteDataSourceImpl.signOut', () {
+  group('AuthSupabaseDataSource.signOut', () {
     test(
       'invokes Supabase auth.signOut so the session is invalidated',
       () async {
@@ -66,7 +66,7 @@ void main() {
         when(() => client.auth).thenReturn(auth);
         when(() => auth.signOut()).thenAnswer((_) async {});
 
-        final dataSource = AuthRemoteDataSourceImpl(client: client);
+        final dataSource = AuthSupabaseDataSource(client: client);
         await dataSource.signOut();
 
         verify(() => auth.signOut()).called(1);

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tabare3/features/profile/data/datasources/profile_remote_data_source_impl.dart';
+import 'package:tabare3/features/profile/data/datasources/supabase/profile_supabase_data_source.dart';
 import 'package:tabare3/features/profile/data/models/profile_model.dart';
 
 void main() {

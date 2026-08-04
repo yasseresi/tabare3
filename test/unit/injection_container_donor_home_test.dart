@@ -9,12 +9,15 @@ import 'package:tabare3/features/donor_home/presentation/bloc/donor_card_bloc.da
 import 'package:tabare3/features/donor_home/presentation/bloc/donor_feed_bloc.dart';
 import 'package:tabare3/injection_container.dart';
 
+import '../support/fake_backend.dart';
+
 void main() {
   tearDown(() async {
     await sl.reset();
   });
 
   test('registers the complete donor home dependency graph', () async {
+    await initCore(const FakeBackend());
     await initDonorHome();
 
     expect(sl.isRegistered<DonorFeedRemoteDataSource>(), isTrue);

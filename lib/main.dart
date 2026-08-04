@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import 'core/network/supabase_service.dart';
+import 'backend/active_backend.dart';
 import 'core/utils/language_manager.dart';
 import 'core/utils/route_manager.dart';
 import 'core/utils/theme_manager.dart';
@@ -10,8 +10,8 @@ import 'injection_container.dart' as di;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  await SupabaseService.initialize();
-  await di.init();
+  await activeBackend.initialize();
+  await di.init(activeBackend);
   runApp(
     EasyLocalization(
       supportedLocales: const [arabicLocale, englishLocale],
