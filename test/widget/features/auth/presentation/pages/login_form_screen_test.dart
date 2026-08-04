@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:tabare3/core/constants/widget_keys.dart';
 import 'package:tabare3/core/usecases/usecase.dart';
 import 'package:tabare3/features/auth/domain/repositories/auth_repository.dart';
 import 'package:tabare3/features/auth/domain/usecases/get_current_session.dart';
@@ -95,14 +96,20 @@ void main() {
   testWidgets('uses the Figma login screen content inset', (tester) async {
     await pumpScreen(tester);
 
+    // The page itself is inset 10px; the design puts the 32px gutter on the
+    // form's content area rather than the whole screen.
     final scrollView = tester.widget<SingleChildScrollView>(
       find.byType(SingleChildScrollView),
     );
-
     expect(
       scrollView.padding,
-      const EdgeInsets.symmetric(horizontal: 32, vertical: 100),
+      const EdgeInsets.symmetric(horizontal: 10, vertical: 32),
     );
+
+    final contentArea = tester.widget<Padding>(
+      find.byKey(WidgetKeys.loginContentArea),
+    );
+    expect(contentArea.padding, const EdgeInsets.symmetric(horizontal: 32));
   });
 
   testWidgets('tapping signup link navigates to SignUpScreen', (tester) async {

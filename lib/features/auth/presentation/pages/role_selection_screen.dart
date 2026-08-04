@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/presentation/widgets/app_dialog.dart';
+import '../../../../core/presentation/widgets/app_gradient_background.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
@@ -47,18 +48,7 @@ class RoleSelectionScreen extends StatelessWidget {
           return Scaffold(
             body: Directionality(
               textDirection: TextDirection.rtl,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: ColorManager.white,
-                  gradient: LinearGradient(
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                    colors: [
-                      ColorManager.welcomeGradientStart,
-                      ColorManager.welcomeGradientEnd,
-                    ],
-                  ),
-                ),
+              child: AppGradientBackground(
                 child: LayoutBuilder(
                   builder: (context, constraints) => SingleChildScrollView(
                     child: ConstrainedBox(
@@ -107,7 +97,6 @@ class RoleSelectionScreen extends StatelessWidget {
                                       color: ColorManager.grey,
                                     ),
                                   ),
-                                  const SizedBox(height: AppSize.s4),
                                   Text(
                                     AppStrings.hadithRelief.tr(),
                                     textAlign: TextAlign.center,
@@ -122,64 +111,19 @@ class RoleSelectionScreen extends StatelessWidget {
                                   const SizedBox(height: AppSize.s20),
                                   Text(
                                     AppStrings.areYou.tr(),
-                                    style: TextStyle(
-                                      fontFamily: FontConstants.fontFamily,
+                                    textAlign: TextAlign.center,
+                                    style: getBoldStyle(
                                       fontSize: FontSize.s32,
-                                      fontWeight: FontWeightManager.bold,
-                                      color: ColorManager.textPrimary,
+                                      color: ColorManager.black,
+                                      lineHeight: LineHeight.h35,
                                     ),
                                   ),
                                   const SizedBox(height: AppPadding.p10),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: ElevatedButton(
-                                      onPressed: () =>
-                                          _showConfirmationDialog(context),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: ColorManager.white,
-                                        foregroundColor: ColorManager.primary,
-                                        elevation: AppSize.s1,
-                                        shadowColor: ColorManager.black,
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: AppPadding.p9_3,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            AppSize.s9_6,
-                                          ),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        AppStrings.iNeedBlood.tr(),
-                                        style: getBoldStyle(
-                                          fontSize: FontSize.s19,
-                                          color: ColorManager.primary,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppPadding.p9_3),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: TextButton(
-                                      onPressed: () =>
-                                          _selectRole(context, isDonor: true),
-                                      style: TextButton.styleFrom(
-                                        foregroundColor:
-                                            ColorManager.welcomeText,
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: AppPadding.p9_3,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        AppStrings.iAmDonor.tr(),
-                                        style: const TextStyle(
-                                          fontFamily: FontConstants.fontFamily,
-                                          fontSize: FontSize.s19,
-                                          fontWeight: FontWeightManager.bold,
-                                        ),
-                                      ),
-                                    ),
+                                  _RoleTabs(
+                                    onNeedBlood: () =>
+                                        _showConfirmationDialog(context),
+                                    onDonor: () =>
+                                        _selectRole(context, isDonor: true),
                                   ),
                                 ],
                               ),
@@ -308,6 +252,81 @@ class RoleSelectionScreen extends StatelessWidget {
   }) {
     context.read<AuthBloc>().add(
       UpdateRoleRequested(isDonor: isDonor, isRecipient: isRecipient),
+    );
+  }
+}
+
+/// Figma `Tabs`: a white rounded container holding the two role buttons, with
+/// the selected one raised on its own white card.
+class _RoleTabs extends StatelessWidget {
+  final VoidCallback onNeedBlood;
+  final VoidCallback onDonor;
+
+  const _RoleTabs({required this.onNeedBlood, required this.onDonor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(AppPadding.p10),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(AppPadding.p4_8),
+        decoration: BoxDecoration(
+          color: ColorManager.white,
+          borderRadius: BorderRadius.circular(AppSize.radiusTabs),
+        ),
+        child: Column(
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: onNeedBlood,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ColorManager.white,
+                  foregroundColor: ColorManager.primary,
+                  elevation: AppSize.s1,
+                  shadowColor: ColorManager.black,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppPadding.p9_6,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppSize.s9_6),
+                  ),
+                ),
+                child: Text(
+                  AppStrings.iNeedBlood.tr(),
+                  style: getBoldStyle(
+                    fontSize: FontSize.s19,
+                    color: ColorManager.primary,
+                    lineHeight: LineHeight.h24,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSize.s10),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: onDonor,
+                style: TextButton.styleFrom(
+                  foregroundColor: ColorManager.welcomeText,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppPadding.p9_6,
+                  ),
+                ),
+                child: Text(
+                  AppStrings.iAmDonor.tr(),
+                  style: getBoldStyle(
+                    fontSize: FontSize.s19,
+                    color: ColorManager.welcomeText,
+                    lineHeight: LineHeight.h24,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

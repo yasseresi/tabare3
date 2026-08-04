@@ -1,8 +1,11 @@
+
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/constants/widget_keys.dart';
 import '../../../../core/presentation/widgets/app_dialog.dart';
+import '../../../../core/presentation/widgets/app_gradient_background.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
 import '../../../../core/presentation/widgets/loading_overlay.dart';
 import '../../../../core/utils/assets_manager.dart';
@@ -29,6 +32,13 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   void _dispatchLogin(AuthBloc bloc) {
     if (!_formKey.currentState!.validate()) return;
     bloc.add(
@@ -50,122 +60,23 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
             visible: state is AuthLoading,
             message: AppStrings.loggingIn.tr(),
             child: Scaffold(
+              backgroundColor: ColorManager.transparent,
               body: Directionality(
                 textDirection: TextDirection.rtl,
-                child: SafeArea(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppPadding.p32,
-                      vertical: AppPadding.p100,
-                    ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          Image.asset(
-                            ImageAssets.icon6,
-                            width: AppSize.s76,
-                            height: AppSize.s76,
-                            errorBuilder: (_, __, ___) => Icon(
-                              Icons.bloodtype_outlined,
-                              color: ColorManager.primary,
-                              size: AppSize.s76,
-                            ),
+                child: AppGradientBackground(
+                  child: SafeArea(
+                    child: Center(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppPadding.p10,
+                          vertical: AppPadding.p32,
+                        ),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            maxWidth: AppSize.s402,
                           ),
-                          const SizedBox(height: AppSize.s15),
-                          Image.asset(
-                            ImageAssets.demo1,
-                            width: AppSize.s170,
-                            height: AppSize.s169,
-                            errorBuilder: (_, __, ___) => Icon(
-                              Icons.assignment_ind_outlined,
-                              color: ColorManager.primary,
-                              size: 120,
-                            ),
-                          ),
-                          const SizedBox(height: AppSize.s15),
-                          Text(
-                            AppStrings.login.tr(),
-                            style: TextStyle(
-                              fontFamily: FontConstants.fontFamily,
-                              fontSize: FontSize.s30,
-                              fontWeight: FontWeightManager.bold,
-                              color: ColorManager.black,
-                            ),
-                          ),
-                          const SizedBox(height: AppSize.s30),
-                          AppTextField(
-                            hintText: AppStrings.username.tr(),
-                            prefixSvg: SvgAssets.person,
-                            controller: _usernameController,
-                            keyboardType: TextInputType.text,
-                            validator: validateUsername,
-                          ),
-                          const SizedBox(height: AppSize.s16),
-                          AppTextField(
-                            hintText: AppStrings.passwordMask.tr(),
-                            prefixSvg: SvgAssets.password,
-                            obscureSvg: SvgAssets.hidden,
-                            isPassword: true,
-                            controller: _passwordController,
-                            validator: validatePassword,
-                          ),
-                          const SizedBox(height: AppSize.s30),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: ColorManager.primary,
-                              foregroundColor: ColorManager.white,
-                              minimumSize: const Size(
-                                AppSize.s220,
-                                AppSize.s56,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppPadding.p50,
-                                vertical: AppPadding.p18,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  AppSize.radiusButton,
-                                ),
-                              ),
-                              textStyle: TextStyle(
-                                fontFamily: FontConstants.fontFamily,
-                                fontSize: FontSize.s19,
-                                fontWeight: FontWeightManager.medium,
-                                color: ColorManager.white,
-                              ),
-                            ),
-                            onPressed: () =>
-                                _dispatchLogin(context.read<AuthBloc>()),
-                            child: Text(AppStrings.login.tr()),
-                          ),
-                          const SizedBox(height: AppSize.s5),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '${AppStrings.noAccount.tr()} ',
-                                style: getRegularStyle(
-                                  fontSize: FontSize.s12,
-                                  color: ColorManager.textMuted,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () => Navigator.pushNamed(
-                                  context,
-                                  Routes.signupRoute,
-                                ),
-                                child: Text(
-                                  AppStrings.signup.tr(),
-                                  style: getBoldStyle(
-                                    fontSize: FontSize.s12,
-                                    color: ColorManager.primary,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                          child: Form(key: _formKey, child: _buildForm(context)),
+                        ),
                       ),
                     ),
                   ),
@@ -175,6 +86,74 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildForm(BuildContext context) {
+    return Column(
+      children: [
+        Image.asset(
+          ImageAssets.logo76,
+          width: AppSize.s76,
+          height: AppSize.s76,
+          errorBuilder: (_, _, _) => Icon(
+            Icons.bloodtype_outlined,
+            color: ColorManager.primary,
+            size: AppSize.s76,
+          ),
+        ),
+        const SizedBox(height: AppSize.s12),
+        Image.asset(
+          ImageAssets.loginIllustration,
+          width: AppSize.s170,
+          height: AppSize.s169,
+          errorBuilder: (_, _, _) => Icon(
+            Icons.assignment_ind_outlined,
+            color: ColorManager.primary,
+            size: AppSize.s120,
+          ),
+        ),
+        const SizedBox(height: AppSize.s12),
+        Text(
+          AppStrings.login.tr(),
+          textAlign: TextAlign.center,
+          style: getBoldStyle(
+            fontSize: FontSize.s30,
+            color: ColorManager.black,
+          ),
+        ),
+        const SizedBox(height: AppSize.s12),
+        Padding(
+          key: WidgetKeys.loginContentArea,
+          padding: const EdgeInsets.symmetric(horizontal: AppPadding.p32),
+          child: Column(
+            children: [
+              AppTextField(
+                hintText: AppStrings.username.tr(),
+                prefixSvg: SvgAssets.person,
+                controller: _usernameController,
+                keyboardType: TextInputType.text,
+                validator: validateUsername,
+              ),
+              const SizedBox(height: AppSize.s16),
+              AppTextField(
+                hintText: AppStrings.passwordMask.tr(),
+                prefixSvg: SvgAssets.password,
+                obscureSvg: SvgAssets.hidden,
+                isPassword: true,
+                controller: _passwordController,
+                validator: validatePassword,
+              ),
+              const SizedBox(height: AppSize.s30),
+              _LoginButton(
+                onPressed: () => _dispatchLogin(context.read<AuthBloc>()),
+              ),
+              const SizedBox(height: AppSize.s5),
+              const _SignupLink(),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -207,5 +186,71 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
         ),
       );
     }
+  }
+}
+
+class _LoginButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _LoginButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: ColorManager.primary,
+          foregroundColor: ColorManager.white,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppPadding.p50,
+            vertical: AppPadding.p18,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSize.radiusButton),
+          ),
+        ),
+        child: Text(
+          AppStrings.login.tr(),
+          style: getMediumStyle(
+            fontSize: FontSize.s19,
+            color: ColorManager.white,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SignupLink extends StatelessWidget {
+  const _SignupLink();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          '${AppStrings.noAccount.tr()} ',
+          style: getRegularStyle(
+            fontSize: FontSize.s12,
+            color: ColorManager.textMuted,
+            lineHeight: LineHeight.h16,
+          ),
+        ),
+        GestureDetector(
+          onTap: () => Navigator.pushNamed(context, Routes.signupRoute),
+          child: Text(
+            AppStrings.signup.tr(),
+            style: getBoldStyle(
+              fontSize: FontSize.s12,
+              color: ColorManager.primary,
+              lineHeight: LineHeight.h16,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

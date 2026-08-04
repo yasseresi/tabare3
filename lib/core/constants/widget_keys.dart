@@ -6,6 +6,7 @@ class WidgetKeys {
   static const profileNotificationsButton = Key('profile_notifications_button');
   static const profileQrRow = Key('profile_qr_row');
   static const Key splashProgressBar = Key('splash_progress_bar');
+  static const Key loginContentArea = Key('login_content_area');
   static const Key logoutDialogConfirmButton = Key('logout_dialog_confirm');
   static const Key logoutDialogCancelButton = Key('logout_dialog_cancel');
   static const Key requestHospitalField = Key('request_hospital_field');

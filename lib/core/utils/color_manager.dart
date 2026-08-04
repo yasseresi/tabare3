@@ -19,6 +19,7 @@ class ColorManager {
   static Color lightGrey = const Color(0xff9CA3AF);
   static Color borderGrey = const Color(0xffE1E3E4);
   static Color dividerGrey = const Color(0xffE5E5E5);
+  static Color toggleTrack = const Color(0xffD1D5DB);
   static Color white = const Color(0xffFFFFFF);
 
   // Backgrounds

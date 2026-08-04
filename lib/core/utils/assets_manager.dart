@@ -17,6 +17,10 @@ class ImageAssets {
   static const String hadithIllustration = demo;
   static const String requestAvatar = '$imagePath/request_avatar.png';
 
+  /// App logo and the clipboard illustration on the login screen.
+  static const String logo76 = icon6;
+  static const String loginIllustration = demo1;
+
   /// Donor-card mascot and the trophy shown on each earned badge.
   static const String donorMascot = '$imagePath/donor_mascot.png';
   static const String badgeTrophy = '$imagePath/badge_trophy.png';

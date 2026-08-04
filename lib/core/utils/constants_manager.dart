@@ -3,6 +3,7 @@ class AppConstants {
   static const int splashDelayUnauthenticated = 3;
   static const int sliderAnimationTime = 300;
   static const int toastDuration = 3;
+  static const int toggleAnimationMs = 150;
   static const int paginationLimit = 10;
   static const int profileHadithMaxLines = 3;
   static const int statusTagMaxLines = 1;
