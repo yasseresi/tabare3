@@ -2,13 +2,21 @@ import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/presentation/widgets/app_card.dart';
+import '../../../../core/presentation/widgets/app_empty_state.dart';
+import '../../../../core/presentation/widgets/app_gradient_background.dart';
+import '../../../../core/presentation/widgets/app_info_row.dart';
+import '../../../../core/presentation/widgets/app_page.dart';
+import '../../../../core/presentation/widgets/app_tag_pill.dart';
+import '../../../../core/presentation/widgets/hero_banner.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/blood_request_entity.dart';
 import '../bloc/request_bloc.dart';
@@ -30,189 +38,75 @@ class _DonorHistoryScreenState extends State<DonorHistoryScreen> {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Container(
-        decoration: BoxDecoration(
-          color: ColorManager.white,
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [
-              ColorManager.welcomeGradientStart,
-              ColorManager.welcomeGradientEnd,
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: BlocBuilder<RequestBloc, RequestState>(
-            builder: (context, state) {
-              if (state.status == RequestViewStatus.initial ||
-                  state.status == RequestViewStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (state.status == RequestViewStatus.failure) {
-                return Center(
-                  child: Text(state.errorMessage ?? AppStrings.error.tr()),
-                );
-              }
-              if (state.requests.isEmpty) return const _EmptyDonorHistory();
-              return Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: AppSize.s402),
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppPadding.p10,
-                      vertical: AppPadding.p32,
+      child: BlocBuilder<RequestBloc, RequestState>(
+        builder: (context, state) {
+          if (state.status == RequestViewStatus.initial ||
+              state.status == RequestViewStatus.loading) {
+            return const AppGradientBackground(
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+          if (state.status == RequestViewStatus.failure) {
+            return AppGradientBackground(
+              child: Center(
+                child: Text(state.errorMessage ?? AppStrings.error.tr()),
+              ),
+            );
+          }
+          return AppPage(
+            title: AppStrings.welcomeUser.tr(),
+            subtitle: AppStrings.getWellSoon.tr(),
+            notificationsKey: WidgetKeys.requesterNotificationsButton,
+            onNotifications:
+                widget.onNotifications ??
+                () => Navigator.pushNamed(context, Routes.notificationsRoute),
+            children: [
+              HeroBanner(
+                title: AppStrings.donors.tr(),
+                message: AppStrings.donorsSectionDescription.tr(),
+              ),
+              const SizedBox(height: AppSize.s12),
+              Text(
+                AppStrings.donorsList.tr(),
+                textAlign: TextAlign.center,
+                style: getSemiBoldStyle(
+                  fontSize: FontSize.s16,
+                  color: ColorManager.sectionTitle,
+                  lineHeight: LineHeight.h28,
+                ),
+              ),
+              const SizedBox(height: AppSize.s12),
+              _DonorHistoryTabs(
+                showCompleted: _showCompleted,
+                onChanged: (value) => setState(() => _showCompleted = value),
+              ),
+              const SizedBox(height: AppSize.s12),
+              if (state.requests.isEmpty)
+                AppEmptyState(
+                  title: AppStrings.noRequestsYet.tr(),
+                  message: AppStrings.noRequestsDescription.tr(),
+                )
+              else
+                ...state.requests.map(
+                  (request) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppPadding.p12),
+                    child: _DonorHistoryCard(
+                      request: request,
+                      isCompleted: _showCompleted,
+                      onDetail: widget.onDetail,
                     ),
-                    itemCount: state.requests.length + AppSize.s2.toInt(),
-                    separatorBuilder: (_, index) => SizedBox(
-                      height: index == AppSize.s0.toInt()
-                          ? AppSize.s20
-                          : AppSize.s12,
-                    ),
-                    itemBuilder: (context, index) {
-                      if (index == AppSize.s0.toInt()) {
-                        return _DonorHistoryHeader(
-                          onNotifications: widget.onNotifications,
-                        );
-                      }
-                      if (index == AppSize.s1.toInt()) {
-                        return _DonorHistoryTabs(
-                          showCompleted: _showCompleted,
-                          onChanged: (value) {
-                            setState(() => _showCompleted = value);
-                          },
-                        );
-                      }
-                      return _DonorHistoryCard(
-                        request: state.requests[index - AppSize.s2.toInt()],
-                        onDetail: widget.onDetail,
-                      );
-                    },
                   ),
                 ),
-              );
-            },
-          ),
-        ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-class _DonorHistoryHeader extends StatelessWidget {
-  final VoidCallback? onNotifications;
-
-  const _DonorHistoryHeader({required this.onNotifications});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppStrings.welcomeUser.tr(),
-                    style: const TextStyle(
-                      fontSize: AppSize.s20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    AppStrings.getWellSoon.tr(),
-                    style: TextStyle(color: ColorManager.textMuted),
-                  ),
-                ],
-              ),
-            ),
-            IconButton(
-              key: WidgetKeys.requesterNotificationsButton,
-              onPressed:
-                  onNotifications ??
-                  () => Navigator.pushNamed(context, Routes.notificationsRoute),
-              style: IconButton.styleFrom(
-                padding: const EdgeInsets.all(AppPadding.p8),
-                backgroundColor: ColorManager.surfaceAlt,
-                minimumSize: const Size.square(AppSize.s40),
-                maximumSize: const Size.square(AppSize.s40),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                shape: const CircleBorder(),
-              ),
-              constraints: const BoxConstraints(),
-              icon: const Icon(
-                Icons.notifications_none_rounded,
-                size: AppSize.s24,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSize.s46),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(AppPadding.p20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [ColorManager.error, ColorManager.primaryDark],
-            ),
-            borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
-            border: Border.all(color: ColorManager.borderGrey),
-          ),
-          child: Row(
-            children: [
-              Image.asset(
-                ImageAssets.icon7,
-                width: AppSize.s130,
-                height: AppSize.s104,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(width: AppSize.s12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      AppStrings.donors.tr(),
-                      style: TextStyle(
-                        color: ColorManager.white,
-                        fontSize: AppSize.s24,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: AppSize.s4),
-                    Text(
-                      AppStrings.donorsSectionDescription.tr(),
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        color: ColorManager.white,
-                        fontSize: AppSize.s12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: AppSize.s20),
-        Text(
-          AppStrings.donorsList.tr(),
-          style: TextStyle(
-            color: ColorManager.nearBlack,
-            fontSize: AppSize.s16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
+/// Figma `Frame 1000009037`: two 110x42 pills, `المقبولين` on the leading
+/// (right) side and `المكتملين` beside it.
 class _DonorHistoryTabs extends StatelessWidget {
   final bool showCompleted;
   final ValueChanged<bool> onChanged;
@@ -225,17 +119,18 @@ class _DonorHistoryTabs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        _HistoryTab(
+          label: AppStrings.acceptedTab.tr(),
+          selected: !showCompleted,
+          onTap: () => onChanged(false),
+        ),
+        const SizedBox(width: AppSize.s60),
         _HistoryTab(
           label: AppStrings.completedDonors.tr(),
           selected: showCompleted,
           onTap: () => onChanged(true),
-        ),
-        _HistoryTab(
-          label: AppStrings.accepted.tr(),
-          selected: !showCompleted,
-          onTap: () => onChanged(false),
         ),
       ],
     );
@@ -255,25 +150,27 @@ class _HistoryTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: AppSize.s111,
-      child: FilledButton(
-        style: FilledButton.styleFrom(
-          backgroundColor: selected ? ColorManager.primary : ColorManager.white,
-          foregroundColor: selected
-              ? ColorManager.white
-              : ColorManager.textLight,
-          padding: const EdgeInsets.symmetric(vertical: AppPadding.p14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSize.radiusXLarge),
+    final radius = BorderRadius.circular(AppSize.radiusXLarge);
+    return Material(
+      color: selected ? ColorManager.cardValue : ColorManager.white,
+      borderRadius: radius,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
+        child: Container(
+          width: AppSize.s111,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppPadding.p10,
+            vertical: AppPadding.p15,
           ),
-        ),
-        onPressed: onTap,
-        child: Text(
-          label,
-          style: const TextStyle(
-            fontSize: AppSize.s12,
-            fontWeight: FontWeight.w600,
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: getSemiBoldStyle(
+              fontSize: FontSize.s12,
+              color: selected ? ColorManager.white : ColorManager.tabInactive,
+            ),
           ),
         ),
       ),
@@ -281,11 +178,18 @@ class _HistoryTab extends StatelessWidget {
   }
 }
 
+/// Figma donor card: the hospital row with its status pill, then the name,
+/// donation date and location rows.
 class _DonorHistoryCard extends StatelessWidget {
   final BloodRequestEntity request;
+  final bool isCompleted;
   final ValueChanged<BloodRequestEntity>? onDetail;
 
-  const _DonorHistoryCard({required this.request, this.onDetail});
+  const _DonorHistoryCard({
+    required this.request,
+    required this.isCompleted,
+    this.onDetail,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -303,26 +207,13 @@ class _DonorHistoryCard extends StatelessWidget {
           arguments: request,
         );
       },
-      child: Container(
-        padding: const EdgeInsets.all(AppPadding.p20),
-        decoration: BoxDecoration(
-          color: ColorManager.white,
-          borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
-          border: Border.all(color: ColorManager.borderGrey),
-          boxShadow: [
-            BoxShadow(
-              color: ColorManager.black.withValues(alpha: AppOpacity.subtle),
-              blurRadius: AppSize.s14,
-              offset: const Offset(AppSize.s0, AppSize.s8),
-            ),
-          ],
-        ),
+      child: AppCard.list(
         child: Column(
           children: [
             Row(
               children: [
                 Image.asset(
-                  ImageAssets.icon9,
+                  ImageAssets.donationAvatar,
                   width: AppSize.s50,
                   height: AppSize.s50,
                   fit: BoxFit.contain,
@@ -331,116 +222,51 @@ class _DonorHistoryCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     request.hospital.nameAr,
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: ColorManager.nearBlack,
-                      fontSize: AppSize.s16,
-                      fontWeight: FontWeight.bold,
+                    style: getBoldStyle(
+                      fontSize: FontSize.s16,
+                      color: ColorManager.cardTitle,
                     ),
                   ),
                 ),
-                const _CompletedStatus(),
+                const SizedBox(width: AppSize.s12),
+                AppTagPill(
+                  label: isCompleted
+                      ? AppStrings.donationSuccessful.tr()
+                      : AppStrings.pending.tr(),
+                  dotColor: isCompleted
+                      ? ColorManager.success
+                      : ColorManager.urgencyCritical,
+                  labelColor: ColorManager.textMuted,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppPadding.p10,
+                    vertical: AppPadding.p6,
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: AppSize.s16),
-            _HistoryInfoRow(
+            const SizedBox(height: AppSize.s18),
+            AppInfoRow(
               label: AppStrings.fullName.tr(),
               value: request.patient?.fullName ?? AppStrings.notAvailable.tr(),
+              labelColor: ColorManager.textMuted,
             ),
-            _HistoryInfoRow(
+            const SizedBox(height: AppSize.s18),
+            AppInfoRow(
               label: AppStrings.donationDate.tr(),
               value: DateFormat(
                 AppConstants.requestDateFormat,
               ).format(date.toLocal()),
+              labelColor: ColorManager.textMuted,
             ),
-            _HistoryInfoRow(
+            const SizedBox(height: AppSize.s18),
+            AppInfoRow(
               label: AppStrings.location.tr(),
               value: request.hospital.address ?? AppStrings.notAvailable.tr(),
+              labelColor: ColorManager.textMuted,
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _CompletedStatus extends StatelessWidget {
-  const _CompletedStatus();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppPadding.p10,
-        vertical: AppPadding.p6,
-      ),
-      decoration: BoxDecoration(
-        color: ColorManager.surfaceLight,
-        borderRadius: BorderRadius.circular(AppSize.radiusCircle),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: AppSize.s8,
-            height: AppSize.s8,
-            decoration: BoxDecoration(
-              color: ColorManager.success,
-              borderRadius: BorderRadius.circular(AppSize.radiusCircle),
-            ),
-          ),
-          const SizedBox(width: AppSize.s4),
-          Text(
-            AppStrings.donationSuccessful.tr(),
-            style: TextStyle(
-              color: ColorManager.textMuted,
-              fontSize: AppSize.s12,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HistoryInfoRow extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _HistoryInfoRow({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppPadding.p4),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(label, style: TextStyle(color: ColorManager.textMuted)),
-          ),
-          Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.left,
-              style: TextStyle(
-                color: ColorManager.primaryDark,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EmptyDonorHistory extends StatelessWidget {
-  const _EmptyDonorHistory();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(AppStrings.noRequestsYet.tr(), textAlign: TextAlign.center),
     );
   }
 }

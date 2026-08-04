@@ -4,11 +4,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:qr_flutter/qr_flutter.dart';
 
-import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/presentation/widgets/app_card.dart';
+import '../../../../core/presentation/widgets/app_info_row.dart';
+import '../../../../core/presentation/widgets/app_page.dart';
+import '../../../../core/presentation/widgets/app_pill_button.dart';
+import '../../../../core/presentation/widgets/app_progress_bar.dart';
+import '../../../../core/presentation/widgets/app_tag_pill.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/blood_request_entity.dart';
 import '../bloc/request_detail_bloc.dart';
@@ -31,15 +38,15 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<RequestDetailBloc>().add(
-      RequestDetailLoadRequested(
-        requestId: widget.request.id,
-        includeCompatibleDonors:
-            widget.request.priority == RequestPriority.urgent &&
-            widget.request.isActive,
-      ),
-    );
+    context.read<RequestDetailBloc>().add(_loadEvent());
   }
+
+  RequestDetailLoadRequested _loadEvent() => RequestDetailLoadRequested(
+    requestId: widget.request.id,
+    includeCompatibleDonors:
+        widget.request.priority == RequestPriority.urgent &&
+        widget.request.isActive,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -56,150 +63,54 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
         },
         builder: (context, state) => Scaffold(
           backgroundColor: ColorManager.transparent,
-          body: Container(
-            decoration: BoxDecoration(
-              color: ColorManager.white,
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  ColorManager.welcomeGradientStart,
-                  ColorManager.welcomeGradientEnd,
-                ],
-              ),
-            ),
-            child: SafeArea(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: AppSize.s402),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(
-                          AppPadding.p32,
-                          AppPadding.p32,
-                          AppPadding.p32,
-                          AppPadding.p20,
-                        ),
-                        child: _RequestDetailHeader(
-                          onNotifications: widget.onNotifications,
-                        ),
-                      ),
-                      Expanded(
-                        child: state.status == RequestDetailStatus.loading
-                            ? Center(
-                                child: CircularProgressIndicator(
-                                  color: ColorManager.primary,
-                                ),
-                              )
-                            : RefreshIndicator(
-                                onRefresh: () async {
-                                  context.read<RequestDetailBloc>().add(
-                                    RequestDetailLoadRequested(
-                                      requestId: widget.request.id,
-                                      includeCompatibleDonors:
-                                          widget.request.priority ==
-                                              RequestPriority.urgent &&
-                                          widget.request.isActive,
-                                    ),
-                                  );
-                                },
-                                child: ListView(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    AppPadding.p10,
-                                    AppPadding.p4,
-                                    AppPadding.p10,
-                                    AppPadding.p100,
-                                  ),
-                                  children: [
-                                    Text(
-                                      AppStrings.requestDetails.tr(),
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        fontSize: AppSize.s20,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: AppSize.s20),
-                                    _RequestSummaryCard(
-                                      request: widget.request,
-                                    ),
-                                    const SizedBox(height: AppSize.s24),
-                                    _BeneficiarySection(request: widget.request),
-                                    const SizedBox(height: AppSize.s24),
-                                    _QrSection(
-                                      request: widget.request,
-                                      state: state,
-                                    ),
-                                    const SizedBox(height: AppSize.s24),
-                                    _DonorSection(state: state),
-                                    if (widget.request.priority ==
-                                            RequestPriority.urgent &&
-                                        widget.request.isActive) ...[
-                                      const SizedBox(height: AppSize.s24),
-                                      _InvitationSection(state: state),
-                                      const SizedBox(height: AppSize.s24),
-                                      _CompatibleDonorSection(
-                                        requestId: widget.request.id,
-                                        state: state,
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _RequestDetailHeader extends StatelessWidget {
-  final VoidCallback? onNotifications;
-
-  const _RequestDetailHeader({this.onNotifications});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          body: AppPage(
+            title: AppStrings.welcomeUser.tr(),
+            subtitle: AppStrings.getWellSoon.tr(),
+            notificationsKey: WidgetKeys.requesterNotificationsButton,
+            onNotifications: widget.onNotifications,
+            onRefresh: () async {
+              context.read<RequestDetailBloc>().add(_loadEvent());
+            },
             children: [
               Text(
-                AppStrings.welcomeUser.tr(),
-                style: const TextStyle(
-                  fontSize: AppSize.s18,
-                  fontWeight: FontWeight.w800,
+                AppStrings.requestDetails.tr(),
+                textAlign: TextAlign.center,
+                style: getSemiBoldStyle(
+                  fontSize: FontSize.s16,
+                  color: ColorManager.sectionTitle,
+                  lineHeight: LineHeight.h28,
                 ),
               ),
-              Text(
-                AppStrings.getWellSoon.tr(),
-                style: TextStyle(
-                  color: ColorManager.textMuted,
-                  fontSize: AppSize.s14,
-                  fontWeight: FontWeight.w600,
+              const SizedBox(height: AppSize.s12),
+              _RequestSummaryCard(request: widget.request),
+              const SizedBox(height: AppSize.s12),
+              _BeneficiarySection(request: widget.request),
+              const SizedBox(height: AppSize.s12),
+              _QrSection(request: widget.request, state: state),
+              const SizedBox(height: AppSize.s12),
+              _DonorSection(state: state),
+              if (widget.request.priority == RequestPriority.urgent &&
+                  widget.request.isActive) ...[
+                const SizedBox(height: AppSize.s12),
+                _InvitationSection(state: state),
+                const SizedBox(height: AppSize.s12),
+                _CompatibleDonorSection(
+                  requestId: widget.request.id,
+                  state: state,
                 ),
-              ),
+              ],
+              if (state.status == RequestDetailStatus.loading) ...[
+                const SizedBox(height: AppSize.s20),
+                Center(
+                  child: CircularProgressIndicator(
+                    color: ColorManager.primary,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
-        Material(
-          color: ColorManager.surfaceAlt,
-          shape: const CircleBorder(),
-          child: IconButton(
-            onPressed: onNotifications,
-            icon: const Icon(Icons.notifications_none_rounded),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -211,23 +122,24 @@ class _RequestSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppPadding.p20),
-      decoration: _cardDecoration(),
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             request.hospital.nameAr,
-            textAlign: TextAlign.right,
-            style: Theme.of(context).textTheme.titleLarge,
+            style: getBoldStyle(
+              fontSize: FontSize.s16,
+              color: ColorManager.cardTitle,
+            ),
           ),
-          const SizedBox(height: AppSize.s16),
-          _DetailRow(
+          const SizedBox(height: AppSize.s18),
+          AppInfoRow(
             label: AppStrings.bloodType.tr(),
             value: request.bloodType,
           ),
-          _DetailRow(
+          const SizedBox(height: AppSize.s18),
+          AppInfoRow(
             label: AppStrings.bagsProvided.tr(
               namedArgs: {
                 'provided': request.unitsFulfilled.toString(),
@@ -241,13 +153,11 @@ class _RequestSummaryCard extends StatelessWidget {
               },
             ),
           ),
-          const SizedBox(height: AppSize.s8),
-          LinearProgressIndicator(
-            value: request.unitsFulfilled / request.unitsNeeded,
-            minHeight: AppSize.s8,
-            backgroundColor: ColorManager.progressTrack,
-            valueColor: AlwaysStoppedAnimation(ColorManager.progressFill),
-            borderRadius: BorderRadius.circular(AppSize.radiusSmall),
+          const SizedBox(height: AppSize.s10),
+          AppProgressBar(
+            value: request.unitsNeeded == AppSize.s0
+                ? AppSize.s0
+                : request.unitsFulfilled / request.unitsNeeded,
           ),
         ],
       ),
@@ -267,58 +177,62 @@ class _BeneficiarySection extends StatelessWidget {
           ? AppStrings.forSomeoneElse.tr()
           : AppStrings.requestForSelf.tr(),
       child: request.isForSomeoneElse
-          ? _buildPatientDetails(context)
+          ? _buildPatientDetails()
           : Text(
               AppStrings.requestForSelf.tr(),
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: getRegularStyle(
+                fontSize: FontSize.s14,
+                color: ColorManager.textSecondary,
+              ),
             ),
     );
   }
 
-  Widget _buildPatientDetails(BuildContext context) {
+  Widget _buildPatientDetails() {
     final patient = request.patient;
     if (patient == null) {
       return Text(
         AppStrings.patientDetailsRequired.tr(),
         textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.bodyMedium,
+        style: getRegularStyle(
+          fontSize: FontSize.s14,
+          color: ColorManager.textSecondary,
+        ),
       );
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _DetailRow(
-          label: AppStrings.fullName.tr(),
-          value: patient.fullName,
-        ),
-        _DetailRow(
+        AppInfoRow(label: AppStrings.fullName.tr(), value: patient.fullName),
+        const SizedBox(height: AppSize.s18),
+        AppInfoRow(
           label: AppStrings.nationalId.tr(),
           value: patient.nationalId,
         ),
-        _DetailRow(
-          label: AppStrings.bloodType.tr(),
-          value: patient.bloodType,
-        ),
-        _DetailRow(
-          label: AppStrings.gender.tr(),
-          value: patient.gender,
-        ),
-        _DetailRow(
+        const SizedBox(height: AppSize.s18),
+        AppInfoRow(label: AppStrings.bloodType.tr(), value: patient.bloodType),
+        const SizedBox(height: AppSize.s18),
+        AppInfoRow(label: AppStrings.gender.tr(), value: patient.gender),
+        const SizedBox(height: AppSize.s18),
+        AppInfoRow(
           label: AppStrings.weight.tr(),
           value: '${patient.weight.toStringAsFixed(0)} ${AppStrings.kg.tr()}',
         ),
-        _DetailRow(
+        const SizedBox(height: AppSize.s18),
+        AppInfoRow(
           label: AppStrings.dateOfBirth.tr(),
           value: patient.dateOfBirth,
         ),
         if (patient.chronicDiseases != null &&
-            patient.chronicDiseases!.isNotEmpty)
-          _DetailRow(
+            patient.chronicDiseases!.isNotEmpty) ...[
+          const SizedBox(height: AppSize.s18),
+          AppInfoRow(
             label: AppStrings.chronicDiseases.tr(),
             value: patient.chronicDiseases!,
           ),
+        ],
       ],
     );
   }
@@ -333,22 +247,26 @@ class _QrSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final qr = state.issuedQr;
-    return Container(
-      padding: const EdgeInsets.all(AppPadding.p20),
-      decoration: _cardDecoration(),
+    return AppCard(
       child: Column(
         children: [
           Text(
             AppStrings.requestQrTitle.tr(),
-            style: Theme.of(context).textTheme.headlineSmall,
+            textAlign: TextAlign.center,
+            style: getSemiBoldStyle(
+              fontSize: FontSize.s16,
+              color: ColorManager.sectionTitle,
+              lineHeight: LineHeight.h28,
+            ),
           ),
-          const SizedBox(height: AppSize.s8),
+          const SizedBox(height: AppSize.s10),
           Text(
             AppStrings.requestQrDescription.tr(),
             textAlign: TextAlign.center,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyLarge?.copyWith(color: ColorManager.textMuted),
+            style: getRegularStyle(
+              fontSize: FontSize.s14,
+              color: ColorManager.textMuted,
+            ),
           ),
           if (qr != null) ...[
             const SizedBox(height: AppSize.s20),
@@ -361,7 +279,7 @@ class _QrSection extends StatelessWidget {
               eyeStyle: QrEyeStyle(color: ColorManager.primaryDark),
               dataModuleStyle: QrDataModuleStyle(color: ColorManager.nearBlack),
             ),
-            const SizedBox(height: AppSize.s8),
+            const SizedBox(height: AppSize.s10),
             Text(
               AppStrings.qrExpiresAt.tr(
                 namedArgs: {
@@ -370,11 +288,21 @@ class _QrSection extends StatelessWidget {
                   ).format(qr.expiresAt.toLocal()),
                 },
               ),
+              textAlign: TextAlign.center,
+              style: getRegularStyle(
+                fontSize: FontSize.s12,
+                color: ColorManager.textMuted,
+              ),
             ),
           ],
-          const SizedBox(height: AppSize.s16),
-          ElevatedButton(
-            key: WidgetKeys.requestQrIssueButton,
+          const SizedBox(height: AppSize.s18),
+          AppPillButton(
+            buttonKey: WidgetKeys.requestQrIssueButton,
+            label: (qr == null
+                    ? AppStrings.generateRequestQr
+                    : AppStrings.refreshRequestQr)
+                .tr(),
+            background: ColorManager.primary,
             onPressed:
                 !request.isActive ||
                     state.status == RequestDetailStatus.actionLoading
@@ -384,12 +312,6 @@ class _QrSection extends StatelessWidget {
                       RequestQrIssueRequested(requestId: request.id),
                     );
                   },
-            child: Text(
-              (qr == null
-                      ? AppStrings.generateRequestQr
-                      : AppStrings.refreshRequestQr)
-                  .tr(),
-            ),
           ),
         ],
       ),
@@ -407,22 +329,28 @@ class _DonorSection extends StatelessWidget {
     return _SectionCard(
       title: AppStrings.acceptedDonors.tr(),
       child: state.donors.isEmpty
-          ? Text(AppStrings.noAcceptedDonors.tr(), textAlign: TextAlign.center)
+          ? _EmptySectionMessage(message: AppStrings.noAcceptedDonors.tr())
           : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: state.donors
                   .map(
-                    (donor) => ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: CircleAvatar(
-                        backgroundColor: ColorManager.primaryLight,
-                        child: Icon(
-                          Icons.bloodtype_outlined,
-                          color: ColorManager.primaryDark,
-                        ),
+                    (donor) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppPadding.p18),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: AppInfoRow(
+                              label: donor.fullName,
+                              value: donor.bloodType,
+                            ),
+                          ),
+                          const SizedBox(width: AppSize.s12),
+                          AppTagPill(
+                            label: _appointmentStatus(donor.status).tr(),
+                            labelColor: ColorManager.textMuted,
+                          ),
+                        ],
                       ),
-                      title: Text(donor.fullName),
-                      subtitle: Text(donor.bloodType),
-                      trailing: Text(_appointmentStatus(donor.status).tr()),
                     ),
                   )
                   .toList(),
@@ -441,15 +369,28 @@ class _InvitationSection extends StatelessWidget {
     return _SectionCard(
       title: AppStrings.sentInvitations.tr(),
       child: state.invitations.isEmpty
-          ? Text(AppStrings.noSentInvitations.tr(), textAlign: TextAlign.center)
+          ? _EmptySectionMessage(message: AppStrings.noSentInvitations.tr())
           : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: state.invitations
                   .map(
-                    (invitation) => ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(invitation.fullName),
-                      subtitle: Text(invitation.bloodType),
-                      trailing: Text(_invitationStatus(invitation.status).tr()),
+                    (invitation) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppPadding.p18),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: AppInfoRow(
+                              label: invitation.fullName,
+                              value: invitation.bloodType,
+                            ),
+                          ),
+                          const SizedBox(width: AppSize.s12),
+                          AppTagPill(
+                            label: _invitationStatus(invitation.status).tr(),
+                            labelColor: ColorManager.textMuted,
+                          ),
+                        ],
+                      ),
                     ),
                   )
                   .toList(),
@@ -469,31 +410,39 @@ class _CompatibleDonorSection extends StatelessWidget {
     return _SectionCard(
       title: AppStrings.availableDonors.tr(),
       child: state.compatibleDonors.isEmpty
-          ? Text(
-              AppStrings.noCompatibleDonors.tr(),
-              textAlign: TextAlign.center,
-            )
+          ? _EmptySectionMessage(message: AppStrings.noCompatibleDonors.tr())
           : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: state.compatibleDonors
                   .map(
-                    (donor) => ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(donor.fullName),
-                      subtitle: Text(donor.bloodType),
-                      trailing: ElevatedButton(
-                        key: WidgetKeys.compatibleDonorInviteButton,
-                        onPressed:
-                            state.status == RequestDetailStatus.actionLoading
-                            ? null
-                            : () {
-                                context.read<RequestDetailBloc>().add(
-                                  CompatibleDonorInviteRequested(
-                                    requestId: requestId,
-                                    donorId: donor.donorId,
-                                  ),
-                                );
-                              },
-                        child: Text(AppStrings.inviteDonor.tr()),
+                    (donor) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppPadding.p18),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          AppInfoRow(
+                            label: donor.fullName,
+                            value: donor.bloodType,
+                          ),
+                          const SizedBox(height: AppSize.s10),
+                          AppPillButton(
+                            buttonKey: WidgetKeys.compatibleDonorInviteButton,
+                            label: AppStrings.inviteDonor.tr(),
+                            background: ColorManager.primary,
+                            onPressed:
+                                state.status ==
+                                    RequestDetailStatus.actionLoading
+                                ? null
+                                : () {
+                                    context.read<RequestDetailBloc>().add(
+                                      CompatibleDonorInviteRequested(
+                                        requestId: requestId,
+                                        donorId: donor.donorId,
+                                      ),
+                                    );
+                                  },
+                          ),
+                        ],
                       ),
                     ),
                   )
@@ -511,14 +460,19 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppPadding.p20),
-      decoration: _cardDecoration(),
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(title, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: AppSize.s16),
+          Text(
+            title,
+            style: getSemiBoldStyle(
+              fontSize: FontSize.s16,
+              color: ColorManager.sectionTitle,
+              lineHeight: LineHeight.h28,
+            ),
+          ),
+          const SizedBox(height: AppSize.s18),
           child,
         ],
       ),
@@ -526,44 +480,23 @@ class _SectionCard extends StatelessWidget {
   }
 }
 
-class _DetailRow extends StatelessWidget {
-  final String label;
-  final String value;
+class _EmptySectionMessage extends StatelessWidget {
+  final String message;
 
-  const _DetailRow({required this.label, required this.value});
+  const _EmptySectionMessage({required this.message});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppPadding.p6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(child: Text(label)),
-          Text(
-            value,
-            style: Theme.of(
-              context,
-            ).textTheme.titleSmall?.copyWith(color: ColorManager.primaryDark),
-          ),
-        ],
+    return Text(
+      message,
+      textAlign: TextAlign.center,
+      style: getRegularStyle(
+        fontSize: FontSize.s14,
+        color: ColorManager.textMuted,
       ),
     );
   }
 }
-
-BoxDecoration _cardDecoration() => BoxDecoration(
-  color: ColorManager.white,
-  borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
-  border: Border.all(color: ColorManager.borderGrey),
-  boxShadow: [
-    BoxShadow(
-      color: ColorManager.black.withValues(alpha: AppOpacity.subtle),
-      blurRadius: AppSize.s20,
-      offset: const Offset(AppSize.s0, AppSize.s10),
-    ),
-  ],
-);
 
 String _appointmentStatus(DonationAppointmentStatus status) => switch (status) {
   DonationAppointmentStatus.pending => AppStrings.pending,
