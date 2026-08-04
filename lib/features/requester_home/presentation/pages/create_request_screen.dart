@@ -1,19 +1,26 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart' as intl;
 
-import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/algerian_wilayas.dart';
 import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/presentation/widgets/app_dialog.dart';
+import '../../../../core/presentation/widgets/app_page.dart';
+import '../../../../core/presentation/widgets/app_text_field.dart';
+import '../../../../core/presentation/widgets/hero_banner.dart';
+import '../../../../core/presentation/widgets/searchable_wilaya_field.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/blood_request_entity.dart';
 import '../bloc/request_bloc.dart';
+import '../widgets/request_form_fields.dart';
 
 class CreateRequestScreen extends StatefulWidget {
   final VoidCallback? onSuccess;
@@ -34,6 +41,7 @@ class CreateRequestScreen extends StatefulWidget {
 class _CreateRequestScreenState extends State<CreateRequestScreen> {
   final _unitsController = TextEditingController();
   final _notesController = TextEditingController();
+  final _wilayaController = TextEditingController();
   final _patientNameController = TextEditingController();
   final _patientNationalIdController = TextEditingController();
   final _patientWeightController = TextEditingController();
@@ -45,6 +53,10 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   String _patientGender = AppConstants.genderMale;
   BeneficiaryType _beneficiaryType = BeneficiaryType.self;
   RequestPriority _priority = RequestPriority.normal;
+
+  /// The third-party flow is two Figma screens: the patient identity step and
+  /// the request step. The `for myself` flow only ever shows the second one.
+  bool _isPatientStep = false;
 
   @override
   void initState() {
@@ -58,6 +70,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   void dispose() {
     _unitsController.dispose();
     _notesController.dispose();
+    _wilayaController.dispose();
     _patientNameController.dispose();
     _patientNationalIdController.dispose();
     _patientWeightController.dispose();
@@ -83,132 +96,20 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
         }
       },
       builder: (context, state) {
-        return Scaffold(
-          body: Directionality(
-            textDirection: TextDirection.rtl,
-            child: Container(
-              decoration: BoxDecoration(
-                color: ColorManager.white,
-                gradient: LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [
-                    ColorManager.welcomeGradientStart,
-                    ColorManager.welcomeGradientEnd,
-                  ],
-                ),
-              ),
-              child: Material(
-                color: ColorManager.transparent,
-                child: SafeArea(
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: AppSize.s402),
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppPadding.p10,
-                          vertical: AppPadding.p32,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            _buildHeader(context),
-                            const SizedBox(height: AppSize.s46),
-                            _buildBanner(context),
-                            const SizedBox(height: AppSize.s24),
-                            Text(
-                              AppStrings.urgencyLevel.tr(),
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            const SizedBox(height: AppSize.s12),
-                            _buildPrioritySelector(),
-                            const SizedBox(height: AppSize.s24),
-                            _buildHospitalField(state),
-                            const SizedBox(height: AppSize.s16),
-                            _buildBloodTypeField(),
-                            const SizedBox(height: AppSize.s16),
-                            if (_beneficiaryType == BeneficiaryType.other) ...[
-                              _buildPatientFields(context),
-                              const SizedBox(height: AppSize.s16),
-                            ],
-                            TextField(
-                              key: WidgetKeys.requestUnitsField,
-                              controller: _unitsController,
-                              keyboardType: TextInputType.number,
-                              textAlign: TextAlign.right,
-                              decoration: InputDecoration(
-                                hintText: AppStrings.bagsRequired.tr(),
-                                suffixIcon: const Icon(
-                                  Icons.bloodtype_outlined,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: AppSize.s16),
-                            _buildDeadlineField(context),
-                            const SizedBox(height: AppSize.s16),
-                            TextField(
-                              key: WidgetKeys.requestNotesField,
-                              controller: _notesController,
-                              maxLines: AppSize.s4.toInt(),
-                              textAlign: TextAlign.right,
-                              decoration: InputDecoration(
-                                hintText: AppStrings.notes.tr(),
-                                suffixIcon: const Icon(Icons.notes_outlined),
-                              ),
-                            ),
-                            if (state.hospitals.isEmpty &&
-                                state.status != RequestViewStatus.loading) ...[
-                              const SizedBox(height: AppSize.s12),
-                              Text(
-                                AppStrings.noVerifiedHospitals.tr(),
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(color: ColorManager.error),
-                              ),
-                            ],
-                            const SizedBox(height: AppSize.s24),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton(
-                                    key: WidgetKeys.requestSubmitButton,
-                                    onPressed:
-                                        state.status ==
-                                                RequestViewStatus.submitting ||
-                                            state.hospitals.isEmpty
-                                        ? null
-                                        : _submit,
-                                    child:
-                                        state.status ==
-                                            RequestViewStatus.submitting
-                                        ? SizedBox(
-                                            width: AppSize.s24,
-                                            height: AppSize.s24,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: AppSize.s2,
-                                              color: ColorManager.white,
-                                            ),
-                                          )
-                                        : Text(AppStrings.next.tr()),
-                                  ),
-                                ),
-                                const SizedBox(width: AppSize.s12),
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: _clear,
-                                    child: Text(AppStrings.clearFields.tr()),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: Scaffold(
+            backgroundColor: ColorManager.transparent,
+            body: AppPage(
+              title: AppStrings.welcomeUser.tr(),
+              subtitle: AppStrings.getWellSoon.tr(),
+              notificationsKey: WidgetKeys.requesterNotificationsButton,
+              onNotifications:
+                  widget.onNotifications ??
+                  () => Navigator.pushNamed(context, Routes.notificationsRoute),
+              children: _isPatientStep
+                  ? _buildPatientStep()
+                  : _buildRequestStep(state),
             ),
           ),
         );
@@ -216,188 +117,33 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppStrings.welcomeUser.tr(),
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              Text(
-                AppStrings.getWellSoon.tr(),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-        ),
-        IconButton(
-          key: WidgetKeys.requesterNotificationsButton,
-          onPressed:
-              widget.onNotifications ??
-              () => Navigator.pushNamed(context, Routes.notificationsRoute),
-          style: IconButton.styleFrom(
-            padding: const EdgeInsets.all(AppPadding.p8),
-            backgroundColor: ColorManager.surfaceAlt,
-            minimumSize: const Size.square(AppSize.s40),
-            maximumSize: const Size.square(AppSize.s40),
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            shape: const CircleBorder(),
-          ),
-          constraints: const BoxConstraints(),
-          icon: const Icon(Icons.notifications_none_rounded, size: AppSize.s24),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBanner(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppPadding.p20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [ColorManager.primary, ColorManager.primaryDark],
-        ),
-        borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
+  /// Figma `776:188` — the third-party patient identity step.
+  List<Widget> _buildPatientStep() {
+    final dateOfBirth = _patientDateOfBirth;
+    return [
+      HeroBanner(
+        title: AppStrings.createRequestBanner.tr(),
+        message: AppStrings.otherRequestDescription.tr(),
       ),
-      child: Row(
+      const SizedBox(height: AppSize.s12),
+      RequestFormSection(
+        hintColor: ColorManager.lightGrey,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppStrings.createRequestBanner.tr(),
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(color: ColorManager.white),
-                ),
-                const SizedBox(height: AppSize.s8),
-                Text(
-                  AppStrings.requestFormDescription.tr(),
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: ColorManager.white),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: AppSize.s12),
-          Icon(
-            Icons.volunteer_activism_outlined,
-            size: AppSize.s60,
-            color: ColorManager.white,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPrioritySelector() {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      spacing: AppSize.s8,
-      runSpacing: AppSize.s8,
-      children: RequestPriority.values.map((priority) {
-        final selected = priority == _priority;
-        final color = _priorityColor(priority);
-        return ChoiceChip(
-          selected: selected,
-          onSelected: (_) => setState(() => _priority = priority),
-          label: Text(_priorityLabel(priority).tr()),
-          avatar: Icon(Icons.circle, size: AppSize.s8, color: color),
-          selectedColor: color.withValues(alpha: AppOpacity.muted),
-          side: BorderSide(color: selected ? color : ColorManager.borderGrey),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildHospitalField(RequestState state) {
-    return DropdownButtonFormField<String>(
-      key: WidgetKeys.requestHospitalField,
-      initialValue: _hospitalId,
-      isExpanded: true,
-      decoration: InputDecoration(
-        hintText: AppStrings.selectHospital.tr(),
-        suffixIcon: const Icon(Icons.local_hospital_outlined),
-      ),
-      items: state.hospitals
-          .map(
-            (hospital) => DropdownMenuItem(
-              value: hospital.id,
-              child: Text(hospital.nameAr, overflow: TextOverflow.ellipsis),
-            ),
-          )
-          .toList(),
-      onChanged: (value) => setState(() => _hospitalId = value),
-    );
-  }
-
-  Widget _buildBloodTypeField() {
-    return DropdownButtonFormField<String>(
-      key: WidgetKeys.requestBloodTypeField,
-      initialValue: _bloodType,
-      isExpanded: true,
-      decoration: InputDecoration(
-        hintText: AppStrings.selectBloodType.tr(),
-        suffixIcon: const Icon(Icons.bloodtype_outlined),
-      ),
-      items: supportedBloodTypes
-          .map(
-            (bloodType) =>
-                DropdownMenuItem(value: bloodType, child: Text(bloodType)),
-          )
-          .toList(),
-      onChanged: (value) => setState(() => _bloodType = value),
-    );
-  }
-
-  Widget _buildPatientFields(BuildContext context) {
-    final dateLabel = _patientDateOfBirth == null
-        ? AppStrings.dateOfBirth.tr()
-        : intl.DateFormat(
-            AppConstants.requestDateFormat,
-          ).format(_patientDateOfBirth!.toLocal());
-    return Container(
-      padding: const EdgeInsets.all(AppPadding.p16),
-      decoration: BoxDecoration(
-        color: ColorManager.white,
-        borderRadius: BorderRadius.circular(AppSize.radiusLarge),
-      ),
-      child: Column(
-        children: [
-          TextField(
+          AppTextField(
+            hintText: AppStrings.username.tr(),
+            prefixSvg: SvgAssets.person,
             controller: _patientNameController,
-            textAlign: TextAlign.right,
-            decoration: InputDecoration(
-              hintText: AppStrings.patientName.tr(),
-              suffixIcon: const Icon(Icons.person_outline_rounded),
-            ),
           ),
-          const SizedBox(height: AppSize.s12),
-          TextField(
+          AppTextField(
+            hintText: AppStrings.nationalId.tr(),
+            prefixSvg: SvgAssets.idSerialNumber,
             controller: _patientNationalIdController,
             keyboardType: TextInputType.number,
-            textAlign: TextAlign.right,
-            decoration: InputDecoration(
-              hintText: AppStrings.nationalId.tr(),
-              suffixIcon: const Icon(Icons.badge_outlined),
-            ),
           ),
-          const SizedBox(height: AppSize.s12),
-          DropdownButtonFormField<String>(
-            initialValue: _patientGender,
-            isExpanded: true,
-            decoration: InputDecoration(
-              hintText: AppStrings.gender.tr(),
-              suffixIcon: const Icon(Icons.person_outline_rounded),
-            ),
+          RequestDropdownField<String>(
+            value: _patientGender,
+            hintText: AppStrings.gender.tr(),
+            prefixSvg: SvgAssets.person,
             items: [
               DropdownMenuItem(
                 value: AppConstants.genderMale,
@@ -411,57 +157,189 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             onChanged: (value) =>
                 setState(() => _patientGender = value ?? _patientGender),
           ),
-          const SizedBox(height: AppSize.s12),
-          TextField(
-            controller: _patientWeightController,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            textAlign: TextAlign.right,
-            decoration: InputDecoration(
-              hintText: AppStrings.weight.tr(),
-              suffixIcon: const Icon(Icons.monitor_weight_outlined),
-            ),
-          ),
-          const SizedBox(height: AppSize.s12),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(dateLabel, textAlign: TextAlign.right),
-            trailing: const Icon(Icons.calendar_today_outlined),
+          RequestPickerField(
+            label: dateOfBirth == null
+                ? AppStrings.dateOfBirth.tr()
+                : intl.DateFormat(
+                    AppConstants.requestDateFormat,
+                  ).format(dateOfBirth.toLocal()),
+            prefixSvg: SvgAssets.calendarDate,
+            isPlaceholder: dateOfBirth == null,
             onTap: () => _pickPatientDateOfBirth(context),
           ),
-          const SizedBox(height: AppSize.s12),
-          TextField(
+          AppTextField(
+            hintText: AppStrings.weight.tr(),
+            prefixSvg: SvgAssets.weight,
+            controller: _patientWeightController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          ),
+          RequestDropdownField<String>(
+            value: _bloodType,
+            hintText: AppStrings.bloodType.tr(),
+            prefixSvg: SvgAssets.bloodType,
+            items: supportedBloodTypes
+                .map(
+                  (bloodType) =>
+                      DropdownMenuItem(value: bloodType, child: Text(bloodType)),
+                )
+                .toList(),
+            onChanged: (value) => setState(() => _bloodType = value),
+          ),
+          AppTextField(
+            hintText: AppStrings.chronicDiseases.tr(),
+            prefixSvg: SvgAssets.requestNote,
             controller: _patientChronicDiseasesController,
-            textAlign: TextAlign.right,
-            maxLines: AppSize.s4.toInt(),
-            decoration: InputDecoration(
-              hintText: AppStrings.chronicDiseases.tr(),
-              suffixIcon: const Icon(Icons.medical_information_outlined),
-            ),
+            isMultiline: true,
           ),
         ],
       ),
-    );
+      const SizedBox(height: AppSize.s12),
+      RequestFooterButtons(
+        clearLabel: AppStrings.clearFields.tr(),
+        onClear: _clear,
+        actionLabel: AppStrings.next.tr(),
+        onAction: () => setState(() => _isPatientStep = false),
+      ),
+    ];
   }
 
-  Widget _buildDeadlineField(BuildContext context) {
-    final label = _neededBy == null
-        ? AppStrings.optionalDeadline.tr()
-        : intl.DateFormat(
-            AppConstants.requestDateFormat,
-          ).format(_neededBy!.toLocal());
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: AppPadding.p16,
-        vertical: AppPadding.p4,
+  /// Figma `774:79` (for myself) and `776:342` (for someone else).
+  List<Widget> _buildRequestStep(RequestState state) {
+    final isForOther = _beneficiaryType == BeneficiaryType.other;
+    final hospitals = _visibleHospitals(state);
+    final neededBy = _neededBy;
+    return [
+      HeroBanner(
+        title: AppStrings.createRequestBanner.tr(),
+        message: isForOther
+            ? AppStrings.otherRequestDescription.tr()
+            : AppStrings.requestFormDescription.tr(),
       ),
-      tileColor: ColorManager.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSize.radiusLarge),
+      const SizedBox(height: AppSize.s12),
+      RequestUrgencySelector<RequestPriority>(
+        title: AppStrings.urgencyLevel.tr(),
+        selected: _priority,
+        unselectedBackground: ColorManager.white,
+        onSelected: (priority) => setState(() => _priority = priority),
+        options: _priorityOptions(),
       ),
-      title: Text(label),
-      trailing: const Icon(Icons.calendar_today_outlined),
-      onTap: () => _pickDeadline(context),
-    );
+      const SizedBox(height: AppSize.s12),
+      RequestFormSection(
+        children: [
+          AppTextField(
+            key: WidgetKeys.requestUnitsField,
+            hintText: AppStrings.bagsRequired.tr(),
+            prefixSvg: SvgAssets.requestBags,
+            controller: _unitsController,
+            keyboardType: TextInputType.number,
+          ),
+          if (!isForOther)
+            SearchableWilayaField(controller: _wilayaController),
+          RequestDropdownField<String>(
+            fieldKey: WidgetKeys.requestHospitalField,
+            value: hospitals.any((hospital) => hospital.id == _hospitalId)
+                ? _hospitalId
+                : null,
+            hintText: AppStrings.hospitalNameField.tr(),
+            prefixSvg: SvgAssets.requestHospital,
+            items: hospitals
+                .map(
+                  (hospital) => DropdownMenuItem(
+                    value: hospital.id,
+                    child: Text(
+                      hospital.nameAr,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                )
+                .toList(),
+            onChanged: (value) => setState(() => _hospitalId = value),
+          ),
+          if (!isForOther)
+            RequestDropdownField<String>(
+              fieldKey: WidgetKeys.requestBloodTypeField,
+              value: _bloodType,
+              hintText: AppStrings.bloodType.tr(),
+              prefixSvg: SvgAssets.bloodType,
+              items: supportedBloodTypes
+                  .map(
+                    (bloodType) => DropdownMenuItem(
+                      value: bloodType,
+                      child: Text(bloodType),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) => setState(() => _bloodType = value),
+            ),
+          RequestPickerField(
+            label: neededBy == null
+                ? AppStrings.deadlineField.tr()
+                : intl.DateFormat(
+                    AppConstants.requestDateFormat,
+                  ).format(neededBy.toLocal()),
+            prefixSvg: SvgAssets.calendarDate,
+            isPlaceholder: neededBy == null,
+            onTap: () => _pickDeadline(context),
+          ),
+          AppTextField(
+            key: WidgetKeys.requestNotesField,
+            hintText: isForOther
+                ? AppStrings.requestReason.tr()
+                : AppStrings.notes.tr(),
+            prefixSvg: SvgAssets.requestNote,
+            controller: _notesController,
+            isMultiline: true,
+          ),
+        ],
+      ),
+      if (state.hospitals.isEmpty &&
+          state.status != RequestViewStatus.loading) ...[
+        const SizedBox(height: AppSize.s12),
+        Text(
+          AppStrings.noVerifiedHospitals.tr(),
+          textAlign: TextAlign.center,
+          style: getRegularStyle(
+            fontSize: FontSize.s12,
+            color: ColorManager.error,
+          ),
+        ),
+      ],
+      const SizedBox(height: AppSize.s12),
+      RequestFooterButtons(
+        clearLabel: AppStrings.clearFields.tr(),
+        onClear: _clear,
+        actionLabel: AppStrings.next.tr(),
+        actionKey: WidgetKeys.requestSubmitButton,
+        isBusy: state.status == RequestViewStatus.submitting,
+        onAction:
+            state.status == RequestViewStatus.submitting ||
+                state.hospitals.isEmpty
+            ? null
+            : _submit,
+      ),
+    ];
+  }
+
+  List<RequestUrgencyOption<RequestPriority>> _priorityOptions() =>
+      RequestPriority.values
+          .map(
+            (priority) => RequestUrgencyOption(
+              value: priority,
+              label: _priorityLabel(priority).tr(),
+              dotColor: _priorityColor(priority),
+            ),
+          )
+          .toList();
+
+  /// Hospitals narrowed to the wilaya typed into the Figma `الولاية` field —
+  /// a view-level filter over the list the bloc already loaded.
+  List<HospitalEntity> _visibleHospitals(RequestState state) {
+    final index = algerianWilayas.indexOf(_wilayaController.text.trim());
+    if (index < AppSize.s0.toInt()) return state.hospitals;
+    final wilayaId = index + AppSize.s1.toInt();
+    return state.hospitals
+        .where((hospital) => hospital.wilayaId == wilayaId)
+        .toList();
   }
 
   Future<void> _pickDeadline(BuildContext context) async {
@@ -563,6 +441,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       _priority = RequestPriority.normal;
       _unitsController.clear();
       _notesController.clear();
+      _wilayaController.clear();
       _patientNameController.clear();
       _patientNationalIdController.clear();
       _patientWeightController.clear();
@@ -579,96 +458,24 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       barrierColor: ColorManager.dialogScrim,
       builder: (dialogContext) => Directionality(
         textDirection: TextDirection.rtl,
-        child: Dialog(
-          backgroundColor: ColorManager.transparent,
-          elevation: AppSize.s0,
-          insetPadding: const EdgeInsets.symmetric(horizontal: AppPadding.p20),
-          child: Container(
-            width: AppSize.s320,
-            padding: const EdgeInsets.all(AppSize.s40),
-            decoration: BoxDecoration(
-              color: ColorManager.white,
-              borderRadius: BorderRadius.circular(AppSize.s40),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SvgPicture.asset(
-                  SvgAssets.warning,
-                  width: AppSize.s60,
-                  height: AppSize.s60,
-                ),
-                const SizedBox(height: AppSize.s10),
-                Text(
-                  AppStrings.profileDataTitle.tr(),
-                  textAlign: TextAlign.center,
-                  style: Theme.of(dialogContext).textTheme.titleMedium
-                      ?.copyWith(
-                        color: ColorManager.welcomeText,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                const SizedBox(height: AppSize.s10),
-                Text(
-                  AppStrings.profileDataNotice.tr(),
-                  textAlign: TextAlign.center,
-                  style: Theme.of(dialogContext).textTheme.bodyMedium?.copyWith(
-                    color: ColorManager.welcomeText,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: AppSize.s10),
-                SizedBox(
-                  width: AppSize.s174,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                      _showBeneficiaryDialog();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSize.s11_6,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSize.radiusDialogAction,
-                        ),
-                      ),
-                    ),
-                    child: Text(AppStrings.confirm.tr()),
-                  ),
-                ),
-                const SizedBox(height: AppSize.s10),
-                SizedBox(
-                  width: AppSize.s174,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                      (widget.onProfile ??
-                              () => Navigator.pushNamed(
-                                context,
-                                Routes.requesterProfileRoute,
-                              ))
-                          .call();
-                    },
-                    style: TextButton.styleFrom(
-                      backgroundColor: ColorManager.welcomeText,
-                      foregroundColor: ColorManager.white,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSize.s11_6,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSize.radiusDialogAction,
-                        ),
-                      ),
-                    ),
-                    child: Text(AppStrings.updateProfile.tr()),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        child: AppDialog.warning(
+          title: AppStrings.profileDataTitle.tr(),
+          message: AppStrings.profileDataNotice.tr(),
+          actionLabel: AppStrings.confirm.tr(),
+          onAction: () {
+            Navigator.pop(dialogContext);
+            _showBeneficiaryDialog();
+          },
+          secondaryLabel: AppStrings.updateProfile.tr(),
+          onSecondaryAction: () {
+            Navigator.pop(dialogContext);
+            (widget.onProfile ??
+                    () => Navigator.pushNamed(
+                      context,
+                      Routes.requesterProfileRoute,
+                    ))
+                .call();
+          },
         ),
       ),
     );
@@ -681,93 +488,27 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       barrierColor: ColorManager.dialogScrim,
       builder: (dialogContext) => Directionality(
         textDirection: TextDirection.rtl,
-        child: Dialog(
-          backgroundColor: ColorManager.transparent,
-          elevation: AppSize.s0,
-          insetPadding: const EdgeInsets.symmetric(horizontal: AppPadding.p20),
-          child: Container(
-            width: AppSize.s320,
-            padding: const EdgeInsets.all(AppSize.s40),
-            decoration: BoxDecoration(
-              color: ColorManager.white,
-              borderRadius: BorderRadius.circular(AppSize.s40),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SvgPicture.asset(
-                  SvgAssets.warning,
-                  width: AppSize.s60,
-                  height: AppSize.s60,
-                ),
-                const SizedBox(height: AppSize.s10),
-                Text(
-                  AppStrings.requestBeneficiaryTitle.tr(),
-                  textAlign: TextAlign.center,
-                  style: Theme.of(dialogContext).textTheme.titleMedium
-                      ?.copyWith(
-                        color: ColorManager.welcomeText,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                const SizedBox(height: AppSize.s10),
-                Text(
-                  AppStrings.requestBeneficiaryBody.tr(),
-                  textAlign: TextAlign.center,
-                  style: Theme.of(dialogContext).textTheme.bodyMedium?.copyWith(
-                    color: ColorManager.welcomeText,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: AppSize.s10),
-                SizedBox(
-                  width: AppSize.s174,
-                  child: ElevatedButton(
-                    key: WidgetKeys.requestForSelfButton,
-                    onPressed: () {
-                      setState(() => _beneficiaryType = BeneficiaryType.self);
-                      Navigator.pop(dialogContext);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSize.s11_6,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSize.radiusDialogAction,
-                        ),
-                      ),
-                    ),
-                    child: Text(AppStrings.requestForSelf.tr()),
-                  ),
-                ),
-                const SizedBox(height: AppSize.s10),
-                SizedBox(
-                  width: AppSize.s174,
-                  child: TextButton(
-                    key: WidgetKeys.requestForOtherButton,
-                    onPressed: () {
-                      setState(() => _beneficiaryType = BeneficiaryType.other);
-                      Navigator.pop(dialogContext);
-                    },
-                    style: TextButton.styleFrom(
-                      backgroundColor: ColorManager.welcomeText,
-                      foregroundColor: ColorManager.white,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSize.s11_6,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSize.radiusDialogAction,
-                        ),
-                      ),
-                    ),
-                    child: Text(AppStrings.requestForOther.tr()),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        child: AppDialog.warning(
+          title: AppStrings.requestBeneficiaryTitle.tr(),
+          message: AppStrings.requestBeneficiaryBody.tr(),
+          actionLabel: AppStrings.requestForSelf.tr(),
+          actionKey: WidgetKeys.requestForSelfButton,
+          onAction: () {
+            setState(() {
+              _beneficiaryType = BeneficiaryType.self;
+              _isPatientStep = false;
+            });
+            Navigator.pop(dialogContext);
+          },
+          secondaryLabel: AppStrings.requestForOther.tr(),
+          secondaryKey: WidgetKeys.requestForOtherButton,
+          onSecondaryAction: () {
+            setState(() {
+              _beneficiaryType = BeneficiaryType.other;
+              _isPatientStep = true;
+            });
+            Navigator.pop(dialogContext);
+          },
         ),
       ),
     );
@@ -780,65 +521,13 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       barrierColor: ColorManager.dialogScrim,
       builder: (dialogContext) => Directionality(
         textDirection: TextDirection.rtl,
-        child: Dialog(
-          backgroundColor: ColorManager.transparent,
-          elevation: AppSize.s0,
-          insetPadding: const EdgeInsets.symmetric(horizontal: AppPadding.p20),
-          child: Container(
-            width: AppSize.s320,
-            padding: const EdgeInsets.all(AppSize.s40),
-            decoration: BoxDecoration(
-              color: ColorManager.white,
-              borderRadius: BorderRadius.circular(AppSize.s40),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SvgPicture.asset(
-                  SvgAssets.successCheck,
-                  width: AppSize.s60,
-                  height: AppSize.s60,
-                ),
-                const SizedBox(height: AppSize.s10),
-                Text(
-                  AppStrings.requestCreated.tr(),
-                  textAlign: TextAlign.center,
-                  style: Theme.of(dialogContext).textTheme.titleMedium
-                      ?.copyWith(
-                        color: ColorManager.welcomeText,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                const SizedBox(height: AppSize.s10),
-                Image.asset(
-                  ImageAssets.icon6,
-                  width: AppSize.s76,
-                  height: AppSize.s76,
-                ),
-                const SizedBox(height: AppSize.s10),
-                SizedBox(
-                  width: AppSize.s174,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(dialogContext);
-                      widget.onSuccess?.call();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSize.s11_6,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          AppSize.radiusDialogAction,
-                        ),
-                      ),
-                    ),
-                    child: Text(AppStrings.myRequests.tr()),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        child: AppDialog.success(
+          title: AppStrings.requestCreated.tr(),
+          actionLabel: AppStrings.myRequests.tr(),
+          onAction: () {
+            Navigator.pop(dialogContext);
+            widget.onSuccess?.call();
+          },
         ),
       ),
     );
@@ -852,7 +541,7 @@ String _priorityLabel(RequestPriority priority) => switch (priority) {
 };
 
 Color _priorityColor(RequestPriority priority) => switch (priority) {
-  RequestPriority.normal => ColorManager.success,
-  RequestPriority.semiUrgent => ColorManager.warning,
-  RequestPriority.urgent => ColorManager.error,
+  RequestPriority.normal => ColorManager.urgencyNormal,
+  RequestPriority.semiUrgent => ColorManager.urgencyUrgent,
+  RequestPriority.urgent => ColorManager.urgencyCritical,
 };
