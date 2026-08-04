@@ -132,34 +132,34 @@ ThemeData getAppTheme() {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: ColorManager.surface,
+      fillColor: ColorManager.white,
       contentPadding: const EdgeInsets.symmetric(
-        horizontal: AppPadding.p20,
-        vertical: AppPadding.p16,
+        horizontal: AppPadding.p16,
+        vertical: AppPadding.p11,
       ),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSize.radiusLarge),
+        borderRadius: BorderRadius.circular(AppSize.radiusField),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSize.radiusLarge),
+        borderRadius: BorderRadius.circular(AppSize.radiusField),
         borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSize.radiusLarge),
+        borderRadius: BorderRadius.circular(AppSize.radiusField),
         borderSide: BorderSide(color: ColorManager.primary, width: AppSize.s1),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSize.radiusLarge),
+        borderRadius: BorderRadius.circular(AppSize.radiusField),
         borderSide: BorderSide(color: ColorManager.error, width: AppSize.s1),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSize.radiusLarge),
+        borderRadius: BorderRadius.circular(AppSize.radiusField),
         borderSide: BorderSide(color: ColorManager.error, width: AppSize.s1),
       ),
       hintStyle: getRegularStyle(
         color: ColorManager.textLight,
-        fontSize: FontSize.s14,
+        fontSize: FontSize.s16,
       ),
       labelStyle: getMediumStyle(
         color: ColorManager.textMuted,
