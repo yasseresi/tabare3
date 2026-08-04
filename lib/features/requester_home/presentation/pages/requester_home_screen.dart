@@ -32,6 +32,7 @@ import 'create_request_screen.dart';
 import 'donor_history_screen.dart';
 import 'edit_request_screen.dart';
 import 'request_detail_screen.dart';
+import 'requester_qr_screen.dart';
 import 'requests_screen.dart';
 
 enum _RequesterTab {
@@ -44,6 +45,7 @@ enum _RequesterTab {
   about,
   edit,
   detail,
+  qr,
 }
 
 class RequesterHomeScreen extends StatefulWidget {
@@ -127,6 +129,17 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
           onAbout: () => setState(() => _selectedTab = _RequesterTab.about),
           onNotifications: () =>
               setState(() => _selectedTab = _RequesterTab.notifications),
+          onQrCode: () => setState(() => _selectedTab = _RequesterTab.qr),
+        ),
+      ),
+      _RequesterTab.qr => BlocProvider(
+        create: (_) => sl<RequestDetailBloc>(),
+        child: Builder(
+          builder: (context) => RequesterQrScreen(
+            request: _activeRequest(context),
+            onNotifications: () =>
+                setState(() => _selectedTab = _RequesterTab.notifications),
+          ),
         ),
       ),
       _RequesterTab.notifications => BlocProvider(
@@ -172,6 +185,16 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
                 ),
               ),
     };
+  }
+
+  /// The request a recipient QR should be issued against — their single open
+  /// request, since the schema allows only one at a time.
+  BloodRequestEntity? _activeRequest(BuildContext context) {
+    final requests = context.read<RequestBloc>().state.requests;
+    for (final request in requests) {
+      if (request.isActive) return request;
+    }
+    return null;
   }
 
   void _openDetail(BloodRequestEntity request) {
@@ -364,7 +387,8 @@ class _RequesterNavigation extends StatelessWidget {
           asset: SvgAssets.navPerson,
           selected:
               selectedTab == _RequesterTab.profile ||
-              selectedTab == _RequesterTab.about,
+              selectedTab == _RequesterTab.about ||
+              selectedTab == _RequesterTab.qr,
           onTap: () => onSelected(_RequesterTab.profile),
         ),
       ],

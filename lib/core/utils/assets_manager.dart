@@ -63,4 +63,5 @@ class SvgAssets {
   static const String headerBell = '$iconPath/header_bell.svg';
   static const String search = '$iconPath/search.svg';
   static const String giftCard = '$iconPath/gift_card.svg';
+  static const String qrScanFrame = '$iconPath/qr_scan_frame.svg';
 }

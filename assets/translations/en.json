@@ -339,5 +339,8 @@
   "qr_section": "QR code",
   "scan_qr_code": "Scan QR code",
   "my_qr_code": "My QR code",
-  "level_progress_description": "Every donation brings you closer to a new level and increases your impact in saving lives, because continued giving deserves recognition."
+  "level_progress_description": "Every donation brings you closer to a new level and increases your impact in saving lives, because continued giving deserves recognition.",
+  "qr_code_title": "QR code",
+  "scan_qr_to_complete": "Scan the QR code to complete the blood donation.",
+  "show_qr_description": "Show your QR code to complete the donation."
 }

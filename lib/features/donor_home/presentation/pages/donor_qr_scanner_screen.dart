@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
@@ -7,6 +6,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/presentation/widgets/app_bottom_nav.dart';
+import '../../../../core/presentation/widgets/app_gradient_background.dart';
+import '../../../../core/presentation/widgets/app_header.dart';
+import '../../../../core/presentation/widgets/qr_page_body.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/string_manager.dart';
@@ -65,92 +68,45 @@ class _DonorQrScannerScreenState extends State<DonorQrScannerScreen> {
       child: Scaffold(
         backgroundColor: ColorManager.transparent,
         bottomNavigationBar: _ScannerNavigation(onNavigate: _navigate),
-        body: Container(
-          decoration: BoxDecoration(
-            color: ColorManager.white,
-            gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [
-                ColorManager.welcomeGradientStart,
-                ColorManager.welcomeGradientEnd,
-              ],
-            ),
-          ),
+        body: AppGradientBackground(
           child: SafeArea(
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: AppSize.s402),
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppPadding.p32,
-                        AppPadding.p32,
-                        AppPadding.p32,
-                        AppPadding.p20,
-                      ),
-                      child: _ScannerHeader(
-                        onNotifications: () =>
-                            _navigate(DonorScannerDestination.notifications),
-                      ),
+                    AppHeader(
+                      title: AppStrings.welcomeUser.tr(),
+                      subtitle: AppStrings.donationLifeChance.tr(),
+                      notificationsKey: WidgetKeys.donorNotificationsButton,
+                      onNotifications: () =>
+                          _navigate(DonorScannerDestination.notifications),
                     ),
-                    Text(
-                      AppStrings.scanQrTitle.tr(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: AppSize.s24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: AppSize.s10),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppPadding.p10,
-                      ),
-                      child: Text(
-                        AppStrings.scanQrDescription.tr(),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: ColorManager.textMuted,
-                          fontSize: AppSize.s20,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppSize.s40),
                     Expanded(
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          final scanSize = math.min(
-                            constraints.maxWidth - AppPadding.p20,
-                            constraints.maxHeight,
-                          );
-                          return Center(
-                            child: SizedBox(
-                              width: scanSize,
-                              height: scanSize,
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                      AppSize.radiusXXLarge,
-                                    ),
-                                    child: scanner,
-                                  ),
-                                  IgnorePointer(
-                                    child: CustomPaint(
-                                      painter: _QrScanFramePainter(
-                                        color: ColorManager.primary,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppPadding.p10,
+                        ),
+                        child: QrPageBody(
+                          description: AppStrings.scanQrToComplete.tr(),
+                          square: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                  AppSize.radiusXXLarge,
+                                ),
+                                child: scanner,
                               ),
-                            ),
-                          );
-                        },
+                              IgnorePointer(
+                                child: SvgPicture.asset(
+                                  SvgAssets.qrScanFrame,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -187,52 +143,6 @@ class _DonorQrScannerScreenState extends State<DonorQrScannerScreen> {
   }
 }
 
-class _ScannerHeader extends StatelessWidget {
-  const _ScannerHeader({required this.onNotifications});
-
-  final VoidCallback onNotifications;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppStrings.welcomeUser.tr(),
-                style: const TextStyle(
-                  fontSize: AppSize.s18,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              Text(
-                AppStrings.donationLifeChance.tr(),
-                style: TextStyle(
-                  color: ColorManager.textMuted,
-                  fontSize: AppSize.s14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-        IconButton(
-          onPressed: onNotifications,
-          style: IconButton.styleFrom(
-            padding: const EdgeInsets.all(AppPadding.p8),
-            backgroundColor: ColorManager.surfaceAlt,
-            shape: const CircleBorder(),
-          ),
-          constraints: const BoxConstraints(),
-          icon: const Icon(Icons.notifications_none_rounded, size: AppSize.s24),
-        ),
-      ],
-    );
-  }
-}
-
 class _ScannerNavigation extends StatelessWidget {
   const _ScannerNavigation({required this.onNavigate});
 
@@ -240,127 +150,37 @@ class _ScannerNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: AppSize.s80,
-      child: ColoredBox(
-        color: ColorManager.white,
-        child: Directionality(
-          textDirection: TextDirection.ltr,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _ScannerNavigationItem(
-                navKey: WidgetKeys.donorNavigationHome,
-                asset: SvgAssets.icon1,
-                destination: DonorScannerDestination.home,
-                onNavigate: onNavigate,
-              ),
-              _ScannerNavigationItem(
-                asset: SvgAssets.icon2,
-                destination: DonorScannerDestination.requests,
-                onNavigate: onNavigate,
-              ),
-              _ScannerNavigationItem(
-                navKey: WidgetKeys.donorNavigationAppointments,
-                asset: SvgAssets.icon3,
-                destination: DonorScannerDestination.appointments,
-                onNavigate: onNavigate,
-              ),
-              _ScannerNavigationItem(
-                asset: SvgAssets.icon4,
-                destination: DonorScannerDestination.record,
-                onNavigate: onNavigate,
-              ),
-              _ScannerNavigationItem(
-                navKey: WidgetKeys.donorNavigationProfile,
-                asset: SvgAssets.icon5,
-                destination: DonorScannerDestination.profile,
-                onNavigate: onNavigate,
-              ),
-            ],
-          ),
+    return AppBottomNav(
+      items: [
+        AppBottomNavItem(
+          itemKey: WidgetKeys.donorNavigationHome,
+          asset: SvgAssets.navHome,
+          selected: false,
+          onTap: () => onNavigate(DonorScannerDestination.home),
         ),
-      ),
+        AppBottomNavItem(
+          asset: SvgAssets.navRequests,
+          selected: false,
+          onTap: () => onNavigate(DonorScannerDestination.requests),
+        ),
+        AppBottomNavItem(
+          itemKey: WidgetKeys.donorNavigationAppointments,
+          asset: SvgAssets.navCalendar,
+          selected: false,
+          onTap: () => onNavigate(DonorScannerDestination.appointments),
+        ),
+        AppBottomNavItem(
+          asset: SvgAssets.navHistory,
+          selected: false,
+          onTap: () => onNavigate(DonorScannerDestination.record),
+        ),
+        AppBottomNavItem(
+          itemKey: WidgetKeys.donorNavigationProfile,
+          asset: SvgAssets.navPerson,
+          selected: false,
+          onTap: () => onNavigate(DonorScannerDestination.profile),
+        ),
+      ],
     );
-  }
-}
-
-class _ScannerNavigationItem extends StatelessWidget {
-  const _ScannerNavigationItem({
-    this.navKey,
-    required this.asset,
-    required this.destination,
-    required this.onNavigate,
-  });
-
-  final Key? navKey;
-  final String asset;
-  final DonorScannerDestination destination;
-  final ValueChanged<DonorScannerDestination> onNavigate;
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      key: navKey,
-      onPressed: () => onNavigate(destination),
-      style: IconButton.styleFrom(backgroundColor: ColorManager.transparent),
-      icon: SvgPicture.asset(
-        asset,
-        width: AppSize.s35,
-        height: AppSize.s35,
-        colorFilter: ColorFilter.mode(ColorManager.mediumGrey, BlendMode.srcIn),
-      ),
-    );
-  }
-}
-
-class _QrScanFramePainter extends CustomPainter {
-  final Color color;
-
-  const _QrScanFramePainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = AppSize.s30
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-    final inset = AppSize.s52;
-    final corner = AppSize.s52;
-    final right = size.width - inset;
-    final bottom = size.height - inset;
-    final center = size.height / AppSize.s2;
-
-    canvas.drawLine(Offset(inset, inset + corner), Offset(inset, inset), paint);
-    canvas.drawLine(Offset(inset, inset), Offset(inset + corner, inset), paint);
-    canvas.drawLine(Offset(right - corner, inset), Offset(right, inset), paint);
-    canvas.drawLine(Offset(right, inset), Offset(right, inset + corner), paint);
-    canvas.drawLine(
-      Offset(inset, bottom - corner),
-      Offset(inset, bottom),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(inset, bottom),
-      Offset(inset + corner, bottom),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(right - corner, bottom),
-      Offset(right, bottom),
-      paint,
-    );
-    canvas.drawLine(
-      Offset(right, bottom - corner),
-      Offset(right, bottom),
-      paint,
-    );
-    canvas.drawLine(Offset(inset, center), Offset(right, center), paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _QrScanFramePainter oldDelegate) {
-    return oldDelegate.color != color;
   }
 }

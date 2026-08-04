@@ -398,6 +398,9 @@ class AppStrings {
   static const String cooldownUntil = 'cooldown_until';
   static const String notAvailable = 'not_available';
   static const String scanQrTitle = 'scan_qr_title';
+  static const String qrCodeTitle = 'qr_code_title';
+  static const String scanQrToComplete = 'scan_qr_to_complete';
+  static const String showQrDescription = 'show_qr_description';
   static const String scanQrDescription = 'scan_qr_description';
   static const String availabilityUpdated = 'availability_updated';
 

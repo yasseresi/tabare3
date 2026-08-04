@@ -116,7 +116,7 @@ void main() {
 
     await tester.tap(find.text('open scanner'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.notifications_none_rounded));
+    await tester.tap(find.byKey(WidgetKeys.donorNotificationsButton));
     await tester.pumpAndSettle();
 
     expect(destination, DonorScannerDestination.notifications);
