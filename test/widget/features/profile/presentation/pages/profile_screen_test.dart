@@ -155,15 +155,15 @@ void main() {
         find.byKey(WidgetKeys.profileGradientBackground),
         findsOneWidget,
       );
-      final background = tester.widget<Container>(
+      final background = tester.widget<DecoratedBox>(
         find
             .descendant(
               of: find.byKey(WidgetKeys.profileGradientBackground),
-              matching: find.byType(Container),
+              matching: find.byType(DecoratedBox),
             )
             .first,
       );
-      expect((background.decoration! as BoxDecoration).gradient, isNotNull);
+      expect((background.decoration as BoxDecoration).gradient, isNotNull);
 
       await tester.tap(find.byKey(WidgetKeys.profileNotificationsButton));
       await tester.pump();
