@@ -464,18 +464,45 @@ void main() {
     await tester.tap(find.byKey(WidgetKeys.requestForSelfButton));
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(
+      find.byKey(WidgetKeys.requestHospitalField),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.byKey(WidgetKeys.requestHospitalField));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(WidgetKeys.requestHospitalField));
     await tester.pumpAndSettle();
     await tester.tap(find.text('مستشفى مصطفى باشا').last);
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(
+      find.byKey(WidgetKeys.requestBloodTypeField),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.byKey(WidgetKeys.requestBloodTypeField));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(WidgetKeys.requestBloodTypeField));
     await tester.pumpAndSettle();
     await tester.tap(find.text('O+').last);
     await tester.pumpAndSettle();
 
+    await tester.scrollUntilVisible(
+      find.byKey(WidgetKeys.requestUnitsField),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.byKey(WidgetKeys.requestUnitsField));
+    await tester.pumpAndSettle();
     await tester.enterText(find.byKey(WidgetKeys.requestUnitsField), '2');
+    await tester.scrollUntilVisible(
+      find.byKey(WidgetKeys.requestSubmitButton),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.ensureVisible(find.byKey(WidgetKeys.requestSubmitButton));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(WidgetKeys.requestSubmitButton));
     await tester.pumpAndSettle();
 
@@ -506,10 +533,19 @@ void main() {
 
     expect(find.text('مرحباً، أحمد'), findsOneWidget);
     expect(find.text('تعديل طلب تبرع بالدم'), findsOneWidget);
-    expect(find.text('محو'), findsOneWidget);
 
+    await tester.scrollUntilVisible(
+      find.byKey(WidgetKeys.requestUnitsField),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.enterText(find.byKey(WidgetKeys.requestUnitsField), '2');
-    await tester.ensureVisible(find.byKey(WidgetKeys.requestEditSaveButton));
+    await tester.scrollUntilVisible(
+      find.byKey(WidgetKeys.requestEditSaveButton),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('محو'), findsOneWidget);
     await tester.tap(find.byKey(WidgetKeys.requestEditSaveButton));
     await tester.pumpAndSettle();
 
@@ -565,7 +601,11 @@ void main() {
       ),
     );
 
-    await tester.ensureVisible(find.byKey(WidgetKeys.requestCancelButton));
+    await tester.scrollUntilVisible(
+      find.byKey(WidgetKeys.requestCancelButton),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.byKey(WidgetKeys.requestCancelButton));
     await tester.pumpAndSettle();
     await tester.enterText(
