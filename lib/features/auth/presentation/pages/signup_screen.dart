@@ -8,6 +8,8 @@ import '../../../../core/presentation/widgets/app_gradient_background.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
 import '../../../../core/presentation/widgets/loading_overlay.dart';
 import '../../../../core/presentation/widgets/searchable_wilaya_field.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/widget_keys.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../../../core/utils/color_manager.dart';
@@ -126,7 +128,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 child: SafeArea(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: AppPadding.p20,
+                      horizontal: AppPadding.p30,
                       vertical: AppPadding.p60,
                     ),
                     child: Form(
@@ -143,66 +145,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               size: AppSize.s76,
                             ),
                           ),
-                          const SizedBox(height: AppSize.s10),
+                          // Figma root `gap: 12` between the logo and the
+                          // content area.
+                          const SizedBox(height: AppSize.s12),
                           Text(
                             AppStrings.signup.tr(),
                             style: getBoldStyle(
                               fontSize: FontSize.s30,
-                              color: ColorManager.textPrimary,
+                              color: ColorManager.black,
+                              lineHeight: LineHeight.h36,
                             ),
                           ),
-                          const SizedBox(height: AppSize.s5),
+                          // `Heading 1:margin` pb 4 + content-area gap 20.
+                          const SizedBox(height: AppSize.s24),
                           Text(
                             _getStepTitle(),
                             style: getRegularStyle(
                               fontSize: FontSize.s14,
-                              color: ColorManager.textSecondary,
+                              color: ColorManager.welcomeText,
+                              lineHeight: LineHeight.h20,
                             ),
                           ),
-                          const SizedBox(height: AppSize.s20),
+                          // `Margin` pb 10 + content-area gap 20.
+                          const SizedBox(height: AppSize.s30),
                           _buildStepIndicator(),
                           const SizedBox(height: AppSize.s20),
                           _buildCurrentStepView(),
                           const SizedBox(height: AppSize.s20),
-                          ElevatedButton(
-                            onPressed: (_currentStep == 3 && !_agreeToTerms)
-                                ? null
-                                : _nextStep,
-                            child: Text(
-                              _currentStep == 3
-                                  ? AppStrings.signup.tr()
-                                  : AppStrings.next.tr(),
-                            ),
-                          ),
+                          _buildPrimaryButton(),
                           if (_currentStep == 1) ...[
                             const SizedBox(height: AppSize.s20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  '${AppStrings.hasAccount.tr()} ',
-                                  style: getRegularStyle(
-                                    fontSize: FontSize.s12,
-                                    color: ColorManager.textMuted,
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () => Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const LoginFormScreen(),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    AppStrings.login.tr(),
-                                    style: getBoldStyle(
-                                      fontSize: FontSize.s12,
-                                      color: ColorManager.primary,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            _buildFooterLink(),
                           ],
                           const SizedBox(height: AppSize.s20),
                         ],
@@ -231,46 +204,124 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  /// The stepper always reads 1·2·3 left to right, even inside the RTL page.
   Widget _buildStepIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildCircle(1),
-        _buildLine(),
-        _buildCircle(2),
-        _buildLine(),
-        _buildCircle(3),
-      ],
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildCircle(1),
+          _buildLine(),
+          _buildCircle(2),
+          _buildLine(),
+          _buildCircle(3),
+        ],
+      ),
     );
   }
 
   Widget _buildCircle(int step) {
     final isCurrent = _currentStep == step;
+    final numeral = '$step';
     return Container(
-      width: AppSize.s35,
-      height: AppSize.s35,
+      width: AppSize.s37_4,
+      height: AppSize.s37_4,
       decoration: BoxDecoration(
-        color: isCurrent ? ColorManager.primary : ColorManager.dividerGrey,
+        color: isCurrent ? ColorManager.primary : ColorManager.white,
         shape: BoxShape.circle,
+        border: isCurrent
+            ? null
+            : Border.all(color: ColorManager.dividerGrey, width: AppSize.s1),
       ),
       child: Center(
-        child: Text(
-          '$step',
-          style: TextStyle(
-            fontFamily: FontConstants.fontFamily,
-            color: isCurrent ? ColorManager.white : ColorManager.textMuted,
-            fontWeight: FontWeightManager.bold,
-          ),
-        ),
+        child: step == 1
+            ? Text(
+                numeral,
+                style: getMediumStyle(
+                  fontSize: FontSize.s17_9,
+                  color: isCurrent
+                      ? ColorManager.white
+                      : ColorManager.stepperInactive,
+                ),
+              )
+            : Text(
+                numeral,
+                style: getLightStyle(
+                  fontSize: FontSize.s17_9,
+                  color: isCurrent
+                      ? ColorManager.white
+                      : ColorManager.stepperInactive,
+                ),
+              ),
       ),
     );
   }
 
   Widget _buildLine() {
     return Container(
-      width: AppSize.s40,
-      height: AppSize.s2,
+      width: AppSize.s44_9,
+      height: AppSize.s1,
       color: ColorManager.dividerGrey,
+    );
+  }
+
+  /// Full-width red pill shared by all three steps.
+  Widget _buildPrimaryButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: (_currentStep == 3 && !_agreeToTerms) ? null : _nextStep,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: ColorManager.primary,
+          foregroundColor: ColorManager.white,
+          minimumSize: Size.zero,
+          padding: const EdgeInsets.symmetric(vertical: AppPadding.p16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSize.radiusField),
+          ),
+          elevation: AppSize.s8,
+          shadowColor: ColorManager.black.withValues(alpha: AppOpacity.muted),
+          textStyle: getSemiBoldStyle(
+            fontSize: FontSize.s16,
+            color: ColorManager.white,
+            lineHeight: LineHeight.h24,
+          ),
+        ),
+        child: Text(
+          _currentStep == 3 ? AppStrings.signup.tr() : AppStrings.next.tr(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFooterLink() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          '${AppStrings.hasAccount.tr()} ',
+          style: getRegularStyle(
+            fontSize: FontSize.s12,
+            color: ColorManager.welcomeText,
+            lineHeight: LineHeight.h16,
+          ),
+        ),
+        GestureDetector(
+          onTap: () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const LoginFormScreen()),
+          ),
+          child: Text(
+            AppStrings.login.tr(),
+            style: getBoldStyle(
+              fontSize: FontSize.s12,
+              color: ColorManager.black,
+              lineHeight: LineHeight.h16,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -286,16 +337,50 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Widget _buildCurrentStepView() {
-    switch (_currentStep) {
-      case 1:
-        return _buildStep1();
-      case 2:
-        return _buildStep2();
-      case 3:
-        return _buildStep3();
-      default:
-        return Container();
-    }
+    // Signup inputs sit on the gradient, so they are white pills rather than
+    // the grey `surface` fill the global theme uses on the login screen.
+    final theme = Theme.of(context);
+    return Theme(
+      data: theme.copyWith(
+        inputDecorationTheme: theme.inputDecorationTheme.copyWith(
+          fillColor: ColorManager.white,
+          contentPadding: const EdgeInsetsDirectional.fromSTEB(
+            AppSize.s0,
+            AppPadding.p11,
+            AppPadding.p16,
+            AppPadding.p11,
+          ),
+          border: _fieldBorder(),
+          enabledBorder: _fieldBorder(),
+          focusedBorder: _fieldBorder(
+            side: BorderSide(color: ColorManager.primary, width: AppSize.s1),
+          ),
+          errorBorder: _fieldBorder(
+            side: BorderSide(color: ColorManager.error, width: AppSize.s1),
+          ),
+          focusedErrorBorder: _fieldBorder(
+            side: BorderSide(color: ColorManager.error, width: AppSize.s1),
+          ),
+          hintStyle: getRegularStyle(
+            fontSize: FontSize.s16,
+            color: ColorManager.lightGrey,
+          ),
+        ),
+      ),
+      child: switch (_currentStep) {
+        1 => _buildStep1(),
+        2 => _buildStep2(),
+        3 => _buildStep3(),
+        _ => const SizedBox.shrink(),
+      },
+    );
+  }
+
+  OutlineInputBorder _fieldBorder({BorderSide? side}) {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(AppSize.radiusField),
+      borderSide: side ?? BorderSide.none,
+    );
   }
 
   Widget _buildStep1() {
@@ -408,11 +493,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
           validator: validateCity,
         ),
         const SizedBox(height: AppSize.s15),
-        AppTextField(
-          hintText: AppStrings.chronicDiseases.tr(),
-          prefixSvg: SvgAssets.illnesses,
-          controller: _chronicDiseasesController,
-          isMultiline: true,
+        SizedBox(
+          height: AppSize.s123,
+          child: AppTextField(
+            hintText: AppStrings.chronicDiseases.tr(),
+            prefixSvg: SvgAssets.illnesses,
+            controller: _chronicDiseasesController,
+            isMultiline: true,
+          ),
         ),
       ],
     );
@@ -422,36 +510,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Column(
       children: [
         Container(
+          width: double.infinity,
           padding: const EdgeInsets.all(AppPadding.p20),
           decoration: BoxDecoration(
-            color: ColorManager.surface,
-            borderRadius: BorderRadius.circular(AppSize.s20),
+            color: ColorManager.white,
+            borderRadius: BorderRadius.circular(AppSize.radiusXXLarge),
           ),
           child: Text(
             AppStrings.termsBody.tr(),
             style: getRegularStyle(
               fontSize: FontSize.s16,
-              color: ColorManager.textPrimary,
+              color: ColorManager.black,
             ),
-            textAlign: TextAlign.justify,
+            textAlign: TextAlign.start,
           ),
         ),
         const SizedBox(height: AppSize.s20),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Transform.scale(
-              scale: 0.8,
-              child: Switch(
-                value: _agreeToTerms,
-                onChanged: (v) => setState(() => _agreeToTerms = v),
+            Expanded(
+              child: Text(
+                AppStrings.acceptTerms.tr(),
+                textAlign: TextAlign.start,
+                style: getRegularStyle(
+                  fontSize: FontSize.s12,
+                  color: ColorManager.welcomeText,
+                  lineHeight: LineHeight.h16,
+                ),
               ),
             ),
-            Text(
-              AppStrings.acceptTerms.tr(),
-              style: getRegularStyle(
-                fontSize: FontSize.s14,
-                color: ColorManager.textSecondary,
-              ),
+            const SizedBox(width: AppSize.s8),
+            _TermsToggle(
+              key: WidgetKeys.signupTermsToggle,
+              value: _agreeToTerms,
+              onChanged: (v) => setState(() => _agreeToTerms = v),
             ),
           ],
         ),
@@ -489,5 +582,52 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       );
     }
+  }
+}
+
+/// Figma `Toggle Switch` on signup step 3: a 40x20 pill track with a 20x20
+/// knob outlined in the track colour. Built for this screen only — the login
+/// remember-me toggle was removed for good when sessions became persistent.
+class _TermsToggle extends StatelessWidget {
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _TermsToggle({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => onChanged(!value),
+      child: Container(
+        width: AppSize.s40,
+        height: AppSize.s20,
+        decoration: BoxDecoration(
+          color: value ? ColorManager.secondary : ColorManager.toggleTrack,
+          borderRadius: BorderRadius.circular(AppSize.radiusCircle),
+        ),
+        child: AnimatedAlign(
+          duration: const Duration(milliseconds: AppDuration.toggle),
+          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+          child: Container(
+            width: AppSize.s20,
+            height: AppSize.s20,
+            decoration: BoxDecoration(
+              color: ColorManager.white,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: value
+                    ? ColorManager.toggleKnobBorder
+                    : ColorManager.toggleTrack,
+                width: AppSize.s2,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

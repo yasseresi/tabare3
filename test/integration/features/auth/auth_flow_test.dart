@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:tabare3/core/constants/widget_keys.dart';
 import 'package:tabare3/core/error/failures.dart';
 import 'package:tabare3/core/network/network_info.dart';
 import 'package:tabare3/core/presentation/widgets/app_text_field.dart';
@@ -409,7 +410,7 @@ void main() {
         final createButton = find.widgetWithText(ElevatedButton, 'إنشاء حساب');
         expect(tester.widget<ElevatedButton>(createButton).onPressed, isNull);
 
-        await tester.tap(find.byType(Switch));
+        await tester.tap(find.byKey(WidgetKeys.signupTermsToggle));
         await tester.pumpAndSettle();
 
         final enabledButton = tester.widget<ElevatedButton>(createButton);

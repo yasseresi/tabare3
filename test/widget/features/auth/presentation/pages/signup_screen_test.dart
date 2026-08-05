@@ -98,7 +98,7 @@ void main() {
     expect(
       scrollView.padding,
       const EdgeInsets.symmetric(
-        horizontal: AppPadding.p20,
+        horizontal: AppPadding.p30,
         vertical: AppPadding.p60,
       ),
     );
