@@ -151,6 +151,7 @@ class AppStrings {
   static const String loginSuccess = 'login_success';
   static const String signupSuccess = 'signup_success';
   static const String logoutSuccess = 'logout_success';
+  static const String logoutSuccessMessage = 'logout_success_message';
   static const String requestCreated = 'request_created';
   static const String requestAccepted = 'request_accepted';
   static const String requestCancelled = 'request_cancelled';
@@ -319,7 +320,6 @@ class AppStrings {
   static const String bagsRatio = 'bags_ratio';
   static const String editRequestBanner = 'edit_request_banner';
   static const String editRequestSubtitle = 'edit_request_subtitle';
-  static const String confirmAcceptRequestMsg = 'confirm_accept_request_msg';
   static const String acceptRequestNotice = 'accept_request_notice';
   static const String acceptRequestThanks = 'accept_request_thanks';
   static const String requestReason = 'request_reason';
