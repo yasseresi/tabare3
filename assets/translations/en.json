@@ -55,7 +55,7 @@
   "governorate": "Governorate",
   "search_wilaya": "Search for governorate...",
   "city_invalid": "Please select a valid governorate",
-  "accept_terms": "I agree to the terms and conditions.",
+  "accept_terms": "I agree to the terms and conditions",
   "home": "Home",
   "requests": "Requests",
   "appointments": "Appointments",
@@ -111,7 +111,7 @@
   "search_notifications": "Search notifications...",
   "new_notification": "New notification",
   "emergency_alert": "Emergency alert",
-  "login_success": "You have successfully logged in to",
+  "login_success": "You have successfully logged in",
   "signup_success": "Account created successfully",
   "logout_success": "Logged out successfully",
   "logout_success_message": "We look forward to seeing you again. Thank you for supporting the blood donation community.",
@@ -332,5 +332,6 @@
   "time_ago_minutes": "{count}m ago",
   "time_ago_hour": "An hour ago",
   "time_ago_hours": "{count}h ago",
-  "time_ago_days": "{count}d ago"
+  "time_ago_days": "{count}d ago",
+  "no_notifications_description": "You have no new notifications right now. We'll let you know as soon as updates or new donation requests arrive."
 }

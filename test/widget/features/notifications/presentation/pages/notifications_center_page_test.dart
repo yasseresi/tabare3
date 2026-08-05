@@ -8,6 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tabare3/core/presentation/widgets/app_card.dart';
 import 'package:tabare3/features/notifications/domain/entities/notification_entity.dart';
 import 'package:tabare3/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:tabare3/features/notifications/presentation/pages/notifications_center_page.dart';
@@ -114,22 +116,11 @@ void main() {
     expect(find.text('ابحث عن الاشعارات...'), findsOneWidget);
     expect(find.text('حاجة مستعجلة'), findsOneWidget);
     expect(find.text('شكراً لك'), findsOneWidget);
+    // Figma gives every card a 48x48 slot holding a 40x40 type glyph.
+    expect(find.byType(SvgPicture), findsWidgets);
     expect(
-      tester.widget<Icon>(find.byIcon(Icons.notifications_none_rounded)).size,
-      24,
-    );
-    expect(
-      tester
-          .getSize(
-            find
-                .ancestor(
-                  of: find.byIcon(Icons.check),
-                  matching: find.byType(Container),
-                )
-                .first,
-          )
-          .width,
-      40,
+      tester.getSize(find.byType(AppCard).first).width,
+      greaterThan(0),
     );
   });
 

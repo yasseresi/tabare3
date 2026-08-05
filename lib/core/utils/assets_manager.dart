@@ -32,6 +32,9 @@ class ImageAssets {
 
   /// Blood-bag artwork used as the donation-record card avatar.
   static const String donationAvatar = icon9;
+
+  /// Illustration on the notifications-centre empty state.
+  static const String emptyNotifications = '$imagePath/empty_notifications.png';
 }
 
 class SvgAssets {
