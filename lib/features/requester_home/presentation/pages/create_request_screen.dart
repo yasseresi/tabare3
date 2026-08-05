@@ -187,7 +187,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
           ),
           AppTextField(
             hintText: AppStrings.chronicDiseases.tr(),
-            prefixSvg: SvgAssets.requestNote,
+            prefixSvg: SvgAssets.illnesses,
             controller: _patientChronicDiseasesController,
             isMultiline: true,
           ),
