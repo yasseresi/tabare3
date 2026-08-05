@@ -201,7 +201,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('الشروط والأحكام'), findsOneWidget);
-    expect(find.text('أوافق على الشروط والأحكام.'), findsOneWidget);
+    expect(find.text('أوافق على الشروط والأحكام'), findsOneWidget);
     expect(find.text('إنشاء حساب'), findsWidgets);
   });
 
