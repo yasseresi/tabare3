@@ -376,10 +376,21 @@ void main() {
           '1990-01-01',
         );
 
+        final genderDropdown = find.widgetWithText(
+          DropdownButtonFormField<String>,
+          'الجنس',
+        );
+        await tester.ensureVisible(genderDropdown);
+        await tester.tap(genderDropdown);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('ذكر').last);
+        await tester.pumpAndSettle();
+
         final bloodTypeDropdown = find.widgetWithText(
           DropdownButtonFormField<String>,
           'فصيلة الدم',
         );
+        await tester.ensureVisible(bloodTypeDropdown);
         await tester.tap(bloodTypeDropdown);
         await tester.pumpAndSettle();
         await tester.tap(find.text('O+').last);

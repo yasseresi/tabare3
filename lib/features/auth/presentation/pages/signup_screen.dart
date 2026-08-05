@@ -10,6 +10,7 @@ import '../../../../core/presentation/widgets/loading_overlay.dart';
 import '../../../../core/presentation/widgets/searchable_wilaya_field.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/utils/constants_manager.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../../../core/utils/color_manager.dart';
@@ -34,7 +35,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   int _currentStep = 1;
   bool _agreeToTerms = false;
   DateTime? _selectedDate;
-  String _genderValue = 'male';
+  String? _genderValue;
 
   final _usernameController = TextEditingController();
   final _fullNameController = TextEditingController();
@@ -99,7 +100,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       password: _passwordController.text,
       phone: _phoneController.text.trim(),
       dateOfBirth: _selectedDate ?? DateTime(2000),
-      gender: _genderValue,
+      gender: _genderValue ?? AppConstants.genderMale,
       bloodType: _bloodTypeController.text.trim(),
       city: _cityController.text.trim(),
       nationalId: _nationalIdController.text.trim().isEmpty
@@ -452,13 +453,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
             prefixIcon: _buildSvgPrefixIcon(SvgAssets.person),
           ),
           items: [
-            DropdownMenuItem(value: 'male', child: Text(AppStrings.male.tr())),
             DropdownMenuItem(
-              value: 'female',
+              value: AppConstants.genderMale,
+              child: Text(AppStrings.male.tr()),
+            ),
+            DropdownMenuItem(
+              value: AppConstants.genderFemale,
               child: Text(AppStrings.female.tr()),
             ),
           ],
-          onChanged: (v) => setState(() => _genderValue = v ?? 'male'),
+          onChanged: (v) => setState(() => _genderValue = v),
+          // The dropdown stores gender codes, so only the presence check from
+          // [validateGender] applies; its label branch never sees a raw value.
+          validator: (v) => v == null ? validateGender(null) : null,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(

@@ -90,22 +90,18 @@ class RoleSelectionScreen extends StatelessWidget {
                                   Text(
                                     AppStrings.hadithIntro.tr(),
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontFamily: FontConstants.fontFamily,
+                                    style: getMediumStyle(
                                       fontSize: FontSize.s20,
-                                      fontWeight: FontWeightManager.medium,
                                       color: ColorManager.grey,
                                     ),
                                   ),
                                   Text(
                                     AppStrings.hadithRelief.tr(),
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontFamily: FontConstants.fontFamily,
+                                    style: getMediumStyle(
                                       fontSize: FontSize.s20,
-                                      fontWeight: FontWeightManager.medium,
                                       color: ColorManager.grey,
-                                      height: 1.6,
+                                      lineHeight: LineHeight.h32,
                                     ),
                                   ),
                                   const SizedBox(height: AppSize.s20),

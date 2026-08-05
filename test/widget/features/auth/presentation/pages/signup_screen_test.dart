@@ -89,6 +89,49 @@ void main() {
     await tester.enterText(fields.at(4), 'password1234');
   }
 
+  // Gender is a placeholder dropdown on step 2, so it must be picked before the
+  // step can advance; blood type and wilaya are the other required fields.
+  Future<void> fillStep2Required(WidgetTester tester) async {
+    final scrollable = find.byType(Scrollable).first;
+
+    await tester.scrollUntilVisible(
+      find.widgetWithText(DropdownButtonFormField<String>, 'الجنس'),
+      400,
+      scrollable: scrollable,
+    );
+    await tester.tap(
+      find.widgetWithText(DropdownButtonFormField<String>, 'الجنس'),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('ذكر').last);
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.widgetWithText(DropdownButtonFormField<String>, 'فصيلة الدم'),
+      400,
+      scrollable: scrollable,
+    );
+    await tester.tap(
+      find.widgetWithText(DropdownButtonFormField<String>, 'فصيلة الدم'),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('O+').last);
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.widgetWithText(TextFormField, 'ابحث عن الولاية...'),
+      400,
+      scrollable: scrollable,
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'ابحث عن الولاية...'),
+      'الجزائر',
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('الجزائر').last);
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('renders step 1 with account info fields', (tester) async {
     await pumpTestApp(tester, signUpUnderTest());
 
@@ -147,30 +190,7 @@ void main() {
       '2000-01-01',
     );
 
-    await tester.scrollUntilVisible(
-      find.widgetWithText(DropdownButtonFormField<String>, 'فصيلة الدم'),
-      400,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.tap(
-      find.widgetWithText(DropdownButtonFormField<String>, 'فصيلة الدم'),
-    );
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('O+').last);
-    await tester.pumpAndSettle();
-
-    await tester.scrollUntilVisible(
-      find.widgetWithText(TextFormField, 'ابحث عن الولاية...'),
-      400,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'ابحث عن الولاية...'),
-      'الجزائر',
-    );
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('الجزائر').last);
-    await tester.pumpAndSettle();
+    await fillStep2Required(tester);
 
     await tester.scrollUntilVisible(
       find.text('التالي'),
@@ -181,7 +201,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('الشروط والأحكام'), findsOneWidget);
-    expect(find.text('أوافق على الشروط والأحكام'), findsOneWidget);
+    expect(find.text('أوافق على الشروط والأحكام.'), findsOneWidget);
     expect(find.text('إنشاء حساب'), findsWidgets);
   });
 
