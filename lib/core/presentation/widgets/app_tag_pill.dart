@@ -14,12 +14,23 @@ class AppTagPill extends StatelessWidget {
   final Color? labelColor;
   final EdgeInsetsGeometry padding;
 
+  /// Gap between the dot and the label. Figma uses 8 on the urgency chips and
+  /// 10 on the eligibility chip.
+  final double gap;
+
+  /// Places the dot after the label, so it lands on the far side of an RTL
+  /// row. Figma draws the urgency chips this way and the eligibility chip the
+  /// other way round.
+  final bool dotTrailing;
+
   const AppTagPill({
     super.key,
     required this.label,
     this.dotColor,
     this.background,
     this.labelColor,
+    this.gap = AppSize.s8,
+    this.dotTrailing = false,
     this.padding = const EdgeInsets.symmetric(
       horizontal: AppPadding.p12,
       vertical: AppPadding.p6,
@@ -31,6 +42,8 @@ class AppTagPill extends StatelessWidget {
     : dotColor = null,
       background = null,
       labelColor = null,
+      gap = AppSize.s8,
+      dotTrailing = false,
       padding = const EdgeInsets.symmetric(
         horizontal: AppPadding.p8,
         vertical: AppPadding.p2,
@@ -47,14 +60,7 @@ class AppTagPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (dotColor != null) ...[
-            Container(
-              width: AppSize.s8,
-              height: AppSize.s8,
-              decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
-            ),
-            const SizedBox(width: AppSize.s8),
-          ],
+          if (dotColor != null && !dotTrailing) ...[_dot, SizedBox(width: gap)],
           Flexible(
             child: Text(
               label,
@@ -66,8 +72,15 @@ class AppTagPill extends StatelessWidget {
               ),
             ),
           ),
+          if (dotColor != null && dotTrailing) ...[SizedBox(width: gap), _dot],
         ],
       ),
     );
   }
+
+  Widget get _dot => Container(
+    width: AppSize.s8,
+    height: AppSize.s8,
+    decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
+  );
 }

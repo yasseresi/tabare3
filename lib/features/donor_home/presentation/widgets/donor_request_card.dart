@@ -45,6 +45,7 @@ class DonorRequestCard extends StatelessWidget {
           label: donorPriorityLabel(request.priority),
           dotColor: donorPriorityColor(request.priority),
           labelColor: ColorManager.navInactive,
+          dotTrailing: true,
         ),
       ],
       details: [

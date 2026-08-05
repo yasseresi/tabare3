@@ -61,14 +61,18 @@ class DonorAppointmentsScreen extends StatelessWidget {
                 message: AppStrings.appointmentsDescription.tr(),
               ),
               const SizedBox(height: AppSize.s12),
+              // Figma keeps the section title above the empty state.
+              AppSectionHeader(
+                title: AppStrings.upcomingAppointments.tr(),
+                centered: true,
+              ),
+              const SizedBox(height: AppSize.s10),
               if (appointments.isEmpty)
                 AppEmptyState(
                   title: AppStrings.noUpcomingAppointments.tr(),
                   message: AppStrings.noAppointmentsDescription.tr(),
                 )
               else ...[
-                AppSectionHeader(title: AppStrings.upcomingAppointments.tr()),
-                const SizedBox(height: AppSize.s10),
                 ...appointments.map(
                   (appointment) => Padding(
                     padding: const EdgeInsets.only(bottom: AppPadding.p15),
@@ -110,15 +114,22 @@ class _AppointmentCard extends StatelessWidget {
     return RequestCard(
       avatar: ImageAssets.appointmentAvatar,
       title: title,
+      // Figma shows a single urgency chip; the appointment status is conveyed
+      // by the card living under `المواعيد القادمة`.
       tags: [
         if (request != null)
           AppTagPill(
             label: donorPriorityLabel(request.priority),
             dotColor: donorPriorityColor(request.priority),
             labelColor: ColorManager.textMuted,
-          ),
-        _statusPill(appointment.status),
+            dotTrailing: true,
+          )
+        else
+          _statusPill(appointment.status),
       ],
+      // Figma also lists `المريض` and `تم توفير … أكياس` here, but the
+      // appointment's request reference carries neither the patient name nor
+      // the unit counts, so those rows stay out until the entity grows them.
       details: [
         if (request != null)
           RequestCardDetail(

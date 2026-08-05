@@ -60,6 +60,10 @@ class ColorManager {
   static Color urgencyCritical = const Color(0xffFF1300);
   static Color urgencyUrgent = const Color(0xffF2994A);
   static Color urgencyNormal = const Color(0xff16A34A);
+
+  /// Fill of the `مؤهل الآن` chip (`rgba(109, 194, 136, 0.06)`); the dot keeps
+  /// the stronger [success] green.
+  static Color eligiblePillTint = const Color(0xff6DC288);
   static Color progressTrackLight = const Color(0xffEFF9FF);
   static Color progressTrackBorder = const Color(0xffB9B9B9);
   static Color searchBorder = const Color(0xffF9EBE9);

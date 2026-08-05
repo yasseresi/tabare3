@@ -376,6 +376,13 @@ class _AvailabilityCard extends StatelessWidget {
     final statusColor = eligible
         ? ColorManager.success
         : ColorManager.urgencyCritical;
+    // Figma tints the two chips differently: a soft sage behind `مؤهل الآن`
+    // and the urgency red at a heavier 9% behind `غير مؤهل الآن`.
+    final statusBackground = eligible
+        ? ColorManager.eligiblePillTint.withValues(alpha: AppOpacity.tint)
+        : ColorManager.urgencyCritical.withValues(
+            alpha: AppOpacity.notEligiblePill,
+          );
     return HadithStatsCard(
       statusPill: Semantics(
         button: true,
@@ -394,7 +401,8 @@ class _AvailabilityCard extends StatelessWidget {
                 ? AppStrings.eligibleNow.tr()
                 : AppStrings.notEligibleNow.tr(),
             dotColor: statusColor,
-            background: statusColor.withValues(alpha: AppOpacity.tint),
+            background: statusBackground,
+            gap: AppSize.s10,
           ),
         ),
       ),

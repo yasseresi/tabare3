@@ -63,7 +63,10 @@ class DonorRecordScreen extends StatelessWidget {
                   message: AppStrings.donationRecordDescription.tr(),
                 )
               else ...[
-                AppSectionHeader(title: AppStrings.donationRecord.tr()),
+                AppSectionHeader(
+                  title: AppStrings.donationRecord.tr(),
+                  centered: true,
+                ),
                 const SizedBox(height: AppSize.s10),
                 ...records.map(
                   (record) => Padding(
@@ -108,6 +111,8 @@ class _DonationRecordCard extends StatelessWidget {
         AppTagPill(
           label: AppStrings.donationCompleted.tr(),
           dotColor: ColorManager.success,
+          labelColor: ColorManager.textMuted,
+          dotTrailing: true,
         ),
       ],
       details: [
