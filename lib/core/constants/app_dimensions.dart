@@ -8,3 +8,8 @@ class AppOpacity {
   static const double chip = 0.23;
   static const double strong = 0.8;
 }
+
+class AppDuration {
+  /// Knob travel of the signup terms toggle, in milliseconds.
+  static const int toggle = 150;
+}
