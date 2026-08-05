@@ -37,7 +37,7 @@ class SplashScreen extends StatelessWidget {
                     size: AppSize.s100,
                   ),
                 ),
-                const SizedBox(height: AppSize.s40),
+                const SizedBox(height: AppSize.s26),
                 Container(
                   key: WidgetKeys.splashProgressBar,
                   width: AppSize.s80,

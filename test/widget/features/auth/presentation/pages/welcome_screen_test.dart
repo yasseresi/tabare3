@@ -82,23 +82,33 @@ void main() {
   ) async {
     await pumpTestApp(tester, const WelcomeScreen());
 
-    final background = tester.widget<Container>(
+    // The wash is two 25%-opacity stops, so it only reads correctly when it
+    // composites over an opaque white layer of its own rather than over the
+    // transparent scaffold.
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is ColoredBox && widget.color == const Color(0xFFFFFFFF),
+      ),
+      findsWidgets,
+    );
+
+    final wash = tester.widget<DecoratedBox>(
       find
           .byWidgetPredicate(
             (widget) =>
-                widget is Container &&
+                widget is DecoratedBox &&
                 widget.decoration is BoxDecoration &&
-                (widget.decoration! as BoxDecoration).gradient != null,
+                (widget.decoration as BoxDecoration).gradient != null,
           )
           .first,
     );
-    final decoration = background.decoration! as BoxDecoration;
+    final gradient =
+        (wash.decoration as BoxDecoration).gradient! as LinearGradient;
 
-    expect(decoration.color, const Color(0xFFFFFFFF));
-    expect(decoration.gradient!.colors, const [
-      Color(0x40FDB6B0),
-      Color(0x40DFE0FE),
-    ]);
+    expect(gradient.colors, const [Color(0x40FDB6B0), Color(0x40DFE0FE)]);
+    expect(gradient.begin, Alignment.centerLeft);
+    expect(gradient.end, Alignment.centerRight);
   });
 
   testWidgets('tapping login navigates to LoginFormScreen', (tester) async {
