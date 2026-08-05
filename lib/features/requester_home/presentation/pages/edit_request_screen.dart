@@ -120,7 +120,6 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                 ),
                 const SizedBox(height: AppSize.s12),
                 RequestFormSection(
-                  fillColor: ColorManager.surface,
                   children: [
                     AppTextField(
                       key: WidgetKeys.requestUnitsField,

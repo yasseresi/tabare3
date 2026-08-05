@@ -9,17 +9,14 @@ import '../../../../core/utils/values_manager.dart';
 /// Figma `Form Fields` input surface: a white 16px-radius pill with 16/11
 /// padding and a 20x20 glyph pinned 16px from the leading (right) edge — the
 /// 48px trailing gutter comes from the 14px padding around that glyph.
-InputDecorationTheme requestFieldTheme({
-  required Color hintColor,
-  required Color fillColor,
-}) {
+InputDecorationTheme requestFieldTheme({required Color hintColor}) {
   final border = OutlineInputBorder(
     borderRadius: BorderRadius.circular(AppSize.radiusField),
     borderSide: BorderSide.none,
   );
   return InputDecorationTheme(
     filled: true,
-    fillColor: fillColor,
+    fillColor: ColorManager.white,
     isDense: true,
     contentPadding: const EdgeInsets.symmetric(
       horizontal: AppPadding.p16,
@@ -51,15 +48,7 @@ class RequestFormSection extends StatelessWidget {
   final List<Widget> children;
   final Color? hintColor;
 
-  /// White on the create screens, `#F3F4F6` on the edit screen.
-  final Color? fillColor;
-
-  const RequestFormSection({
-    super.key,
-    required this.children,
-    this.hintColor,
-    this.fillColor,
-  });
+  const RequestFormSection({super.key, required this.children, this.hintColor});
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +61,6 @@ class RequestFormSection extends StatelessWidget {
       data: Theme.of(context).copyWith(
         inputDecorationTheme: requestFieldTheme(
           hintColor: hintColor ?? ColorManager.navInactive,
-          fillColor: fillColor ?? ColorManager.white,
         ),
       ),
       child: Column(
