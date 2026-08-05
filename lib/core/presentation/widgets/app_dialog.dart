@@ -79,6 +79,10 @@ class AppDialog extends StatelessWidget {
     return Dialog(
       backgroundColor: ColorManager.transparent,
       elevation: AppSize.s0,
+      // The design frame insets the card by 20 horizontally and centres it
+      // vertically; the default Material inset would squeeze the two-button
+      // variants, whose copy can run to several lines.
+      insetPadding: const EdgeInsets.symmetric(horizontal: AppPadding.p20),
       child: Container(
         width: AppSize.s320,
         padding: const EdgeInsets.all(AppPadding.p40),
@@ -86,46 +90,39 @@ class AppDialog extends StatelessWidget {
           color: ColorManager.white,
           borderRadius: BorderRadius.circular(AppSize.s40),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: _buildContent(),
+        // Keeps the card intact rather than overflowing when the viewport is
+        // shorter than the card (small phones, split screen).
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: _buildContent(),
+          ),
         ),
       ),
     );
   }
 
+  /// Every card in the design stacks its children with a uniform `10` gap, so
+  /// the variants only differ in which children they contribute.
   List<Widget> _buildContent() {
     switch (type) {
       case AppDialogType.success:
-        return [
-          _buildBadge(ColorManager.dialogSuccess, Icons.check),
-          const SizedBox(height: AppSize.s10),
+        return _withGaps([
+          // The "logo" flavour of the card (signup/login success) uses the
+          // slightly larger 62x63 tick; the body-copy flavour uses 60x60.
+          _buildSuccessBadge(
+            message == null ? AppSize.s62 : AppSize.s60,
+            message == null ? AppSize.s63 : AppSize.s60,
+          ),
           _buildTitle(),
-          if (message != null) ...[
-            const SizedBox(height: AppSize.s10),
-            Text(
-              message!,
-              textAlign: TextAlign.center,
-              style: getBoldStyle(
-                fontSize: FontSize.s16,
-                color: ColorManager.welcomeText,
-              ),
-            ),
-            const SizedBox(height: AppSize.s10),
-          ] else ...[
-            const SizedBox(height: AppSize.s10),
-            _buildLogo(),
-            const SizedBox(height: AppSize.s20),
-          ],
+          if (message != null) _buildBody(message!) else _buildLogo(),
           _buildPrimaryButton(),
-        ];
+        ]);
       case AppDialogType.error:
-        return [
-          _buildBadge(ColorManager.error, Icons.close),
-          const SizedBox(height: AppSize.s10),
+        return _withGaps([
+          _buildErrorBadge(),
           _buildTitle(),
-          if (message != null) ...[
-            const SizedBox(height: AppSize.s8),
+          if (message != null)
             Text(
               message!,
               textAlign: TextAlign.center,
@@ -134,44 +131,28 @@ class AppDialog extends StatelessWidget {
                 color: ColorManager.textSecondary,
               ),
             ),
-          ],
-          const SizedBox(height: AppSize.s20),
           _buildPrimaryButton(),
-        ];
+        ]);
       case AppDialogType.warning:
-        return [
+        return _withGaps([
           SvgPicture.asset(
             SvgAssets.warning,
             width: AppSize.s60,
             height: AppSize.s60,
           ),
-          const SizedBox(height: AppSize.s10),
           _buildTitle(),
-          if (message != null) ...[
-            const SizedBox(height: AppSize.s10),
-            Text(
-              message!,
-              textAlign: TextAlign.center,
-              style: getBoldStyle(
-                fontSize: FontSize.s16,
-                color: ColorManager.navInactive,
-              ),
-            ),
-          ],
-          const SizedBox(height: AppSize.s10),
+          if (message != null) _buildBody(message!),
           _buildPrimaryButton(),
-          if (secondaryLabel != null) ...[
-            const SizedBox(height: AppSize.s10),
+          if (secondaryLabel != null)
             _buildActionButton(
               label: secondaryLabel,
               onPressed: onSecondaryAction,
               background: ColorManager.navInactive,
               buttonKey: secondaryKey,
             ),
-          ],
-        ];
+        ]);
       case AppDialogType.loading:
-        return [
+        return _withGaps([
           SizedBox(
             width: AppSize.s60,
             height: AppSize.s60,
@@ -180,7 +161,6 @@ class AppDialog extends StatelessWidget {
               strokeWidth: AppSize.s4,
             ),
           ),
-          const SizedBox(height: AppSize.s20),
           Text(
             title,
             textAlign: TextAlign.center,
@@ -189,16 +169,35 @@ class AppDialog extends StatelessWidget {
               color: ColorManager.textPrimary,
             ),
           ),
-        ];
+        ]);
     }
   }
 
-  Widget _buildBadge(Color color, IconData icon) {
+  /// Interleaves the Figma `gap: 10` between the card's children.
+  List<Widget> _withGaps(List<Widget> children) => [
+    for (var i = 0; i < children.length; i++) ...[
+      if (i > 0) const SizedBox(height: AppSize.s10),
+      children[i],
+    ],
+  ];
+
+  Widget _buildSuccessBadge(double width, double height) {
+    return SvgPicture.asset(
+      SvgAssets.successCheck,
+      width: width,
+      height: height,
+    );
+  }
+
+  Widget _buildErrorBadge() {
     return Container(
       width: AppSize.s62,
       height: AppSize.s63,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-      child: Icon(icon, color: ColorManager.white, size: AppSize.s40),
+      decoration: BoxDecoration(
+        color: ColorManager.error,
+        shape: BoxShape.circle,
+      ),
+      child: Icon(Icons.close, color: ColorManager.white, size: AppSize.s40),
     );
   }
 
@@ -209,6 +208,19 @@ class AppDialog extends StatelessWidget {
       style: getBoldStyle(
         fontSize: FontSize.s16,
         color: ColorManager.navInactive,
+        lineHeight: LineHeight.h22_75,
+      ),
+    );
+  }
+
+  Widget _buildBody(String body) {
+    return Text(
+      body,
+      textAlign: TextAlign.center,
+      style: getBoldStyle(
+        fontSize: FontSize.s16,
+        color: ColorManager.navInactive,
+        lineHeight: LineHeight.h22_75,
       ),
     );
   }
@@ -258,6 +270,7 @@ class AppDialog extends StatelessWidget {
           textStyle: getBoldStyle(
             fontSize: FontSize.s14,
             color: ColorManager.white,
+            lineHeight: LineHeight.h17,
           ),
         ),
         child: Text(label ?? AppStrings.continueAction.tr()),
