@@ -329,5 +329,6 @@
   "time_ago_minutes": "{count}m ago",
   "time_ago_hour": "An hour ago",
   "time_ago_hours": "{count}h ago",
-  "time_ago_days": "{count}d ago"
+  "time_ago_days": "{count}d ago",
+  "no_notifications_description": "You have no new notifications right now. We'll let you know as soon as updates or new donation requests arrive."
 }

@@ -69,6 +69,7 @@ class DonorAppointmentsScreen extends StatelessWidget {
               const SizedBox(height: AppSize.s10),
               if (appointments.isEmpty)
                 AppEmptyState(
+                  illustration: ImageAssets.appointmentAvatar,
                   title: AppStrings.noUpcomingAppointments.tr(),
                   message: AppStrings.noAppointmentsDescription.tr(),
                 )

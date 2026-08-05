@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/presentation/widgets/app_card.dart';
+import '../../../../core/presentation/widgets/app_empty_state.dart';
 import '../../../../core/presentation/widgets/app_gradient_background.dart';
 import '../../../../core/presentation/widgets/app_header.dart';
 import '../../../../core/presentation/widgets/app_search_field.dart';
@@ -110,13 +111,13 @@ class _NotificationsCenterPageState extends State<NotificationsCenterPage> {
 
         final loaded = state as NotificationsLoaded;
         if (loaded.visibleNotifications.isEmpty) {
-          return Center(
-            child: Text(
-              AppStrings.noNotifications.tr(),
-              style: getSemiBoldStyle(
-                fontSize: FontSize.s16,
-                color: ColorManager.textSecondary,
-                lineHeight: LineHeight.h28,
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(top: AppPadding.p60),
+              child: AppEmptyState(
+                illustration: ImageAssets.emptyNotifications,
+                title: AppStrings.noNotifications.tr(),
+                message: AppStrings.noNotificationsDescription.tr(),
               ),
             ),
           );

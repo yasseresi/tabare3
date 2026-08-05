@@ -14,12 +14,17 @@ class AppEmptyState extends StatelessWidget {
   final String? secondaryMessage;
   final Widget? action;
 
+  /// Illustration above the headline. Defaults to the patient artwork; the
+  /// appointment and notification empty states pass their own.
+  final String illustration;
+
   const AppEmptyState({
     super.key,
     required this.title,
     required this.message,
     this.secondaryMessage,
     this.action,
+    this.illustration = ImageAssets.requestAvatar,
   });
 
   @override
@@ -38,12 +43,12 @@ class AppEmptyState extends StatelessWidget {
       child: Column(
         children: [
           Image.asset(
-            ImageAssets.requestAvatar,
+            illustration,
             width: AppSize.s100,
             height: AppSize.s100,
             fit: BoxFit.cover,
           ),
-          const SizedBox(height: AppSize.s10),
+          const SizedBox(height: AppSize.s9_6),
           Text(
             title,
             textAlign: TextAlign.center,
@@ -52,7 +57,7 @@ class AppEmptyState extends StatelessWidget {
               color: ColorManager.textPrimary,
             ),
           ),
-          const SizedBox(height: AppSize.s10),
+          const SizedBox(height: AppSize.s9_6),
           Text(message, textAlign: TextAlign.center, style: messageStyle),
           if (secondaryMessage != null) ...[
             const SizedBox(height: AppSize.s10),

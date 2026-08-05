@@ -138,6 +138,8 @@ class AppStrings {
 
   // Notifications
   static const String noNotifications = 'no_notifications';
+  static const String noNotificationsDescription =
+      'no_notifications_description';
   static const String searchNotifications = 'search_notifications';
   static const String newNotification = 'new_notification';
   static const String timeAgoNow = 'time_ago_now';
