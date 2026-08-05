@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../../core/presentation/widgets/app_section_header.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
@@ -23,18 +24,7 @@ class ProfileSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (title != null) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppPadding.p10),
-            child: Text(
-              title!,
-              textAlign: TextAlign.center,
-              style: getSemiBoldStyle(
-                fontSize: FontSize.s16,
-                color: ColorManager.sectionTitle,
-                lineHeight: LineHeight.h28,
-              ),
-            ),
-          ),
+          AppSectionHeader(title: title!, centered: true),
           const SizedBox(height: AppSize.s12),
         ],
         ClipRRect(

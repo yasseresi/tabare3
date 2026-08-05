@@ -12,12 +12,16 @@ class AppSectionHeader extends StatelessWidget {
   final VoidCallback? onAction;
   final Key? actionKey;
 
+  /// Centres the title, as the profile and notification screens do.
+  final bool centered;
+
   const AppSectionHeader({
     super.key,
     required this.title,
     this.actionLabel,
     this.onAction,
     this.actionKey,
+    this.centered = false,
   });
 
   @override
@@ -25,7 +29,9 @@ class AppSectionHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppPadding.p10),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: centered
+            ? MainAxisAlignment.center
+            : MainAxisAlignment.spaceBetween,
         children: [
           Flexible(
             child: Text(

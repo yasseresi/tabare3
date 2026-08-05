@@ -26,4 +26,5 @@ extension NotificationEntityX on NotificationEntity {
 class NotificationTypes {
   static const String thankYou = 'thank_you';
   static const String participationAccepted = 'participation_accepted';
+  static const String appointmentReminder = 'appointment_reminder';
 }

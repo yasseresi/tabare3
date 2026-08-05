@@ -94,6 +94,16 @@ class SvgAssets {
   static const String requestHospital = '$iconPath/request_hospital.svg';
   static const String requestNote = '$iconPath/request_note.svg';
 
+  // Notification card glyphs (exported from Figma)
+  static const String notificationBloodBag =
+      '$iconPath/notification_blood_bag.svg';
+  static const String notificationAppointment =
+      '$iconPath/notification_appointment.svg';
+  static const String notificationAccepted =
+      '$iconPath/notification_accepted.svg';
+  static const String notificationThanks =
+      '$iconPath/notification_thanks.svg';
+
   /// 16x16 chevron drawn pointing right; rows rotate it 180° for the trailing
   /// disclosure and 90° for the account-type dropdown.
   static const String rowChevron = '$iconPath/row_chevron.svg';

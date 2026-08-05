@@ -145,7 +145,7 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
       ),
       _DonorTab.notifications => BlocProvider(
         create: (_) => sl<NotificationsBloc>(),
-        child: const NotificationsCenterPage(),
+        child: const NotificationsCenterPage(isDonor: true),
       ),
       _DonorTab.about => AboutAppScreen(
         onBack: () => setState(() => _selectedTab = _DonorTab.profile),

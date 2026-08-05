@@ -1,7 +1,6 @@
 {
   "app_name": "Tabare3",
   "app_name_ar": "تبرع",
-
   "loading": "Loading...",
   "logging_in": "Logging in",
   "retry_again": "Retry again",
@@ -21,7 +20,6 @@
   "back": "Back",
   "see_all": "See all",
   "all": "All",
-
   "login": "Login",
   "password_mask": "............",
   "username": "Username",
@@ -58,7 +56,6 @@
   "search_wilaya": "Search for governorate...",
   "city_invalid": "Please select a valid governorate",
   "accept_terms": "I agree to the terms and conditions",
-
   "home": "Home",
   "requests": "Requests",
   "appointments": "Appointments",
@@ -71,7 +68,6 @@
   "about": "About",
   "contact": "Contact",
   "help": "Help",
-
   "welcome": "Welcome",
   "welcome_to": "Welcome to",
   "active_donor": "Active donor",
@@ -79,7 +75,6 @@
   "urgent_requests": "Urgent requests",
   "your_next_donation": "Your next donation",
   "today_tip": "Today's tip",
-
   "create_request": "Create request",
   "edit_request": "Edit request",
   "request_details": "Request details",
@@ -102,7 +97,6 @@
   "accept_request": "Accept request",
   "cancel_request": "Cancel request",
   "close_request": "Close request",
-
   "donor_history": "Donation history",
   "total_donations": "My total donations",
   "last_donation": "Last donation",
@@ -113,12 +107,10 @@
   "points": "Points",
   "badges": "Badges",
   "successful_donation": "Successful donation",
-
   "no_notifications": "No notifications yet",
   "search_notifications": "Search notifications...",
   "new_notification": "New notification",
   "emergency_alert": "Emergency alert",
-
   "login_success": "You have successfully logged in",
   "signup_success": "Account created successfully",
   "logout_success": "Logged out successfully",
@@ -133,7 +125,6 @@
   "cancellation_reason": "Cancellation reason",
   "cancellation_reason_required": "Please enter a cancellation reason",
   "confirm_accept_request": "Are you sure you want to accept this request?",
-
   "about_app": "About the app",
   "privacy_policy": "Privacy policy",
   "terms_of_service": "Terms of service",
@@ -167,21 +158,18 @@
   "about_app_paragraph_3": "Every blood donation is a new chance at life, and together we can make a real difference in our community.",
   "developer_contact_description": "For any inquiry, suggestion, or to report a problem, you can contact us and we will be happy to help you as soon as possible.",
   "version_number": "Version {version}",
-
   "male": "Male",
   "female": "Female",
   "kg": "kg",
   "bags": "bags",
   "yes": "Yes",
   "no": "No",
-
   "welcome_user": "Hello, Ahmed",
   "get_well_soon": "We wish you a speedy recovery",
   "donation_life_chance": "Every blood donation is a new chance for life",
   "hadith_believer_affair": "«How wonderful is the affair of the believer, for his affairs are all good, and this is not for anyone except the believer. If something good happens to him, he is grateful, and that is good for him. If something bad happens to him, he is patient, and that is good for him»",
   "requests_near_you": "Requests near you",
   "next_donation_appointment": "Next donation appointment",
-
   "request_active": "Your request is active",
   "no_requests_you": "You have no requests",
   "requests_count": "Number of requests",
@@ -214,7 +202,6 @@
   "no_requests_yet": "No requests yet",
   "no_requests_description": "No blood donation requests were found in your area. Please check back later or enable notifications to be informed when new requests are available.",
   "thanks_for_donating": "Thank you for your willingness to donate. Your contribution may save a life.",
-
   "profile_data_title": "Profile data",
   "profile_data_notice": "This request data is filled automatically from your profile. Please update your data if anything has changed.",
   "create_request_banner": "Create blood donation request",
@@ -241,19 +228,16 @@
   "confirm_accept_request_msg": "Are you sure you want to accept this request?",
   "accept_request_notice": "By accepting the request, the requester will be notified that you are ready to donate blood.",
   "accept_request_thanks": "Thank you for your humanitarian contribution. The requester has been notified of your readiness to donate, and you will be contacted when needed.",
-
   "donors": "Donors",
   "donors_section_description": "This section shows donors who have agreed to your request and can help provide the required blood.",
   "donors_list": "Donors list",
   "completed_donors": "Completed",
   "donation_successful": "Donation successful",
   "location": "Location",
-
   "notifications_header": "Notifications",
   "donors_completed": "Donors completed",
   "donors_completed_desc": "The blood donation request has been fully covered",
   "new_donor_accepted": "New donor",
-
   "save_changes": "Save changes",
   "phone_number_label": "Phone number",
   "account_type": "Account type",
@@ -270,7 +254,6 @@
   "app_values": "App values",
   "full_name_value": "Ahmed Loucif",
   "image_too_large": "Image must be less than 10 MB",
-
   "drop_of_hope": "Drop of hope",
   "committed_donor": "Committed donor",
   "distinguished_donor": "Distinguished donor",
@@ -321,7 +304,6 @@
   "scan_qr_description": "Point the camera at the QR code to record the donation",
   "availability_updated": "Donation availability updated",
   "search_patients": "Search for a patient or hospital...",
-
   "quran_verse": "وَمَنْ أَحْيَاهَا فَكَأَنَّمَا أَحْيَا النَّاسَ جَمِيعًا",
   "hadith_relief": "«مَنْ نَفَّسَ عَنْ مُؤْمِنٍ كُرْبَةً مِنْ كُرَبِ الدُّنْيَا، نَفَّسَ اللَّهُ عَنْهُ كُرْبَةً مِنْ كُرَبِ يَوْمِ الْقِيَامَةِ، وَمَنْ يَسَّرَ عَلَى مُعْسِرٍ، يَسَّرَ اللَّهُ عَلَيْهِ فِي الدُّنْيَا وَالْآخِرَةِ، وَمَنْ سَتَرَ مُسْلِمًا، سَتَرَهُ اللَّهُ فِي الدُّنْيَا وَالْآخِرَةِ، وَاللَّهُ فِي عَوْنِ الْعَبْدِ مَا كَانَ الْعَبْدُ فِي عَوْنِ أَخِيهِ»",
   "quran_saving_life": "مِنْ أَجْلِ ذَٰلِكَ كَتَبْنَا عَلَىٰ بَنِي إِسْرَائِيلَ أَنَّهُ مَنْ قَتَلَ نَفْسًا بِغَيْرِ نَفْسٍ أَوْ فَسَادٍ فِي الْأَرْضِ فَكَأَنَّمَا قَتَلَ النَّاسَ جَمِيعًا وَمَنْ أَحْيَاهَا فَكَأَنَّمَا أَحْيَا النَّاسَ جَمِيعًا",
@@ -342,5 +324,10 @@
   "level_progress_description": "Every donation brings you closer to a new level and increases your impact in saving lives, because continued giving deserves recognition.",
   "qr_code_title": "QR code",
   "scan_qr_to_complete": "Scan the QR code to complete the blood donation.",
-  "show_qr_description": "Show your QR code to complete the donation."
+  "show_qr_description": "Show your QR code to complete the donation.",
+  "time_ago_now": "Just now",
+  "time_ago_minutes": "{count}m ago",
+  "time_ago_hour": "An hour ago",
+  "time_ago_hours": "{count}h ago",
+  "time_ago_days": "{count}d ago"
 }
