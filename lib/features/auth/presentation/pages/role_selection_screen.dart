@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/presentation/widgets/app_dialog.dart';
 import '../../../../core/presentation/widgets/app_gradient_background.dart';
@@ -150,95 +149,16 @@ class RoleSelectionScreen extends StatelessWidget {
       builder: (dialogContext) {
         return Directionality(
           textDirection: TextDirection.rtl,
-          child: Dialog(
-            backgroundColor: ColorManager.transparent,
-            elevation: AppSize.s0,
-            insetPadding: const EdgeInsets.symmetric(
-              horizontal: AppPadding.p20,
-            ),
-            child: Container(
-              width: AppSize.s320,
-              padding: const EdgeInsets.all(AppSize.s40),
-              decoration: BoxDecoration(
-                color: ColorManager.white,
-                borderRadius: BorderRadius.circular(AppSize.s40),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SvgPicture.asset(
-                    SvgAssets.warning,
-                    width: AppSize.s60,
-                    height: AppSize.s60,
-                  ),
-                  const SizedBox(height: AppSize.s10),
-                  Text(
-                    AppStrings.confirmRoleUpdate.tr(),
-                    textAlign: TextAlign.center,
-                    style: getBoldStyle(
-                      fontSize: FontSize.s16,
-                      color: ColorManager.welcomeText,
-                    ),
-                  ),
-                  const SizedBox(height: AppSize.s10),
-                  Text(
-                    AppStrings.roleSwitchWarning.tr(),
-                    textAlign: TextAlign.center,
-                    style: getBoldStyle(
-                      fontSize: FontSize.s16,
-                      color: ColorManager.welcomeText,
-                    ),
-                  ),
-                  const SizedBox(height: AppSize.s10),
-                  SizedBox(
-                    width: AppSize.s174,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(dialogContext);
-                        _selectRole(context, isDonor: false, isRecipient: true);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppSize.s11_6,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSize.radiusDialogAction,
-                          ),
-                        ),
-                      ),
-                      child: Text(AppStrings.confirm.tr()),
-                    ),
-                  ),
-                  const SizedBox(height: AppSize.s10),
-                  SizedBox(
-                    width: AppSize.s174,
-                    child: TextButton(
-                      onPressed: () => Navigator.pop(dialogContext),
-                      style: TextButton.styleFrom(
-                        backgroundColor: ColorManager.welcomeText,
-                        foregroundColor: ColorManager.white,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppSize.s11_6,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            AppSize.radiusDialogAction,
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        AppStrings.cancel.tr(),
-                        style: getSemiBoldStyle(
-                          fontSize: FontSize.s14,
-                          color: ColorManager.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          child: AppDialog.warning(
+            title: AppStrings.confirmRoleUpdate.tr(),
+            message: AppStrings.roleSwitchWarning.tr(),
+            actionLabel: AppStrings.confirm.tr(),
+            onAction: () {
+              Navigator.pop(dialogContext);
+              _selectRole(context, isDonor: false, isRecipient: true);
+            },
+            secondaryLabel: AppStrings.cancel.tr(),
+            onSecondaryAction: () => Navigator.pop(dialogContext),
           ),
         );
       },
