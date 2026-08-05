@@ -14,6 +14,7 @@ import '../../../../core/presentation/widgets/hadith_stats_card.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/presentation/widgets/logout_dialog.dart';
 import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/values_manager.dart';
@@ -65,10 +66,13 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
     return BlocListener<AuthBloc, AuthState>(
       listenWhen: (previous, current) => current is Unauthenticated,
       listener: (context, state) {
-        Navigator.pushNamedAndRemoveUntil(
+        showLogoutSuccessDialog(
           context,
-          Routes.welcomeRoute,
-          (route) => false,
+          onDismissed: () => Navigator.pushNamedAndRemoveUntil(
+            context,
+            Routes.welcomeRoute,
+            (route) => false,
+          ),
         );
       },
       child: Directionality(

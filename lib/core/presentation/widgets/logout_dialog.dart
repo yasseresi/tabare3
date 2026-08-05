@@ -1,6 +1,9 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 
 import '../../constants/widget_keys.dart';
+import '../../utils/color_manager.dart';
+import '../../utils/string_manager.dart';
 import 'app_dialog.dart';
 
 /// Logout confirmation. The design reuses the shared warning card verbatim, so
@@ -49,4 +52,31 @@ class LogoutDialog extends StatelessWidget {
       },
     );
   }
+}
+
+/// Result card shown once the session has actually ended. Both home shells
+/// listen for `Unauthenticated`, so the copy and the exit route live here
+/// rather than being duplicated in each of them.
+Future<void> showLogoutSuccessDialog(
+  BuildContext context, {
+  required VoidCallback onDismissed,
+}) {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    barrierColor: ColorManager.dialogScrim,
+    builder: (dialogContext) => Directionality(
+      textDirection: TextDirection.rtl,
+      child: AppDialog.success(
+        title: AppStrings.logoutSuccess.tr(),
+        message: AppStrings.logoutSuccessMessage.tr(),
+        actionLabel: AppStrings.homePage.tr(),
+        actionKey: WidgetKeys.logoutSuccessButton,
+        onAction: () {
+          Navigator.pop(dialogContext);
+          onDismissed();
+        },
+      ),
+    ),
+  );
 }

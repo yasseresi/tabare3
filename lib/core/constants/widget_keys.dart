@@ -8,6 +8,10 @@ class WidgetKeys {
   static const Key splashProgressBar = Key('splash_progress_bar');
   static const Key loginContentArea = Key('login_content_area');
   static const Key signupTermsToggle = Key('signup_terms_toggle');
+  static const Key acceptRequestConfirmButton = Key(
+    'accept_request_confirm_button',
+  );
+  static const Key logoutSuccessButton = Key('logout_success_button');
   static const Key logoutDialogConfirmButton = Key('logout_dialog_confirm');
   static const Key logoutDialogCancelButton = Key('logout_dialog_cancel');
   static const Key requestHospitalField = Key('request_hospital_field');
