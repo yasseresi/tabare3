@@ -161,6 +161,7 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
+      barrierColor: ColorManager.dialogScrim,
       builder: (dialogContext) => AppDialog.success(
         title: AppStrings.requestAccepted.tr(),
         message: AppStrings.acceptRequestThanks.tr(),

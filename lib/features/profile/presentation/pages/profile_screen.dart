@@ -548,6 +548,7 @@ class _ProfileContent extends StatelessWidget {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
+      barrierColor: ColorManager.dialogScrim,
       builder: (dialogContext) => LogoutDialog(
         title: AppStrings.confirmLogout.tr(),
         message: AppStrings.confirmLogoutMessage.tr(),

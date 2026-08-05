@@ -34,6 +34,7 @@ class RoleSelectionScreen extends StatelessWidget {
             showDialog(
               context: context,
               barrierDismissible: true,
+              barrierColor: ColorManager.dialogScrim,
               builder: (_) => AppDialog.error(
                 title: AppStrings.roleUpdateError.tr(),
                 message: state.failure.message,

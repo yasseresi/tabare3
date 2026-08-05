@@ -162,6 +162,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
+        barrierColor: ColorManager.dialogScrim,
         builder: (_) => AppDialog.success(
           title: AppStrings.loginSuccess.tr(),
           actionLabel: AppStrings.homePage.tr(),
@@ -178,6 +179,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
       showDialog(
         context: context,
         barrierDismissible: true,
+        barrierColor: ColorManager.dialogScrim,
         builder: (_) => AppDialog.error(
           title: AppStrings.loginError.tr(),
           message: state.failure.message,

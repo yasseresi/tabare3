@@ -574,6 +574,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       showDialog(
         context: context,
         barrierDismissible: true,
+        barrierColor: ColorManager.dialogScrim,
         builder: (_) => AppDialog.error(
           title: AppStrings.signupError.tr(),
           message: state.failure.message,

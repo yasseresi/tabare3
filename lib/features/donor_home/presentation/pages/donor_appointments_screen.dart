@@ -181,6 +181,7 @@ class _AppointmentCard extends StatelessWidget {
     final bloc = context.read<DonorFeedBloc>();
     final confirmed = await showDialog<bool>(
       context: context,
+      barrierColor: ColorManager.dialogScrim,
       builder: (dialogContext) => Directionality(
         textDirection: TextDirection.rtl,
         child: AppDialog.warning(
