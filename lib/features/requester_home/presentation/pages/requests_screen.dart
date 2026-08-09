@@ -10,6 +10,7 @@ import '../../../../core/presentation/widgets/app_search_field.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/greeting.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/blood_request_entity.dart';
 import '../bloc/request_bloc.dart';
@@ -72,7 +73,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
           }
           final requests = _filter(state.requests);
           return AppPage(
-            title: AppStrings.welcomeUser.tr(),
+            title: welcomeTitle(),
             subtitle: AppStrings.getWellSoon.tr(),
             onNotifications: widget.onNotifications,
             onRefresh: () async {
@@ -95,7 +96,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                     padding: const EdgeInsets.only(bottom: AppPadding.p15),
                     child: RequesterRequestCard(
                       request: request,
-                      ownerName: AppStrings.welcomeUser.tr(),
+                      ownerName: currentUserFullName(),
                       viewDonorsKey: WidgetKeys.requestDetailsButton,
                       editKey: WidgetKeys.requestEditButton,
                       onViewDonors: () => _openDetail(context, request),

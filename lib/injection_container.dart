@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'core/backend/backend.dart';
 import 'core/error/error_handler.dart';
 import 'core/network/network_info.dart';
+import 'core/session/session_manager.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
 import 'features/auth/domain/usecases/get_current_session.dart';
@@ -176,6 +177,8 @@ Future<void> initCore(Backend backend) async {
 }
 
 Future<void> initAuth() async {
+  sl.registerLazySingleton(() => SessionManager());
+
   sl.registerFactory(
     () => AuthBloc(
       loginWithUsernamePassword: sl(),
@@ -183,6 +186,7 @@ Future<void> initAuth() async {
       signOutUseCase: sl(),
       getCurrentSession: sl(),
       updateUserRole: sl(),
+      sessionManager: sl(),
     ),
   );
 

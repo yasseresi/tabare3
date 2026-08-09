@@ -16,6 +16,7 @@ import '../../../../core/utils/constants_manager.dart';
 import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/greeting.dart';
 import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/blood_request_entity.dart';
@@ -91,7 +92,7 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
           child: Scaffold(
             backgroundColor: ColorManager.transparent,
             body: AppPage(
-              title: AppStrings.welcomeUser.tr(),
+              title: welcomeTitle(),
               subtitle: AppStrings.getWellSoon.tr(),
               notificationsKey: WidgetKeys.requesterNotificationsButton,
               onNotifications:

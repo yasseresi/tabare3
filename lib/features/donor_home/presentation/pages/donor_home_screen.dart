@@ -17,6 +17,7 @@ import '../../../../core/utils/constants_manager.dart';
 import '../../../../core/presentation/widgets/logout_dialog.dart';
 import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/greeting.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../../../injection_container.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -313,7 +314,7 @@ class _DonorOverview extends StatelessWidget {
         final loaded = state as DonorFeedLoaded;
         final feed = loaded.feed;
         return AppPage(
-          title: AppStrings.welcomeUser.tr(),
+          title: welcomeTitle(),
           subtitle: AppStrings.donationLifeChance.tr(),
           notificationsKey: WidgetKeys.donorNotificationsButton,
           onNotifications:

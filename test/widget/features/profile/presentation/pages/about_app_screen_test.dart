@@ -12,7 +12,7 @@ void main() {
   ) async {
     await pumpTestApp(tester, AboutAppScreen(onBack: () {}));
 
-    expect(find.text('مرحباً، أحمد'), findsOneWidget);
+    expect(find.text('مرحباً'), findsOneWidget);
     expect(find.text('معلومات التطبيق'), findsOneWidget);
     await tester.scrollUntilVisible(
       find.text('التواصل مع المطور'),

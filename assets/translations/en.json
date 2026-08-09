@@ -165,7 +165,7 @@
   "bags": "bags",
   "yes": "Yes",
   "no": "No",
-  "welcome_user": "Hello, Ahmed",
+  "welcome_user": "Hello, {name}",
   "get_well_soon": "We wish you a speedy recovery",
   "donation_life_chance": "Every blood donation is a new chance for life",
   "hadith_believer_affair": "«How wonderful is the affair of the believer, for his affairs are all good, and this is not for anyone except the believer. If something good happens to him, he is grateful, and that is good for him. If something bad happens to him, he is patient, and that is good for him»",

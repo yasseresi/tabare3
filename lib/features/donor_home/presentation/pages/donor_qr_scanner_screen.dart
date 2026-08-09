@@ -13,6 +13,7 @@ import '../../../../core/presentation/widgets/qr_page_body.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/greeting.dart';
 import '../../../../core/utils/values_manager.dart';
 
 typedef DonorScannerBuilder = Widget Function(ValueChanged<String> onScanned);
@@ -76,7 +77,7 @@ class _DonorQrScannerScreenState extends State<DonorQrScannerScreen> {
                 child: Column(
                   children: [
                     AppHeader(
-                      title: AppStrings.welcomeUser.tr(),
+                      title: welcomeTitle(),
                       subtitle: AppStrings.donationLifeChance.tr(),
                       notificationsKey: WidgetKeys.donorNotificationsButton,
                       onNotifications: () =>

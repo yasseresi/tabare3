@@ -15,6 +15,7 @@ import '../../../../core/utils/constants_manager.dart';
 import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/greeting.dart';
 import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/donor_feed_entity.dart';
@@ -53,7 +54,7 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
           final loaded = state as DonorFeedLoaded;
           final requests = _filter(loaded.feed.compatibleRequests);
           return AppPage(
-            title: AppStrings.welcomeUser.tr(),
+            title: welcomeTitle(),
             subtitle: AppStrings.donationLifeChance.tr(),
             notificationsKey: WidgetKeys.donorNotificationsButton,
             onNotifications:

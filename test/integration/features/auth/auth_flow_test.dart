@@ -18,6 +18,7 @@ import 'package:tabare3/features/auth/domain/usecases/login_with_email_password.
 import 'package:tabare3/features/auth/domain/usecases/sign_out.dart';
 import 'package:tabare3/features/auth/domain/usecases/signup_with_email_password.dart';
 import 'package:tabare3/features/auth/domain/usecases/update_user_role.dart';
+import 'package:tabare3/core/session/session_manager.dart';
 import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:tabare3/features/auth/presentation/pages/login_form_screen.dart';
 import 'package:tabare3/features/auth/presentation/pages/role_selection_screen.dart';
@@ -94,6 +95,9 @@ void registerAllDependencies({
   sl.registerLazySingleton(() => GetCurrentSession(sl()));
   sl.registerLazySingleton(() => UpdateUserRole(sl()));
 
+  sl.registerLazySingleton(() => SessionManager());
+
+
   sl.registerFactory(
     () => AuthBloc(
       loginWithUsernamePassword: sl(),
@@ -101,6 +105,7 @@ void registerAllDependencies({
       signOutUseCase: sl(),
       getCurrentSession: sl(),
       updateUserRole: sl(),
+      sessionManager: sl(),
     ),
   );
 

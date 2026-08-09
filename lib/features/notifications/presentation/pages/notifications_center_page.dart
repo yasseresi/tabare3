@@ -13,6 +13,7 @@ import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/greeting.dart';
 import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/notification_entity.dart';
@@ -58,7 +59,7 @@ class _NotificationsCenterPageState extends State<NotificationsCenterPage> {
           child: Column(
             children: [
               AppHeader(
-                title: AppStrings.welcomeUser.tr(),
+                title: welcomeTitle(),
                 subtitle: widget.isDonor
                     ? AppStrings.donationLifeChance.tr()
                     : AppStrings.getWellSoon.tr(),

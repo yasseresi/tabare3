@@ -12,6 +12,7 @@ import 'package:tabare3/features/auth/domain/usecases/login_with_email_password.
 import 'package:tabare3/features/auth/domain/usecases/sign_out.dart';
 import 'package:tabare3/features/auth/domain/usecases/signup_with_email_password.dart';
 import 'package:tabare3/features/auth/domain/usecases/update_user_role.dart';
+import 'package:tabare3/core/session/session_manager.dart';
 import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
 
 class MockLoginWithUsernamePassword extends Mock
@@ -78,6 +79,7 @@ void main() {
       signOutUseCase: mockSignOut,
       getCurrentSession: mockGetCurrentSession,
       updateUserRole: mockUpdateUserRole,
+      sessionManager: SessionManager(),
     );
   });
 

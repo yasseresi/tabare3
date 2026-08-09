@@ -17,6 +17,7 @@ import '../../../../core/utils/constants_manager.dart';
 import '../../../../core/presentation/widgets/logout_dialog.dart';
 import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/greeting.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../../../injection_container.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -257,7 +258,7 @@ class _RequesterOverview extends StatelessWidget {
         }
         final requests = state.requests;
         return AppPage(
-          title: AppStrings.welcomeUser.tr(),
+          title: welcomeTitle(),
           subtitle: AppStrings.getWellSoon.tr(),
           onNotifications: onNotifications,
           onRefresh: () async {
@@ -290,7 +291,7 @@ class _RequesterOverview extends StatelessWidget {
                       padding: const EdgeInsets.only(bottom: AppPadding.p15),
                       child: RequesterRequestCard(
                         request: request,
-                        ownerName: AppStrings.welcomeUser.tr(),
+                        ownerName: currentUserFullName(),
                         onEdit: () => onEdit(request),
                       ),
                     ),

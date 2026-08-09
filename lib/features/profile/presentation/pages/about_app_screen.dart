@@ -8,6 +8,7 @@ import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
 import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/greeting.dart';
 import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../widgets/profile_widgets.dart';
@@ -38,7 +39,7 @@ class AboutAppScreen extends StatelessWidget {
                       child: BackButton(color: ColorManager.textPrimary),
                     ),
                   AppHeader(
-                    title: AppStrings.welcomeUser.tr(),
+                    title: welcomeTitle(),
                     subtitle: AppStrings.donationLifeChance.tr(),
                   ),
                   // Figma floats the header and starts the content at y=150;

@@ -118,7 +118,7 @@ void main() {
     expect(find.text('1/3'), findsOneWidget);
     expect(find.text('المتبرعين المتاحين'), findsOneWidget);
     expect(find.text('تعديل الطلب'), findsOneWidget);
-    expect(find.text('مرحباً، أحمد'), findsWidgets);
+    expect(find.text('مرحباً'), findsWidgets);
   });
 
   testWidgets('requester dashboard renders backend request data', (
@@ -531,7 +531,7 @@ void main() {
       ),
     );
 
-    expect(find.text('مرحباً، أحمد'), findsOneWidget);
+    expect(find.text('مرحباً'), findsOneWidget);
     expect(find.text('تعديل طلب تبرع بالدم'), findsOneWidget);
 
     await tester.scrollUntilVisible(

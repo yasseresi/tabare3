@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/session/session_manager.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/get_current_session.dart';
@@ -19,6 +20,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SignOut signOutUseCase;
   final GetCurrentSession getCurrentSession;
   final UpdateUserRole updateUserRole;
+  final SessionManager sessionManager;
 
   AuthBloc({
     required this.loginWithUsernamePassword,
@@ -26,6 +28,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.signOutUseCase,
     required this.getCurrentSession,
     required this.updateUserRole,
+    required this.sessionManager,
   }) : super(AuthInitial()) {
     on<LoginRequested>(_onLoginRequested);
     on<SignupRequested>(_onSignupRequested);
@@ -42,10 +45,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await loginWithUsernamePassword(
       LoginParams(username: event.username, password: event.password),
     );
-    result.fold(
-      (failure) => emit(AuthError(failure)),
-      (user) => emit(Authenticated(user)),
-    );
+    result.fold((failure) => emit(AuthError(failure)), (user) {
+      sessionManager.setUser(user);
+      emit(Authenticated(user));
+    });
   }
 
   Future<void> _onSignupRequested(
@@ -54,10 +57,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     final result = await signupWithUsernamePassword(event.params);
-    result.fold(
-      (failure) => emit(AuthError(failure)),
-      (user) => emit(Authenticated(user)),
-    );
+    result.fold((failure) => emit(AuthError(failure)), (user) {
+      sessionManager.setUser(user);
+      emit(Authenticated(user));
+    });
   }
 
   Future<void> _onSignOutRequested(
@@ -66,10 +69,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     final result = await signOutUseCase(NoParams());
-    result.fold(
-      (failure) => emit(AuthError(failure)),
-      (_) => emit(Unauthenticated()),
-    );
+    result.fold((failure) => emit(AuthError(failure)), (_) {
+      sessionManager.clear();
+      emit(Unauthenticated());
+    });
   }
 
   Future<void> _onSessionCheckRequested(
@@ -80,8 +83,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await getCurrentSession(NoParams());
     result.fold((failure) => emit(Unauthenticated()), (user) {
       if (user != null) {
+        sessionManager.setUser(user);
         emit(Authenticated(user));
       } else {
+        sessionManager.clear();
         emit(Unauthenticated());
       }
     });
@@ -95,9 +100,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await updateUserRole(
       UpdateRoleParams(isDonor: event.isDonor, isRecipient: event.isRecipient),
     );
-    result.fold(
-      (failure) => emit(AuthError(failure)),
-      (user) => emit(RoleUpdated(user)),
-    );
+    result.fold((failure) => emit(AuthError(failure)), (user) {
+      sessionManager.setUser(user);
+      emit(RoleUpdated(user));
+    });
   }
 }

@@ -15,6 +15,7 @@ import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
 import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/greeting.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/donor_feed_entity.dart';
 import '../bloc/donor_feed_bloc.dart';
@@ -42,7 +43,7 @@ class DonorRecordScreen extends StatelessWidget {
           }
           final records = (state as DonorFeedLoaded).records;
           return AppPage(
-            title: AppStrings.welcomeUser.tr(),
+            title: welcomeTitle(),
             subtitle: AppStrings.donationLifeChance.tr(),
             notificationsKey: WidgetKeys.donorNotificationsButton,
             onNotifications:
