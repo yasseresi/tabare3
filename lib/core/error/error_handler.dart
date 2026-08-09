@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'dart:io';
+
+import 'package:http/http.dart' as http;
 
 import '../backend/backend_error_mapper.dart';
 import 'failures.dart';
@@ -33,6 +36,22 @@ class ErrorHandler {
       return NetworkFailure(
         -6,
         ErrorMessages.getMessage(AppStrings.networkError),
+      );
+    }
+    if (error is TimeoutException) {
+      return NetworkFailure(
+        -6,
+        ErrorMessages.getMessage(AppStrings.timeoutError),
+      );
+    }
+    // The Supabase/REST stack calls package:http, which raises a
+    // ClientException (not a SocketException) on intermittent connectivity —
+    // e.g. a dropped connection while the home feed loads. Without this branch
+    // it collapses into the opaque default error.
+    if (error is http.ClientException) {
+      return NetworkFailure(
+        -6,
+        ErrorMessages.getMessage(AppStrings.connectionError),
       );
     }
     return ServerFailure(-7, ErrorMessages.getMessage(AppStrings.defaultError));
