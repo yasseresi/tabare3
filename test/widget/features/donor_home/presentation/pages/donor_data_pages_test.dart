@@ -9,7 +9,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tabare3/core/constants/widget_keys.dart';
+import 'package:tabare3/core/session/session_manager.dart';
+import 'package:tabare3/features/auth/domain/entities/user_entity.dart';
 import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:tabare3/injection_container.dart';
 import 'package:tabare3/features/donor_home/domain/entities/donor_feed_entity.dart';
 import 'package:tabare3/features/donor_home/domain/entities/donor_card_entity.dart';
 import 'package:tabare3/features/donor_home/presentation/bloc/donor_card_bloc.dart';
@@ -201,6 +204,29 @@ void main() {
 
     expect(notificationsOpened, isTrue);
   });
+
+  testWidgets(
+    'donor overview header shows the signed-in user first name',
+    (tester) async {
+      sl.registerLazySingleton(() => SessionManager());
+      addTearDown(() async => sl.reset());
+      sl<SessionManager>().setUser(
+        const UserEntity(
+          id: 'donor-1',
+          email: 'mohamed@example.com',
+          username: 'mohamed',
+          fullName: 'محمد الأمين',
+          bloodType: 'O-',
+          isDonor: true,
+        ),
+      );
+
+      await pumpPage(tester, const DonorHomeScreen());
+
+      expect(find.text('مرحباً، محمد'), findsOneWidget);
+      expect(find.text('مرحباً، أحمد'), findsNothing);
+    },
+  );
 
   testWidgets('renders donor overview from backend state', (tester) async {
     await pumpPage(tester, const DonorHomeScreen());
