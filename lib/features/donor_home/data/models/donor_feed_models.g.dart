@@ -240,9 +240,11 @@ _DonationRecordRequestRefModel _$DonationRecordRequestRefModelFromJson(
   Map<String, dynamic> json,
 ) => _DonationRecordRequestRefModel(
   id: json['id'] as String,
-  recipient: DonationRecordRecipientModel.fromJson(
-    json['recipient'] as Map<String, dynamic>,
-  ),
+  recipient: json['recipient'] == null
+      ? null
+      : DonationRecordRecipientModel.fromJson(
+          json['recipient'] as Map<String, dynamic>,
+        ),
   hospital: DonorHospitalModel.fromJson(
     json['hospital'] as Map<String, dynamic>,
   ),

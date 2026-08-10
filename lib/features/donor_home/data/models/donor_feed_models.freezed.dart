@@ -2379,7 +2379,9 @@ as String,
 /// @nodoc
 mixin _$DonationRecordRequestRefModel {
 
- String get id; DonationRecordRecipientModel get recipient; DonorHospitalModel get hospital;
+ String get id;// RLS limits donors to their own `users` row, so PostgREST returns a null
+// recipient embed for someone else's request. Keep it optional.
+ DonationRecordRecipientModel? get recipient; DonorHospitalModel get hospital;
 /// Create a copy of DonationRecordRequestRefModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2412,11 +2414,11 @@ abstract mixin class $DonationRecordRequestRefModelCopyWith<$Res>  {
   factory $DonationRecordRequestRefModelCopyWith(DonationRecordRequestRefModel value, $Res Function(DonationRecordRequestRefModel) _then) = _$DonationRecordRequestRefModelCopyWithImpl;
 @useResult
 $Res call({
- String id, DonationRecordRecipientModel recipient, DonorHospitalModel hospital
+ String id, DonationRecordRecipientModel? recipient, DonorHospitalModel hospital
 });
 
 
-$DonationRecordRecipientModelCopyWith<$Res> get recipient;$DonorHospitalModelCopyWith<$Res> get hospital;
+$DonationRecordRecipientModelCopyWith<$Res>? get recipient;$DonorHospitalModelCopyWith<$Res> get hospital;
 
 }
 /// @nodoc
@@ -2429,11 +2431,11 @@ class _$DonationRecordRequestRefModelCopyWithImpl<$Res>
 
 /// Create a copy of DonationRecordRequestRefModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? recipient = null,Object? hospital = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? recipient = freezed,Object? hospital = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,recipient: null == recipient ? _self.recipient : recipient // ignore: cast_nullable_to_non_nullable
-as DonationRecordRecipientModel,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as String,recipient: freezed == recipient ? _self.recipient : recipient // ignore: cast_nullable_to_non_nullable
+as DonationRecordRecipientModel?,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
 as DonorHospitalModel,
   ));
 }
@@ -2441,9 +2443,12 @@ as DonorHospitalModel,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$DonationRecordRecipientModelCopyWith<$Res> get recipient {
-  
-  return $DonationRecordRecipientModelCopyWith<$Res>(_self.recipient, (value) {
+$DonationRecordRecipientModelCopyWith<$Res>? get recipient {
+    if (_self.recipient == null) {
+    return null;
+  }
+
+  return $DonationRecordRecipientModelCopyWith<$Res>(_self.recipient!, (value) {
     return _then(_self.copyWith(recipient: value));
   });
 }/// Create a copy of DonationRecordRequestRefModel
@@ -2537,7 +2542,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DonationRecordRecipientModel recipient,  DonorHospitalModel hospital)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DonationRecordRecipientModel? recipient,  DonorHospitalModel hospital)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DonationRecordRequestRefModel() when $default != null:
 return $default(_that.id,_that.recipient,_that.hospital);case _:
@@ -2558,7 +2563,7 @@ return $default(_that.id,_that.recipient,_that.hospital);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DonationRecordRecipientModel recipient,  DonorHospitalModel hospital)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DonationRecordRecipientModel? recipient,  DonorHospitalModel hospital)  $default,) {final _that = this;
 switch (_that) {
 case _DonationRecordRequestRefModel():
 return $default(_that.id,_that.recipient,_that.hospital);case _:
@@ -2578,7 +2583,7 @@ return $default(_that.id,_that.recipient,_that.hospital);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DonationRecordRecipientModel recipient,  DonorHospitalModel hospital)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DonationRecordRecipientModel? recipient,  DonorHospitalModel hospital)?  $default,) {final _that = this;
 switch (_that) {
 case _DonationRecordRequestRefModel() when $default != null:
 return $default(_that.id,_that.recipient,_that.hospital);case _:
@@ -2593,11 +2598,13 @@ return $default(_that.id,_that.recipient,_that.hospital);case _:
 @JsonSerializable()
 
 class _DonationRecordRequestRefModel extends DonationRecordRequestRefModel {
-  const _DonationRecordRequestRefModel({required this.id, required this.recipient, required this.hospital}): super._();
+  const _DonationRecordRequestRefModel({required this.id, this.recipient, required this.hospital}): super._();
   factory _DonationRecordRequestRefModel.fromJson(Map<String, dynamic> json) => _$DonationRecordRequestRefModelFromJson(json);
 
 @override final  String id;
-@override final  DonationRecordRecipientModel recipient;
+// RLS limits donors to their own `users` row, so PostgREST returns a null
+// recipient embed for someone else's request. Keep it optional.
+@override final  DonationRecordRecipientModel? recipient;
 @override final  DonorHospitalModel hospital;
 
 /// Create a copy of DonationRecordRequestRefModel
@@ -2633,11 +2640,11 @@ abstract mixin class _$DonationRecordRequestRefModelCopyWith<$Res> implements $D
   factory _$DonationRecordRequestRefModelCopyWith(_DonationRecordRequestRefModel value, $Res Function(_DonationRecordRequestRefModel) _then) = __$DonationRecordRequestRefModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, DonationRecordRecipientModel recipient, DonorHospitalModel hospital
+ String id, DonationRecordRecipientModel? recipient, DonorHospitalModel hospital
 });
 
 
-@override $DonationRecordRecipientModelCopyWith<$Res> get recipient;@override $DonorHospitalModelCopyWith<$Res> get hospital;
+@override $DonationRecordRecipientModelCopyWith<$Res>? get recipient;@override $DonorHospitalModelCopyWith<$Res> get hospital;
 
 }
 /// @nodoc
@@ -2650,11 +2657,11 @@ class __$DonationRecordRequestRefModelCopyWithImpl<$Res>
 
 /// Create a copy of DonationRecordRequestRefModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? recipient = null,Object? hospital = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? recipient = freezed,Object? hospital = null,}) {
   return _then(_DonationRecordRequestRefModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,recipient: null == recipient ? _self.recipient : recipient // ignore: cast_nullable_to_non_nullable
-as DonationRecordRecipientModel,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as String,recipient: freezed == recipient ? _self.recipient : recipient // ignore: cast_nullable_to_non_nullable
+as DonationRecordRecipientModel?,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
 as DonorHospitalModel,
   ));
 }
@@ -2663,9 +2670,12 @@ as DonorHospitalModel,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$DonationRecordRecipientModelCopyWith<$Res> get recipient {
-  
-  return $DonationRecordRecipientModelCopyWith<$Res>(_self.recipient, (value) {
+$DonationRecordRecipientModelCopyWith<$Res>? get recipient {
+    if (_self.recipient == null) {
+    return null;
+  }
+
+  return $DonationRecordRecipientModelCopyWith<$Res>(_self.recipient!, (value) {
     return _then(_self.copyWith(recipient: value));
   });
 }/// Create a copy of DonationRecordRequestRefModel

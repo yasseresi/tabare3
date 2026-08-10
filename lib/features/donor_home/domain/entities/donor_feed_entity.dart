@@ -237,7 +237,8 @@ abstract class DonorAppointmentEntity with _$DonorAppointmentEntity {
 abstract class DonationRecordRequestRef with _$DonationRecordRequestRef {
   const factory DonationRecordRequestRef({
     required String id,
-    required String recipientName,
+    // Null when RLS hides the requester's profile from the donor.
+    String? recipientName,
     required DonorHospitalEntity hospital,
   }) = _DonationRecordRequestRef;
 }

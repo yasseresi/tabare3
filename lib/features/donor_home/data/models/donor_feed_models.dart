@@ -252,7 +252,9 @@ abstract class DonationRecordRequestRefModel
 
   const factory DonationRecordRequestRefModel({
     required String id,
-    required DonationRecordRecipientModel recipient,
+    // RLS limits donors to their own `users` row, so PostgREST returns a null
+    // recipient embed for someone else's request. Keep it optional.
+    DonationRecordRecipientModel? recipient,
     required DonorHospitalModel hospital,
   }) = _DonationRecordRequestRefModel;
 
@@ -261,7 +263,7 @@ abstract class DonationRecordRequestRefModel
 
   DonationRecordRequestRef toEntity() => DonationRecordRequestRef(
     id: id,
-    recipientName: recipient.fullName,
+    recipientName: recipient?.fullName,
     hospital: hospital.toEntity(),
   );
 }

@@ -97,6 +97,35 @@ void main() {
     );
   });
 
+  test('record model parses when RLS hides the recipient profile', () {
+    // Donors may only SELECT their own `users` row, so PostgREST returns a
+    // null `recipient` embed for someone else's request. Parsing must survive
+    // it instead of collapsing into the generic "unexpected error" screen.
+    final record = DonationRecordModel.fromJson({
+      'id': 'record-1',
+      'donor_id': 'donor-1',
+      'source': 'request',
+      'request_id': 'request-1',
+      'campaign_id': null,
+      'appointment_id': null,
+      'hospital_id': 'hospital-1',
+      'donated_at': '2030-01-10T12:00:00.000Z',
+      'units': 1,
+      'blood_request': {
+        'id': 'request-1',
+        'recipient': null,
+        'hospital': hospitalJson,
+      },
+      'campaign': null,
+    });
+
+    expect(record.toEntity().bloodRequest?.recipientName, isNull);
+    expect(
+      record.toEntity().bloodRequest?.hospital.nameAr,
+      'مستشفى مصطفى باشا',
+    );
+  });
+
   test('record model and RPC payloads preserve backend contracts', () {
     final record = DonationRecordModel.fromJson({
       'id': 'record-1',

@@ -2073,7 +2073,8 @@ $DonorAppointmentCampaignRefCopyWith<$Res>? get campaign {
 /// @nodoc
 mixin _$DonationRecordRequestRef {
 
- String get id; String get recipientName; DonorHospitalEntity get hospital;
+ String get id;// Null when RLS hides the requester's profile from the donor.
+ String? get recipientName; DonorHospitalEntity get hospital;
 /// Create a copy of DonationRecordRequestRef
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2104,7 +2105,7 @@ abstract mixin class $DonationRecordRequestRefCopyWith<$Res>  {
   factory $DonationRecordRequestRefCopyWith(DonationRecordRequestRef value, $Res Function(DonationRecordRequestRef) _then) = _$DonationRecordRequestRefCopyWithImpl;
 @useResult
 $Res call({
- String id, String recipientName, DonorHospitalEntity hospital
+ String id, String? recipientName, DonorHospitalEntity hospital
 });
 
 
@@ -2121,11 +2122,11 @@ class _$DonationRecordRequestRefCopyWithImpl<$Res>
 
 /// Create a copy of DonationRecordRequestRef
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? recipientName = null,Object? hospital = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? recipientName = freezed,Object? hospital = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,recipientName: null == recipientName ? _self.recipientName : recipientName // ignore: cast_nullable_to_non_nullable
-as String,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as String,recipientName: freezed == recipientName ? _self.recipientName : recipientName // ignore: cast_nullable_to_non_nullable
+as String?,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
 as DonorHospitalEntity,
   ));
 }
@@ -2220,7 +2221,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String recipientName,  DonorHospitalEntity hospital)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? recipientName,  DonorHospitalEntity hospital)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DonationRecordRequestRef() when $default != null:
 return $default(_that.id,_that.recipientName,_that.hospital);case _:
@@ -2241,7 +2242,7 @@ return $default(_that.id,_that.recipientName,_that.hospital);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String recipientName,  DonorHospitalEntity hospital)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? recipientName,  DonorHospitalEntity hospital)  $default,) {final _that = this;
 switch (_that) {
 case _DonationRecordRequestRef():
 return $default(_that.id,_that.recipientName,_that.hospital);case _:
@@ -2261,7 +2262,7 @@ return $default(_that.id,_that.recipientName,_that.hospital);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String recipientName,  DonorHospitalEntity hospital)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? recipientName,  DonorHospitalEntity hospital)?  $default,) {final _that = this;
 switch (_that) {
 case _DonationRecordRequestRef() when $default != null:
 return $default(_that.id,_that.recipientName,_that.hospital);case _:
@@ -2276,11 +2277,12 @@ return $default(_that.id,_that.recipientName,_that.hospital);case _:
 
 
 class _DonationRecordRequestRef implements DonationRecordRequestRef {
-  const _DonationRecordRequestRef({required this.id, required this.recipientName, required this.hospital});
+  const _DonationRecordRequestRef({required this.id, this.recipientName, required this.hospital});
   
 
 @override final  String id;
-@override final  String recipientName;
+// Null when RLS hides the requester's profile from the donor.
+@override final  String? recipientName;
 @override final  DonorHospitalEntity hospital;
 
 /// Create a copy of DonationRecordRequestRef
@@ -2313,7 +2315,7 @@ abstract mixin class _$DonationRecordRequestRefCopyWith<$Res> implements $Donati
   factory _$DonationRecordRequestRefCopyWith(_DonationRecordRequestRef value, $Res Function(_DonationRecordRequestRef) _then) = __$DonationRecordRequestRefCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String recipientName, DonorHospitalEntity hospital
+ String id, String? recipientName, DonorHospitalEntity hospital
 });
 
 
@@ -2330,11 +2332,11 @@ class __$DonationRecordRequestRefCopyWithImpl<$Res>
 
 /// Create a copy of DonationRecordRequestRef
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? recipientName = null,Object? hospital = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? recipientName = freezed,Object? hospital = null,}) {
   return _then(_DonationRecordRequestRef(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,recipientName: null == recipientName ? _self.recipientName : recipientName // ignore: cast_nullable_to_non_nullable
-as String,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as String,recipientName: freezed == recipientName ? _self.recipientName : recipientName // ignore: cast_nullable_to_non_nullable
+as String?,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
 as DonorHospitalEntity,
   ));
 }
