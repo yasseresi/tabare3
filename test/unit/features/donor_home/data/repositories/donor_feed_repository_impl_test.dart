@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
+import 'package:tabare3/core/error/failures.dart';
 import 'package:tabare3/features/donor_home/data/datasources/donor_feed_remote_data_source.dart';
 import 'package:tabare3/features/donor_home/data/models/donor_feed_models.dart';
 import 'package:tabare3/features/donor_home/data/repositories/donor_feed_repository_impl.dart';
@@ -171,4 +173,22 @@ void main() {
     );
     expect((await repository.listAvailableCampaigns()).isLeft(), true);
   });
+
+  test(
+    'getFeed maps a dropped connection to NetworkFailure, not the generic default',
+    () async {
+      // Regression for the home-feed "unexpected error" screen: postgrest
+      // throws http.ClientException (not SocketException) when connectivity
+      // drops mid-request.
+      when(() => dataSource.getAvailability()).thenThrow(
+        http.ClientException('Failed host lookup: example.supabase.co'),
+      );
+
+      final result = await repository.getFeed();
+
+      expect(result.isLeft(), true);
+      final failure = result.fold((f) => f, (_) => throw StateError('right'));
+      expect(failure, isA<NetworkFailure>());
+    },
+  );
 }
