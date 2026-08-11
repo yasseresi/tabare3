@@ -37,6 +37,7 @@ import 'features/profile/data/datasources/profile_local_data_source_impl.dart';
 import 'features/profile/data/repositories/profile_repository_impl.dart';
 import 'features/profile/domain/repositories/profile_repository.dart';
 import 'features/profile/domain/usecases/change_role.dart';
+import 'features/profile/domain/usecases/get_cached_profile.dart';
 import 'features/profile/domain/usecases/get_profile.dart';
 import 'features/profile/domain/usecases/update_profile.dart';
 import 'features/profile/domain/usecases/upload_avatar.dart';
@@ -149,6 +150,7 @@ Future<void> initProfile() async {
   sl.registerFactory(
     () => ProfileBloc(
       getProfile: sl(),
+      getCachedProfile: sl(),
       updateProfile: sl(),
       changeRole: sl(),
       uploadAvatar: sl(),
@@ -156,6 +158,7 @@ Future<void> initProfile() async {
   );
 
   sl.registerLazySingleton(() => GetProfile(sl()));
+  sl.registerLazySingleton(() => GetCachedProfile(sl()));
   sl.registerLazySingleton(() => UpdateProfile(sl()));
   sl.registerLazySingleton(() => ChangeRole(sl()));
   sl.registerLazySingleton(() => UploadAvatar(sl()));

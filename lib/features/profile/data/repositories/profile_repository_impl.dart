@@ -18,6 +18,12 @@ class ProfileRepositoryImpl implements ProfileRepository {
   });
 
   @override
+  Future<ProfileEntity?> getCachedProfile() async {
+    final cached = await localDataSource.getLastProfile();
+    return cached?.toEntity();
+  }
+
+  @override
   Future<Either<Failure, ProfileEntity>> getProfile() async {
     try {
       final remoteProfile = await remoteDataSource.getProfile();

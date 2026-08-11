@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/usecases/usecase.dart';
 import '../../domain/usecases/change_role.dart';
+import '../../domain/usecases/get_cached_profile.dart';
 import '../../domain/usecases/get_profile.dart';
 import '../../domain/usecases/update_profile.dart';
 import '../../domain/usecases/upload_avatar.dart';
@@ -13,12 +14,14 @@ export 'profile_state.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final GetProfile getProfile;
+  final GetCachedProfile getCachedProfile;
   final UpdateProfile updateProfile;
   final ChangeRole changeRole;
   final UploadAvatar uploadAvatar;
 
   ProfileBloc({
     required this.getProfile,
+    required this.getCachedProfile,
     required this.updateProfile,
     required this.changeRole,
     required this.uploadAvatar,
@@ -36,10 +39,21 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     LoadProfile event,
     Emitter<ProfileState> emit,
   ) async {
-    emit(ProfileLoading());
+    // Paint the cached profile instantly; only fall back to the spinner when
+    // there is nothing to show yet.
+    final cached = await getCachedProfile();
+    if (cached != null) {
+      emit(ProfileLoaded(profile: cached, isEditing: false));
+    } else {
+      emit(ProfileLoading());
+    }
+
     final result = await getProfile(NoParams());
     result.fold(
-      (failure) => emit(ProfileError(failure: failure)),
+      (failure) {
+        // Keep the cached view on-screen if the refresh fails.
+        if (state is! ProfileLoaded) emit(ProfileError(failure: failure));
+      },
       (profile) => emit(ProfileLoaded(profile: profile, isEditing: false)),
     );
   }
