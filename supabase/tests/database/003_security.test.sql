@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(26);
+select plan(27);
 
 select ok(
   has_table_privilege('authenticated', 'public.users', 'SELECT'),
@@ -16,6 +16,12 @@ select ok(
 select ok(
   has_column_privilege('authenticated', 'public.users', 'phone', 'UPDATE'),
   'users may update their phone through the own-row policy'
+);
+-- The profile save payload always carries is_active. Without this grant the
+-- whole update is rejected before RLS runs, breaking every profile edit.
+select ok(
+  has_column_privilege('authenticated', 'public.users', 'is_active', 'UPDATE'),
+  'users may toggle their own account status from the profile screen'
 );
 select ok(
   has_column_privilege(
