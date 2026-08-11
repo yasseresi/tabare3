@@ -234,6 +234,27 @@ void main() {
       expect(find.text('حفظ التعديلات'), findsOneWidget);
     });
 
+    testWidgets('reveals the camera affordance only in edit mode', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          BlocProvider(
+            create: (_) => buildProfileBloc(),
+            child: const ProfileScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.camera_alt_rounded), findsNothing);
+
+      await tester.tap(find.text('تعديل'));
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.camera_alt_rounded), findsOneWidget);
+    });
+
     testWidgets('tapping save changes dispatches SaveProfile', (tester) async {
       await tester.pumpWidget(
         buildTestApp(

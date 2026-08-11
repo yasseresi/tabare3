@@ -19,8 +19,15 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   @override
   Future<ProfileEntity?> getCachedProfile() async {
-    final cached = await localDataSource.getLastProfile();
-    return cached?.toEntity();
+    try {
+      final cached = await localDataSource.getLastProfile();
+      return cached?.toEntity();
+    } catch (_) {
+      // A corrupt or schema-drifted cache entry is indistinguishable from a
+      // cache miss to callers: fall through to the remote fetch rather than
+      // letting a decode error blank the screen.
+      return null;
+    }
   }
 
   @override

@@ -116,7 +116,7 @@ create table users (
 -- BLOOD REQUESTS
 -- ============================================================
 create table blood_requests (
-  id              uuid                  primary key default uuid_generate_v4(),
+  id              uuid                  primary key default gen_random_uuid(),
   requested_by    uuid                  not null references users(id) on delete cascade,
   hospital_name   text                  not null,
   city            text                  not null,
@@ -139,7 +139,7 @@ create table blood_requests (
 -- CAMPAIGNS
 -- ============================================================
 create table campaigns (
-  id                  uuid                  primary key default uuid_generate_v4(),
+  id                  uuid                  primary key default gen_random_uuid(),
   created_by          uuid                  references users(id) on delete set null,
   organizer_name      text                  not null,
   title               text                  not null,
@@ -164,7 +164,7 @@ create table campaigns (
 -- APPOINTMENTS
 -- ============================================================
 create table appointments (
-  id                uuid                    primary key default uuid_generate_v4(),
+  id                uuid                    primary key default gen_random_uuid(),
   donor_id          uuid                    not null references users(id) on delete cascade,
   blood_request_id  uuid                    references blood_requests(id) on delete cascade,
   campaign_id       uuid                    references campaigns(id) on delete cascade,
@@ -185,7 +185,7 @@ create table appointments (
 -- POINT TRANSACTIONS
 -- ============================================================
 create table point_transactions (
-  id          uuid              primary key default uuid_generate_v4(),
+  id          uuid              primary key default gen_random_uuid(),
   donor_id    uuid              not null references users(id) on delete cascade,
   amount      int               not null,
   reason      point_reason_enum not null,
@@ -219,7 +219,7 @@ insert into levels (level_number, min_points, name_ar) values
 -- BADGES
 -- ============================================================
 create table badges (
-  id              uuid        primary key default uuid_generate_v4(),
+  id              uuid        primary key default gen_random_uuid(),
   name_ar         text        not null,
   name_en         text,
   description_ar  text,
@@ -233,7 +233,7 @@ create table badges (
 );
 
 create table user_badges (
-  id          uuid        primary key default uuid_generate_v4(),
+  id          uuid        primary key default gen_random_uuid(),
   user_id     uuid        not null references users(id) on delete cascade,
   badge_id    uuid        not null references badges(id) on delete cascade,
   earned_at   timestamptz not null default now(),
@@ -246,7 +246,7 @@ create table user_badges (
 -- NOTIFICATIONS
 -- ============================================================
 create table notifications (
-  id          uuid                    primary key default uuid_generate_v4(),
+  id          uuid                    primary key default gen_random_uuid(),
   user_id     uuid                    not null references users(id) on delete cascade,
   type        notification_type_enum  not null,
   title       text                    not null,
@@ -265,7 +265,7 @@ create table notifications (
 -- REFERRALS
 -- ============================================================
 create table referrals (
-  id              uuid        primary key default uuid_generate_v4(),
+  id              uuid        primary key default gen_random_uuid(),
   referrer_id     uuid        not null references users(id) on delete cascade,
   referred_id     uuid        not null references users(id) on delete cascade,
   appointment_id  uuid        references appointments(id) on delete set null,

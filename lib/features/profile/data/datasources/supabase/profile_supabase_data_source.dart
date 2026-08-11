@@ -12,6 +12,14 @@ const profileSelectColumns =
 
 const _avatarBucket = 'profile_pic';
 
+/// Object name for a newly uploaded avatar.
+///
+/// The name carries [at] so each upload lands on a fresh public URL. A fixed
+/// name (`avatar.jpg`) reused the same URL on every change, and both the image
+/// cache and the storage CDN kept serving the previous photo.
+String buildAvatarObjectName({required String extension, required DateTime at}) =>
+    'avatar_${at.millisecondsSinceEpoch}.$extension';
+
 Map<String, dynamic> buildProfileUpdatePayload(ProfileModel profile) => {
   'username': profile.username,
   'phone': profile.phone,
@@ -76,7 +84,8 @@ class ProfileSupabaseDataSource implements ProfileRemoteDataSource {
     final file = File(filePath);
     final bytes = await file.readAsBytes();
     final ext = filePath.split('.').last.toLowerCase();
-    final path = '$_userId/avatar.$ext';
+    final name = buildAvatarObjectName(extension: ext, at: DateTime.now());
+    final path = '$_userId/$name';
 
     await client.storage
         .from(_avatarBucket)
@@ -86,6 +95,29 @@ class ProfileSupabaseDataSource implements ProfileRemoteDataSource {
           fileOptions: const FileOptions(upsert: true),
         );
 
+    await _removeSupersededAvatars(keep: name);
+
     return client.storage.from(_avatarBucket).getPublicUrl(path);
+  }
+
+  /// Deletes the user's previous avatar objects so versioned names don't
+  /// accumulate. Best-effort: the upload already succeeded by this point, so a
+  /// failed cleanup must not surface as a failed avatar change. Any leftover
+  /// object is unreferenced and safe to collect later.
+  Future<void> _removeSupersededAvatars({required String keep}) async {
+    try {
+      final existing = await client.storage
+          .from(_avatarBucket)
+          .list(path: _userId);
+      final superseded = existing
+          .where((object) => object.name != keep)
+          .map((object) => '$_userId/${object.name}')
+          .toList();
+      if (superseded.isNotEmpty) {
+        await client.storage.from(_avatarBucket).remove(superseded);
+      }
+    } catch (_) {
+      // Intentionally ignored — see doc comment.
+    }
   }
 }

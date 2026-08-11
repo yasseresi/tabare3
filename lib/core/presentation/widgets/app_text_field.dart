@@ -53,7 +53,15 @@ class _AppTextFieldState extends State<AppTextField> {
       decoration: InputDecoration(
         hintText: widget.hintText,
         prefixIcon: _buildPrefixIcon(),
+        prefixIconConstraints: const BoxConstraints(
+          minWidth: AppSize.s48,
+          minHeight: AppSize.s20,
+        ),
         suffixIcon: widget.isPassword ? _buildVisibilityToggle() : null,
+        suffixIconConstraints: const BoxConstraints(
+          minWidth: AppSize.s48,
+          minHeight: AppSize.s20,
+        ),
       ),
     );
   }
@@ -61,7 +69,7 @@ class _AppTextFieldState extends State<AppTextField> {
   Widget? _buildPrefixIcon() {
     if (widget.prefixSvg != null) {
       return Padding(
-        padding: const EdgeInsets.all(AppPadding.p14),
+        padding: const EdgeInsets.symmetric(horizontal: AppPadding.p14),
         child: SvgPicture.asset(
           widget.prefixSvg!,
           width: AppSize.s20,
@@ -77,20 +85,20 @@ class _AppTextFieldState extends State<AppTextField> {
 
   Widget _buildVisibilityToggle() {
     final svg = _obscure ? widget.obscureSvg : widget.visibleSvg;
-    if (svg != null) {
-      return IconButton(
-        icon: Padding(
-          padding: const EdgeInsets.all(AppPadding.p14),
-          child: SvgPicture.asset(svg, width: AppSize.s20, height: AppSize.s20),
-        ),
-        onPressed: () => setState(() => _obscure = !_obscure),
-      );
-    }
-    return IconButton(
-      icon: Icon(
-        _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => setState(() => _obscure = !_obscure),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppPadding.p14),
+        child: svg != null
+            ? SvgPicture.asset(svg, width: AppSize.s20, height: AppSize.s20)
+            : Icon(
+                _obscure
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+                size: AppSize.s20,
+              ),
       ),
-      onPressed: () => setState(() => _obscure = !_obscure),
     );
   }
 }

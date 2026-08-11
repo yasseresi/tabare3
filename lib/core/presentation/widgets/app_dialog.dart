@@ -258,10 +258,15 @@ class AppDialog extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: background ?? ColorManager.primary,
           foregroundColor: ColorManager.white,
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppPadding.p20,
-            vertical: AppSize.s11_6,
-          ),
+          // Figma button is exactly 174 x 40.6 (11.6 vertical padding + 17.4
+          // line). The default padded tap target inflates the height to 48, so
+          // shrink-wrap it and drop the min size to honour the design box.
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          // No horizontal padding in Figma: the button is a fixed 174 box with
+          // only vertical padding, so the label keeps the full width and stays
+          // on one line ("تحديث الملف الشخصي").
+          padding: const EdgeInsets.symmetric(vertical: AppSize.s11_6),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSize.radiusDialogAction),
           ),
@@ -273,7 +278,14 @@ class AppDialog extends StatelessWidget {
             lineHeight: LineHeight.h17,
           ),
         ),
-        child: Text(label ?? AppStrings.continueAction.tr()),
+        // Figma keeps every action label on a single line inside the fixed
+        // 174 box (e.g. "تحديث الملف الشخصي"); force it rather than wrap.
+        child: Text(
+          label ?? AppStrings.continueAction.tr(),
+          maxLines: 1,
+          softWrap: false,
+          overflow: TextOverflow.visible,
+        ),
       ),
     );
   }
