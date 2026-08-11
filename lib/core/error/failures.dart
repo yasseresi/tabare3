@@ -43,6 +43,17 @@ class StorageFailure extends Failure {
   ]);
 }
 
+/// A backend payload did not match the shape the models expect — typically a
+/// column or embed that is nullable in the database but `required` in the
+/// model. Distinct from [ServerFailure] so parse bugs are greppable in logs
+/// instead of hiding behind the generic "unexpected error".
+class ParseFailure extends Failure {
+  const ParseFailure([
+    super.code = -12,
+    super.message = 'خطأ في الخادم، يرجى المحاولة لاحقاً',
+  ]);
+}
+
 class ValidationFailure extends Failure {
   const ValidationFailure([
     super.code = -11,

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
@@ -27,7 +28,15 @@ class ErrorHandler {
     _backendMapper = null;
   }
 
-  static Failure handle(dynamic error) {
+  /// Maps [error] to a [Failure].
+  ///
+  /// [source] is an optional call-site label (e.g. `'donorFeed.getAvailability'`)
+  /// that is attached to parse-failure logs to point at the offending query.
+  static Failure handle(
+    dynamic error, {
+    String? source,
+    StackTrace? stackTrace,
+  }) {
     if (error is Object) {
       final mapped = _backendMapper?.map(error);
       if (mapped != null) return mapped;
@@ -52,6 +61,25 @@ class ErrorHandler {
       return NetworkFailure(
         -6,
         ErrorMessages.getMessage(AppStrings.connectionError),
+      );
+    }
+    // A `required` model field fed a null column, or a column changed type:
+    // json_serializable raises a TypeError from the cast, and hand-rolled
+    // parsing raises FormatException. Both are our bug, not the server's, so
+    // give them a distinct failure and leave a log breadcrumb — otherwise
+    // every one of them renders as the same undiagnosable default error.
+    if (error is TypeError || error is FormatException) {
+      developer.log(
+        'Failed to parse a backend payload${source == null ? '' : ' from $source'}'
+        ' — a model field is likely `required` while the column or embed is '
+        'nullable.',
+        name: 'ErrorHandler.parse',
+        error: error,
+        stackTrace: stackTrace ?? StackTrace.current,
+      );
+      return ParseFailure(
+        -12,
+        ErrorMessages.getMessage(AppStrings.defaultError),
       );
     }
     return ServerFailure(-7, ErrorMessages.getMessage(AppStrings.defaultError));

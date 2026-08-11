@@ -49,6 +49,34 @@ void main() {
       expect(failure.message, ErrorMessages.getMessage(AppStrings.networkError));
     });
 
+    test('maps a null-to-non-null cast to a parse failure', () {
+      // What json_serializable throws when a `required` model field is fed a
+      // nullable column. It must be distinguishable from a real server error.
+      final Map<String, dynamic> row = {'venue_name': null};
+      Failure? failure;
+      try {
+        row['venue_name'] as String;
+      } catch (error, stackTrace) {
+        failure = ErrorHandler.handle(
+          error,
+          source: 'campaigns.venue_name',
+          stackTrace: stackTrace,
+        );
+      }
+
+      expect(failure, isA<ParseFailure>());
+      expect(failure, isNot(isA<ServerFailure>()));
+    });
+
+    test('maps FormatException to a parse failure', () {
+      final failure = ErrorHandler.handle(
+        const FormatException('Supabase RPC returned no row'),
+      );
+
+      expect(failure, isA<ParseFailure>());
+      expect(failure.message, ErrorMessages.getMessage(AppStrings.defaultError));
+    });
+
     test('falls back to a server failure for unknown errors', () {
       final failure = ErrorHandler.handle(StateError('boom'));
 
