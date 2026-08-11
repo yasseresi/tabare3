@@ -15,19 +15,25 @@ class DonorCardBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The Figma background stacks a solid black fill under a translucent
+    // purple wash. `BoxDecoration` ignores `color` when a `gradient` is set,
+    // so the opaque base is painted by the outer container and the gradient
+    // by the inner one.
     return Container(
-      decoration: BoxDecoration(
-        color: ColorManager.donorCardBackground,
-        gradient: LinearGradient(
-          begin: Alignment.centerRight,
-          end: Alignment.centerLeft,
-          colors: [
-            ColorManager.donorCardGradientStart,
-            ColorManager.donorCardGradientEnd,
-          ],
+      color: ColorManager.donorCardBackground,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.centerRight,
+            end: Alignment.centerLeft,
+            colors: [
+              ColorManager.donorCardGradientStart,
+              ColorManager.donorCardGradientEnd,
+            ],
+          ),
         ),
+        child: child,
       ),
-      child: child,
     );
   }
 }

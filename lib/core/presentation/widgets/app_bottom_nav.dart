@@ -28,27 +28,38 @@ class AppBottomNavItem {
 class AppBottomNav extends StatelessWidget {
   final List<AppBottomNavItem> items;
 
-  const AppBottomNav({super.key, required this.items});
+  /// Wraps the nav band in a background. Defaults to [AppGradientBackground]
+  /// (the pink wash). Screens with a different page background (e.g. the dark
+  /// donor-card screens) pass their own so the nav band matches the page it
+  /// sits below instead of showing a mismatched colour band.
+  final Widget Function(Widget child)? backgroundBuilder;
+
+  const AppBottomNav({
+    super.key,
+    required this.items,
+    this.backgroundBuilder,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return AppGradientBackground(
-      child: SizedBox(
-        height: AppSize.s80,
-        child: Directionality(
-          textDirection: TextDirection.ltr,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppPadding.p32),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                for (final item in items) _AppBottomNavIcon(item: item),
-              ],
-            ),
+    final content = SizedBox(
+      height: AppSize.s80,
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppPadding.p32),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              for (final item in items) _AppBottomNavIcon(item: item),
+            ],
           ),
         ),
       ),
     );
+
+    return backgroundBuilder?.call(content) ??
+        AppGradientBackground(child: content);
   }
 }
 

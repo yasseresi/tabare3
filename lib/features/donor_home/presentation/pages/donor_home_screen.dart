@@ -29,6 +29,7 @@ import '../../../profile/presentation/pages/about_app_screen.dart';
 import '../../domain/entities/donor_feed_entity.dart';
 import '../bloc/donor_feed_bloc.dart';
 import '../bloc/donor_card_bloc.dart';
+import '../widgets/donor_card_theme.dart';
 import '../widgets/donor_request_actions.dart';
 import '../widgets/donor_request_card.dart';
 import 'donor_appointments_screen.dart';
@@ -451,7 +452,12 @@ class _BottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onDonorCard =
+        selectedTab == _DonorTab.card || selectedTab == _DonorTab.cardInfo;
     return AppBottomNav(
+      backgroundBuilder: onDonorCard
+          ? (child) => DonorCardBackground(child: child)
+          : null,
       items: [
         AppBottomNavItem(
           itemKey: WidgetKeys.donorNavigationHome,
