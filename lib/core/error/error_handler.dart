@@ -30,13 +30,10 @@ class ErrorHandler {
 
   /// Maps [error] to a [Failure].
   ///
-  /// [source] is an optional call-site label (e.g. `'donorFeed.getAvailability'`)
-  /// that is attached to parse-failure logs to point at the offending query.
-  static Failure handle(
-    dynamic error, {
-    String? source,
-    StackTrace? stackTrace,
-  }) {
+  /// Pass [stackTrace] from the catch clause (`catch (error, stackTrace)`)
+  /// whenever it is available — for parse failures it is the only thing that
+  /// names the model and field that failed to deserialize.
+  static Failure handle(dynamic error, {StackTrace? stackTrace}) {
     if (error is Object) {
       final mapped = _backendMapper?.map(error);
       if (mapped != null) return mapped;
@@ -63,16 +60,16 @@ class ErrorHandler {
         ErrorMessages.getMessage(AppStrings.connectionError),
       );
     }
-    // A `required` model field fed a null column, or a column changed type:
-    // json_serializable raises a TypeError from the cast, and hand-rolled
-    // parsing raises FormatException. Both are our bug, not the server's, so
-    // give them a distinct failure and leave a log breadcrumb — otherwise
-    // every one of them renders as the same undiagnosable default error.
+    // The backend payload did not match the model: json_serializable raises a
+    // TypeError from the cast when a `required` field is fed a null column, and
+    // hand-rolled parsing raises FormatException. Both are our bug, not the
+    // server's, so give them a distinct failure and leave a log breadcrumb —
+    // otherwise every one renders as the same undiagnosable default error.
     if (error is TypeError || error is FormatException) {
       developer.log(
-        'Failed to parse a backend payload${source == null ? '' : ' from $source'}'
-        ' — a model field is likely `required` while the column or embed is '
-        'nullable.',
+        'Failed to parse a backend payload. A model field is likely `required` '
+        'while the column or embed is nullable — the stack trace names the '
+        'model that failed.',
         name: 'ErrorHandler.parse',
         error: error,
         stackTrace: stackTrace ?? StackTrace.current,

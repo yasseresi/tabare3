@@ -31,8 +31,8 @@ class DonorFeedRepositoryImpl implements DonorFeedRepository {
           appointments: appointments.map((model) => model.toEntity()).toList(),
         ),
       );
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -41,8 +41,8 @@ class DonorFeedRepositoryImpl implements DonorFeedRepository {
     try {
       final model = await remoteDataSource.getAvailability();
       return Right(model.toEntity());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -53,8 +53,8 @@ class DonorFeedRepositoryImpl implements DonorFeedRepository {
     try {
       final model = await remoteDataSource.setAvailability(isAvailable);
       return Right(model.toEntity());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -64,8 +64,8 @@ class DonorFeedRepositoryImpl implements DonorFeedRepository {
     try {
       final models = await remoteDataSource.listCompatibleRequests();
       return Right(models.map((model) => model.toEntity()).toList());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -75,8 +75,8 @@ class DonorFeedRepositoryImpl implements DonorFeedRepository {
     try {
       final models = await remoteDataSource.listAvailableCampaigns();
       return Right(models.map((model) => model.toEntity()).toList());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -86,8 +86,8 @@ class DonorFeedRepositoryImpl implements DonorFeedRepository {
     try {
       final models = await remoteDataSource.listAppointments();
       return Right(models.map((model) => model.toEntity()).toList());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -97,8 +97,8 @@ class DonorFeedRepositoryImpl implements DonorFeedRepository {
     try {
       final models = await remoteDataSource.listDonationRecords();
       return Right(models.map((model) => model.toEntity()).toList());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -113,8 +113,8 @@ class DonorFeedRepositoryImpl implements DonorFeedRepository {
         scheduledAt: scheduledAt,
       );
       return Right(model.toEntity());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -129,8 +129,8 @@ class DonorFeedRepositoryImpl implements DonorFeedRepository {
         reason: reason,
       );
       return Right(model.toEntity());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -141,8 +141,8 @@ class DonorFeedRepositoryImpl implements DonorFeedRepository {
     try {
       final model = await remoteDataSource.redeemRequestQr(token);
       return Right(model.toEntity());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -153,8 +153,8 @@ class DonorFeedRepositoryImpl implements DonorFeedRepository {
     try {
       final model = await remoteDataSource.redeemCampaignQr(token);
       return Right(model.toEntity());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 }

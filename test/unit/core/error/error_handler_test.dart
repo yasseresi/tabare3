@@ -46,7 +46,10 @@ void main() {
       );
 
       expect(failure, isA<NetworkFailure>());
-      expect(failure.message, ErrorMessages.getMessage(AppStrings.networkError));
+      expect(
+        failure.message,
+        ErrorMessages.getMessage(AppStrings.networkError),
+      );
     });
 
     test('maps a null-to-non-null cast to a parse failure', () {
@@ -57,11 +60,7 @@ void main() {
       try {
         row['venue_name'] as String;
       } catch (error, stackTrace) {
-        failure = ErrorHandler.handle(
-          error,
-          source: 'campaigns.venue_name',
-          stackTrace: stackTrace,
-        );
+        failure = ErrorHandler.handle(error, stackTrace: stackTrace);
       }
 
       expect(failure, isA<ParseFailure>());
@@ -74,14 +73,20 @@ void main() {
       );
 
       expect(failure, isA<ParseFailure>());
-      expect(failure.message, ErrorMessages.getMessage(AppStrings.defaultError));
+      expect(
+        failure.message,
+        ErrorMessages.getMessage(AppStrings.defaultError),
+      );
     });
 
     test('falls back to a server failure for unknown errors', () {
       final failure = ErrorHandler.handle(StateError('boom'));
 
       expect(failure, isA<ServerFailure>());
-      expect(failure.message, ErrorMessages.getMessage(AppStrings.defaultError));
+      expect(
+        failure.message,
+        ErrorMessages.getMessage(AppStrings.defaultError),
+      );
     });
   });
 }

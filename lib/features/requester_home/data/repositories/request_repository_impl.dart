@@ -16,8 +16,8 @@ class RequestRepositoryImpl implements RequestRepository {
     try {
       final models = await remoteDataSource.listOwnRequests();
       return Right(models.map((model) => model.toEntity()).toList());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -28,8 +28,8 @@ class RequestRepositoryImpl implements RequestRepository {
     try {
       final model = await remoteDataSource.getRequest(requestId);
       return Right(model.toEntity());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -38,8 +38,8 @@ class RequestRepositoryImpl implements RequestRepository {
     try {
       final models = await remoteDataSource.listHospitals();
       return Right(models.map((model) => model.toEntity()).toList());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -50,8 +50,8 @@ class RequestRepositoryImpl implements RequestRepository {
     try {
       final model = await remoteDataSource.createRequest(draft);
       return Right(model.toEntity());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -66,8 +66,8 @@ class RequestRepositoryImpl implements RequestRepository {
         draft: draft,
       );
       return Right(model.toEntity());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -82,8 +82,8 @@ class RequestRepositoryImpl implements RequestRepository {
         reason: reason,
       );
       return Right(model.toEntity());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -94,8 +94,8 @@ class RequestRepositoryImpl implements RequestRepository {
     try {
       final models = await remoteDataSource.listRequestDonors(requestId);
       return Right(models.map((model) => model.toEntity()).toList());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -106,8 +106,8 @@ class RequestRepositoryImpl implements RequestRepository {
     try {
       final models = await remoteDataSource.listCompatibleDonors(requestId);
       return Right(models.map((model) => model.toEntity()).toList());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -118,8 +118,8 @@ class RequestRepositoryImpl implements RequestRepository {
     try {
       final models = await remoteDataSource.listInvitations(requestId);
       return Right(models.map((model) => model.toEntity()).toList());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -134,8 +134,8 @@ class RequestRepositoryImpl implements RequestRepository {
         donorId: donorId,
       );
       return const Right(null);
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 
@@ -146,8 +146,8 @@ class RequestRepositoryImpl implements RequestRepository {
     try {
       final model = await remoteDataSource.issueRequestQr(requestId);
       return Right(model.toEntity());
-    } catch (error) {
-      return Left(ErrorHandler.handle(error));
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
 }
