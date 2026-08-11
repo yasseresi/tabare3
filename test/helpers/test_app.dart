@@ -35,7 +35,10 @@ Future<void> setupTestLocalization() async {
 
 /// Wraps [home] in EasyLocalization + MaterialApp with Arabic translations
 /// loaded from assets/translations (ar.json / en.json).
-Widget buildTestApp(Widget home) {
+Widget buildTestApp(
+  Widget home, {
+  RouteFactory? onGenerateRoute,
+}) {
   return EasyLocalization(
     supportedLocales: const [Locale('ar'), Locale('en')],
     path: 'assets/translations',
@@ -48,15 +51,21 @@ Widget buildTestApp(Widget home) {
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
-        onGenerateRoute: RouteGenerator.getRoute,
+        onGenerateRoute: onGenerateRoute ?? RouteGenerator.getRoute,
         home: home,
       ),
     ),
   );
 }
 
-Future<void> pumpTestApp(WidgetTester tester, Widget home) async {
-  await tester.pumpWidget(buildTestApp(home));
+Future<void> pumpTestApp(
+  WidgetTester tester,
+  Widget home, {
+  RouteFactory? onGenerateRoute,
+}) async {
+  await tester.pumpWidget(
+    buildTestApp(home, onGenerateRoute: onGenerateRoute),
+  );
   await tester.pumpAndSettle();
 }
 

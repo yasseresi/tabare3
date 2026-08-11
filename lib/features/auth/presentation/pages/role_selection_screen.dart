@@ -187,7 +187,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSize.s30),
                   SizedBox(
-                    width: 220,
+                    width: AppSize.s174,
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
@@ -199,7 +199,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSize.s10),
                   SizedBox(
-                    width: 220,
+                    width: AppSize.s174,
                     height: 50,
                     child: TextButton(
                       onPressed: () => Navigator.pop(dialogContext),
