@@ -7,6 +7,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tabare3/core/constants/widget_keys.dart';
 import 'package:tabare3/core/usecases/usecase.dart';
 import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:tabare3/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:tabare3/features/requester_home/domain/entities/blood_request_entity.dart';
 import 'package:tabare3/features/requester_home/domain/usecases/request_usecases.dart';
 import 'package:tabare3/features/requester_home/presentation/bloc/request_bloc.dart';
@@ -32,6 +33,16 @@ class MockCancelRecipientRequest extends Mock
     implements CancelRecipientRequest {}
 
 class MockAuthBloc extends MockBloc<AuthEvent, AuthState> implements AuthBloc {}
+
+class MockNotificationsBloc
+    extends MockBloc<NotificationsEvent, NotificationsState>
+    implements NotificationsBloc {}
+
+MockNotificationsBloc buildNotificationsBloc() {
+  final bloc = MockNotificationsBloc();
+  when(() => bloc.state).thenReturn(const NotificationsInitial());
+  return bloc;
+}
 
 void main() {
   late MockGetRecipientRequests getRequests;
@@ -139,6 +150,9 @@ void main() {
         providers: [
           BlocProvider(create: (_) => buildBloc()),
           BlocProvider<AuthBloc>.value(value: authBloc),
+          BlocProvider<NotificationsBloc>(
+            create: (_) => buildNotificationsBloc(),
+          ),
         ],
         child: const RequesterHomeScreen(),
       ),
@@ -168,6 +182,9 @@ void main() {
         providers: [
           BlocProvider(create: (_) => buildBloc()),
           BlocProvider<AuthBloc>.value(value: authBloc),
+          BlocProvider<NotificationsBloc>(
+            create: (_) => buildNotificationsBloc(),
+          ),
         ],
         child: const RequesterHomeScreen(),
       ),
@@ -199,6 +216,9 @@ void main() {
         providers: [
           BlocProvider(create: (_) => buildBloc()),
           BlocProvider<AuthBloc>.value(value: authBloc),
+          BlocProvider<NotificationsBloc>(
+            create: (_) => buildNotificationsBloc(),
+          ),
         ],
         child: const RequesterHomeScreen(),
       ),
@@ -228,6 +248,9 @@ void main() {
         providers: [
           BlocProvider(create: (_) => buildBloc()),
           BlocProvider<AuthBloc>.value(value: authBloc),
+          BlocProvider<NotificationsBloc>(
+            create: (_) => buildNotificationsBloc(),
+          ),
         ],
         child: const RequesterHomeScreen(),
       ),

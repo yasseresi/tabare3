@@ -99,4 +99,28 @@ void main() {
       expect((result as Left).value, isA<ServerFailure>());
     });
   });
+
+  group('watchNotifications', () {
+    test('maps streamed models to entity lists', () async {
+      when(
+        () => remoteDataSource.watchNotifications(),
+      ).thenAnswer((_) => Stream.value([notificationModel]));
+
+      final result = await repository.watchNotifications().first;
+
+      expect(result.isRight(), true);
+      expect(result.getOrElse(() => []), [notificationEntity]);
+    });
+
+    test('maps a stream error to a ServerFailure emission', () async {
+      when(
+        () => remoteDataSource.watchNotifications(),
+      ).thenAnswer((_) => Stream.error(Exception('boom')));
+
+      final result = await repository.watchNotifications().first;
+
+      expect(result, isA<Left<Failure, List<NotificationEntity>>>());
+      expect((result as Left).value, isA<ServerFailure>());
+    });
+  });
 }

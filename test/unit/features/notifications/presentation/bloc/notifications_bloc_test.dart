@@ -3,19 +3,18 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tabare3/core/error/failures.dart';
-import 'package:tabare3/core/usecases/usecase.dart';
 import 'package:tabare3/features/notifications/domain/entities/notification_entity.dart';
-import 'package:tabare3/features/notifications/domain/usecases/get_notifications.dart';
 import 'package:tabare3/features/notifications/domain/usecases/mark_notification_as_read.dart';
+import 'package:tabare3/features/notifications/domain/usecases/watch_notifications.dart';
 import 'package:tabare3/features/notifications/presentation/bloc/notifications_bloc.dart';
 
-class MockGetNotifications extends Mock implements GetNotifications {}
+class MockWatchNotifications extends Mock implements WatchNotifications {}
 
 class MockMarkNotificationAsRead extends Mock
     implements MarkNotificationAsRead {}
 
 void main() {
-  late MockGetNotifications getNotifications;
+  late MockWatchNotifications watchNotifications;
   late MockMarkNotificationAsRead markNotificationAsRead;
 
   final unreadNotification = NotificationEntity(
@@ -43,18 +42,25 @@ void main() {
   );
 
   NotificationsBloc buildBloc() => NotificationsBloc(
-    getNotifications: getNotifications,
+    watchNotifications: watchNotifications,
     markNotificationAsRead: markNotificationAsRead,
   );
 
+  void stubStream(
+    Stream<Either<Failure, List<NotificationEntity>>> stream,
+  ) {
+    when(() => watchNotifications()).thenAnswer((_) => stream);
+  }
+
   setUpAll(() {
-    registerFallbackValue(NoParams());
     registerFallbackValue(const MarkNotificationAsReadParams('notification-1'));
   });
 
   setUp(() {
-    getNotifications = MockGetNotifications();
+    watchNotifications = MockWatchNotifications();
     markNotificationAsRead = MockMarkNotificationAsRead();
+    // Default: an inert stream so blocs that never subscribe stay clean.
+    stubStream(const Stream.empty());
   });
 
   test('initial state is NotificationsInitial', () {
@@ -62,11 +68,11 @@ void main() {
   });
 
   blocTest<NotificationsBloc, NotificationsState>(
-    'loads notifications successfully',
+    'streams notifications from the realtime source',
     build: () {
-      when(
-        () => getNotifications(any()),
-      ).thenAnswer((_) async => Right([unreadNotification, readNotification]));
+      stubStream(
+        Stream.value(Right([unreadNotification, readNotification])),
+      );
       return buildBloc();
     },
     act: (bloc) => bloc.add(const NotificationsRequested()),
@@ -80,11 +86,24 @@ void main() {
   );
 
   blocTest<NotificationsBloc, NotificationsState>(
-    'emits an error when loading notifications fails',
+    'exposes the unread count on the loaded state',
     build: () {
-      when(
-        () => getNotifications(any()),
-      ).thenAnswer((_) async => const Left(ServerFailure()));
+      stubStream(
+        Stream.value(Right([unreadNotification, readNotification])),
+      );
+      return buildBloc();
+    },
+    act: (bloc) => bloc.add(const NotificationsRequested()),
+    verify: (bloc) {
+      final state = bloc.state as NotificationsLoaded;
+      expect(state.unreadCount, 1);
+    },
+  );
+
+  blocTest<NotificationsBloc, NotificationsState>(
+    'emits an error when the realtime stream errors',
+    build: () {
+      stubStream(Stream.value(const Left(ServerFailure())));
       return buildBloc();
     },
     act: (bloc) => bloc.add(const NotificationsRequested()),
@@ -109,7 +128,7 @@ void main() {
   );
 
   blocTest<NotificationsBloc, NotificationsState>(
-    'marks a notification as read and updates the loaded list',
+    'marks a notification as read (stream re-emits the update)',
     build: () {
       when(() => markNotificationAsRead(any())).thenAnswer(
         (_) async => Right(unreadNotification.copyWith(isRead: true)),
@@ -121,18 +140,7 @@ void main() {
       visibleNotifications: [unreadNotification, readNotification],
     ),
     act: (bloc) => bloc.add(const NotificationReadRequested('notification-1')),
-    expect: () => [
-      NotificationsLoaded(
-        notifications: [
-          unreadNotification.copyWith(isRead: true),
-          readNotification,
-        ],
-        visibleNotifications: [
-          unreadNotification.copyWith(isRead: true),
-          readNotification,
-        ],
-      ),
-    ],
+    expect: () => <NotificationsState>[],
     verify: (_) {
       final params =
           verify(() => markNotificationAsRead(captureAny())).captured.single

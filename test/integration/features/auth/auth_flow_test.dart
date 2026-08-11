@@ -32,6 +32,7 @@ import 'package:tabare3/features/counter/domain/usecases/increment_counter.dart'
 import 'package:tabare3/features/counter/presentation/bloc/counter_bloc.dart';
 import 'package:tabare3/features/donor_home/presentation/bloc/donor_feed_bloc.dart';
 import 'package:tabare3/features/donor_home/presentation/pages/donor_home_screen.dart';
+import 'package:tabare3/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:tabare3/features/requester_home/presentation/bloc/request_bloc.dart';
 import 'package:tabare3/features/requester_home/presentation/pages/requester_home_screen.dart';
 import 'package:tabare3/features/splash/presentation/pages/splash_screen.dart';
@@ -48,6 +49,10 @@ class MockDonorFeedBloc extends MockBloc<DonorFeedEvent, DonorFeedState>
 
 class MockRequestBloc extends MockBloc<RequestEvent, RequestState>
     implements RequestBloc {}
+
+class MockNotificationsBloc
+    extends MockBloc<NotificationsEvent, NotificationsState>
+    implements NotificationsBloc {}
 
 const testDonorModel = UserModel(
   id: 'user-123',
@@ -130,6 +135,11 @@ void registerAllDependencies({
     when(
       () => bloc.state,
     ).thenReturn(const RequestState(status: RequestViewStatus.empty));
+    return bloc;
+  });
+  sl.registerFactory<NotificationsBloc>(() {
+    final bloc = MockNotificationsBloc();
+    when(() => bloc.state).thenReturn(const NotificationsInitial());
     return bloc;
   });
 }

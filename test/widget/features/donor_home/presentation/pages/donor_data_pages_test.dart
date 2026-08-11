@@ -17,6 +17,7 @@ import 'package:tabare3/features/donor_home/domain/entities/donor_feed_entity.da
 import 'package:tabare3/features/donor_home/domain/entities/donor_card_entity.dart';
 import 'package:tabare3/features/donor_home/presentation/bloc/donor_card_bloc.dart';
 import 'package:tabare3/features/donor_home/presentation/bloc/donor_feed_bloc.dart';
+import 'package:tabare3/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:tabare3/features/donor_home/presentation/pages/donor_appointments_screen.dart';
 import 'package:tabare3/features/donor_home/presentation/pages/donor_card_screen.dart';
 import 'package:tabare3/features/donor_home/presentation/pages/donor_card_info_screen.dart';
@@ -40,12 +41,17 @@ class MockDonorFeedBloc extends MockBloc<DonorFeedEvent, DonorFeedState>
 
 class MockAuthBloc extends MockBloc<AuthEvent, AuthState> implements AuthBloc {}
 
+class MockNotificationsBloc
+    extends MockBloc<NotificationsEvent, NotificationsState>
+    implements NotificationsBloc {}
+
 class MockDonorCardBloc extends MockBloc<DonorCardEvent, DonorCardState>
     implements DonorCardBloc {}
 
 void main() {
   late MockDonorFeedBloc bloc;
   late MockAuthBloc authBloc;
+  late MockNotificationsBloc notificationsBloc;
   late Map<String, dynamic> translations;
 
   final hospital = DonorHospitalEntity(
@@ -137,8 +143,10 @@ void main() {
   setUp(() {
     bloc = MockDonorFeedBloc();
     authBloc = MockAuthBloc();
+    notificationsBloc = MockNotificationsBloc();
     when(() => bloc.state).thenReturn(loadedState);
     when(() => authBloc.state).thenReturn(AuthInitial());
+    when(() => notificationsBloc.state).thenReturn(const NotificationsInitial());
   });
 
   Future<void> pumpPage(WidgetTester tester, Widget page) async {
@@ -158,6 +166,7 @@ void main() {
               providers: [
                 BlocProvider<DonorFeedBloc>.value(value: bloc),
                 BlocProvider<AuthBloc>.value(value: authBloc),
+                BlocProvider<NotificationsBloc>.value(value: notificationsBloc),
               ],
               child: Scaffold(body: page),
             ),
