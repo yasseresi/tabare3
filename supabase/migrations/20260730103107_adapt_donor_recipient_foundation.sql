@@ -101,7 +101,7 @@ on conflict (id) do update set
   name_fr = excluded.name_fr;
 
 create table public.hospitals (
-  id uuid primary key default extensions.uuid_generate_v4(),
+  id uuid primary key default extensions.gen_random_uuid(),
   wilaya_id smallint not null references public.wilayas(id),
   name_ar text not null,
   name_fr text,
@@ -116,7 +116,7 @@ create table public.hospitals (
 );
 
 create table public.associations (
-  id uuid primary key default extensions.uuid_generate_v4(),
+  id uuid primary key default extensions.gen_random_uuid(),
   wilaya_id smallint not null references public.wilayas(id),
   name_ar text not null,
   name_fr text,
@@ -131,7 +131,7 @@ create table public.associations (
 );
 
 create table public.chronic_diseases (
-  id uuid primary key default extensions.uuid_generate_v4(),
+  id uuid primary key default extensions.gen_random_uuid(),
   name_ar text not null unique,
   name_fr text,
   blocks_donation boolean not null default false,
@@ -202,7 +202,7 @@ alter table public.appointments
   add column cancel_reason text;
 
 create table public.direct_invitations (
-  id uuid primary key default extensions.uuid_generate_v4(),
+  id uuid primary key default extensions.gen_random_uuid(),
   request_id uuid not null
     references public.blood_requests(id) on delete cascade,
   donor_id uuid not null references public.users(id) on delete cascade,
@@ -216,7 +216,7 @@ create table public.direct_invitations (
 );
 
 create table public.qr_tokens (
-  id uuid primary key default extensions.uuid_generate_v4(),
+  id uuid primary key default extensions.gen_random_uuid(),
   kind public.qr_token_kind_enum not null,
   token_hash text not null,
   request_id uuid references public.blood_requests(id) on delete cascade,
@@ -243,7 +243,7 @@ create table public.qr_tokens (
 );
 
 create table public.donation_records (
-  id uuid primary key default extensions.uuid_generate_v4(),
+  id uuid primary key default extensions.gen_random_uuid(),
   donor_id uuid not null references public.users(id) on delete cascade,
   source public.donation_source_enum not null,
   request_id uuid references public.blood_requests(id) on delete set null,
@@ -271,7 +271,7 @@ create table public.donation_records (
 );
 
 create table public.identity_corrections (
-  id uuid primary key default extensions.uuid_generate_v4(),
+  id uuid primary key default extensions.gen_random_uuid(),
   user_id uuid not null references public.users(id) on delete cascade,
   corrected_by uuid not null references public.users(id) on delete restrict,
   field_name text not null check (field_name in ('full_name', 'national_id')),
