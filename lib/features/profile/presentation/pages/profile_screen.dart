@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -60,6 +61,7 @@ class ProfileScreen extends StatelessWidget {
                 return _ProfileContent(
                   profile: state.profile,
                   isEditing: state.isEditing,
+                  pendingAvatarPath: state.pendingAvatarPath,
                   showRecipientIdentityDetails: showRecipientIdentityDetails,
                   onAbout: onAbout,
                   onDonorCard: onDonorCard,
@@ -91,6 +93,7 @@ class ProfileScreen extends StatelessWidget {
 class _ProfileContent extends StatelessWidget {
   final ProfileEntity profile;
   final bool isEditing;
+  final String? pendingAvatarPath;
   final bool showRecipientIdentityDetails;
   final VoidCallback? onAbout;
   final VoidCallback? onDonorCard;
@@ -100,6 +103,7 @@ class _ProfileContent extends StatelessWidget {
   const _ProfileContent({
     required this.profile,
     required this.isEditing,
+    required this.pendingAvatarPath,
     required this.showRecipientIdentityDetails,
     required this.onAbout,
     required this.onDonorCard,
@@ -164,7 +168,11 @@ class _ProfileContent extends StatelessWidget {
   Widget _buildAvatarSection(BuildContext context) {
     return Column(
       children: [
-        _AvatarPicker(profile: profile),
+        _AvatarPicker(
+          profile: profile,
+          isEditing: isEditing,
+          pendingAvatarPath: pendingAvatarPath,
+        ),
         const SizedBox(height: AppSize.s16),
         Text(
           profile.fullName,
@@ -562,13 +570,19 @@ class _ProfileContent extends StatelessWidget {
 
 class _AvatarPicker extends StatelessWidget {
   final ProfileEntity profile;
+  final bool isEditing;
+  final String? pendingAvatarPath;
 
-  const _AvatarPicker({required this.profile});
+  const _AvatarPicker({
+    required this.profile,
+    required this.isEditing,
+    required this.pendingAvatarPath,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => _pickImage(context),
+      onTap: isEditing ? () => _pickImage(context) : null,
       child: Container(
         width: AppSize.s96,
         height: AppSize.s96,
@@ -584,18 +598,51 @@ class _AvatarPicker extends StatelessWidget {
             ),
           ],
         ),
-        child: profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
-            ? ClipOval(
-                child: Image.network(
-                  profile.avatarUrl!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      _FallbackAvatar(profile.fullName),
+        child: ClipOval(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              _buildImage(),
+              // Edit mode reveals a camera affordance inside the circle so the
+              // user knows the picture is tappable.
+              if (isEditing)
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: ColorManager.black.withValues(
+                      alpha: AppOpacity.avatarScrim,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.camera_alt_rounded,
+                    color: ColorManager.white,
+                    size: AppSize.s28,
+                  ),
                 ),
-              )
-            : _FallbackAvatar(profile.fullName),
+            ],
+          ),
+        ),
       ),
     );
+  }
+
+  Widget _buildImage() {
+    // A freshly picked file previews immediately from disk while it uploads.
+    if (pendingAvatarPath != null) {
+      return Image.file(
+        File(pendingAvatarPath!),
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _FallbackAvatar(profile.fullName),
+      );
+    }
+    if (profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: profile.avatarUrl!,
+        fit: BoxFit.cover,
+        placeholder: (_, __) => _FallbackAvatar(profile.fullName),
+        errorWidget: (_, __, ___) => _FallbackAvatar(profile.fullName),
+      );
+    }
+    return _FallbackAvatar(profile.fullName);
   }
 
   Future<void> _pickImage(BuildContext context) async {

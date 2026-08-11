@@ -9,6 +9,9 @@ class AppOpacity {
 
   /// Fill of the donor-card point chips (`rgba(144, 85, 237, 0.23)`).
   static const double chip = 0.23;
+
+  /// Dim scrim behind the avatar camera icon in profile edit mode.
+  static const double avatarScrim = 0.35;
   static const double strong = 0.8;
 }
 

@@ -9,6 +9,7 @@ import 'package:tabare3/core/error/failures.dart';
 import 'package:tabare3/core/usecases/usecase.dart';
 import 'package:tabare3/features/profile/domain/entities/profile_entity.dart';
 import 'package:tabare3/features/profile/domain/usecases/change_role.dart';
+import 'package:tabare3/features/profile/domain/usecases/get_cached_profile.dart';
 import 'package:tabare3/features/profile/domain/usecases/get_profile.dart';
 import 'package:tabare3/features/profile/domain/usecases/update_profile.dart';
 import 'package:tabare3/features/profile/domain/usecases/upload_avatar.dart';
@@ -20,6 +21,8 @@ import '../../../../../helpers/test_app.dart';
 
 class MockGetProfile extends Mock implements GetProfile {}
 
+class MockGetCachedProfile extends Mock implements GetCachedProfile {}
+
 class MockUpdateProfile extends Mock implements UpdateProfile {}
 
 class MockChangeRole extends Mock implements ChangeRole {}
@@ -28,6 +31,7 @@ class MockUploadAvatar extends Mock implements UploadAvatar {}
 
 void main() {
   late MockGetProfile getProfile;
+  late MockGetCachedProfile getCachedProfile;
   late MockUpdateProfile updateProfile;
   late MockChangeRole changeRole;
   late MockUploadAvatar uploadAvatar;
@@ -62,10 +66,12 @@ void main() {
 
   setUp(() {
     getProfile = MockGetProfile();
+    getCachedProfile = MockGetCachedProfile();
     updateProfile = MockUpdateProfile();
     changeRole = MockChangeRole();
     uploadAvatar = MockUploadAvatar();
 
+    when(() => getCachedProfile.call()).thenAnswer((_) async => null);
     when(
       () => getProfile.call(any()),
     ).thenAnswer((_) async => const Right(profile));
@@ -83,6 +89,7 @@ void main() {
   ProfileBloc buildProfileBloc() {
     return ProfileBloc(
       getProfile: getProfile,
+      getCachedProfile: getCachedProfile,
       updateProfile: updateProfile,
       changeRole: changeRole,
       uploadAvatar: uploadAvatar,
