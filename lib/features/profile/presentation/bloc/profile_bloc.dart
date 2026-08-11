@@ -129,7 +129,16 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
     final uploadResult = await uploadAvatar(event.filePath);
     final url = uploadResult.fold((failure) {
-      emit(ProfileError(failure: failure));
+      // Keep the profile (and the picked preview) on-screen and report the
+      // failure as a transient message instead of blanking the page.
+      emit(
+        ProfileLoaded(
+          profile: current.profile,
+          isEditing: current.isEditing,
+          pendingAvatarPath: event.filePath,
+          actionError: failure,
+        ),
+      );
       return null;
     }, (url) => url);
     if (url == null) return;
@@ -137,7 +146,14 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     final updated = current.profile.copyWith(avatarUrl: url);
     final saveResult = await updateProfile(updated);
     saveResult.fold(
-      (failure) => emit(ProfileError(failure: failure)),
+      (failure) => emit(
+        ProfileLoaded(
+          profile: current.profile,
+          isEditing: current.isEditing,
+          pendingAvatarPath: event.filePath,
+          actionError: failure,
+        ),
+      ),
       (profile) =>
           emit(ProfileLoaded(profile: profile, isEditing: current.isEditing)),
     );

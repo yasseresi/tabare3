@@ -81,6 +81,11 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _profileListener(BuildContext context, ProfileState state) {
+    if (state is ProfileLoaded && state.actionError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(state.actionError!.message)),
+      );
+    }
     if (state is ProfileRoleChanged) {
       final route = state.profile.isDonor
           ? Routes.donorHomeRoute
@@ -652,7 +657,7 @@ class _AvatarPicker extends StatelessWidget {
 
     final file = File(picked.path);
     final length = await file.length();
-    if (length > 10 * 1024 * 1024) {
+    if (length > AppConstants.maxAvatarBytes) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,

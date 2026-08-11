@@ -256,7 +256,8 @@ void main() {
     );
 
     blocTest<ProfileBloc, ProfileState>(
-      'emits an error and does not save when avatar upload fails',
+      'keeps the profile with a transient error (no blank page) and does not '
+      'save when avatar upload fails',
       build: () {
         when(
           () => uploadAvatar('/tmp/avatar.png'),
@@ -271,7 +272,12 @@ void main() {
           isEditing: false,
           pendingAvatarPath: '/tmp/avatar.png',
         ),
-        isA<ProfileError>(),
+        const ProfileLoaded(
+          profile: profile,
+          isEditing: false,
+          pendingAvatarPath: '/tmp/avatar.png',
+          actionError: ServerFailure(),
+        ),
       ],
       verify: (_) => verifyNever(() => updateProfile(any())),
     );

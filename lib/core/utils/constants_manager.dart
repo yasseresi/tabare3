@@ -10,6 +10,9 @@ class AppConstants {
   /// badge renders [AppStrings.badgeOverflow] (e.g. `9+`).
   static const int badgeMaxCount = 9;
   static const int profileHadithMaxLines = 3;
+
+  /// Largest avatar the profile picker accepts, in bytes (10 MB).
+  static const int maxAvatarBytes = 10 * 1024 * 1024;
   static const int statusTagMaxLines = 1;
   static const int minPasswordLength = 8;
   static const int minDonorAge = 18;
