@@ -51,8 +51,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     final result = await getProfile(NoParams());
     result.fold(
       (failure) {
-        // Keep the cached view on-screen if the refresh fails.
-        if (state is! ProfileLoaded) emit(ProfileError(failure: failure));
+        // Keep the cached view on-screen if the refresh fails. Keyed off
+        // `cached` rather than the current state, which a concurrent event
+        // could have changed.
+        if (cached == null) emit(ProfileError(failure: failure));
       },
       (profile) => emit(ProfileLoaded(profile: profile, isEditing: false)),
     );

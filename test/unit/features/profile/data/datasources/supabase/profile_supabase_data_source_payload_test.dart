@@ -47,4 +47,31 @@ void main() {
     expect(profileSelectColumns, contains('is_active'));
     expect(profileSelectColumns, isNot(contains('is_available_for_donation')));
   });
+
+  group('avatar object name', () {
+    // A fixed object name reuses one public URL for every upload, so the image
+    // cache and the storage CDN keep serving the previous photo — the new
+    // avatar flashes on screen and then reverts to the old one.
+    test('changes on every upload so the public URL is never reused', () {
+      final first = buildAvatarObjectName(
+        extension: 'jpg',
+        at: DateTime.fromMillisecondsSinceEpoch(1000),
+      );
+      final second = buildAvatarObjectName(
+        extension: 'jpg',
+        at: DateTime.fromMillisecondsSinceEpoch(2000),
+      );
+
+      expect(first, isNot(second));
+    });
+
+    test('keeps the picked file extension', () {
+      final name = buildAvatarObjectName(
+        extension: 'png',
+        at: DateTime.fromMillisecondsSinceEpoch(1000),
+      );
+
+      expect(name, endsWith('.png'));
+    });
+  });
 }

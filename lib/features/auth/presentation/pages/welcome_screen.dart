@@ -7,6 +7,7 @@ import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/route_manager.dart';
 import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -40,10 +41,8 @@ class WelcomeScreen extends StatelessWidget {
                     Text(
                       AppStrings.welcomeTo.tr(),
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: FontConstants.fontFamily,
+                      style: getMediumStyle(
                         fontSize: FontSize.s32,
-                        fontWeight: FontWeightManager.medium,
                         color: ColorManager.welcomeText,
                       ),
                     ),
@@ -74,11 +73,10 @@ class WelcomeScreen extends StatelessWidget {
                             AppSize.radiusButton,
                           ),
                         ),
-                        textStyle: TextStyle(
-                          fontFamily: FontConstants.fontFamily,
+                        textStyle: getMediumStyle(
                           fontSize: FontSize.s19,
-                          fontWeight: FontWeightManager.medium,
                           color: ColorManager.white,
+                          lineHeight: FontSize.s19,
                         ),
                       ),
 
@@ -106,11 +104,10 @@ class WelcomeScreen extends StatelessWidget {
                             AppSize.radiusCircle,
                           ),
                         ),
-                        textStyle: TextStyle(
-                          fontFamily: FontConstants.fontFamily,
+                        textStyle: getSemiBoldStyle(
                           fontSize: FontSize.s19,
-                          fontWeight: FontWeightManager.semiBold,
                           color: ColorManager.signupText,
+                          lineHeight: FontSize.s19,
                         ),
                       ),
                       onPressed: () {

@@ -218,6 +218,7 @@ class _LoginButton extends StatelessWidget {
           style: getMediumStyle(
             fontSize: FontSize.s19,
             color: ColorManager.white,
+            lineHeight: FontSize.s19,
           ),
         ),
       ),

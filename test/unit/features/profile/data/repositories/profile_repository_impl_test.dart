@@ -160,6 +160,33 @@ void main() {
     });
   });
 
+  group('getCachedProfile', () {
+    test('should return the cached profile when one is stored', () async {
+      when(
+        () => localDataSource.getLastProfile(),
+      ).thenAnswer((_) async => profileModel);
+
+      expect(await repository.getCachedProfile(), profileModel.toEntity());
+    });
+
+    test('should return null when nothing is cached', () async {
+      when(() => localDataSource.getLastProfile()).thenAnswer((_) async => null);
+
+      expect(await repository.getCachedProfile(), isNull);
+    });
+
+    // The bloc awaits this on every profile load, outside any try/catch. An
+    // escaping decode error leaves the bloc in its initial state and the
+    // profile screen renders blank.
+    test('should treat an undecodable cache entry as a cache miss', () async {
+      when(
+        () => localDataSource.getLastProfile(),
+      ).thenThrow(const FormatException('corrupt cached profile'));
+
+      expect(await repository.getCachedProfile(), isNull);
+    });
+  });
+
   group('uploadAvatar', () {
     test('should upload avatar and return public URL', () async {
       when(
