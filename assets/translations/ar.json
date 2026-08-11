@@ -333,5 +333,6 @@
   "time_ago_hour": "منذ ساعة",
   "time_ago_hours": "منذ {count} س",
   "time_ago_days": "منذ {count} ي",
-  "no_notifications_description": "ليس لديك أي إشعارات جديدة في الوقت الحالي. سنقوم بإعلامك فور توفر تحديثات أو طلبات تبرع جديدة."
+  "no_notifications_description": "ليس لديك أي إشعارات جديدة في الوقت الحالي. سنقوم بإعلامك فور توفر تحديثات أو طلبات تبرع جديدة.",
+  "badge_overflow": "9+"
 }

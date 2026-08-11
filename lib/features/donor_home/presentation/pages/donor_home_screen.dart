@@ -148,8 +148,8 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
         create: (_) => sl<DonorCardBloc>()..add(const DonorCardRequested()),
         child: const DonorCardInfoScreen(),
       ),
-      _DonorTab.notifications => BlocProvider(
-        create: (_) => sl<NotificationsBloc>(),
+      _DonorTab.notifications => BlocProvider.value(
+        value: context.read<NotificationsBloc>(),
         child: const NotificationsCenterPage(isDonor: true),
       ),
       _DonorTab.about => AboutAppScreen(
@@ -313,9 +313,14 @@ class _DonorOverview extends StatelessWidget {
         }
         final loaded = state as DonorFeedLoaded;
         final feed = loaded.feed;
+        final notificationsState = context.watch<NotificationsBloc>().state;
+        final unreadCount = notificationsState is NotificationsLoaded
+            ? notificationsState.unreadCount
+            : 0;
         return AppPage(
           title: welcomeTitle(),
           subtitle: AppStrings.donationLifeChance.tr(),
+          unreadCount: unreadCount,
           notificationsKey: WidgetKeys.donorNotificationsButton,
           onNotifications:
               onNotifications ??

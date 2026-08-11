@@ -1,4 +1,8 @@
+import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
+
+import '../../../../core/error/failures.dart';
+import '../../domain/entities/notification_entity.dart';
 
 abstract class NotificationsEvent extends Equatable {
   const NotificationsEvent();
@@ -27,4 +31,14 @@ class NotificationReadRequested extends NotificationsEvent {
 
   @override
   List<Object?> get props => [notificationId];
+}
+
+/// Internal: a new snapshot arrived on the realtime stream (or it errored).
+class NotificationsStreamUpdated extends NotificationsEvent {
+  final Either<Failure, List<NotificationEntity>> result;
+
+  const NotificationsStreamUpdated(this.result);
+
+  @override
+  List<Object?> get props => [result];
 }

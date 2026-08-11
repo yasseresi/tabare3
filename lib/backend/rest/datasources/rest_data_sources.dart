@@ -147,6 +147,10 @@ class NotificationRestDataSource implements NotificationRemoteDataSource {
   @override
   Future<NotificationModel> markAsRead(String notificationId) async =>
       _todo('PATCH /notifications/{id}');
+
+  @override
+  Stream<List<NotificationModel>> watchNotifications() =>
+      _todo('STREAM /notifications');
 }
 
 class DonorCardRestDataSource implements DonorCardRemoteDataSource {

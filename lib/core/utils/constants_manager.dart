@@ -5,6 +5,10 @@ class AppConstants {
   static const int toastDuration = 3;
   static const int toggleAnimationMs = 150;
   static const int paginationLimit = 10;
+
+  /// Highest exact number shown on the notification bell badge; above this the
+  /// badge renders [AppStrings.badgeOverflow] (e.g. `9+`).
+  static const int badgeMaxCount = 9;
   static const int profileHadithMaxLines = 3;
   static const int statusTagMaxLines = 1;
   static const int minPasswordLength = 8;

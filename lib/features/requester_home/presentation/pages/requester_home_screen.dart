@@ -147,8 +147,8 @@ class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
           ),
         ),
       ),
-      _RequesterTab.notifications => BlocProvider(
-        create: (_) => sl<NotificationsBloc>(),
+      _RequesterTab.notifications => BlocProvider.value(
+        value: context.read<NotificationsBloc>(),
         child: const NotificationsCenterPage(),
       ),
       _RequesterTab.about => AboutAppScreen(
@@ -257,9 +257,14 @@ class _RequesterOverview extends StatelessWidget {
           );
         }
         final requests = state.requests;
+        final notificationsState = context.watch<NotificationsBloc>().state;
+        final unreadCount = notificationsState is NotificationsLoaded
+            ? notificationsState.unreadCount
+            : 0;
         return AppPage(
           title: welcomeTitle(),
           subtitle: AppStrings.getWellSoon.tr(),
+          unreadCount: unreadCount,
           onNotifications: onNotifications,
           onRefresh: () async {
             context.read<RequestBloc>().add(const RequestsLoadRequested());

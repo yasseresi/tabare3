@@ -29,6 +29,10 @@ class NotificationsLoaded extends NotificationsState {
     this.query = '',
   });
 
+  /// Number of unread notifications, used to drive the header bell badge.
+  int get unreadCount =>
+      notifications.where((notification) => !notification.isRead).length;
+
   @override
   List<Object?> get props => [notifications, visibleNotifications, query];
 }

@@ -90,6 +90,10 @@ class RouteGenerator {
                 create: (_) =>
                     sl<RequestBloc>()..add(const RequestsLoadRequested()),
               ),
+              BlocProvider(
+                create: (_) =>
+                    sl<NotificationsBloc>()..add(const NotificationsRequested()),
+              ),
             ],
             child: const RequesterHomeScreen(),
           ),
@@ -159,6 +163,10 @@ class RouteGenerator {
               BlocProvider(
                 create: (_) =>
                     sl<DonorFeedBloc>()..add(const DonorFeedRequested()),
+              ),
+              BlocProvider(
+                create: (_) =>
+                    sl<NotificationsBloc>()..add(const NotificationsRequested()),
               ),
             ],
             child: const DonorHomeScreen(),

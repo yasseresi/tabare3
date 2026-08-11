@@ -31,6 +31,7 @@ import 'features/notifications/data/repositories/notification_repository_impl.da
 import 'features/notifications/domain/repositories/notification_repository.dart';
 import 'features/notifications/domain/usecases/get_notifications.dart';
 import 'features/notifications/domain/usecases/mark_notification_as_read.dart';
+import 'features/notifications/domain/usecases/watch_notifications.dart';
 import 'features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'features/profile/data/datasources/profile_local_data_source.dart';
 import 'features/profile/data/datasources/profile_local_data_source_impl.dart';
@@ -99,10 +100,13 @@ Future<void> initDonorHome() async {
 
 Future<void> initNotifications() async {
   sl.registerFactory(
-    () =>
-        NotificationsBloc(getNotifications: sl(), markNotificationAsRead: sl()),
+    () => NotificationsBloc(
+      watchNotifications: sl(),
+      markNotificationAsRead: sl(),
+    ),
   );
   sl.registerLazySingleton(() => GetNotifications(sl()));
+  sl.registerLazySingleton(() => WatchNotifications(sl()));
   sl.registerLazySingleton(() => MarkNotificationAsRead(sl()));
   sl.registerLazySingleton<NotificationRepository>(
     () => NotificationRepositoryImpl(remoteDataSource: sl()),

@@ -36,4 +36,14 @@ class NotificationSupabaseDataSource implements NotificationRemoteDataSource {
 
     return NotificationModel.fromJson(row);
   }
+
+  @override
+  Stream<List<NotificationModel>> watchNotifications() {
+    return client
+        .from('notifications')
+        .stream(primaryKey: ['id'])
+        .eq('user_id', _userId)
+        .order('created_at', ascending: false)
+        .map((rows) => rows.map(NotificationModel.fromJson).toList());
+  }
 }

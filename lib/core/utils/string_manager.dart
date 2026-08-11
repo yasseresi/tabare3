@@ -82,6 +82,7 @@ class AppStrings {
   static const String activeDonor = 'active_donor';
   static const String latestNearbyRequests = 'latest_nearby_requests';
   static const String viewAll = 'view_all';
+  static const String badgeOverflow = 'badge_overflow';
   static const String lastDeadline = 'last_deadline';
   static const String unitsProgress = 'units_progress';
   static const String normalPriority = 'normal_priority';

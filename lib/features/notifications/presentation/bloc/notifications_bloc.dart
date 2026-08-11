@@ -1,9 +1,12 @@
+import 'dart:async';
+
+import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/usecases/usecase.dart';
+import '../../../../core/error/failures.dart';
 import '../../domain/entities/notification_entity.dart';
-import '../../domain/usecases/get_notifications.dart';
 import '../../domain/usecases/mark_notification_as_read.dart';
+import '../../domain/usecases/watch_notifications.dart';
 import 'notifications_event.dart';
 import 'notifications_state.dart';
 
@@ -11,33 +14,51 @@ export 'notifications_event.dart';
 export 'notifications_state.dart';
 
 class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
-  final GetNotifications getNotifications;
+  final WatchNotifications watchNotifications;
   final MarkNotificationAsRead markNotificationAsRead;
 
+  StreamSubscription<Either<Failure, List<NotificationEntity>>>? _subscription;
+
   NotificationsBloc({
-    required this.getNotifications,
+    required this.watchNotifications,
     required this.markNotificationAsRead,
   }) : super(const NotificationsInitial()) {
     on<NotificationsRequested>(_onRequested);
+    on<NotificationsStreamUpdated>(_onStreamUpdated);
     on<NotificationsSearchChanged>(_onSearchChanged);
     on<NotificationReadRequested>(_onReadRequested);
   }
 
-  Future<void> _onRequested(
+  void _onRequested(
     NotificationsRequested event,
     Emitter<NotificationsState> emit,
-  ) async {
-    emit(const NotificationsLoading());
-    final result = await getNotifications(NoParams());
-    result.fold(
-      (failure) => emit(NotificationsError(failure)),
-      (notifications) => emit(
+  ) {
+    if (state is NotificationsInitial) emit(const NotificationsLoading());
+    // Managed subscription (not emit.forEach) so the search/read handlers stay
+    // responsive while the realtime stream runs for the bloc's whole lifetime.
+    _subscription?.cancel();
+    _subscription = watchNotifications().listen(
+      (result) => add(NotificationsStreamUpdated(result)),
+    );
+  }
+
+  void _onStreamUpdated(
+    NotificationsStreamUpdated event,
+    Emitter<NotificationsState> emit,
+  ) {
+    event.result.fold((failure) => emit(NotificationsError(failure)), (
+      notifications,
+    ) {
+      final current = state;
+      final query = current is NotificationsLoaded ? current.query : '';
+      emit(
         NotificationsLoaded(
           notifications: notifications,
-          visibleNotifications: notifications,
+          visibleNotifications: _filterNotifications(notifications, query),
+          query: query,
         ),
-      ),
-    );
+      );
+    });
   }
 
   void _onSearchChanged(
@@ -69,25 +90,18 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     );
     if (target.isEmpty || target.first.isRead) return;
 
+    // The realtime stream re-emits the updated row, so the read state and
+    // unread badge refresh on their own; only surface a failure here.
     final result = await markNotificationAsRead(
       MarkNotificationAsReadParams(event.notificationId),
     );
+    result.fold((failure) => emit(NotificationsError(failure)), (_) {});
+  }
 
-    result.fold((failure) => emit(NotificationsError(failure)), (updated) {
-      final notifications = current.notifications.map((notification) {
-        return notification.id == updated.id ? updated : notification;
-      }).toList();
-      emit(
-        NotificationsLoaded(
-          notifications: notifications,
-          visibleNotifications: _filterNotifications(
-            notifications,
-            current.query,
-          ),
-          query: current.query,
-        ),
-      );
-    });
+  @override
+  Future<void> close() {
+    _subscription?.cancel();
+    return super.close();
   }
 }
 

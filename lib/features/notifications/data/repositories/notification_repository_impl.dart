@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/error/error_handler.dart';
@@ -32,5 +34,18 @@ class NotificationRepositoryImpl implements NotificationRepository {
     } catch (error) {
       return Left(ErrorHandler.handle(error));
     }
+  }
+
+  @override
+  Stream<Either<Failure, List<NotificationEntity>>> watchNotifications() {
+    return remoteDataSource.watchNotifications().transform(
+      StreamTransformer.fromHandlers(
+        handleData: (models, sink) => sink.add(
+          Right(models.map((model) => model.toEntity()).toList()),
+        ),
+        handleError: (error, stackTrace, sink) =>
+            sink.add(Left(ErrorHandler.handle(error))),
+      ),
+    );
   }
 }
