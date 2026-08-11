@@ -92,6 +92,38 @@ void main() {
     expect(validationResult, '');
   });
 
+  testWidgets('password field renders same height as plain field', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              AppTextField(
+                hintText: 'اسم المستخدم',
+                prefixSvg: SvgAssets.person,
+              ),
+              AppTextField(
+                hintText: 'كلمة المرور',
+                prefixSvg: SvgAssets.password,
+                obscureSvg: SvgAssets.hidden,
+                isPassword: true,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final plainHeight = tester.getSize(find.byType(AppTextField).at(0)).height;
+    final passwordHeight =
+        tester.getSize(find.byType(AppTextField).at(1)).height;
+
+    expect(passwordHeight, plainHeight);
+  });
+
   testWidgets('renders SVG prefix icon when prefixSvg provided', (
     tester,
   ) async {
