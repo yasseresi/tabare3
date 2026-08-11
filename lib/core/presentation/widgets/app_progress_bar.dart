@@ -14,7 +14,12 @@ class AppProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final clamped = value.clamp(AppSize.s0, AppSize.s1);
+    // Keep a sliver visible even at 0 so the bar reads as a fulfilment track.
+    final widthFactor = clamped < AppSize.progressMinFraction
+        ? AppSize.progressMinFraction
+        : clamped;
     return Container(
+      width: double.infinity,
       height: AppSize.s12,
       decoration: BoxDecoration(
         color: ColorManager.progressTrackLight,
@@ -25,8 +30,8 @@ class AppProgressBar extends StatelessWidget {
         ),
       ),
       child: FractionallySizedBox(
-        alignment: AlignmentDirectional.centerStart,
-        widthFactor: clamped,
+        alignment: Alignment.centerRight,
+        widthFactor: widthFactor,
         child: Container(
           decoration: BoxDecoration(
             color: ColorManager.cardValue,

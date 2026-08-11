@@ -152,6 +152,10 @@ class AppSize {
   static const double blurDonorCard = 81.35;
   static const double offsetCard = 7.005;
 
+  /// Minimum visible fill for the fulfilment bar so an empty (0/n) request
+  /// still shows a sliver on the leading edge.
+  static const double progressMinFraction = 0.06;
+
   // Border radius
   static const double radiusProgress = 6.0;
   static const double radiusSmall = 8.0;
