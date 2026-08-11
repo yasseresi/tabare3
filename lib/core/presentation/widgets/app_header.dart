@@ -7,6 +7,7 @@ import '../../utils/color_manager.dart';
 import '../../utils/font_manager.dart';
 import '../../utils/styles_manager.dart';
 import '../../utils/values_manager.dart';
+import 'app_gradient_background.dart';
 
 /// Figma `Section - ArtistGrid` header: 60px top / 10px bottom / 32px side
 /// padding, greeting stack on the trailing side and a 40x40 circular bell
@@ -27,45 +28,49 @@ class AppHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: AppPadding.p60,
-        bottom: AppPadding.p10,
-        left: AppPadding.p32,
-        right: AppPadding.p32,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: getExtraBoldStyle(
-                    fontSize: FontSize.s18,
-                    color: ColorManager.black,
-                    lineHeight: LineHeight.h28,
+    // Opaque wash behind the header so list content scrolls out of sight
+    // beneath it instead of bleeding through the greeting text.
+    return AppGradientBackground(
+      child: Padding(
+        padding: const EdgeInsets.only(
+          top: AppPadding.p60,
+          bottom: AppPadding.p10,
+          left: AppPadding.p32,
+          right: AppPadding.p32,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    style: getExtraBoldStyle(
+                      fontSize: FontSize.s18,
+                      color: ColorManager.black,
+                      lineHeight: LineHeight.h28,
+                    ),
                   ),
-                ),
-                Text(
-                  subtitle,
-                  style: getSemiBoldStyle(
-                    fontSize: FontSize.s14,
-                    color: ColorManager.textMuted,
-                    lineHeight: LineHeight.h30,
+                  Text(
+                    subtitle,
+                    style: getSemiBoldStyle(
+                      fontSize: FontSize.s14,
+                      color: ColorManager.textMuted,
+                      lineHeight: LineHeight.h30,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          _NotificationsButton(
-            onPressed: onNotifications,
-            buttonKey: notificationsKey,
-          ),
-        ],
+            _NotificationsButton(
+              onPressed: onNotifications,
+              buttonKey: notificationsKey,
+            ),
+          ],
+        ),
       ),
     );
   }
