@@ -153,7 +153,10 @@ class _CampaignCard extends StatelessWidget {
             value: campaign.organizerName,
           ),
           const SizedBox(height: AppSize.s18),
-          AppInfoRow(label: AppStrings.place.tr(), value: campaign.venueName),
+          AppInfoRow(
+            label: AppStrings.place.tr(),
+            value: campaign.venueName ?? AppStrings.notAvailable.tr(),
+          ),
           const SizedBox(height: AppSize.s18),
           AppInfoRow(label: AppStrings.location.tr(), value: campaign.city),
           const SizedBox(height: AppSize.s18),

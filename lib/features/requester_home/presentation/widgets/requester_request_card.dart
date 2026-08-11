@@ -111,8 +111,8 @@ class RequesterRequestCard extends StatelessWidget {
             value: dateFormat.format(deadline.toLocal()),
           ),
         RequestCardDetail(
-          label: request.hospital.nameAr,
-          value: request.hospital.address ?? AppStrings.location.tr(),
+          label: request.hospital?.nameAr ?? AppStrings.notAvailable.tr(),
+          value: request.hospital?.address ?? AppStrings.location.tr(),
         ),
         RequestCardDetail(
           label: AppStrings.unitsProgress.tr(

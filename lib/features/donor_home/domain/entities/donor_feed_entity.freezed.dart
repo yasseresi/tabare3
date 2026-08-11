@@ -286,7 +286,8 @@ as bool,
 /// @nodoc
 mixin _$DonorAvailabilityEntity {
 
- String get userId; bool get isAccountActive; bool get isAvailableForDonation; bool get isDonor; String get bloodType; int get wilayaId; DateTime? get cooldownUntil; DateTime? get lastDonationDate; int get totalDonationsCount;
+ String get userId; bool get isAccountActive; bool get isAvailableForDonation; bool get isDonor; String get bloodType;// Null for donors with no wilaya recorded on their profile.
+ int? get wilayaId; DateTime? get cooldownUntil; DateTime? get lastDonationDate; int get totalDonationsCount;
 /// Create a copy of DonorAvailabilityEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -317,7 +318,7 @@ abstract mixin class $DonorAvailabilityEntityCopyWith<$Res>  {
   factory $DonorAvailabilityEntityCopyWith(DonorAvailabilityEntity value, $Res Function(DonorAvailabilityEntity) _then) = _$DonorAvailabilityEntityCopyWithImpl;
 @useResult
 $Res call({
- String userId, bool isAccountActive, bool isAvailableForDonation, bool isDonor, String bloodType, int wilayaId, DateTime? cooldownUntil, DateTime? lastDonationDate, int totalDonationsCount
+ String userId, bool isAccountActive, bool isAvailableForDonation, bool isDonor, String bloodType, int? wilayaId, DateTime? cooldownUntil, DateTime? lastDonationDate, int totalDonationsCount
 });
 
 
@@ -334,15 +335,15 @@ class _$DonorAvailabilityEntityCopyWithImpl<$Res>
 
 /// Create a copy of DonorAvailabilityEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? isAccountActive = null,Object? isAvailableForDonation = null,Object? isDonor = null,Object? bloodType = null,Object? wilayaId = null,Object? cooldownUntil = freezed,Object? lastDonationDate = freezed,Object? totalDonationsCount = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? isAccountActive = null,Object? isAvailableForDonation = null,Object? isDonor = null,Object? bloodType = null,Object? wilayaId = freezed,Object? cooldownUntil = freezed,Object? lastDonationDate = freezed,Object? totalDonationsCount = null,}) {
   return _then(_self.copyWith(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,isAccountActive: null == isAccountActive ? _self.isAccountActive : isAccountActive // ignore: cast_nullable_to_non_nullable
 as bool,isAvailableForDonation: null == isAvailableForDonation ? _self.isAvailableForDonation : isAvailableForDonation // ignore: cast_nullable_to_non_nullable
 as bool,isDonor: null == isDonor ? _self.isDonor : isDonor // ignore: cast_nullable_to_non_nullable
 as bool,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
-as String,wilayaId: null == wilayaId ? _self.wilayaId : wilayaId // ignore: cast_nullable_to_non_nullable
-as int,cooldownUntil: freezed == cooldownUntil ? _self.cooldownUntil : cooldownUntil // ignore: cast_nullable_to_non_nullable
+as String,wilayaId: freezed == wilayaId ? _self.wilayaId : wilayaId // ignore: cast_nullable_to_non_nullable
+as int?,cooldownUntil: freezed == cooldownUntil ? _self.cooldownUntil : cooldownUntil // ignore: cast_nullable_to_non_nullable
 as DateTime?,lastDonationDate: freezed == lastDonationDate ? _self.lastDonationDate : lastDonationDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,totalDonationsCount: null == totalDonationsCount ? _self.totalDonationsCount : totalDonationsCount // ignore: cast_nullable_to_non_nullable
 as int,
@@ -430,7 +431,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  bool isAccountActive,  bool isAvailableForDonation,  bool isDonor,  String bloodType,  int wilayaId,  DateTime? cooldownUntil,  DateTime? lastDonationDate,  int totalDonationsCount)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  bool isAccountActive,  bool isAvailableForDonation,  bool isDonor,  String bloodType,  int? wilayaId,  DateTime? cooldownUntil,  DateTime? lastDonationDate,  int totalDonationsCount)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DonorAvailabilityEntity() when $default != null:
 return $default(_that.userId,_that.isAccountActive,_that.isAvailableForDonation,_that.isDonor,_that.bloodType,_that.wilayaId,_that.cooldownUntil,_that.lastDonationDate,_that.totalDonationsCount);case _:
@@ -451,7 +452,7 @@ return $default(_that.userId,_that.isAccountActive,_that.isAvailableForDonation,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  bool isAccountActive,  bool isAvailableForDonation,  bool isDonor,  String bloodType,  int wilayaId,  DateTime? cooldownUntil,  DateTime? lastDonationDate,  int totalDonationsCount)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  bool isAccountActive,  bool isAvailableForDonation,  bool isDonor,  String bloodType,  int? wilayaId,  DateTime? cooldownUntil,  DateTime? lastDonationDate,  int totalDonationsCount)  $default,) {final _that = this;
 switch (_that) {
 case _DonorAvailabilityEntity():
 return $default(_that.userId,_that.isAccountActive,_that.isAvailableForDonation,_that.isDonor,_that.bloodType,_that.wilayaId,_that.cooldownUntil,_that.lastDonationDate,_that.totalDonationsCount);case _:
@@ -471,7 +472,7 @@ return $default(_that.userId,_that.isAccountActive,_that.isAvailableForDonation,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  bool isAccountActive,  bool isAvailableForDonation,  bool isDonor,  String bloodType,  int wilayaId,  DateTime? cooldownUntil,  DateTime? lastDonationDate,  int totalDonationsCount)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  bool isAccountActive,  bool isAvailableForDonation,  bool isDonor,  String bloodType,  int? wilayaId,  DateTime? cooldownUntil,  DateTime? lastDonationDate,  int totalDonationsCount)?  $default,) {final _that = this;
 switch (_that) {
 case _DonorAvailabilityEntity() when $default != null:
 return $default(_that.userId,_that.isAccountActive,_that.isAvailableForDonation,_that.isDonor,_that.bloodType,_that.wilayaId,_that.cooldownUntil,_that.lastDonationDate,_that.totalDonationsCount);case _:
@@ -486,7 +487,7 @@ return $default(_that.userId,_that.isAccountActive,_that.isAvailableForDonation,
 
 
 class _DonorAvailabilityEntity extends DonorAvailabilityEntity {
-  const _DonorAvailabilityEntity({required this.userId, required this.isAccountActive, required this.isAvailableForDonation, required this.isDonor, required this.bloodType, required this.wilayaId, this.cooldownUntil, this.lastDonationDate, required this.totalDonationsCount}): super._();
+  const _DonorAvailabilityEntity({required this.userId, required this.isAccountActive, required this.isAvailableForDonation, required this.isDonor, required this.bloodType, this.wilayaId, this.cooldownUntil, this.lastDonationDate, required this.totalDonationsCount}): super._();
   
 
 @override final  String userId;
@@ -494,7 +495,8 @@ class _DonorAvailabilityEntity extends DonorAvailabilityEntity {
 @override final  bool isAvailableForDonation;
 @override final  bool isDonor;
 @override final  String bloodType;
-@override final  int wilayaId;
+// Null for donors with no wilaya recorded on their profile.
+@override final  int? wilayaId;
 @override final  DateTime? cooldownUntil;
 @override final  DateTime? lastDonationDate;
 @override final  int totalDonationsCount;
@@ -529,7 +531,7 @@ abstract mixin class _$DonorAvailabilityEntityCopyWith<$Res> implements $DonorAv
   factory _$DonorAvailabilityEntityCopyWith(_DonorAvailabilityEntity value, $Res Function(_DonorAvailabilityEntity) _then) = __$DonorAvailabilityEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String userId, bool isAccountActive, bool isAvailableForDonation, bool isDonor, String bloodType, int wilayaId, DateTime? cooldownUntil, DateTime? lastDonationDate, int totalDonationsCount
+ String userId, bool isAccountActive, bool isAvailableForDonation, bool isDonor, String bloodType, int? wilayaId, DateTime? cooldownUntil, DateTime? lastDonationDate, int totalDonationsCount
 });
 
 
@@ -546,15 +548,15 @@ class __$DonorAvailabilityEntityCopyWithImpl<$Res>
 
 /// Create a copy of DonorAvailabilityEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? isAccountActive = null,Object? isAvailableForDonation = null,Object? isDonor = null,Object? bloodType = null,Object? wilayaId = null,Object? cooldownUntil = freezed,Object? lastDonationDate = freezed,Object? totalDonationsCount = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? isAccountActive = null,Object? isAvailableForDonation = null,Object? isDonor = null,Object? bloodType = null,Object? wilayaId = freezed,Object? cooldownUntil = freezed,Object? lastDonationDate = freezed,Object? totalDonationsCount = null,}) {
   return _then(_DonorAvailabilityEntity(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,isAccountActive: null == isAccountActive ? _self.isAccountActive : isAccountActive // ignore: cast_nullable_to_non_nullable
 as bool,isAvailableForDonation: null == isAvailableForDonation ? _self.isAvailableForDonation : isAvailableForDonation // ignore: cast_nullable_to_non_nullable
 as bool,isDonor: null == isDonor ? _self.isDonor : isDonor // ignore: cast_nullable_to_non_nullable
 as bool,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
-as String,wilayaId: null == wilayaId ? _self.wilayaId : wilayaId // ignore: cast_nullable_to_non_nullable
-as int,cooldownUntil: freezed == cooldownUntil ? _self.cooldownUntil : cooldownUntil // ignore: cast_nullable_to_non_nullable
+as String,wilayaId: freezed == wilayaId ? _self.wilayaId : wilayaId // ignore: cast_nullable_to_non_nullable
+as int?,cooldownUntil: freezed == cooldownUntil ? _self.cooldownUntil : cooldownUntil // ignore: cast_nullable_to_non_nullable
 as DateTime?,lastDonationDate: freezed == lastDonationDate ? _self.lastDonationDate : lastDonationDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,totalDonationsCount: null == totalDonationsCount ? _self.totalDonationsCount : totalDonationsCount // ignore: cast_nullable_to_non_nullable
 as int,
@@ -878,7 +880,7 @@ $DonorHospitalEntityCopyWith<$Res> get hospital {
 /// @nodoc
 mixin _$DonorCampaignEntity {
 
- String get id; String? get createdBy; String get organizerName; String get title; String? get description; String get venueName; String get city; int get wilayaId; String? get hospitalId; List<String>? get bloodTypesNeeded; DonorCampaignStatus get status; DateTime get startsAt; DateTime get endsAt; DateTime? get publishedAt; DateTime get createdAt;
+ String get id; String? get createdBy; String get organizerName; String get title; String? get description; String? get venueName; String get city; int get wilayaId; String? get hospitalId; List<String>? get bloodTypesNeeded; DonorCampaignStatus get status; DateTime get startsAt; DateTime get endsAt; DateTime? get publishedAt; DateTime get createdAt;
 /// Create a copy of DonorCampaignEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -909,7 +911,7 @@ abstract mixin class $DonorCampaignEntityCopyWith<$Res>  {
   factory $DonorCampaignEntityCopyWith(DonorCampaignEntity value, $Res Function(DonorCampaignEntity) _then) = _$DonorCampaignEntityCopyWithImpl;
 @useResult
 $Res call({
- String id, String? createdBy, String organizerName, String title, String? description, String venueName, String city, int wilayaId, String? hospitalId, List<String>? bloodTypesNeeded, DonorCampaignStatus status, DateTime startsAt, DateTime endsAt, DateTime? publishedAt, DateTime createdAt
+ String id, String? createdBy, String organizerName, String title, String? description, String? venueName, String city, int wilayaId, String? hospitalId, List<String>? bloodTypesNeeded, DonorCampaignStatus status, DateTime startsAt, DateTime endsAt, DateTime? publishedAt, DateTime createdAt
 });
 
 
@@ -926,15 +928,15 @@ class _$DonorCampaignEntityCopyWithImpl<$Res>
 
 /// Create a copy of DonorCampaignEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? createdBy = freezed,Object? organizerName = null,Object? title = null,Object? description = freezed,Object? venueName = null,Object? city = null,Object? wilayaId = null,Object? hospitalId = freezed,Object? bloodTypesNeeded = freezed,Object? status = null,Object? startsAt = null,Object? endsAt = null,Object? publishedAt = freezed,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? createdBy = freezed,Object? organizerName = null,Object? title = null,Object? description = freezed,Object? venueName = freezed,Object? city = null,Object? wilayaId = null,Object? hospitalId = freezed,Object? bloodTypesNeeded = freezed,Object? status = null,Object? startsAt = null,Object? endsAt = null,Object? publishedAt = freezed,Object? createdAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,createdBy: freezed == createdBy ? _self.createdBy : createdBy // ignore: cast_nullable_to_non_nullable
 as String?,organizerName: null == organizerName ? _self.organizerName : organizerName // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,venueName: null == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
-as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String?,venueName: freezed == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
+as String?,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
 as String,wilayaId: null == wilayaId ? _self.wilayaId : wilayaId // ignore: cast_nullable_to_non_nullable
 as int,hospitalId: freezed == hospitalId ? _self.hospitalId : hospitalId // ignore: cast_nullable_to_non_nullable
 as String?,bloodTypesNeeded: freezed == bloodTypesNeeded ? _self.bloodTypesNeeded : bloodTypesNeeded // ignore: cast_nullable_to_non_nullable
@@ -1028,7 +1030,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? createdBy,  String organizerName,  String title,  String? description,  String venueName,  String city,  int wilayaId,  String? hospitalId,  List<String>? bloodTypesNeeded,  DonorCampaignStatus status,  DateTime startsAt,  DateTime endsAt,  DateTime? publishedAt,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? createdBy,  String organizerName,  String title,  String? description,  String? venueName,  String city,  int wilayaId,  String? hospitalId,  List<String>? bloodTypesNeeded,  DonorCampaignStatus status,  DateTime startsAt,  DateTime endsAt,  DateTime? publishedAt,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DonorCampaignEntity() when $default != null:
 return $default(_that.id,_that.createdBy,_that.organizerName,_that.title,_that.description,_that.venueName,_that.city,_that.wilayaId,_that.hospitalId,_that.bloodTypesNeeded,_that.status,_that.startsAt,_that.endsAt,_that.publishedAt,_that.createdAt);case _:
@@ -1049,7 +1051,7 @@ return $default(_that.id,_that.createdBy,_that.organizerName,_that.title,_that.d
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? createdBy,  String organizerName,  String title,  String? description,  String venueName,  String city,  int wilayaId,  String? hospitalId,  List<String>? bloodTypesNeeded,  DonorCampaignStatus status,  DateTime startsAt,  DateTime endsAt,  DateTime? publishedAt,  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? createdBy,  String organizerName,  String title,  String? description,  String? venueName,  String city,  int wilayaId,  String? hospitalId,  List<String>? bloodTypesNeeded,  DonorCampaignStatus status,  DateTime startsAt,  DateTime endsAt,  DateTime? publishedAt,  DateTime createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _DonorCampaignEntity():
 return $default(_that.id,_that.createdBy,_that.organizerName,_that.title,_that.description,_that.venueName,_that.city,_that.wilayaId,_that.hospitalId,_that.bloodTypesNeeded,_that.status,_that.startsAt,_that.endsAt,_that.publishedAt,_that.createdAt);case _:
@@ -1069,7 +1071,7 @@ return $default(_that.id,_that.createdBy,_that.organizerName,_that.title,_that.d
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? createdBy,  String organizerName,  String title,  String? description,  String venueName,  String city,  int wilayaId,  String? hospitalId,  List<String>? bloodTypesNeeded,  DonorCampaignStatus status,  DateTime startsAt,  DateTime endsAt,  DateTime? publishedAt,  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? createdBy,  String organizerName,  String title,  String? description,  String? venueName,  String city,  int wilayaId,  String? hospitalId,  List<String>? bloodTypesNeeded,  DonorCampaignStatus status,  DateTime startsAt,  DateTime endsAt,  DateTime? publishedAt,  DateTime createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _DonorCampaignEntity() when $default != null:
 return $default(_that.id,_that.createdBy,_that.organizerName,_that.title,_that.description,_that.venueName,_that.city,_that.wilayaId,_that.hospitalId,_that.bloodTypesNeeded,_that.status,_that.startsAt,_that.endsAt,_that.publishedAt,_that.createdAt);case _:
@@ -1084,7 +1086,7 @@ return $default(_that.id,_that.createdBy,_that.organizerName,_that.title,_that.d
 
 
 class _DonorCampaignEntity extends DonorCampaignEntity {
-  const _DonorCampaignEntity({required this.id, this.createdBy, required this.organizerName, required this.title, this.description, required this.venueName, required this.city, required this.wilayaId, this.hospitalId, final  List<String>? bloodTypesNeeded, required this.status, required this.startsAt, required this.endsAt, this.publishedAt, required this.createdAt}): _bloodTypesNeeded = bloodTypesNeeded,super._();
+  const _DonorCampaignEntity({required this.id, this.createdBy, required this.organizerName, required this.title, this.description, this.venueName, required this.city, required this.wilayaId, this.hospitalId, final  List<String>? bloodTypesNeeded, required this.status, required this.startsAt, required this.endsAt, this.publishedAt, required this.createdAt}): _bloodTypesNeeded = bloodTypesNeeded,super._();
   
 
 @override final  String id;
@@ -1092,7 +1094,7 @@ class _DonorCampaignEntity extends DonorCampaignEntity {
 @override final  String organizerName;
 @override final  String title;
 @override final  String? description;
-@override final  String venueName;
+@override final  String? venueName;
 @override final  String city;
 @override final  int wilayaId;
 @override final  String? hospitalId;
@@ -1141,7 +1143,7 @@ abstract mixin class _$DonorCampaignEntityCopyWith<$Res> implements $DonorCampai
   factory _$DonorCampaignEntityCopyWith(_DonorCampaignEntity value, $Res Function(_DonorCampaignEntity) _then) = __$DonorCampaignEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String? createdBy, String organizerName, String title, String? description, String venueName, String city, int wilayaId, String? hospitalId, List<String>? bloodTypesNeeded, DonorCampaignStatus status, DateTime startsAt, DateTime endsAt, DateTime? publishedAt, DateTime createdAt
+ String id, String? createdBy, String organizerName, String title, String? description, String? venueName, String city, int wilayaId, String? hospitalId, List<String>? bloodTypesNeeded, DonorCampaignStatus status, DateTime startsAt, DateTime endsAt, DateTime? publishedAt, DateTime createdAt
 });
 
 
@@ -1158,15 +1160,15 @@ class __$DonorCampaignEntityCopyWithImpl<$Res>
 
 /// Create a copy of DonorCampaignEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? createdBy = freezed,Object? organizerName = null,Object? title = null,Object? description = freezed,Object? venueName = null,Object? city = null,Object? wilayaId = null,Object? hospitalId = freezed,Object? bloodTypesNeeded = freezed,Object? status = null,Object? startsAt = null,Object? endsAt = null,Object? publishedAt = freezed,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? createdBy = freezed,Object? organizerName = null,Object? title = null,Object? description = freezed,Object? venueName = freezed,Object? city = null,Object? wilayaId = null,Object? hospitalId = freezed,Object? bloodTypesNeeded = freezed,Object? status = null,Object? startsAt = null,Object? endsAt = null,Object? publishedAt = freezed,Object? createdAt = null,}) {
   return _then(_DonorCampaignEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,createdBy: freezed == createdBy ? _self.createdBy : createdBy // ignore: cast_nullable_to_non_nullable
 as String?,organizerName: null == organizerName ? _self.organizerName : organizerName // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,venueName: null == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
-as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String?,venueName: freezed == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
+as String?,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
 as String,wilayaId: null == wilayaId ? _self.wilayaId : wilayaId // ignore: cast_nullable_to_non_nullable
 as int,hospitalId: freezed == hospitalId ? _self.hospitalId : hospitalId // ignore: cast_nullable_to_non_nullable
 as String?,bloodTypesNeeded: freezed == bloodTypesNeeded ? _self._bloodTypesNeeded : bloodTypesNeeded // ignore: cast_nullable_to_non_nullable
@@ -1185,7 +1187,8 @@ as DateTime,
 /// @nodoc
 mixin _$DonorAppointmentRequestRef {
 
- String get id; DonorHospitalEntity get hospital; String get bloodType; DonorRequestPriority get priority; DateTime? get neededBy;
+ String get id;// Null when the request has no hospital attached.
+ DonorHospitalEntity? get hospital; String get bloodType; DonorRequestPriority get priority; DateTime? get neededBy;
 /// Create a copy of DonorAppointmentRequestRef
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1216,11 +1219,11 @@ abstract mixin class $DonorAppointmentRequestRefCopyWith<$Res>  {
   factory $DonorAppointmentRequestRefCopyWith(DonorAppointmentRequestRef value, $Res Function(DonorAppointmentRequestRef) _then) = _$DonorAppointmentRequestRefCopyWithImpl;
 @useResult
 $Res call({
- String id, DonorHospitalEntity hospital, String bloodType, DonorRequestPriority priority, DateTime? neededBy
+ String id, DonorHospitalEntity? hospital, String bloodType, DonorRequestPriority priority, DateTime? neededBy
 });
 
 
-$DonorHospitalEntityCopyWith<$Res> get hospital;
+$DonorHospitalEntityCopyWith<$Res>? get hospital;
 
 }
 /// @nodoc
@@ -1233,11 +1236,11 @@ class _$DonorAppointmentRequestRefCopyWithImpl<$Res>
 
 /// Create a copy of DonorAppointmentRequestRef
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? hospital = null,Object? bloodType = null,Object? priority = null,Object? neededBy = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? hospital = freezed,Object? bloodType = null,Object? priority = null,Object? neededBy = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
-as DonorHospitalEntity,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as String,hospital: freezed == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as DonorHospitalEntity?,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
 as String,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
 as DonorRequestPriority,neededBy: freezed == neededBy ? _self.neededBy : neededBy // ignore: cast_nullable_to_non_nullable
 as DateTime?,
@@ -1247,9 +1250,12 @@ as DateTime?,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$DonorHospitalEntityCopyWith<$Res> get hospital {
-  
-  return $DonorHospitalEntityCopyWith<$Res>(_self.hospital, (value) {
+$DonorHospitalEntityCopyWith<$Res>? get hospital {
+    if (_self.hospital == null) {
+    return null;
+  }
+
+  return $DonorHospitalEntityCopyWith<$Res>(_self.hospital!, (value) {
     return _then(_self.copyWith(hospital: value));
   });
 }
@@ -1334,7 +1340,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DonorHospitalEntity hospital,  String bloodType,  DonorRequestPriority priority,  DateTime? neededBy)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DonorHospitalEntity? hospital,  String bloodType,  DonorRequestPriority priority,  DateTime? neededBy)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DonorAppointmentRequestRef() when $default != null:
 return $default(_that.id,_that.hospital,_that.bloodType,_that.priority,_that.neededBy);case _:
@@ -1355,7 +1361,7 @@ return $default(_that.id,_that.hospital,_that.bloodType,_that.priority,_that.nee
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DonorHospitalEntity hospital,  String bloodType,  DonorRequestPriority priority,  DateTime? neededBy)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DonorHospitalEntity? hospital,  String bloodType,  DonorRequestPriority priority,  DateTime? neededBy)  $default,) {final _that = this;
 switch (_that) {
 case _DonorAppointmentRequestRef():
 return $default(_that.id,_that.hospital,_that.bloodType,_that.priority,_that.neededBy);case _:
@@ -1375,7 +1381,7 @@ return $default(_that.id,_that.hospital,_that.bloodType,_that.priority,_that.nee
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DonorHospitalEntity hospital,  String bloodType,  DonorRequestPriority priority,  DateTime? neededBy)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DonorHospitalEntity? hospital,  String bloodType,  DonorRequestPriority priority,  DateTime? neededBy)?  $default,) {final _that = this;
 switch (_that) {
 case _DonorAppointmentRequestRef() when $default != null:
 return $default(_that.id,_that.hospital,_that.bloodType,_that.priority,_that.neededBy);case _:
@@ -1390,11 +1396,12 @@ return $default(_that.id,_that.hospital,_that.bloodType,_that.priority,_that.nee
 
 
 class _DonorAppointmentRequestRef implements DonorAppointmentRequestRef {
-  const _DonorAppointmentRequestRef({required this.id, required this.hospital, required this.bloodType, required this.priority, this.neededBy});
+  const _DonorAppointmentRequestRef({required this.id, this.hospital, required this.bloodType, required this.priority, this.neededBy});
   
 
 @override final  String id;
-@override final  DonorHospitalEntity hospital;
+// Null when the request has no hospital attached.
+@override final  DonorHospitalEntity? hospital;
 @override final  String bloodType;
 @override final  DonorRequestPriority priority;
 @override final  DateTime? neededBy;
@@ -1429,11 +1436,11 @@ abstract mixin class _$DonorAppointmentRequestRefCopyWith<$Res> implements $Dono
   factory _$DonorAppointmentRequestRefCopyWith(_DonorAppointmentRequestRef value, $Res Function(_DonorAppointmentRequestRef) _then) = __$DonorAppointmentRequestRefCopyWithImpl;
 @override @useResult
 $Res call({
- String id, DonorHospitalEntity hospital, String bloodType, DonorRequestPriority priority, DateTime? neededBy
+ String id, DonorHospitalEntity? hospital, String bloodType, DonorRequestPriority priority, DateTime? neededBy
 });
 
 
-@override $DonorHospitalEntityCopyWith<$Res> get hospital;
+@override $DonorHospitalEntityCopyWith<$Res>? get hospital;
 
 }
 /// @nodoc
@@ -1446,11 +1453,11 @@ class __$DonorAppointmentRequestRefCopyWithImpl<$Res>
 
 /// Create a copy of DonorAppointmentRequestRef
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? hospital = null,Object? bloodType = null,Object? priority = null,Object? neededBy = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? hospital = freezed,Object? bloodType = null,Object? priority = null,Object? neededBy = freezed,}) {
   return _then(_DonorAppointmentRequestRef(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
-as DonorHospitalEntity,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as String,hospital: freezed == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as DonorHospitalEntity?,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
 as String,priority: null == priority ? _self.priority : priority // ignore: cast_nullable_to_non_nullable
 as DonorRequestPriority,neededBy: freezed == neededBy ? _self.neededBy : neededBy // ignore: cast_nullable_to_non_nullable
 as DateTime?,
@@ -1461,9 +1468,12 @@ as DateTime?,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$DonorHospitalEntityCopyWith<$Res> get hospital {
-  
-  return $DonorHospitalEntityCopyWith<$Res>(_self.hospital, (value) {
+$DonorHospitalEntityCopyWith<$Res>? get hospital {
+    if (_self.hospital == null) {
+    return null;
+  }
+
+  return $DonorHospitalEntityCopyWith<$Res>(_self.hospital!, (value) {
     return _then(_self.copyWith(hospital: value));
   });
 }
@@ -2074,7 +2084,8 @@ $DonorAppointmentCampaignRefCopyWith<$Res>? get campaign {
 mixin _$DonationRecordRequestRef {
 
  String get id;// Null when RLS hides the requester's profile from the donor.
- String? get recipientName; DonorHospitalEntity get hospital;
+ String? get recipientName;// Null when the request has no hospital attached.
+ DonorHospitalEntity? get hospital;
 /// Create a copy of DonationRecordRequestRef
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2105,11 +2116,11 @@ abstract mixin class $DonationRecordRequestRefCopyWith<$Res>  {
   factory $DonationRecordRequestRefCopyWith(DonationRecordRequestRef value, $Res Function(DonationRecordRequestRef) _then) = _$DonationRecordRequestRefCopyWithImpl;
 @useResult
 $Res call({
- String id, String? recipientName, DonorHospitalEntity hospital
+ String id, String? recipientName, DonorHospitalEntity? hospital
 });
 
 
-$DonorHospitalEntityCopyWith<$Res> get hospital;
+$DonorHospitalEntityCopyWith<$Res>? get hospital;
 
 }
 /// @nodoc
@@ -2122,21 +2133,24 @@ class _$DonationRecordRequestRefCopyWithImpl<$Res>
 
 /// Create a copy of DonationRecordRequestRef
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? recipientName = freezed,Object? hospital = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? recipientName = freezed,Object? hospital = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,recipientName: freezed == recipientName ? _self.recipientName : recipientName // ignore: cast_nullable_to_non_nullable
-as String?,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
-as DonorHospitalEntity,
+as String?,hospital: freezed == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as DonorHospitalEntity?,
   ));
 }
 /// Create a copy of DonationRecordRequestRef
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$DonorHospitalEntityCopyWith<$Res> get hospital {
-  
-  return $DonorHospitalEntityCopyWith<$Res>(_self.hospital, (value) {
+$DonorHospitalEntityCopyWith<$Res>? get hospital {
+    if (_self.hospital == null) {
+    return null;
+  }
+
+  return $DonorHospitalEntityCopyWith<$Res>(_self.hospital!, (value) {
     return _then(_self.copyWith(hospital: value));
   });
 }
@@ -2221,7 +2235,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? recipientName,  DonorHospitalEntity hospital)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? recipientName,  DonorHospitalEntity? hospital)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DonationRecordRequestRef() when $default != null:
 return $default(_that.id,_that.recipientName,_that.hospital);case _:
@@ -2242,7 +2256,7 @@ return $default(_that.id,_that.recipientName,_that.hospital);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? recipientName,  DonorHospitalEntity hospital)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? recipientName,  DonorHospitalEntity? hospital)  $default,) {final _that = this;
 switch (_that) {
 case _DonationRecordRequestRef():
 return $default(_that.id,_that.recipientName,_that.hospital);case _:
@@ -2262,7 +2276,7 @@ return $default(_that.id,_that.recipientName,_that.hospital);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? recipientName,  DonorHospitalEntity hospital)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? recipientName,  DonorHospitalEntity? hospital)?  $default,) {final _that = this;
 switch (_that) {
 case _DonationRecordRequestRef() when $default != null:
 return $default(_that.id,_that.recipientName,_that.hospital);case _:
@@ -2277,13 +2291,14 @@ return $default(_that.id,_that.recipientName,_that.hospital);case _:
 
 
 class _DonationRecordRequestRef implements DonationRecordRequestRef {
-  const _DonationRecordRequestRef({required this.id, this.recipientName, required this.hospital});
+  const _DonationRecordRequestRef({required this.id, this.recipientName, this.hospital});
   
 
 @override final  String id;
 // Null when RLS hides the requester's profile from the donor.
 @override final  String? recipientName;
-@override final  DonorHospitalEntity hospital;
+// Null when the request has no hospital attached.
+@override final  DonorHospitalEntity? hospital;
 
 /// Create a copy of DonationRecordRequestRef
 /// with the given fields replaced by the non-null parameter values.
@@ -2315,11 +2330,11 @@ abstract mixin class _$DonationRecordRequestRefCopyWith<$Res> implements $Donati
   factory _$DonationRecordRequestRefCopyWith(_DonationRecordRequestRef value, $Res Function(_DonationRecordRequestRef) _then) = __$DonationRecordRequestRefCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String? recipientName, DonorHospitalEntity hospital
+ String id, String? recipientName, DonorHospitalEntity? hospital
 });
 
 
-@override $DonorHospitalEntityCopyWith<$Res> get hospital;
+@override $DonorHospitalEntityCopyWith<$Res>? get hospital;
 
 }
 /// @nodoc
@@ -2332,12 +2347,12 @@ class __$DonationRecordRequestRefCopyWithImpl<$Res>
 
 /// Create a copy of DonationRecordRequestRef
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? recipientName = freezed,Object? hospital = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? recipientName = freezed,Object? hospital = freezed,}) {
   return _then(_DonationRecordRequestRef(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,recipientName: freezed == recipientName ? _self.recipientName : recipientName // ignore: cast_nullable_to_non_nullable
-as String?,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
-as DonorHospitalEntity,
+as String?,hospital: freezed == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as DonorHospitalEntity?,
   ));
 }
 
@@ -2345,9 +2360,12 @@ as DonorHospitalEntity,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$DonorHospitalEntityCopyWith<$Res> get hospital {
-  
-  return $DonorHospitalEntityCopyWith<$Res>(_self.hospital, (value) {
+$DonorHospitalEntityCopyWith<$Res>? get hospital {
+    if (_self.hospital == null) {
+    return null;
+  }
+
+  return $DonorHospitalEntityCopyWith<$Res>(_self.hospital!, (value) {
     return _then(_self.copyWith(hospital: value));
   });
 }
@@ -2356,7 +2374,7 @@ $DonorHospitalEntityCopyWith<$Res> get hospital {
 /// @nodoc
 mixin _$DonationRecordCampaignRef {
 
- String get id; String get title; String get venueName; String get city;
+ String get id; String get title; String? get venueName; String get city;
 /// Create a copy of DonationRecordCampaignRef
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2387,7 +2405,7 @@ abstract mixin class $DonationRecordCampaignRefCopyWith<$Res>  {
   factory $DonationRecordCampaignRefCopyWith(DonationRecordCampaignRef value, $Res Function(DonationRecordCampaignRef) _then) = _$DonationRecordCampaignRefCopyWithImpl;
 @useResult
 $Res call({
- String id, String title, String venueName, String city
+ String id, String title, String? venueName, String city
 });
 
 
@@ -2404,12 +2422,12 @@ class _$DonationRecordCampaignRefCopyWithImpl<$Res>
 
 /// Create a copy of DonationRecordCampaignRef
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? venueName = null,Object? city = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? venueName = freezed,Object? city = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,venueName: null == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
-as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String,venueName: freezed == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
+as String?,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -2495,7 +2513,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  String venueName,  String city)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  String? venueName,  String city)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DonationRecordCampaignRef() when $default != null:
 return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
@@ -2516,7 +2534,7 @@ return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  String venueName,  String city)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  String? venueName,  String city)  $default,) {final _that = this;
 switch (_that) {
 case _DonationRecordCampaignRef():
 return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
@@ -2536,7 +2554,7 @@ return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  String venueName,  String city)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  String? venueName,  String city)?  $default,) {final _that = this;
 switch (_that) {
 case _DonationRecordCampaignRef() when $default != null:
 return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
@@ -2551,12 +2569,12 @@ return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
 
 
 class _DonationRecordCampaignRef implements DonationRecordCampaignRef {
-  const _DonationRecordCampaignRef({required this.id, required this.title, required this.venueName, required this.city});
+  const _DonationRecordCampaignRef({required this.id, required this.title, this.venueName, required this.city});
   
 
 @override final  String id;
 @override final  String title;
-@override final  String venueName;
+@override final  String? venueName;
 @override final  String city;
 
 /// Create a copy of DonationRecordCampaignRef
@@ -2589,7 +2607,7 @@ abstract mixin class _$DonationRecordCampaignRefCopyWith<$Res> implements $Donat
   factory _$DonationRecordCampaignRefCopyWith(_DonationRecordCampaignRef value, $Res Function(_DonationRecordCampaignRef) _then) = __$DonationRecordCampaignRefCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String title, String venueName, String city
+ String id, String title, String? venueName, String city
 });
 
 
@@ -2606,12 +2624,12 @@ class __$DonationRecordCampaignRefCopyWithImpl<$Res>
 
 /// Create a copy of DonationRecordCampaignRef
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? venueName = null,Object? city = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? venueName = freezed,Object? city = null,}) {
   return _then(_DonationRecordCampaignRef(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,venueName: null == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
-as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String,venueName: freezed == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
+as String?,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

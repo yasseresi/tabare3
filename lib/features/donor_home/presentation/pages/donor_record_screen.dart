@@ -94,7 +94,7 @@ class _DonationRecordCard extends StatelessWidget {
     final request = record.bloodRequest;
     final campaign = record.campaign;
     final title =
-        request?.hospital.nameAr ??
+        request?.hospital?.nameAr ??
         campaign?.title ??
         AppStrings.bloodDonation.tr();
     final patient =
@@ -102,7 +102,7 @@ class _DonationRecordCard extends StatelessWidget {
         campaign?.title ??
         AppStrings.notAvailable.tr();
     final location =
-        request?.hospital.address ??
+        request?.hospital?.address ??
         campaign?.city ??
         AppStrings.notAvailable.tr();
     return RequestCard(

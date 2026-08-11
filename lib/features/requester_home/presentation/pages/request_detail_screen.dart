@@ -128,7 +128,7 @@ class _RequestSummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            request.hospital.nameAr,
+            request.hospital?.nameAr ?? AppStrings.notAvailable.tr(),
             style: getBoldStyle(
               fontSize: FontSize.s16,
               color: ColorManager.cardTitle,

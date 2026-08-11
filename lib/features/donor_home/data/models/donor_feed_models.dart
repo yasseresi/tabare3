@@ -42,7 +42,9 @@ abstract class DonorAvailabilityModel with _$DonorAvailabilityModel {
     required bool isAvailableForDonation,
     @JsonKey(name: 'is_donor') required bool isDonor,
     @JsonKey(name: 'blood_type') required String bloodType,
-    @JsonKey(name: 'wilaya_id') required int wilayaId,
+    // `users.wilaya_id` is nullable — a donor who signed up before the wilaya
+    // rollout (or skipped it) has none. Keep it optional so the feed still loads.
+    @JsonKey(name: 'wilaya_id') int? wilayaId,
     @JsonKey(name: 'cooldown_until') DateTime? cooldownUntil,
     @JsonKey(name: 'last_donation_date') DateTime? lastDonationDate,
     @JsonKey(name: 'total_donations_count') required int totalDonationsCount,
@@ -114,7 +116,8 @@ abstract class DonorCampaignModel with _$DonorCampaignModel {
     @JsonKey(name: 'organizer_name') required String organizerName,
     required String title,
     String? description,
-    @JsonKey(name: 'venue_name') required String venueName,
+    // `campaigns.venue_name` is nullable in the schema.
+    @JsonKey(name: 'venue_name') String? venueName,
     required String city,
     @JsonKey(name: 'wilaya_id') required int wilayaId,
     @JsonKey(name: 'hospital_id') String? hospitalId,
@@ -155,7 +158,9 @@ abstract class DonorAppointmentRequestRefModel
 
   const factory DonorAppointmentRequestRefModel({
     required String id,
-    required DonorHospitalModel hospital,
+    // `blood_requests.hospital_id` is nullable, so PostgREST returns a null
+    // hospital embed for requests that have no hospital attached.
+    DonorHospitalModel? hospital,
     @JsonKey(name: 'blood_type') required String bloodType,
     required String urgency,
     @JsonKey(name: 'needed_by') DateTime? neededBy,
@@ -166,7 +171,7 @@ abstract class DonorAppointmentRequestRefModel
 
   DonorAppointmentRequestRef toEntity() => DonorAppointmentRequestRef(
     id: id,
-    hospital: hospital.toEntity(),
+    hospital: hospital?.toEntity(),
     bloodType: bloodType,
     priority: DonorRequestPriority.fromDatabase(urgency),
     neededBy: neededBy,
@@ -255,7 +260,9 @@ abstract class DonationRecordRequestRefModel
     // RLS limits donors to their own `users` row, so PostgREST returns a null
     // recipient embed for someone else's request. Keep it optional.
     DonationRecordRecipientModel? recipient,
-    required DonorHospitalModel hospital,
+    // `blood_requests.hospital_id` is nullable — same null-embed exposure as
+    // the appointment request ref above.
+    DonorHospitalModel? hospital,
   }) = _DonationRecordRequestRefModel;
 
   factory DonationRecordRequestRefModel.fromJson(Map<String, dynamic> json) =>
@@ -264,7 +271,7 @@ abstract class DonationRecordRequestRefModel
   DonationRecordRequestRef toEntity() => DonationRecordRequestRef(
     id: id,
     recipientName: recipient?.fullName,
-    hospital: hospital.toEntity(),
+    hospital: hospital?.toEntity(),
   );
 }
 
@@ -276,7 +283,8 @@ abstract class DonationRecordCampaignRefModel
   const factory DonationRecordCampaignRefModel({
     required String id,
     required String title,
-    @JsonKey(name: 'venue_name') required String venueName,
+    // `campaigns.venue_name` is nullable in the schema.
+    @JsonKey(name: 'venue_name') String? venueName,
     required String city,
   }) = _DonationRecordCampaignRefModel;
 

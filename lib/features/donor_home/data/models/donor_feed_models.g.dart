@@ -34,7 +34,7 @@ _DonorAvailabilityModel _$DonorAvailabilityModelFromJson(
   isAvailableForDonation: json['is_available_for_donation'] as bool,
   isDonor: json['is_donor'] as bool,
   bloodType: json['blood_type'] as String,
-  wilayaId: (json['wilaya_id'] as num).toInt(),
+  wilayaId: (json['wilaya_id'] as num?)?.toInt(),
   cooldownUntil: json['cooldown_until'] == null
       ? null
       : DateTime.parse(json['cooldown_until'] as String),
@@ -107,7 +107,7 @@ _DonorCampaignModel _$DonorCampaignModelFromJson(Map<String, dynamic> json) =>
       organizerName: json['organizer_name'] as String,
       title: json['title'] as String,
       description: json['description'] as String?,
-      venueName: json['venue_name'] as String,
+      venueName: json['venue_name'] as String?,
       city: json['city'] as String,
       wilayaId: (json['wilaya_id'] as num).toInt(),
       hospitalId: json['hospital_id'] as String?,
@@ -146,9 +146,9 @@ _DonorAppointmentRequestRefModel _$DonorAppointmentRequestRefModelFromJson(
   Map<String, dynamic> json,
 ) => _DonorAppointmentRequestRefModel(
   id: json['id'] as String,
-  hospital: DonorHospitalModel.fromJson(
-    json['hospital'] as Map<String, dynamic>,
-  ),
+  hospital: json['hospital'] == null
+      ? null
+      : DonorHospitalModel.fromJson(json['hospital'] as Map<String, dynamic>),
   bloodType: json['blood_type'] as String,
   urgency: json['urgency'] as String,
   neededBy: json['needed_by'] == null
@@ -245,9 +245,9 @@ _DonationRecordRequestRefModel _$DonationRecordRequestRefModelFromJson(
       : DonationRecordRecipientModel.fromJson(
           json['recipient'] as Map<String, dynamic>,
         ),
-  hospital: DonorHospitalModel.fromJson(
-    json['hospital'] as Map<String, dynamic>,
-  ),
+  hospital: json['hospital'] == null
+      ? null
+      : DonorHospitalModel.fromJson(json['hospital'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$DonationRecordRequestRefModelToJson(
@@ -263,7 +263,7 @@ _DonationRecordCampaignRefModel _$DonationRecordCampaignRefModelFromJson(
 ) => _DonationRecordCampaignRefModel(
   id: json['id'] as String,
   title: json['title'] as String,
-  venueName: json['venue_name'] as String,
+  venueName: json['venue_name'] as String?,
   city: json['city'] as String,
 );
 

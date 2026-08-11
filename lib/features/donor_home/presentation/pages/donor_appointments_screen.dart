@@ -104,7 +104,7 @@ class _AppointmentCard extends StatelessWidget {
     final request = appointment.bloodRequest;
     final campaign = appointment.campaign;
     final title =
-        request?.hospital.nameAr ??
+        request?.hospital?.nameAr ??
         campaign?.title ??
         AppStrings.appointments.tr();
     final canCancel =

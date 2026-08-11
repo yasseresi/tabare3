@@ -293,7 +293,9 @@ as bool,
 /// @nodoc
 mixin _$DonorAvailabilityModel {
 
-@JsonKey(name: 'id') String get userId;@JsonKey(name: 'is_active') bool get isAccountActive;@JsonKey(name: 'is_available_for_donation') bool get isAvailableForDonation;@JsonKey(name: 'is_donor') bool get isDonor;@JsonKey(name: 'blood_type') String get bloodType;@JsonKey(name: 'wilaya_id') int get wilayaId;@JsonKey(name: 'cooldown_until') DateTime? get cooldownUntil;@JsonKey(name: 'last_donation_date') DateTime? get lastDonationDate;@JsonKey(name: 'total_donations_count') int get totalDonationsCount;
+@JsonKey(name: 'id') String get userId;@JsonKey(name: 'is_active') bool get isAccountActive;@JsonKey(name: 'is_available_for_donation') bool get isAvailableForDonation;@JsonKey(name: 'is_donor') bool get isDonor;@JsonKey(name: 'blood_type') String get bloodType;// `users.wilaya_id` is nullable — a donor who signed up before the wilaya
+// rollout (or skipped it) has none. Keep it optional so the feed still loads.
+@JsonKey(name: 'wilaya_id') int? get wilayaId;@JsonKey(name: 'cooldown_until') DateTime? get cooldownUntil;@JsonKey(name: 'last_donation_date') DateTime? get lastDonationDate;@JsonKey(name: 'total_donations_count') int get totalDonationsCount;
 /// Create a copy of DonorAvailabilityModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -326,7 +328,7 @@ abstract mixin class $DonorAvailabilityModelCopyWith<$Res>  {
   factory $DonorAvailabilityModelCopyWith(DonorAvailabilityModel value, $Res Function(DonorAvailabilityModel) _then) = _$DonorAvailabilityModelCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'id') String userId,@JsonKey(name: 'is_active') bool isAccountActive,@JsonKey(name: 'is_available_for_donation') bool isAvailableForDonation,@JsonKey(name: 'is_donor') bool isDonor,@JsonKey(name: 'blood_type') String bloodType,@JsonKey(name: 'wilaya_id') int wilayaId,@JsonKey(name: 'cooldown_until') DateTime? cooldownUntil,@JsonKey(name: 'last_donation_date') DateTime? lastDonationDate,@JsonKey(name: 'total_donations_count') int totalDonationsCount
+@JsonKey(name: 'id') String userId,@JsonKey(name: 'is_active') bool isAccountActive,@JsonKey(name: 'is_available_for_donation') bool isAvailableForDonation,@JsonKey(name: 'is_donor') bool isDonor,@JsonKey(name: 'blood_type') String bloodType,@JsonKey(name: 'wilaya_id') int? wilayaId,@JsonKey(name: 'cooldown_until') DateTime? cooldownUntil,@JsonKey(name: 'last_donation_date') DateTime? lastDonationDate,@JsonKey(name: 'total_donations_count') int totalDonationsCount
 });
 
 
@@ -343,15 +345,15 @@ class _$DonorAvailabilityModelCopyWithImpl<$Res>
 
 /// Create a copy of DonorAvailabilityModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? isAccountActive = null,Object? isAvailableForDonation = null,Object? isDonor = null,Object? bloodType = null,Object? wilayaId = null,Object? cooldownUntil = freezed,Object? lastDonationDate = freezed,Object? totalDonationsCount = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? isAccountActive = null,Object? isAvailableForDonation = null,Object? isDonor = null,Object? bloodType = null,Object? wilayaId = freezed,Object? cooldownUntil = freezed,Object? lastDonationDate = freezed,Object? totalDonationsCount = null,}) {
   return _then(_self.copyWith(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,isAccountActive: null == isAccountActive ? _self.isAccountActive : isAccountActive // ignore: cast_nullable_to_non_nullable
 as bool,isAvailableForDonation: null == isAvailableForDonation ? _self.isAvailableForDonation : isAvailableForDonation // ignore: cast_nullable_to_non_nullable
 as bool,isDonor: null == isDonor ? _self.isDonor : isDonor // ignore: cast_nullable_to_non_nullable
 as bool,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
-as String,wilayaId: null == wilayaId ? _self.wilayaId : wilayaId // ignore: cast_nullable_to_non_nullable
-as int,cooldownUntil: freezed == cooldownUntil ? _self.cooldownUntil : cooldownUntil // ignore: cast_nullable_to_non_nullable
+as String,wilayaId: freezed == wilayaId ? _self.wilayaId : wilayaId // ignore: cast_nullable_to_non_nullable
+as int?,cooldownUntil: freezed == cooldownUntil ? _self.cooldownUntil : cooldownUntil // ignore: cast_nullable_to_non_nullable
 as DateTime?,lastDonationDate: freezed == lastDonationDate ? _self.lastDonationDate : lastDonationDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,totalDonationsCount: null == totalDonationsCount ? _self.totalDonationsCount : totalDonationsCount // ignore: cast_nullable_to_non_nullable
 as int,
@@ -439,7 +441,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String userId, @JsonKey(name: 'is_active')  bool isAccountActive, @JsonKey(name: 'is_available_for_donation')  bool isAvailableForDonation, @JsonKey(name: 'is_donor')  bool isDonor, @JsonKey(name: 'blood_type')  String bloodType, @JsonKey(name: 'wilaya_id')  int wilayaId, @JsonKey(name: 'cooldown_until')  DateTime? cooldownUntil, @JsonKey(name: 'last_donation_date')  DateTime? lastDonationDate, @JsonKey(name: 'total_donations_count')  int totalDonationsCount)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String userId, @JsonKey(name: 'is_active')  bool isAccountActive, @JsonKey(name: 'is_available_for_donation')  bool isAvailableForDonation, @JsonKey(name: 'is_donor')  bool isDonor, @JsonKey(name: 'blood_type')  String bloodType, @JsonKey(name: 'wilaya_id')  int? wilayaId, @JsonKey(name: 'cooldown_until')  DateTime? cooldownUntil, @JsonKey(name: 'last_donation_date')  DateTime? lastDonationDate, @JsonKey(name: 'total_donations_count')  int totalDonationsCount)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DonorAvailabilityModel() when $default != null:
 return $default(_that.userId,_that.isAccountActive,_that.isAvailableForDonation,_that.isDonor,_that.bloodType,_that.wilayaId,_that.cooldownUntil,_that.lastDonationDate,_that.totalDonationsCount);case _:
@@ -460,7 +462,7 @@ return $default(_that.userId,_that.isAccountActive,_that.isAvailableForDonation,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String userId, @JsonKey(name: 'is_active')  bool isAccountActive, @JsonKey(name: 'is_available_for_donation')  bool isAvailableForDonation, @JsonKey(name: 'is_donor')  bool isDonor, @JsonKey(name: 'blood_type')  String bloodType, @JsonKey(name: 'wilaya_id')  int wilayaId, @JsonKey(name: 'cooldown_until')  DateTime? cooldownUntil, @JsonKey(name: 'last_donation_date')  DateTime? lastDonationDate, @JsonKey(name: 'total_donations_count')  int totalDonationsCount)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String userId, @JsonKey(name: 'is_active')  bool isAccountActive, @JsonKey(name: 'is_available_for_donation')  bool isAvailableForDonation, @JsonKey(name: 'is_donor')  bool isDonor, @JsonKey(name: 'blood_type')  String bloodType, @JsonKey(name: 'wilaya_id')  int? wilayaId, @JsonKey(name: 'cooldown_until')  DateTime? cooldownUntil, @JsonKey(name: 'last_donation_date')  DateTime? lastDonationDate, @JsonKey(name: 'total_donations_count')  int totalDonationsCount)  $default,) {final _that = this;
 switch (_that) {
 case _DonorAvailabilityModel():
 return $default(_that.userId,_that.isAccountActive,_that.isAvailableForDonation,_that.isDonor,_that.bloodType,_that.wilayaId,_that.cooldownUntil,_that.lastDonationDate,_that.totalDonationsCount);case _:
@@ -480,7 +482,7 @@ return $default(_that.userId,_that.isAccountActive,_that.isAvailableForDonation,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'id')  String userId, @JsonKey(name: 'is_active')  bool isAccountActive, @JsonKey(name: 'is_available_for_donation')  bool isAvailableForDonation, @JsonKey(name: 'is_donor')  bool isDonor, @JsonKey(name: 'blood_type')  String bloodType, @JsonKey(name: 'wilaya_id')  int wilayaId, @JsonKey(name: 'cooldown_until')  DateTime? cooldownUntil, @JsonKey(name: 'last_donation_date')  DateTime? lastDonationDate, @JsonKey(name: 'total_donations_count')  int totalDonationsCount)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'id')  String userId, @JsonKey(name: 'is_active')  bool isAccountActive, @JsonKey(name: 'is_available_for_donation')  bool isAvailableForDonation, @JsonKey(name: 'is_donor')  bool isDonor, @JsonKey(name: 'blood_type')  String bloodType, @JsonKey(name: 'wilaya_id')  int? wilayaId, @JsonKey(name: 'cooldown_until')  DateTime? cooldownUntil, @JsonKey(name: 'last_donation_date')  DateTime? lastDonationDate, @JsonKey(name: 'total_donations_count')  int totalDonationsCount)?  $default,) {final _that = this;
 switch (_that) {
 case _DonorAvailabilityModel() when $default != null:
 return $default(_that.userId,_that.isAccountActive,_that.isAvailableForDonation,_that.isDonor,_that.bloodType,_that.wilayaId,_that.cooldownUntil,_that.lastDonationDate,_that.totalDonationsCount);case _:
@@ -495,7 +497,7 @@ return $default(_that.userId,_that.isAccountActive,_that.isAvailableForDonation,
 @JsonSerializable()
 
 class _DonorAvailabilityModel extends DonorAvailabilityModel {
-  const _DonorAvailabilityModel({@JsonKey(name: 'id') required this.userId, @JsonKey(name: 'is_active') required this.isAccountActive, @JsonKey(name: 'is_available_for_donation') required this.isAvailableForDonation, @JsonKey(name: 'is_donor') required this.isDonor, @JsonKey(name: 'blood_type') required this.bloodType, @JsonKey(name: 'wilaya_id') required this.wilayaId, @JsonKey(name: 'cooldown_until') this.cooldownUntil, @JsonKey(name: 'last_donation_date') this.lastDonationDate, @JsonKey(name: 'total_donations_count') required this.totalDonationsCount}): super._();
+  const _DonorAvailabilityModel({@JsonKey(name: 'id') required this.userId, @JsonKey(name: 'is_active') required this.isAccountActive, @JsonKey(name: 'is_available_for_donation') required this.isAvailableForDonation, @JsonKey(name: 'is_donor') required this.isDonor, @JsonKey(name: 'blood_type') required this.bloodType, @JsonKey(name: 'wilaya_id') this.wilayaId, @JsonKey(name: 'cooldown_until') this.cooldownUntil, @JsonKey(name: 'last_donation_date') this.lastDonationDate, @JsonKey(name: 'total_donations_count') required this.totalDonationsCount}): super._();
   factory _DonorAvailabilityModel.fromJson(Map<String, dynamic> json) => _$DonorAvailabilityModelFromJson(json);
 
 @override@JsonKey(name: 'id') final  String userId;
@@ -503,7 +505,9 @@ class _DonorAvailabilityModel extends DonorAvailabilityModel {
 @override@JsonKey(name: 'is_available_for_donation') final  bool isAvailableForDonation;
 @override@JsonKey(name: 'is_donor') final  bool isDonor;
 @override@JsonKey(name: 'blood_type') final  String bloodType;
-@override@JsonKey(name: 'wilaya_id') final  int wilayaId;
+// `users.wilaya_id` is nullable — a donor who signed up before the wilaya
+// rollout (or skipped it) has none. Keep it optional so the feed still loads.
+@override@JsonKey(name: 'wilaya_id') final  int? wilayaId;
 @override@JsonKey(name: 'cooldown_until') final  DateTime? cooldownUntil;
 @override@JsonKey(name: 'last_donation_date') final  DateTime? lastDonationDate;
 @override@JsonKey(name: 'total_donations_count') final  int totalDonationsCount;
@@ -541,7 +545,7 @@ abstract mixin class _$DonorAvailabilityModelCopyWith<$Res> implements $DonorAva
   factory _$DonorAvailabilityModelCopyWith(_DonorAvailabilityModel value, $Res Function(_DonorAvailabilityModel) _then) = __$DonorAvailabilityModelCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'id') String userId,@JsonKey(name: 'is_active') bool isAccountActive,@JsonKey(name: 'is_available_for_donation') bool isAvailableForDonation,@JsonKey(name: 'is_donor') bool isDonor,@JsonKey(name: 'blood_type') String bloodType,@JsonKey(name: 'wilaya_id') int wilayaId,@JsonKey(name: 'cooldown_until') DateTime? cooldownUntil,@JsonKey(name: 'last_donation_date') DateTime? lastDonationDate,@JsonKey(name: 'total_donations_count') int totalDonationsCount
+@JsonKey(name: 'id') String userId,@JsonKey(name: 'is_active') bool isAccountActive,@JsonKey(name: 'is_available_for_donation') bool isAvailableForDonation,@JsonKey(name: 'is_donor') bool isDonor,@JsonKey(name: 'blood_type') String bloodType,@JsonKey(name: 'wilaya_id') int? wilayaId,@JsonKey(name: 'cooldown_until') DateTime? cooldownUntil,@JsonKey(name: 'last_donation_date') DateTime? lastDonationDate,@JsonKey(name: 'total_donations_count') int totalDonationsCount
 });
 
 
@@ -558,15 +562,15 @@ class __$DonorAvailabilityModelCopyWithImpl<$Res>
 
 /// Create a copy of DonorAvailabilityModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? isAccountActive = null,Object? isAvailableForDonation = null,Object? isDonor = null,Object? bloodType = null,Object? wilayaId = null,Object? cooldownUntil = freezed,Object? lastDonationDate = freezed,Object? totalDonationsCount = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? isAccountActive = null,Object? isAvailableForDonation = null,Object? isDonor = null,Object? bloodType = null,Object? wilayaId = freezed,Object? cooldownUntil = freezed,Object? lastDonationDate = freezed,Object? totalDonationsCount = null,}) {
   return _then(_DonorAvailabilityModel(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,isAccountActive: null == isAccountActive ? _self.isAccountActive : isAccountActive // ignore: cast_nullable_to_non_nullable
 as bool,isAvailableForDonation: null == isAvailableForDonation ? _self.isAvailableForDonation : isAvailableForDonation // ignore: cast_nullable_to_non_nullable
 as bool,isDonor: null == isDonor ? _self.isDonor : isDonor // ignore: cast_nullable_to_non_nullable
 as bool,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
-as String,wilayaId: null == wilayaId ? _self.wilayaId : wilayaId // ignore: cast_nullable_to_non_nullable
-as int,cooldownUntil: freezed == cooldownUntil ? _self.cooldownUntil : cooldownUntil // ignore: cast_nullable_to_non_nullable
+as String,wilayaId: freezed == wilayaId ? _self.wilayaId : wilayaId // ignore: cast_nullable_to_non_nullable
+as int?,cooldownUntil: freezed == cooldownUntil ? _self.cooldownUntil : cooldownUntil // ignore: cast_nullable_to_non_nullable
 as DateTime?,lastDonationDate: freezed == lastDonationDate ? _self.lastDonationDate : lastDonationDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,totalDonationsCount: null == totalDonationsCount ? _self.totalDonationsCount : totalDonationsCount // ignore: cast_nullable_to_non_nullable
 as int,
@@ -897,7 +901,8 @@ $DonorHospitalModelCopyWith<$Res> get hospital {
 /// @nodoc
 mixin _$DonorCampaignModel {
 
- String get id;@JsonKey(name: 'created_by') String? get createdBy;@JsonKey(name: 'organizer_name') String get organizerName; String get title; String? get description;@JsonKey(name: 'venue_name') String get venueName; String get city;@JsonKey(name: 'wilaya_id') int get wilayaId;@JsonKey(name: 'hospital_id') String? get hospitalId;@JsonKey(name: 'blood_types_needed') List<String>? get bloodTypesNeeded; String get status;@JsonKey(name: 'starts_at') DateTime get startsAt;@JsonKey(name: 'ends_at') DateTime get endsAt;@JsonKey(name: 'published_at') DateTime? get publishedAt;@JsonKey(name: 'created_at') DateTime get createdAt;
+ String get id;@JsonKey(name: 'created_by') String? get createdBy;@JsonKey(name: 'organizer_name') String get organizerName; String get title; String? get description;// `campaigns.venue_name` is nullable in the schema.
+@JsonKey(name: 'venue_name') String? get venueName; String get city;@JsonKey(name: 'wilaya_id') int get wilayaId;@JsonKey(name: 'hospital_id') String? get hospitalId;@JsonKey(name: 'blood_types_needed') List<String>? get bloodTypesNeeded; String get status;@JsonKey(name: 'starts_at') DateTime get startsAt;@JsonKey(name: 'ends_at') DateTime get endsAt;@JsonKey(name: 'published_at') DateTime? get publishedAt;@JsonKey(name: 'created_at') DateTime get createdAt;
 /// Create a copy of DonorCampaignModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -930,7 +935,7 @@ abstract mixin class $DonorCampaignModelCopyWith<$Res>  {
   factory $DonorCampaignModelCopyWith(DonorCampaignModel value, $Res Function(DonorCampaignModel) _then) = _$DonorCampaignModelCopyWithImpl;
 @useResult
 $Res call({
- String id,@JsonKey(name: 'created_by') String? createdBy,@JsonKey(name: 'organizer_name') String organizerName, String title, String? description,@JsonKey(name: 'venue_name') String venueName, String city,@JsonKey(name: 'wilaya_id') int wilayaId,@JsonKey(name: 'hospital_id') String? hospitalId,@JsonKey(name: 'blood_types_needed') List<String>? bloodTypesNeeded, String status,@JsonKey(name: 'starts_at') DateTime startsAt,@JsonKey(name: 'ends_at') DateTime endsAt,@JsonKey(name: 'published_at') DateTime? publishedAt,@JsonKey(name: 'created_at') DateTime createdAt
+ String id,@JsonKey(name: 'created_by') String? createdBy,@JsonKey(name: 'organizer_name') String organizerName, String title, String? description,@JsonKey(name: 'venue_name') String? venueName, String city,@JsonKey(name: 'wilaya_id') int wilayaId,@JsonKey(name: 'hospital_id') String? hospitalId,@JsonKey(name: 'blood_types_needed') List<String>? bloodTypesNeeded, String status,@JsonKey(name: 'starts_at') DateTime startsAt,@JsonKey(name: 'ends_at') DateTime endsAt,@JsonKey(name: 'published_at') DateTime? publishedAt,@JsonKey(name: 'created_at') DateTime createdAt
 });
 
 
@@ -947,15 +952,15 @@ class _$DonorCampaignModelCopyWithImpl<$Res>
 
 /// Create a copy of DonorCampaignModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? createdBy = freezed,Object? organizerName = null,Object? title = null,Object? description = freezed,Object? venueName = null,Object? city = null,Object? wilayaId = null,Object? hospitalId = freezed,Object? bloodTypesNeeded = freezed,Object? status = null,Object? startsAt = null,Object? endsAt = null,Object? publishedAt = freezed,Object? createdAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? createdBy = freezed,Object? organizerName = null,Object? title = null,Object? description = freezed,Object? venueName = freezed,Object? city = null,Object? wilayaId = null,Object? hospitalId = freezed,Object? bloodTypesNeeded = freezed,Object? status = null,Object? startsAt = null,Object? endsAt = null,Object? publishedAt = freezed,Object? createdAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,createdBy: freezed == createdBy ? _self.createdBy : createdBy // ignore: cast_nullable_to_non_nullable
 as String?,organizerName: null == organizerName ? _self.organizerName : organizerName // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,venueName: null == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
-as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String?,venueName: freezed == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
+as String?,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
 as String,wilayaId: null == wilayaId ? _self.wilayaId : wilayaId // ignore: cast_nullable_to_non_nullable
 as int,hospitalId: freezed == hospitalId ? _self.hospitalId : hospitalId // ignore: cast_nullable_to_non_nullable
 as String?,bloodTypesNeeded: freezed == bloodTypesNeeded ? _self.bloodTypesNeeded : bloodTypesNeeded // ignore: cast_nullable_to_non_nullable
@@ -1049,7 +1054,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'created_by')  String? createdBy, @JsonKey(name: 'organizer_name')  String organizerName,  String title,  String? description, @JsonKey(name: 'venue_name')  String venueName,  String city, @JsonKey(name: 'wilaya_id')  int wilayaId, @JsonKey(name: 'hospital_id')  String? hospitalId, @JsonKey(name: 'blood_types_needed')  List<String>? bloodTypesNeeded,  String status, @JsonKey(name: 'starts_at')  DateTime startsAt, @JsonKey(name: 'ends_at')  DateTime endsAt, @JsonKey(name: 'published_at')  DateTime? publishedAt, @JsonKey(name: 'created_at')  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'created_by')  String? createdBy, @JsonKey(name: 'organizer_name')  String organizerName,  String title,  String? description, @JsonKey(name: 'venue_name')  String? venueName,  String city, @JsonKey(name: 'wilaya_id')  int wilayaId, @JsonKey(name: 'hospital_id')  String? hospitalId, @JsonKey(name: 'blood_types_needed')  List<String>? bloodTypesNeeded,  String status, @JsonKey(name: 'starts_at')  DateTime startsAt, @JsonKey(name: 'ends_at')  DateTime endsAt, @JsonKey(name: 'published_at')  DateTime? publishedAt, @JsonKey(name: 'created_at')  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DonorCampaignModel() when $default != null:
 return $default(_that.id,_that.createdBy,_that.organizerName,_that.title,_that.description,_that.venueName,_that.city,_that.wilayaId,_that.hospitalId,_that.bloodTypesNeeded,_that.status,_that.startsAt,_that.endsAt,_that.publishedAt,_that.createdAt);case _:
@@ -1070,7 +1075,7 @@ return $default(_that.id,_that.createdBy,_that.organizerName,_that.title,_that.d
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'created_by')  String? createdBy, @JsonKey(name: 'organizer_name')  String organizerName,  String title,  String? description, @JsonKey(name: 'venue_name')  String venueName,  String city, @JsonKey(name: 'wilaya_id')  int wilayaId, @JsonKey(name: 'hospital_id')  String? hospitalId, @JsonKey(name: 'blood_types_needed')  List<String>? bloodTypesNeeded,  String status, @JsonKey(name: 'starts_at')  DateTime startsAt, @JsonKey(name: 'ends_at')  DateTime endsAt, @JsonKey(name: 'published_at')  DateTime? publishedAt, @JsonKey(name: 'created_at')  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'created_by')  String? createdBy, @JsonKey(name: 'organizer_name')  String organizerName,  String title,  String? description, @JsonKey(name: 'venue_name')  String? venueName,  String city, @JsonKey(name: 'wilaya_id')  int wilayaId, @JsonKey(name: 'hospital_id')  String? hospitalId, @JsonKey(name: 'blood_types_needed')  List<String>? bloodTypesNeeded,  String status, @JsonKey(name: 'starts_at')  DateTime startsAt, @JsonKey(name: 'ends_at')  DateTime endsAt, @JsonKey(name: 'published_at')  DateTime? publishedAt, @JsonKey(name: 'created_at')  DateTime createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _DonorCampaignModel():
 return $default(_that.id,_that.createdBy,_that.organizerName,_that.title,_that.description,_that.venueName,_that.city,_that.wilayaId,_that.hospitalId,_that.bloodTypesNeeded,_that.status,_that.startsAt,_that.endsAt,_that.publishedAt,_that.createdAt);case _:
@@ -1090,7 +1095,7 @@ return $default(_that.id,_that.createdBy,_that.organizerName,_that.title,_that.d
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'created_by')  String? createdBy, @JsonKey(name: 'organizer_name')  String organizerName,  String title,  String? description, @JsonKey(name: 'venue_name')  String venueName,  String city, @JsonKey(name: 'wilaya_id')  int wilayaId, @JsonKey(name: 'hospital_id')  String? hospitalId, @JsonKey(name: 'blood_types_needed')  List<String>? bloodTypesNeeded,  String status, @JsonKey(name: 'starts_at')  DateTime startsAt, @JsonKey(name: 'ends_at')  DateTime endsAt, @JsonKey(name: 'published_at')  DateTime? publishedAt, @JsonKey(name: 'created_at')  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'created_by')  String? createdBy, @JsonKey(name: 'organizer_name')  String organizerName,  String title,  String? description, @JsonKey(name: 'venue_name')  String? venueName,  String city, @JsonKey(name: 'wilaya_id')  int wilayaId, @JsonKey(name: 'hospital_id')  String? hospitalId, @JsonKey(name: 'blood_types_needed')  List<String>? bloodTypesNeeded,  String status, @JsonKey(name: 'starts_at')  DateTime startsAt, @JsonKey(name: 'ends_at')  DateTime endsAt, @JsonKey(name: 'published_at')  DateTime? publishedAt, @JsonKey(name: 'created_at')  DateTime createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _DonorCampaignModel() when $default != null:
 return $default(_that.id,_that.createdBy,_that.organizerName,_that.title,_that.description,_that.venueName,_that.city,_that.wilayaId,_that.hospitalId,_that.bloodTypesNeeded,_that.status,_that.startsAt,_that.endsAt,_that.publishedAt,_that.createdAt);case _:
@@ -1105,7 +1110,7 @@ return $default(_that.id,_that.createdBy,_that.organizerName,_that.title,_that.d
 @JsonSerializable()
 
 class _DonorCampaignModel extends DonorCampaignModel {
-  const _DonorCampaignModel({required this.id, @JsonKey(name: 'created_by') this.createdBy, @JsonKey(name: 'organizer_name') required this.organizerName, required this.title, this.description, @JsonKey(name: 'venue_name') required this.venueName, required this.city, @JsonKey(name: 'wilaya_id') required this.wilayaId, @JsonKey(name: 'hospital_id') this.hospitalId, @JsonKey(name: 'blood_types_needed') final  List<String>? bloodTypesNeeded, required this.status, @JsonKey(name: 'starts_at') required this.startsAt, @JsonKey(name: 'ends_at') required this.endsAt, @JsonKey(name: 'published_at') this.publishedAt, @JsonKey(name: 'created_at') required this.createdAt}): _bloodTypesNeeded = bloodTypesNeeded,super._();
+  const _DonorCampaignModel({required this.id, @JsonKey(name: 'created_by') this.createdBy, @JsonKey(name: 'organizer_name') required this.organizerName, required this.title, this.description, @JsonKey(name: 'venue_name') this.venueName, required this.city, @JsonKey(name: 'wilaya_id') required this.wilayaId, @JsonKey(name: 'hospital_id') this.hospitalId, @JsonKey(name: 'blood_types_needed') final  List<String>? bloodTypesNeeded, required this.status, @JsonKey(name: 'starts_at') required this.startsAt, @JsonKey(name: 'ends_at') required this.endsAt, @JsonKey(name: 'published_at') this.publishedAt, @JsonKey(name: 'created_at') required this.createdAt}): _bloodTypesNeeded = bloodTypesNeeded,super._();
   factory _DonorCampaignModel.fromJson(Map<String, dynamic> json) => _$DonorCampaignModelFromJson(json);
 
 @override final  String id;
@@ -1113,7 +1118,8 @@ class _DonorCampaignModel extends DonorCampaignModel {
 @override@JsonKey(name: 'organizer_name') final  String organizerName;
 @override final  String title;
 @override final  String? description;
-@override@JsonKey(name: 'venue_name') final  String venueName;
+// `campaigns.venue_name` is nullable in the schema.
+@override@JsonKey(name: 'venue_name') final  String? venueName;
 @override final  String city;
 @override@JsonKey(name: 'wilaya_id') final  int wilayaId;
 @override@JsonKey(name: 'hospital_id') final  String? hospitalId;
@@ -1165,7 +1171,7 @@ abstract mixin class _$DonorCampaignModelCopyWith<$Res> implements $DonorCampaig
   factory _$DonorCampaignModelCopyWith(_DonorCampaignModel value, $Res Function(_DonorCampaignModel) _then) = __$DonorCampaignModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id,@JsonKey(name: 'created_by') String? createdBy,@JsonKey(name: 'organizer_name') String organizerName, String title, String? description,@JsonKey(name: 'venue_name') String venueName, String city,@JsonKey(name: 'wilaya_id') int wilayaId,@JsonKey(name: 'hospital_id') String? hospitalId,@JsonKey(name: 'blood_types_needed') List<String>? bloodTypesNeeded, String status,@JsonKey(name: 'starts_at') DateTime startsAt,@JsonKey(name: 'ends_at') DateTime endsAt,@JsonKey(name: 'published_at') DateTime? publishedAt,@JsonKey(name: 'created_at') DateTime createdAt
+ String id,@JsonKey(name: 'created_by') String? createdBy,@JsonKey(name: 'organizer_name') String organizerName, String title, String? description,@JsonKey(name: 'venue_name') String? venueName, String city,@JsonKey(name: 'wilaya_id') int wilayaId,@JsonKey(name: 'hospital_id') String? hospitalId,@JsonKey(name: 'blood_types_needed') List<String>? bloodTypesNeeded, String status,@JsonKey(name: 'starts_at') DateTime startsAt,@JsonKey(name: 'ends_at') DateTime endsAt,@JsonKey(name: 'published_at') DateTime? publishedAt,@JsonKey(name: 'created_at') DateTime createdAt
 });
 
 
@@ -1182,15 +1188,15 @@ class __$DonorCampaignModelCopyWithImpl<$Res>
 
 /// Create a copy of DonorCampaignModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? createdBy = freezed,Object? organizerName = null,Object? title = null,Object? description = freezed,Object? venueName = null,Object? city = null,Object? wilayaId = null,Object? hospitalId = freezed,Object? bloodTypesNeeded = freezed,Object? status = null,Object? startsAt = null,Object? endsAt = null,Object? publishedAt = freezed,Object? createdAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? createdBy = freezed,Object? organizerName = null,Object? title = null,Object? description = freezed,Object? venueName = freezed,Object? city = null,Object? wilayaId = null,Object? hospitalId = freezed,Object? bloodTypesNeeded = freezed,Object? status = null,Object? startsAt = null,Object? endsAt = null,Object? publishedAt = freezed,Object? createdAt = null,}) {
   return _then(_DonorCampaignModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,createdBy: freezed == createdBy ? _self.createdBy : createdBy // ignore: cast_nullable_to_non_nullable
 as String?,organizerName: null == organizerName ? _self.organizerName : organizerName // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,venueName: null == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
-as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String?,venueName: freezed == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
+as String?,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
 as String,wilayaId: null == wilayaId ? _self.wilayaId : wilayaId // ignore: cast_nullable_to_non_nullable
 as int,hospitalId: freezed == hospitalId ? _self.hospitalId : hospitalId // ignore: cast_nullable_to_non_nullable
 as String?,bloodTypesNeeded: freezed == bloodTypesNeeded ? _self._bloodTypesNeeded : bloodTypesNeeded // ignore: cast_nullable_to_non_nullable
@@ -1210,7 +1216,9 @@ as DateTime,
 /// @nodoc
 mixin _$DonorAppointmentRequestRefModel {
 
- String get id; DonorHospitalModel get hospital;@JsonKey(name: 'blood_type') String get bloodType; String get urgency;@JsonKey(name: 'needed_by') DateTime? get neededBy;
+ String get id;// `blood_requests.hospital_id` is nullable, so PostgREST returns a null
+// hospital embed for requests that have no hospital attached.
+ DonorHospitalModel? get hospital;@JsonKey(name: 'blood_type') String get bloodType; String get urgency;@JsonKey(name: 'needed_by') DateTime? get neededBy;
 /// Create a copy of DonorAppointmentRequestRefModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1243,11 +1251,11 @@ abstract mixin class $DonorAppointmentRequestRefModelCopyWith<$Res>  {
   factory $DonorAppointmentRequestRefModelCopyWith(DonorAppointmentRequestRefModel value, $Res Function(DonorAppointmentRequestRefModel) _then) = _$DonorAppointmentRequestRefModelCopyWithImpl;
 @useResult
 $Res call({
- String id, DonorHospitalModel hospital,@JsonKey(name: 'blood_type') String bloodType, String urgency,@JsonKey(name: 'needed_by') DateTime? neededBy
+ String id, DonorHospitalModel? hospital,@JsonKey(name: 'blood_type') String bloodType, String urgency,@JsonKey(name: 'needed_by') DateTime? neededBy
 });
 
 
-$DonorHospitalModelCopyWith<$Res> get hospital;
+$DonorHospitalModelCopyWith<$Res>? get hospital;
 
 }
 /// @nodoc
@@ -1260,11 +1268,11 @@ class _$DonorAppointmentRequestRefModelCopyWithImpl<$Res>
 
 /// Create a copy of DonorAppointmentRequestRefModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? hospital = null,Object? bloodType = null,Object? urgency = null,Object? neededBy = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? hospital = freezed,Object? bloodType = null,Object? urgency = null,Object? neededBy = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
-as DonorHospitalModel,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as String,hospital: freezed == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as DonorHospitalModel?,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
 as String,urgency: null == urgency ? _self.urgency : urgency // ignore: cast_nullable_to_non_nullable
 as String,neededBy: freezed == neededBy ? _self.neededBy : neededBy // ignore: cast_nullable_to_non_nullable
 as DateTime?,
@@ -1274,9 +1282,12 @@ as DateTime?,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$DonorHospitalModelCopyWith<$Res> get hospital {
-  
-  return $DonorHospitalModelCopyWith<$Res>(_self.hospital, (value) {
+$DonorHospitalModelCopyWith<$Res>? get hospital {
+    if (_self.hospital == null) {
+    return null;
+  }
+
+  return $DonorHospitalModelCopyWith<$Res>(_self.hospital!, (value) {
     return _then(_self.copyWith(hospital: value));
   });
 }
@@ -1361,7 +1372,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DonorHospitalModel hospital, @JsonKey(name: 'blood_type')  String bloodType,  String urgency, @JsonKey(name: 'needed_by')  DateTime? neededBy)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DonorHospitalModel? hospital, @JsonKey(name: 'blood_type')  String bloodType,  String urgency, @JsonKey(name: 'needed_by')  DateTime? neededBy)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DonorAppointmentRequestRefModel() when $default != null:
 return $default(_that.id,_that.hospital,_that.bloodType,_that.urgency,_that.neededBy);case _:
@@ -1382,7 +1393,7 @@ return $default(_that.id,_that.hospital,_that.bloodType,_that.urgency,_that.need
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DonorHospitalModel hospital, @JsonKey(name: 'blood_type')  String bloodType,  String urgency, @JsonKey(name: 'needed_by')  DateTime? neededBy)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DonorHospitalModel? hospital, @JsonKey(name: 'blood_type')  String bloodType,  String urgency, @JsonKey(name: 'needed_by')  DateTime? neededBy)  $default,) {final _that = this;
 switch (_that) {
 case _DonorAppointmentRequestRefModel():
 return $default(_that.id,_that.hospital,_that.bloodType,_that.urgency,_that.neededBy);case _:
@@ -1402,7 +1413,7 @@ return $default(_that.id,_that.hospital,_that.bloodType,_that.urgency,_that.need
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DonorHospitalModel hospital, @JsonKey(name: 'blood_type')  String bloodType,  String urgency, @JsonKey(name: 'needed_by')  DateTime? neededBy)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DonorHospitalModel? hospital, @JsonKey(name: 'blood_type')  String bloodType,  String urgency, @JsonKey(name: 'needed_by')  DateTime? neededBy)?  $default,) {final _that = this;
 switch (_that) {
 case _DonorAppointmentRequestRefModel() when $default != null:
 return $default(_that.id,_that.hospital,_that.bloodType,_that.urgency,_that.neededBy);case _:
@@ -1417,11 +1428,13 @@ return $default(_that.id,_that.hospital,_that.bloodType,_that.urgency,_that.need
 @JsonSerializable()
 
 class _DonorAppointmentRequestRefModel extends DonorAppointmentRequestRefModel {
-  const _DonorAppointmentRequestRefModel({required this.id, required this.hospital, @JsonKey(name: 'blood_type') required this.bloodType, required this.urgency, @JsonKey(name: 'needed_by') this.neededBy}): super._();
+  const _DonorAppointmentRequestRefModel({required this.id, this.hospital, @JsonKey(name: 'blood_type') required this.bloodType, required this.urgency, @JsonKey(name: 'needed_by') this.neededBy}): super._();
   factory _DonorAppointmentRequestRefModel.fromJson(Map<String, dynamic> json) => _$DonorAppointmentRequestRefModelFromJson(json);
 
 @override final  String id;
-@override final  DonorHospitalModel hospital;
+// `blood_requests.hospital_id` is nullable, so PostgREST returns a null
+// hospital embed for requests that have no hospital attached.
+@override final  DonorHospitalModel? hospital;
 @override@JsonKey(name: 'blood_type') final  String bloodType;
 @override final  String urgency;
 @override@JsonKey(name: 'needed_by') final  DateTime? neededBy;
@@ -1459,11 +1472,11 @@ abstract mixin class _$DonorAppointmentRequestRefModelCopyWith<$Res> implements 
   factory _$DonorAppointmentRequestRefModelCopyWith(_DonorAppointmentRequestRefModel value, $Res Function(_DonorAppointmentRequestRefModel) _then) = __$DonorAppointmentRequestRefModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, DonorHospitalModel hospital,@JsonKey(name: 'blood_type') String bloodType, String urgency,@JsonKey(name: 'needed_by') DateTime? neededBy
+ String id, DonorHospitalModel? hospital,@JsonKey(name: 'blood_type') String bloodType, String urgency,@JsonKey(name: 'needed_by') DateTime? neededBy
 });
 
 
-@override $DonorHospitalModelCopyWith<$Res> get hospital;
+@override $DonorHospitalModelCopyWith<$Res>? get hospital;
 
 }
 /// @nodoc
@@ -1476,11 +1489,11 @@ class __$DonorAppointmentRequestRefModelCopyWithImpl<$Res>
 
 /// Create a copy of DonorAppointmentRequestRefModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? hospital = null,Object? bloodType = null,Object? urgency = null,Object? neededBy = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? hospital = freezed,Object? bloodType = null,Object? urgency = null,Object? neededBy = freezed,}) {
   return _then(_DonorAppointmentRequestRefModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
-as DonorHospitalModel,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
+as String,hospital: freezed == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as DonorHospitalModel?,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
 as String,urgency: null == urgency ? _self.urgency : urgency // ignore: cast_nullable_to_non_nullable
 as String,neededBy: freezed == neededBy ? _self.neededBy : neededBy // ignore: cast_nullable_to_non_nullable
 as DateTime?,
@@ -1491,9 +1504,12 @@ as DateTime?,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$DonorHospitalModelCopyWith<$Res> get hospital {
-  
-  return $DonorHospitalModelCopyWith<$Res>(_self.hospital, (value) {
+$DonorHospitalModelCopyWith<$Res>? get hospital {
+    if (_self.hospital == null) {
+    return null;
+  }
+
+  return $DonorHospitalModelCopyWith<$Res>(_self.hospital!, (value) {
     return _then(_self.copyWith(hospital: value));
   });
 }
@@ -2381,7 +2397,9 @@ mixin _$DonationRecordRequestRefModel {
 
  String get id;// RLS limits donors to their own `users` row, so PostgREST returns a null
 // recipient embed for someone else's request. Keep it optional.
- DonationRecordRecipientModel? get recipient; DonorHospitalModel get hospital;
+ DonationRecordRecipientModel? get recipient;// `blood_requests.hospital_id` is nullable — same null-embed exposure as
+// the appointment request ref above.
+ DonorHospitalModel? get hospital;
 /// Create a copy of DonationRecordRequestRefModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2414,11 +2432,11 @@ abstract mixin class $DonationRecordRequestRefModelCopyWith<$Res>  {
   factory $DonationRecordRequestRefModelCopyWith(DonationRecordRequestRefModel value, $Res Function(DonationRecordRequestRefModel) _then) = _$DonationRecordRequestRefModelCopyWithImpl;
 @useResult
 $Res call({
- String id, DonationRecordRecipientModel? recipient, DonorHospitalModel hospital
+ String id, DonationRecordRecipientModel? recipient, DonorHospitalModel? hospital
 });
 
 
-$DonationRecordRecipientModelCopyWith<$Res>? get recipient;$DonorHospitalModelCopyWith<$Res> get hospital;
+$DonationRecordRecipientModelCopyWith<$Res>? get recipient;$DonorHospitalModelCopyWith<$Res>? get hospital;
 
 }
 /// @nodoc
@@ -2431,12 +2449,12 @@ class _$DonationRecordRequestRefModelCopyWithImpl<$Res>
 
 /// Create a copy of DonationRecordRequestRefModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? recipient = freezed,Object? hospital = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? recipient = freezed,Object? hospital = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,recipient: freezed == recipient ? _self.recipient : recipient // ignore: cast_nullable_to_non_nullable
-as DonationRecordRecipientModel?,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
-as DonorHospitalModel,
+as DonationRecordRecipientModel?,hospital: freezed == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as DonorHospitalModel?,
   ));
 }
 /// Create a copy of DonationRecordRequestRefModel
@@ -2455,9 +2473,12 @@ $DonationRecordRecipientModelCopyWith<$Res>? get recipient {
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$DonorHospitalModelCopyWith<$Res> get hospital {
-  
-  return $DonorHospitalModelCopyWith<$Res>(_self.hospital, (value) {
+$DonorHospitalModelCopyWith<$Res>? get hospital {
+    if (_self.hospital == null) {
+    return null;
+  }
+
+  return $DonorHospitalModelCopyWith<$Res>(_self.hospital!, (value) {
     return _then(_self.copyWith(hospital: value));
   });
 }
@@ -2542,7 +2563,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DonationRecordRecipientModel? recipient,  DonorHospitalModel hospital)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DonationRecordRecipientModel? recipient,  DonorHospitalModel? hospital)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DonationRecordRequestRefModel() when $default != null:
 return $default(_that.id,_that.recipient,_that.hospital);case _:
@@ -2563,7 +2584,7 @@ return $default(_that.id,_that.recipient,_that.hospital);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DonationRecordRecipientModel? recipient,  DonorHospitalModel hospital)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DonationRecordRecipientModel? recipient,  DonorHospitalModel? hospital)  $default,) {final _that = this;
 switch (_that) {
 case _DonationRecordRequestRefModel():
 return $default(_that.id,_that.recipient,_that.hospital);case _:
@@ -2583,7 +2604,7 @@ return $default(_that.id,_that.recipient,_that.hospital);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DonationRecordRecipientModel? recipient,  DonorHospitalModel hospital)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DonationRecordRecipientModel? recipient,  DonorHospitalModel? hospital)?  $default,) {final _that = this;
 switch (_that) {
 case _DonationRecordRequestRefModel() when $default != null:
 return $default(_that.id,_that.recipient,_that.hospital);case _:
@@ -2598,14 +2619,16 @@ return $default(_that.id,_that.recipient,_that.hospital);case _:
 @JsonSerializable()
 
 class _DonationRecordRequestRefModel extends DonationRecordRequestRefModel {
-  const _DonationRecordRequestRefModel({required this.id, this.recipient, required this.hospital}): super._();
+  const _DonationRecordRequestRefModel({required this.id, this.recipient, this.hospital}): super._();
   factory _DonationRecordRequestRefModel.fromJson(Map<String, dynamic> json) => _$DonationRecordRequestRefModelFromJson(json);
 
 @override final  String id;
 // RLS limits donors to their own `users` row, so PostgREST returns a null
 // recipient embed for someone else's request. Keep it optional.
 @override final  DonationRecordRecipientModel? recipient;
-@override final  DonorHospitalModel hospital;
+// `blood_requests.hospital_id` is nullable — same null-embed exposure as
+// the appointment request ref above.
+@override final  DonorHospitalModel? hospital;
 
 /// Create a copy of DonationRecordRequestRefModel
 /// with the given fields replaced by the non-null parameter values.
@@ -2640,11 +2663,11 @@ abstract mixin class _$DonationRecordRequestRefModelCopyWith<$Res> implements $D
   factory _$DonationRecordRequestRefModelCopyWith(_DonationRecordRequestRefModel value, $Res Function(_DonationRecordRequestRefModel) _then) = __$DonationRecordRequestRefModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, DonationRecordRecipientModel? recipient, DonorHospitalModel hospital
+ String id, DonationRecordRecipientModel? recipient, DonorHospitalModel? hospital
 });
 
 
-@override $DonationRecordRecipientModelCopyWith<$Res>? get recipient;@override $DonorHospitalModelCopyWith<$Res> get hospital;
+@override $DonationRecordRecipientModelCopyWith<$Res>? get recipient;@override $DonorHospitalModelCopyWith<$Res>? get hospital;
 
 }
 /// @nodoc
@@ -2657,12 +2680,12 @@ class __$DonationRecordRequestRefModelCopyWithImpl<$Res>
 
 /// Create a copy of DonationRecordRequestRefModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? recipient = freezed,Object? hospital = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? recipient = freezed,Object? hospital = freezed,}) {
   return _then(_DonationRecordRequestRefModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,recipient: freezed == recipient ? _self.recipient : recipient // ignore: cast_nullable_to_non_nullable
-as DonationRecordRecipientModel?,hospital: null == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
-as DonorHospitalModel,
+as DonationRecordRecipientModel?,hospital: freezed == hospital ? _self.hospital : hospital // ignore: cast_nullable_to_non_nullable
+as DonorHospitalModel?,
   ));
 }
 
@@ -2682,9 +2705,12 @@ $DonationRecordRecipientModelCopyWith<$Res>? get recipient {
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$DonorHospitalModelCopyWith<$Res> get hospital {
-  
-  return $DonorHospitalModelCopyWith<$Res>(_self.hospital, (value) {
+$DonorHospitalModelCopyWith<$Res>? get hospital {
+    if (_self.hospital == null) {
+    return null;
+  }
+
+  return $DonorHospitalModelCopyWith<$Res>(_self.hospital!, (value) {
     return _then(_self.copyWith(hospital: value));
   });
 }
@@ -2694,7 +2720,8 @@ $DonorHospitalModelCopyWith<$Res> get hospital {
 /// @nodoc
 mixin _$DonationRecordCampaignRefModel {
 
- String get id; String get title;@JsonKey(name: 'venue_name') String get venueName; String get city;
+ String get id; String get title;// `campaigns.venue_name` is nullable in the schema.
+@JsonKey(name: 'venue_name') String? get venueName; String get city;
 /// Create a copy of DonationRecordCampaignRefModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2727,7 +2754,7 @@ abstract mixin class $DonationRecordCampaignRefModelCopyWith<$Res>  {
   factory $DonationRecordCampaignRefModelCopyWith(DonationRecordCampaignRefModel value, $Res Function(DonationRecordCampaignRefModel) _then) = _$DonationRecordCampaignRefModelCopyWithImpl;
 @useResult
 $Res call({
- String id, String title,@JsonKey(name: 'venue_name') String venueName, String city
+ String id, String title,@JsonKey(name: 'venue_name') String? venueName, String city
 });
 
 
@@ -2744,12 +2771,12 @@ class _$DonationRecordCampaignRefModelCopyWithImpl<$Res>
 
 /// Create a copy of DonationRecordCampaignRefModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? venueName = null,Object? city = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? venueName = freezed,Object? city = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,venueName: null == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
-as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String,venueName: freezed == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
+as String?,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -2835,7 +2862,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title, @JsonKey(name: 'venue_name')  String venueName,  String city)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title, @JsonKey(name: 'venue_name')  String? venueName,  String city)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DonationRecordCampaignRefModel() when $default != null:
 return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
@@ -2856,7 +2883,7 @@ return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title, @JsonKey(name: 'venue_name')  String venueName,  String city)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title, @JsonKey(name: 'venue_name')  String? venueName,  String city)  $default,) {final _that = this;
 switch (_that) {
 case _DonationRecordCampaignRefModel():
 return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
@@ -2876,7 +2903,7 @@ return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title, @JsonKey(name: 'venue_name')  String venueName,  String city)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title, @JsonKey(name: 'venue_name')  String? venueName,  String city)?  $default,) {final _that = this;
 switch (_that) {
 case _DonationRecordCampaignRefModel() when $default != null:
 return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
@@ -2891,12 +2918,13 @@ return $default(_that.id,_that.title,_that.venueName,_that.city);case _:
 @JsonSerializable()
 
 class _DonationRecordCampaignRefModel extends DonationRecordCampaignRefModel {
-  const _DonationRecordCampaignRefModel({required this.id, required this.title, @JsonKey(name: 'venue_name') required this.venueName, required this.city}): super._();
+  const _DonationRecordCampaignRefModel({required this.id, required this.title, @JsonKey(name: 'venue_name') this.venueName, required this.city}): super._();
   factory _DonationRecordCampaignRefModel.fromJson(Map<String, dynamic> json) => _$DonationRecordCampaignRefModelFromJson(json);
 
 @override final  String id;
 @override final  String title;
-@override@JsonKey(name: 'venue_name') final  String venueName;
+// `campaigns.venue_name` is nullable in the schema.
+@override@JsonKey(name: 'venue_name') final  String? venueName;
 @override final  String city;
 
 /// Create a copy of DonationRecordCampaignRefModel
@@ -2932,7 +2960,7 @@ abstract mixin class _$DonationRecordCampaignRefModelCopyWith<$Res> implements $
   factory _$DonationRecordCampaignRefModelCopyWith(_DonationRecordCampaignRefModel value, $Res Function(_DonationRecordCampaignRefModel) _then) = __$DonationRecordCampaignRefModelCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String title,@JsonKey(name: 'venue_name') String venueName, String city
+ String id, String title,@JsonKey(name: 'venue_name') String? venueName, String city
 });
 
 
@@ -2949,12 +2977,12 @@ class __$DonationRecordCampaignRefModelCopyWithImpl<$Res>
 
 /// Create a copy of DonationRecordCampaignRefModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? venueName = null,Object? city = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? venueName = freezed,Object? city = null,}) {
   return _then(_DonationRecordCampaignRefModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,venueName: null == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
-as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String,venueName: freezed == venueName ? _self.venueName : venueName // ignore: cast_nullable_to_non_nullable
+as String?,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

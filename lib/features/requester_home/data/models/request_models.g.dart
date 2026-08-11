@@ -52,9 +52,9 @@ _BloodRequestModel _$BloodRequestModelFromJson(Map<String, dynamic> json) =>
     _BloodRequestModel(
       id: json['id'] as String,
       requestedBy: json['requested_by'] as String,
-      hospital: HospitalModel.fromJson(
-        json['hospital'] as Map<String, dynamic>,
-      ),
+      hospital: json['hospital'] == null
+          ? null
+          : HospitalModel.fromJson(json['hospital'] as Map<String, dynamic>),
       beneficiaryType: json['beneficiary_type'] as String? ?? 'self',
       patient: json['patient'] == null
           ? null

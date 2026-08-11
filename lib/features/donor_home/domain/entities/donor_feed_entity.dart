@@ -116,7 +116,8 @@ abstract class DonorAvailabilityEntity with _$DonorAvailabilityEntity {
     required bool isAvailableForDonation,
     required bool isDonor,
     required String bloodType,
-    required int wilayaId,
+    // Null for donors with no wilaya recorded on their profile.
+    int? wilayaId,
     DateTime? cooldownUntil,
     DateTime? lastDonationDate,
     required int totalDonationsCount,
@@ -173,7 +174,7 @@ abstract class DonorCampaignEntity with _$DonorCampaignEntity {
     required String organizerName,
     required String title,
     String? description,
-    required String venueName,
+    String? venueName,
     required String city,
     required int wilayaId,
     String? hospitalId,
@@ -199,7 +200,8 @@ abstract class DonorCampaignEntity with _$DonorCampaignEntity {
 abstract class DonorAppointmentRequestRef with _$DonorAppointmentRequestRef {
   const factory DonorAppointmentRequestRef({
     required String id,
-    required DonorHospitalEntity hospital,
+    // Null when the request has no hospital attached.
+    DonorHospitalEntity? hospital,
     required String bloodType,
     required DonorRequestPriority priority,
     DateTime? neededBy,
@@ -239,7 +241,8 @@ abstract class DonationRecordRequestRef with _$DonationRecordRequestRef {
     required String id,
     // Null when RLS hides the requester's profile from the donor.
     String? recipientName,
-    required DonorHospitalEntity hospital,
+    // Null when the request has no hospital attached.
+    DonorHospitalEntity? hospital,
   }) = _DonationRecordRequestRef;
 }
 
@@ -248,7 +251,7 @@ abstract class DonationRecordCampaignRef with _$DonationRecordCampaignRef {
   const factory DonationRecordCampaignRef({
     required String id,
     required String title,
-    required String venueName,
+    String? venueName,
     required String city,
   }) = _DonationRecordCampaignRef;
 }

@@ -119,7 +119,8 @@ class _RequestsScreenState extends State<RequestsScreen> {
     return requests
         .where(
           (request) =>
-              request.hospital.nameAr.toLowerCase().contains(query) ||
+              (request.hospital?.nameAr.toLowerCase().contains(query) ??
+                  false) ||
               request.bloodType.toLowerCase().contains(query) ||
               (request.patient?.fullName.toLowerCase().contains(query) ??
                   false),

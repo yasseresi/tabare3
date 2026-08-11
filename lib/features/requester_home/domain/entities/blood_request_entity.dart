@@ -133,7 +133,8 @@ abstract class BloodRequestEntity with _$BloodRequestEntity {
   const factory BloodRequestEntity({
     required String id,
     required String requestedBy,
-    required HospitalEntity hospital,
+    // Null when the request has no hospital attached.
+    HospitalEntity? hospital,
     @Default(BeneficiaryType.self) BeneficiaryType beneficiaryType,
     PatientEntity? patient,
     required String bloodType,

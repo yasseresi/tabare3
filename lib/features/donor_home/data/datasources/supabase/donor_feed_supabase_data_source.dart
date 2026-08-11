@@ -84,10 +84,14 @@ class DonorFeedSupabaseDataSource implements DonorFeedRemoteDataSource {
     final availability = await getAvailability();
     if (!availability.isDonor) return const [];
 
+    // Campaigns are matched by wilaya; a donor without one has nothing to match.
+    final wilayaId = availability.wilayaId;
+    if (wilayaId == null) return const [];
+
     final rows = await client
         .from('campaigns')
         .select(campaignSelectColumns)
-        .eq('wilaya_id', availability.wilayaId)
+        .eq('wilaya_id', wilayaId)
         .not('published_at', 'is', null)
         .inFilter('status', const ['upcoming', 'active'])
         .order('starts_at');

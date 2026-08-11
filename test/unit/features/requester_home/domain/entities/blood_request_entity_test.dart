@@ -34,7 +34,7 @@ void main() {
 
     expect(request.remainingUnits, 2);
     expect(request.isActive, true);
-    expect(request.hospital.wilayaId, 16);
+    expect(request.hospital?.wilayaId, 16);
   });
 
   test('request identifies whether the patient is the requester', () {

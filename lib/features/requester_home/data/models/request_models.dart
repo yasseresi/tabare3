@@ -66,7 +66,9 @@ abstract class BloodRequestModel with _$BloodRequestModel {
   const factory BloodRequestModel({
     required String id,
     @JsonKey(name: 'requested_by') required String requestedBy,
-    required HospitalModel hospital,
+    // `blood_requests.hospital_id` is nullable, so PostgREST returns a null
+    // hospital embed for requests that have no hospital attached.
+    HospitalModel? hospital,
     @JsonKey(name: 'beneficiary_type') @Default('self') String beneficiaryType,
     PatientModel? patient,
     @JsonKey(name: 'blood_type') required String bloodType,
@@ -86,7 +88,7 @@ abstract class BloodRequestModel with _$BloodRequestModel {
   BloodRequestEntity toEntity() => BloodRequestEntity(
     id: id,
     requestedBy: requestedBy,
-    hospital: hospital.toEntity(),
+    hospital: hospital?.toEntity(),
     beneficiaryType: BeneficiaryType.fromDatabase(beneficiaryType),
     patient: patient?.toEntity(),
     bloodType: bloodType,

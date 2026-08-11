@@ -222,7 +222,7 @@ class _DonorHistoryCard extends StatelessWidget {
                 const SizedBox(width: AppSize.s12),
                 Expanded(
                   child: Text(
-                    request.hospital.nameAr,
+                    request.hospital?.nameAr ?? AppStrings.notAvailable.tr(),
                     style: getBoldStyle(
                       fontSize: FontSize.s16,
                       color: ColorManager.cardTitle,
@@ -262,7 +262,7 @@ class _DonorHistoryCard extends StatelessWidget {
             const SizedBox(height: AppSize.s18),
             AppInfoRow(
               label: AppStrings.location.tr(),
-              value: request.hospital.address ?? AppStrings.notAvailable.tr(),
+              value: request.hospital?.address ?? AppStrings.notAvailable.tr(),
               labelColor: ColorManager.textMuted,
             ),
           ],

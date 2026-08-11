@@ -53,6 +53,125 @@ void main() {
     expect(entity.hospital.nameAr, 'مستشفى مصطفى باشا');
   });
 
+  test('availability model parses when the donor has no wilaya', () {
+    // `users.wilaya_id` is nullable, so any donor without one used to crash
+    // getAvailability() on every feed load.
+    final model = DonorAvailabilityModel.fromJson({
+      'id': 'donor-1',
+      'is_active': true,
+      'is_available_for_donation': true,
+      'is_donor': true,
+      'blood_type': 'O+',
+      'wilaya_id': null,
+      'cooldown_until': null,
+      'last_donation_date': null,
+      'total_donations_count': 0,
+    });
+
+    expect(model.wilayaId, isNull);
+    expect(model.toEntity().wilayaId, isNull);
+    expect(model.toEntity().isEligibleAt(DateTime.utc(2030)), true);
+  });
+
+  test('campaign model parses when the venue is unnamed', () {
+    // `campaigns.venue_name` is nullable in the schema.
+    final campaign = DonorCampaignModel.fromJson({
+      'id': 'campaign-1',
+      'created_by': null,
+      'organizer_name': 'جمعية تبرع',
+      'title': 'حملة شتوية',
+      'description': null,
+      'venue_name': null,
+      'city': 'الجزائر',
+      'wilaya_id': 16,
+      'hospital_id': null,
+      'blood_types_needed': null,
+      'status': 'active',
+      'starts_at': '2030-01-10T08:00:00.000Z',
+      'ends_at': '2030-01-10T18:00:00.000Z',
+      'published_at': '2030-01-09T00:00:00.000Z',
+      'created_at': '2030-01-08T00:00:00.000Z',
+    });
+
+    expect(campaign.venueName, isNull);
+    expect(campaign.toEntity().venueName, isNull);
+    expect(campaign.toEntity().status, DonorCampaignStatus.active);
+  });
+
+  test('appointment model parses when the request has no hospital', () {
+    // `blood_requests.hospital_id` is nullable, so PostgREST returns a null
+    // `hospital` embed rather than omitting the row.
+    final appointment = DonorAppointmentModel.fromJson({
+      'id': 'appointment-1',
+      'donor_id': 'donor-1',
+      'scheduled_at': '2030-01-11T10:00:00.000Z',
+      'status': 'confirmed',
+      'completed_at': null,
+      'cancelled_at': null,
+      'cancel_reason': null,
+      'created_at': '2030-01-10T00:00:00.000Z',
+      'blood_request': {
+        'id': 'request-1',
+        'hospital': null,
+        'blood_type': 'O+',
+        'urgency': 'urgent',
+        'needed_by': null,
+      },
+      'campaign': null,
+    });
+
+    final ref = appointment.toEntity().bloodRequest;
+    expect(ref?.hospital, isNull);
+    expect(ref?.priority, DonorRequestPriority.urgent);
+  });
+
+  test('record model parses when the request has no hospital', () {
+    final record = DonationRecordModel.fromJson({
+      'id': 'record-1',
+      'donor_id': 'donor-1',
+      'source': 'request',
+      'request_id': 'request-1',
+      'campaign_id': null,
+      'appointment_id': null,
+      'hospital_id': null,
+      'donated_at': '2030-01-10T12:00:00.000Z',
+      'units': 1,
+      'blood_request': {
+        'id': 'request-1',
+        'recipient': {'full_name': 'علي بن محمد'},
+        'hospital': null,
+      },
+      'campaign': null,
+    });
+
+    expect(record.toEntity().bloodRequest?.hospital, isNull);
+    expect(record.toEntity().bloodRequest?.recipientName, 'علي بن محمد');
+  });
+
+  test('record campaign ref parses when the venue is unnamed', () {
+    final record = DonationRecordModel.fromJson({
+      'id': 'record-1',
+      'donor_id': 'donor-1',
+      'source': 'campaign',
+      'request_id': null,
+      'campaign_id': 'campaign-1',
+      'appointment_id': null,
+      'hospital_id': null,
+      'donated_at': '2030-01-10T12:00:00.000Z',
+      'units': 1,
+      'blood_request': null,
+      'campaign': {
+        'id': 'campaign-1',
+        'title': 'حملة شتوية',
+        'venue_name': null,
+        'city': 'الجزائر',
+      },
+    });
+
+    expect(record.toEntity().campaign?.venueName, isNull);
+    expect(record.toEntity().campaign?.city, 'الجزائر');
+  });
+
   test('campaign and appointment models map backend rows', () {
     final campaign = DonorCampaignModel.fromJson({
       'id': 'campaign-1',
@@ -121,7 +240,7 @@ void main() {
 
     expect(record.toEntity().bloodRequest?.recipientName, isNull);
     expect(
-      record.toEntity().bloodRequest?.hospital.nameAr,
+      record.toEntity().bloodRequest?.hospital?.nameAr,
       'مستشفى مصطفى باشا',
     );
   });
@@ -148,7 +267,7 @@ void main() {
     expect(record.toEntity().source, DonationSource.campaign);
     expect(record.toEntity().bloodRequest?.recipientName, 'علي بن محمد');
     expect(
-      record.toEntity().bloodRequest?.hospital.nameAr,
+      record.toEntity().bloodRequest?.hospital?.nameAr,
       'مستشفى مصطفى باشا',
     );
     expect(

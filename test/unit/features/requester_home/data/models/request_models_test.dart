@@ -49,9 +49,36 @@ void main() {
 
     expect(entity.priority, RequestPriority.semiUrgent);
     expect(entity.remainingUnits, 2);
-    expect(entity.hospital.id, 'hospital-id');
+    expect(entity.hospital?.id, 'hospital-id');
     expect(entity.beneficiaryType, BeneficiaryType.self);
     expect(entity.patient?.fullName, 'صاحب الحساب');
+  });
+
+  test('BloodRequestModel parses when the request has no hospital', () {
+    // `blood_requests.hospital_id` is nullable, so the PostgREST embed returns
+    // a null `hospital` rather than omitting the row.
+    final model = BloodRequestModel.fromJson({
+      'id': 'request-id',
+      'requested_by': 'recipient-id',
+      'hospital': null,
+      'beneficiary_type': 'self',
+      'patient': null,
+      'blood_type': 'A+',
+      'urgency': 'urgent',
+      'units_needed': 2,
+      'units_fulfilled': 0,
+      'status': 'open',
+      'needed_by': null,
+      'expires_at': null,
+      'notes': null,
+      'created_at': '2030-01-01T00:00:00.000Z',
+    });
+
+    final entity = model.toEntity();
+
+    expect(entity.hospital, isNull);
+    expect(entity.priority, RequestPriority.urgent);
+    expect(entity.remainingUnits, 2);
   });
 
   test('request RPC payload uses backend enum and ISO timestamps', () {

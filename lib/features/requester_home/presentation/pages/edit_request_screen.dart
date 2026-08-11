@@ -43,7 +43,9 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
   late final TextEditingController _unitsController;
   late final TextEditingController _notesController;
   final _wilayaController = TextEditingController();
-  late String _hospitalId;
+  // Null when the request has no hospital attached — the user must pick one
+  // before the edit can be submitted.
+  String? _hospitalId;
   late String _bloodType;
   late RequestPriority _priority;
   DateTime? _neededBy;
@@ -51,7 +53,7 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
   @override
   void initState() {
     super.initState();
-    _hospitalId = widget.request.hospital.id;
+    _hospitalId = widget.request.hospital?.id;
     _bloodType = widget.request.bloodType;
     _priority = widget.request.priority;
     _neededBy = widget.request.neededBy;
@@ -232,7 +234,7 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
 
   void _clear() {
     setState(() {
-      _hospitalId = widget.request.hospital.id;
+      _hospitalId = widget.request.hospital?.id;
       _bloodType = widget.request.bloodType;
       _priority = widget.request.priority;
       _neededBy = widget.request.neededBy;
@@ -267,7 +269,8 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
 
   void _submit() {
     final units = int.tryParse(_unitsController.text.trim());
-    if (units == null || units <= AppSize.s0) {
+    final hospitalId = _hospitalId;
+    if (units == null || units <= AppSize.s0 || hospitalId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppStrings.requiredRequestFields.tr())),
       );
@@ -278,7 +281,7 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
       RequestUpdateSubmitted(
         requestId: widget.request.id,
         draft: RequestDraft(
-          hospitalId: _hospitalId,
+          hospitalId: hospitalId,
           bloodType: _bloodType,
           priority: _priority,
           unitsNeeded: units,
