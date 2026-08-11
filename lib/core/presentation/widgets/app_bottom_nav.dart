@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../utils/color_manager.dart';
 import '../../utils/values_manager.dart';
+import 'app_gradient_background.dart';
 
 class AppBottomNavItem {
   final String asset;
@@ -31,17 +32,19 @@ class AppBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: AppSize.s80,
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppPadding.p32),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              for (final item in items) _AppBottomNavIcon(item: item),
-            ],
+    return AppGradientBackground(
+      child: SizedBox(
+        height: AppSize.s80,
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppPadding.p32),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                for (final item in items) _AppBottomNavIcon(item: item),
+              ],
+            ),
           ),
         ),
       ),
