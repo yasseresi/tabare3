@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(25);
+select plan(26);
 
 select has_column(
   'public',
@@ -221,6 +221,22 @@ select has_index(
   'donation_records',
   'uq_donation_records_appointment',
   'request QR replay cannot duplicate a donation record'
+);
+
+-- Editing an open request must notify the donors who already accepted it, so a
+-- recipient who changes the hospital/time/urgency does not leave applicants
+-- acting on stale details. The RPC therefore emits a `request_update`
+-- notification to every active appointment on the request.
+select ok(
+  pg_get_functiondef(
+    (
+      select p.oid
+      from pg_proc p
+      join pg_namespace n on n.oid = p.pronamespace
+      where n.nspname = 'public' and p.proname = 'update_blood_request'
+    )
+  ) like '%request_update%',
+  'editing an open request notifies its accepted donors'
 );
 
 select * from finish();
