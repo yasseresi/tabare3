@@ -197,6 +197,7 @@ class AppStrings {
   // Validation errors
   static const String usernameRequired = 'username_required';
   static const String usernameInvalid = 'username_invalid';
+  static const String usernameTaken = 'username_taken';
   static const String fullNameRequired = 'full_name_required';
   static const String phoneRequired = 'phone_required';
   static const String phoneInvalid = 'phone_invalid';

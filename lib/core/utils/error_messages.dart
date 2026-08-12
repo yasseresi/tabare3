@@ -5,6 +5,7 @@ class ValidationKeys {
 
   static const String usernameRequired = AppStrings.usernameRequired;
   static const String usernameInvalid = AppStrings.usernameInvalid;
+  static const String usernameTaken = AppStrings.usernameTaken;
   static const String fullNameRequired = AppStrings.fullNameRequired;
   static const String phoneRequired = AppStrings.phoneRequired;
   static const String phoneInvalid = AppStrings.phoneInvalid;
@@ -38,6 +39,7 @@ class ErrorMessages {
   static const Map<String, String> _validationMessages = {
     ValidationKeys.usernameRequired: 'يرجى إدخال اسم المستخدم',
     ValidationKeys.usernameInvalid: 'يجب أن يكون اسم المستخدم 3 أحرف على الأقل',
+    ValidationKeys.usernameTaken: 'اسم المستخدم مستخدم بالفعل',
     ValidationKeys.fullNameRequired: 'يرجى إدخال الاسم الكامل',
     ValidationKeys.phoneRequired: 'يرجى إدخال رقم الجوال',
     ValidationKeys.phoneInvalid: 'صيغة رقم الجوال غير صحيحة (0XXXXXXXXX)',

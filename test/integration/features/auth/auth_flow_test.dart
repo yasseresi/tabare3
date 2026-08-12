@@ -13,6 +13,7 @@ import 'package:tabare3/features/auth/data/datasources/auth_remote_data_source.d
 import 'package:tabare3/features/auth/data/models/user_model.dart';
 import 'package:tabare3/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:tabare3/features/auth/domain/repositories/auth_repository.dart';
+import 'package:tabare3/features/auth/domain/usecases/check_username_availability.dart';
 import 'package:tabare3/features/auth/domain/usecases/get_current_session.dart';
 import 'package:tabare3/features/auth/domain/usecases/login_with_email_password.dart';
 import 'package:tabare3/features/auth/domain/usecases/sign_out.dart';
@@ -96,6 +97,7 @@ void registerAllDependencies({
 
   sl.registerLazySingleton(() => LoginWithUsernamePassword(sl()));
   sl.registerLazySingleton(() => SignupWithUsernamePassword(sl()));
+  sl.registerLazySingleton(() => CheckUsernameAvailability(sl()));
   sl.registerLazySingleton(() => SignOut(sl()));
   sl.registerLazySingleton(() => GetCurrentSession(sl()));
   sl.registerLazySingleton(() => UpdateUserRole(sl()));
@@ -107,6 +109,7 @@ void registerAllDependencies({
     () => AuthBloc(
       loginWithUsernamePassword: sl(),
       signupWithUsernamePassword: sl(),
+      checkUsernameAvailability: sl(),
       signOutUseCase: sl(),
       getCurrentSession: sl(),
       updateUserRole: sl(),
@@ -177,6 +180,9 @@ void main() {
     mockDataSource = MockAuthRemoteDataSource();
     mockNetworkInfo = MockNetworkInfo();
     when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
+    when(
+      () => mockDataSource.isUsernameAvailable(any()),
+    ).thenAnswer((_) async => true);
     registerAllDependencies(
       mockDataSource: mockDataSource,
       mockNetworkInfo: mockNetworkInfo,

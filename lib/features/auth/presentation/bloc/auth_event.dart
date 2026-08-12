@@ -28,6 +28,17 @@ class SignupRequested extends AuthEvent {
   List<Object?> get props => [params];
 }
 
+/// Pre-flight check for the sign-up username field, raised when the field
+/// loses focus. Silent: it never puts the form into a loading state.
+class UsernameCheckRequested extends AuthEvent {
+  final String username;
+
+  const UsernameCheckRequested(this.username);
+
+  @override
+  List<Object?> get props => [username];
+}
+
 class SignOutRequested extends AuthEvent {}
 
 class SessionCheckRequested extends AuthEvent {}

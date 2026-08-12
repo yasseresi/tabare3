@@ -56,6 +56,12 @@ abstract class AuthRepository {
     required SignupParams params,
   });
 
+  /// Whether [username] is still free to claim.
+  ///
+  /// Advisory only: the answer can go stale between the check and the sign-up
+  /// call, so the backend's own uniqueness constraint stays the authority.
+  Future<Either<Failure, bool>> isUsernameAvailable(String username);
+
   Future<Either<Failure, void>> signOut();
 
   Future<Either<Failure, UserEntity?>> getCurrentSession();

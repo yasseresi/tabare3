@@ -9,6 +9,10 @@ const _fakeEmailDomain = 'tabara3.dz';
 /// Supabase auth requires an email, so usernames are mapped onto a fake domain.
 String _usernameToEmail(String username) => '$username@$_fakeEmailDomain';
 
+/// `security definer` RPC added by
+/// `20260812140000_add_is_username_available_rpc.sql`.
+const isUsernameAvailableRpcName = 'is_username_available';
+
 Map<String, dynamic> buildRoleUpdatePayload({
   required bool isDonor,
   required bool isRecipient,
@@ -43,6 +47,18 @@ class AuthSupabaseDataSource implements AuthRemoteDataSource {
       data: params.toMetadata(),
     );
     return _fetchUserProfile(response.user!.id);
+  }
+
+  /// `public.users` is closed to anon, so the lookup goes through a
+  /// `security definer` RPC that answers with a bare boolean and leaks nothing
+  /// else about the account.
+  @override
+  Future<bool> isUsernameAvailable(String username) async {
+    final result = await client.rpc(
+      isUsernameAvailableRpcName,
+      params: {'p_username': username},
+    );
+    return result == true;
   }
 
   @override

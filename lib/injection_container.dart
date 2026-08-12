@@ -7,6 +7,7 @@ import 'core/network/network_info.dart';
 import 'core/session/session_manager.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
 import 'features/auth/domain/repositories/auth_repository.dart';
+import 'features/auth/domain/usecases/check_username_availability.dart';
 import 'features/auth/domain/usecases/get_current_session.dart';
 import 'features/auth/domain/usecases/login_with_email_password.dart';
 import 'features/auth/domain/usecases/sign_out.dart';
@@ -192,6 +193,7 @@ Future<void> initAuth() async {
     () => AuthBloc(
       loginWithUsernamePassword: sl(),
       signupWithUsernamePassword: sl(),
+      checkUsernameAvailability: sl(),
       signOutUseCase: sl(),
       getCurrentSession: sl(),
       updateUserRole: sl(),
@@ -201,6 +203,7 @@ Future<void> initAuth() async {
 
   sl.registerLazySingleton(() => LoginWithUsernamePassword(sl()));
   sl.registerLazySingleton(() => SignupWithUsernamePassword(sl()));
+  sl.registerLazySingleton(() => CheckUsernameAvailability(sl()));
   sl.registerLazySingleton(() => SignOut(sl()));
   sl.registerLazySingleton(() => GetCurrentSession(sl()));
   sl.registerLazySingleton(() => UpdateUserRole(sl()));

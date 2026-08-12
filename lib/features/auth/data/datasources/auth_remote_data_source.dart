@@ -10,6 +10,10 @@ abstract class AuthRemoteDataSource {
     required String password,
   });
   Future<UserModel> signUp({required SignupParams params});
+
+  /// Whether [username] is still free. Advisory — see [AuthRepository].
+  Future<bool> isUsernameAvailable(String username);
+
   Future<void> signOut();
   Future<UserModel?> getCurrentUser();
   Future<UserModel> updateUserRole({

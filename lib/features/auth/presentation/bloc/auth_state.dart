@@ -32,6 +32,17 @@ class AuthError extends AuthState {
   List<Object?> get props => [failure];
 }
 
+/// The username the user is trying to claim is already taken. Reported on the
+/// field rather than as a dialog, because the fix is to edit that one field.
+class UsernameTaken extends AuthState {
+  final String username;
+
+  const UsernameTaken(this.username);
+
+  @override
+  List<Object?> get props => [username];
+}
+
 class Unauthenticated extends AuthState {}
 
 class RoleUpdated extends AuthState {
