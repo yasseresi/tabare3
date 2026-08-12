@@ -87,6 +87,10 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
                 _showRequestAcceptedDialog(context);
                 return;
               }
+              if (mutation == DonorFeedMutation.donationRecorded) {
+                // A completed redemption lands the donor on their history.
+                setState(() => _selectedTab = _DonorTab.record);
+              }
               final message = switch (mutation) {
                 DonorFeedMutation.appointmentCancelled =>
                   AppStrings.appointmentCancelled.tr(),
@@ -107,7 +111,7 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
           bottomNavigationBar: _BottomNavigation(
             selectedTab: _selectedTab,
             onSelected: (tab) => setState(() => _selectedTab = tab),
-            onRedeem: () => _showRedeemDialog(context),
+            onRedeem: () => _openScanner(context),
           ),
         ),
       ),
@@ -136,7 +140,7 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
           onAbout: () => setState(() => _selectedTab = _DonorTab.about),
           onDonorCard: () => setState(() => _selectedTab = _DonorTab.card),
           onNotifications: _openNotifications,
-          onQrCode: () => _showRedeemDialog(context),
+          onQrCode: () => _openScanner(context),
         ),
       ),
       _DonorTab.card => BlocProvider(
@@ -177,90 +181,19 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
     );
   }
 
-  Future<void> _showRedeemDialog(BuildContext context) async {
-    final controller = TextEditingController();
-    final selection = await showDialog<_QrRedemption>(
-      context: context,
-      builder: (dialogContext) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: AlertDialog(
-          title: Text(AppStrings.redeemQr.tr()),
-          content: TextField(
-            controller: controller,
-            textAlign: TextAlign.right,
-            decoration: InputDecoration(
-              hintText: AppStrings.requestQrToken.tr(),
-              prefixIcon: IconButton(
-                onPressed: () async {
-                  DonorScannerDestination? destination;
-                  final token = await Navigator.push<String>(
-                    dialogContext,
-                    MaterialPageRoute(
-                      builder: (_) => DonorQrScannerScreen(
-                        onNavigate: (value) => destination = value,
-                      ),
-                    ),
-                  );
-                  final selectedDestination = destination;
-                  if (selectedDestination != null) {
-                    if (dialogContext.mounted) Navigator.pop(dialogContext);
-                    if (context.mounted) {
-                      _navigateFromScanner(selectedDestination);
-                    }
-                    return;
-                  }
-                  if (token != null) controller.text = token;
-                },
-                icon: const Icon(Icons.qr_code_scanner),
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(AppStrings.cancel.tr()),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                  _QrRedemption(
-                    token: controller.text,
-                    source: DonationSource.request,
-                  ),
-                );
-              },
-              child: Text(AppStrings.requestQrToken.tr()),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                  _QrRedemption(
-                    token: controller.text,
-                    source: DonationSource.campaign,
-                  ),
-                );
-              },
-              child: Text(AppStrings.campaignQrToken.tr()),
-            ),
-          ],
+  /// Scan-first redemption: opens the camera directly, keeping the shared
+  /// [DonorFeedBloc] available so the scanner can redeem and self-close. On
+  /// success the feed listener lands the donor on their history tab.
+  Future<void> _openScanner(BuildContext context) {
+    final bloc = context.read<DonorFeedBloc>();
+    return Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => BlocProvider<DonorFeedBloc>.value(
+          value: bloc,
+          child: DonorQrScannerScreen(onNavigate: _navigateFromScanner),
         ),
       ),
     );
-    controller.dispose();
-    if (selection == null || !context.mounted) return;
-    final token = selection.token.trim();
-    if (token.isEmpty) return;
-    final bloc = context.read<DonorFeedBloc>();
-    switch (selection.source) {
-      case DonationSource.request:
-        bloc.add(DonorRequestQrRedeemed(token));
-        break;
-      case DonationSource.campaign:
-        bloc.add(DonorCampaignQrRedeemed(token));
-        break;
-    }
   }
 
   void _navigateFromScanner(DonorScannerDestination destination) {
@@ -498,9 +431,3 @@ class _BottomNavigation extends StatelessWidget {
   }
 }
 
-class _QrRedemption {
-  final String token;
-  final DonationSource source;
-
-  const _QrRedemption({required this.token, required this.source});
-}
