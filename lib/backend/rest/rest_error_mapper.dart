@@ -13,7 +13,10 @@ class RestErrorMapper implements BackendErrorMapper {
   const RestErrorMapper();
 
   @override
-  Failure? map(Object error) {
+  Failure? map(
+    Object error, {
+    BackendOperation operation = BackendOperation.generic,
+  }) {
     if (error is! DioException) return null;
 
     switch (error.type) {
@@ -31,7 +34,7 @@ class RestErrorMapper implements BackendErrorMapper {
           ErrorMessages.getMessage(AppStrings.networkError),
         );
       case DioExceptionType.badResponse:
-        return _mapStatus(error.response?.statusCode);
+        return _mapStatus(error.response?.statusCode, operation);
       case DioExceptionType.badCertificate:
       case DioExceptionType.cancel:
       case DioExceptionType.unknown:
@@ -42,7 +45,22 @@ class RestErrorMapper implements BackendErrorMapper {
     }
   }
 
-  Failure _mapStatus(int? status) {
+  Failure _mapStatus(int? status, BackendOperation operation) {
+    // Mirrors the Supabase mapper: on the sign-in path every rejection of the
+    // credentials — malformed, unknown user, forbidden — reads the same, so the
+    // response never says which factor was wrong. 429 and 5xx are about the
+    // server, not the credentials, and keep their own message.
+    if (operation == BackendOperation.signIn &&
+        status != null &&
+        status >= 400 &&
+        status < 500 &&
+        status != 429) {
+      return AuthFailure(
+        status,
+        ErrorMessages.getMessage(AppStrings.invalidLoginCredentials),
+      );
+    }
+
     switch (status) {
       case 400:
         return ValidationFailure(
