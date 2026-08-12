@@ -1,14 +1,11 @@
-import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/algerian_wilayas.dart';
+import '../../../../core/presentation/widgets/adaptive_pickers.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
 import '../../../../core/utils/font_manager.dart';
-import '../../../../core/utils/language_manager.dart';
 import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
@@ -25,10 +22,10 @@ const List<String> kBloodTypes = [
   'O-',
 ];
 
+/// Kept as the profile-local alias of the shared direction resolver so the
+/// sheets here and the adaptive pickers always mirror together.
 TextDirection appTextDirection(BuildContext context) =>
-    context.locale.languageCode == arabic
-    ? TextDirection.rtl
-    : TextDirection.ltr;
+    adaptivePickerDirection(context);
 
 /// Per-field editors used by the profile screen while in edit mode.
 class ProfileFieldEditors {
@@ -50,50 +47,11 @@ class ProfileFieldEditors {
     final first = DateTime(now.year - 100);
     final last = now;
 
-    if (Platform.isIOS) {
-      var selected = initial;
-      await showModalBottomSheet<void>(
-        context: context,
-        builder: (sheetContext) => Directionality(
-          textDirection: appTextDirection(context),
-          child: SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: CupertinoButton(
-                    onPressed: () {
-                      Navigator.pop(sheetContext);
-                      onPicked(_isoDate(selected));
-                    },
-                    child: Text(AppStrings.save.tr()),
-                  ),
-                ),
-                SizedBox(
-                  height: AppSize.s220,
-                  child: CupertinoDatePicker(
-                    mode: CupertinoDatePickerMode.date,
-                    initialDateTime: initial,
-                    minimumDate: first,
-                    maximumDate: last,
-                    onDateTimeChanged: (date) => selected = date,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-      return;
-    }
-
-    final picked = await showDatePicker(
+    final picked = await showAdaptiveDatePicker(
       context: context,
       initialDate: initial,
       firstDate: first,
       lastDate: last,
-      locale: context.locale,
     );
     if (picked != null) onPicked(_isoDate(picked));
   }

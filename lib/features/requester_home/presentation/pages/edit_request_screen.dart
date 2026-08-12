@@ -5,6 +5,7 @@ import 'package:intl/intl.dart' as intl;
 
 import '../../../../core/constants/algerian_wilayas.dart';
 import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/presentation/widgets/adaptive_pickers.dart';
 import '../../../../core/presentation/widgets/app_dialog.dart';
 import '../../../../core/presentation/widgets/app_page.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
@@ -219,7 +220,7 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
     final firstDate = now.add(
       const Duration(days: AppConstants.requestCalendarStartOffsetDays),
     );
-    final selected = await showDatePicker(
+    final selected = await showAdaptiveDatePicker(
       context: context,
       initialDate: _neededBy ?? firstDate,
       firstDate: firstDate,

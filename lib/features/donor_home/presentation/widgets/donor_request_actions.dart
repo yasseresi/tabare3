@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/presentation/widgets/adaptive_pickers.dart';
 import '../../../../core/presentation/widgets/app_dialog.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
@@ -37,7 +38,7 @@ Future<void> acceptDonorRequest(BuildContext context, String requestId) async {
   final firstDate = now.add(
     const Duration(days: AppConstants.requestCalendarStartOffsetDays),
   );
-  final date = await showDatePicker(
+  final date = await showAdaptiveDatePicker(
     context: context,
     initialDate: firstDate,
     firstDate: firstDate,
@@ -46,7 +47,7 @@ Future<void> acceptDonorRequest(BuildContext context, String requestId) async {
     ),
   );
   if (date == null || !context.mounted) return;
-  final time = await showTimePicker(
+  final time = await showAdaptiveTimePicker(
     context: context,
     initialTime: TimeOfDay.fromDateTime(firstDate),
   );
