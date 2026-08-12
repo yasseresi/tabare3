@@ -135,6 +135,16 @@ class DonorFeedRepositoryImpl implements DonorFeedRepository {
   }
 
   @override
+  Future<Either<Failure, DonationRecordEntity>> redeemQr(String token) async {
+    try {
+      final model = await remoteDataSource.redeemQr(token);
+      return Right(model.toEntity());
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
+    }
+  }
+
+  @override
   Future<Either<Failure, DonationRecordEntity>> redeemRequestQr(
     String token,
   ) async {

@@ -174,6 +174,27 @@ void main() {
     expect((await repository.listAvailableCampaigns()).isLeft(), true);
   });
 
+  test('redeemQr maps the datasource record to a domain entity', () async {
+    when(() => dataSource.redeemQr('token')).thenAnswer((_) async => record);
+
+    final result = await repository.redeemQr('token');
+
+    expect(
+      result.getOrElse(() => throw StateError('failure')).id,
+      'record-1',
+    );
+  });
+
+  test('redeemQr converts a datasource error into a Failure', () async {
+    when(
+      () => dataSource.redeemQr('bad'),
+    ).thenThrow(Exception('qr_invalid'));
+
+    final result = await repository.redeemQr('bad');
+
+    expect(result.isLeft(), true);
+  });
+
   test(
     'getFeed maps a dropped connection to NetworkFailure, not the generic default',
     () async {
