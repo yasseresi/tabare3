@@ -31,7 +31,10 @@ class FakeBackendErrorMapper implements BackendErrorMapper {
   const FakeBackendErrorMapper();
 
   @override
-  Failure? map(Object error) => null;
+  Failure? map(
+    Object error, {
+    BackendOperation operation = BackendOperation.generic,
+  }) => null;
 }
 
 /// In-memory [Backend] for tests: no SDK, no network, only fake data sources.

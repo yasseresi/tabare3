@@ -14,6 +14,7 @@ import '../../../../core/utils/constants_manager.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/error_messages.dart';
 import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/styles_manager.dart';
@@ -36,6 +37,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _agreeToTerms = false;
   DateTime? _selectedDate;
   String? _genderValue;
+
+  /// The username the backend last reported as taken. Kept so the form field
+  /// itself carries the error; it clears as soon as a different one is typed.
+  String? _takenUsername;
 
   final _usernameController = TextEditingController();
   final _fullNameController = TextEditingController();
@@ -90,6 +95,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
             '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
       });
     }
+  }
+
+  /// Field-level validation plus the backend's verdict on the username.
+  String? _validateUsernameField(String? value) {
+    final localError = validateUsername(value);
+    if (localError != null) return localError;
+    if (_takenUsername != null && value?.trim() == _takenUsername) {
+      return ErrorMessages.getValidationMessage(ValidationKeys.usernameTaken);
+    }
+    return null;
   }
 
   void _dispatchSignup() {
@@ -394,11 +409,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
           validator: validateFullName,
         ),
         const SizedBox(height: AppSize.s15),
-        AppTextField(
-          hintText: AppStrings.username.tr(),
-          prefixSvg: SvgAssets.person,
-          controller: _usernameController,
-          validator: validateUsername,
+        Focus(
+          // Check on blur as well as on submit, so a collision is reported
+          // before the user has filled in the other two steps.
+          onFocusChange: (hasFocus) {
+            if (hasFocus) return;
+            final username = _usernameController.text.trim();
+            if (username.isEmpty) return;
+            context.read<AuthBloc>().add(UsernameCheckRequested(username));
+          },
+          child: AppTextField(
+            hintText: AppStrings.username.tr(),
+            prefixSvg: SvgAssets.person,
+            controller: _usernameController,
+            validator: _validateUsernameField,
+          ),
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
@@ -577,6 +602,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
           },
         ),
       );
+    } else if (state is UsernameTaken) {
+      // The check runs on submit from step 3, so walk the user back to the
+      // field that has to change and let the form paint the error on it.
+      setState(() {
+        _takenUsername = state.username;
+        _currentStep = 1;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _formKey.currentState?.validate();
+      });
     } else if (state is AuthError) {
       showDialog(
         context: context,

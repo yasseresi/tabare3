@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 
+import '../../../../core/backend/backend_error_mapper.dart';
 import '../../../../core/error/error_handler.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/network/network_info.dart';
@@ -32,7 +33,9 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return Right(userModel.toEntity());
     } catch (e) {
-      return Left(ErrorHandler.handle(e));
+      // BackendOperation.signIn is what stops the mapper from telling the user
+      // whether it was the username or the password that was wrong.
+      return Left(ErrorHandler.handle(e, operation: BackendOperation.signIn));
     }
   }
 
@@ -46,6 +49,18 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final userModel = await remoteDataSource.signUp(params: params);
       return Right(userModel.toEntity());
+    } catch (e) {
+      return Left(ErrorHandler.handle(e, operation: BackendOperation.signUp));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> isUsernameAvailable(String username) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure());
+    }
+    try {
+      return Right(await remoteDataSource.isUsernameAvailable(username));
     } catch (e) {
       return Left(ErrorHandler.handle(e));
     }

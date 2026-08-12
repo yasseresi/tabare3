@@ -5,6 +5,7 @@ import 'package:mocktail/mocktail.dart';
 
 import 'package:tabare3/core/usecases/usecase.dart';
 import 'package:tabare3/features/auth/domain/repositories/auth_repository.dart';
+import 'package:tabare3/features/auth/domain/usecases/check_username_availability.dart';
 import 'package:tabare3/features/auth/domain/usecases/get_current_session.dart';
 import 'package:tabare3/features/auth/domain/usecases/login_with_email_password.dart';
 import 'package:tabare3/features/auth/domain/usecases/sign_out.dart';
@@ -21,6 +22,8 @@ import '../../../../../helpers/test_app.dart';
 class MockLogin extends Mock implements LoginWithUsernamePassword {}
 
 class MockSignup extends Mock implements SignupWithUsernamePassword {}
+
+class MockCheckUsername extends Mock implements CheckUsernameAvailability {}
 
 class MockSignOut extends Mock implements SignOut {}
 
@@ -60,6 +63,7 @@ void main() {
       () => AuthBloc(
         loginWithUsernamePassword: sl(),
         signupWithUsernamePassword: sl(),
+        checkUsernameAvailability: sl(),
         signOutUseCase: sl(),
         getCurrentSession: sl(),
         updateUserRole: sl(),
@@ -68,6 +72,9 @@ void main() {
     );
     sl.registerLazySingleton<LoginWithUsernamePassword>(() => MockLogin());
     sl.registerLazySingleton<SignupWithUsernamePassword>(() => MockSignup());
+    sl.registerLazySingleton<CheckUsernameAvailability>(
+      () => MockCheckUsername(),
+    );
     sl.registerLazySingleton<SignOut>(() => MockSignOut());
     sl.registerLazySingleton<GetCurrentSession>(() => MockSession());
     sl.registerLazySingleton<UpdateUserRole>(() => MockRole());

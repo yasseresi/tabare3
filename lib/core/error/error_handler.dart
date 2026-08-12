@@ -33,9 +33,17 @@ class ErrorHandler {
   /// Pass [stackTrace] from the catch clause (`catch (error, stackTrace)`)
   /// whenever it is available — for parse failures it is the only thing that
   /// names the model and field that failed to deserialize.
-  static Failure handle(dynamic error, {StackTrace? stackTrace}) {
+  ///
+  /// Pass [operation] whenever the caller sits on a path with its own
+  /// disclosure rules — the sign-in path above all, where every backend error
+  /// has to collapse into a single generic message.
+  static Failure handle(
+    dynamic error, {
+    StackTrace? stackTrace,
+    BackendOperation operation = BackendOperation.generic,
+  }) {
     if (error is Object) {
-      final mapped = _backendMapper?.map(error);
+      final mapped = _backendMapper?.map(error, operation: operation);
       if (mapped != null) return mapped;
     }
     if (error is SocketException) {

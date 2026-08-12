@@ -10,12 +10,15 @@ class SupabaseErrorMapper implements BackendErrorMapper {
   const SupabaseErrorMapper();
 
   @override
-  Failure? map(Object error) {
+  Failure? map(
+    Object error, {
+    BackendOperation operation = BackendOperation.generic,
+  }) {
     if (error is PostgrestException) {
       return _handleDatabaseError(error);
     }
     if (error is AuthException) {
-      return _handleAuthError(error);
+      return _handleAuthError(error, operation);
     }
     if (error is StorageException) {
       return StorageFailure(
@@ -26,9 +29,29 @@ class SupabaseErrorMapper implements BackendErrorMapper {
     return null;
   }
 
-  Failure _handleAuthError(AuthException error) {
+  Failure _handleAuthError(AuthException error, BackendOperation operation) {
     final message = error.message.toLowerCase();
     final statusCode = int.tryParse(error.statusCode ?? '') ?? -9;
+
+    // Sign-in never names the factor that failed. Usernames are mapped onto a
+    // fake email domain, so GoTrue can answer `user not found`, `invalid email`
+    // or a password complaint — each of which tells whoever is typing whether
+    // the username exists and turns a two-factor guess into a one-factor one.
+    // They all collapse into the same message. Throttling is the one branch
+    // that survives: it reveals nothing about the account, and the user needs
+    // to know that waiting, not retyping, is the fix.
+    if (operation == BackendOperation.signIn) {
+      if (message.contains('rate limit')) {
+        return AuthFailure(
+          statusCode,
+          ErrorMessages.getMessage(AppStrings.tooManyRequests),
+        );
+      }
+      return AuthFailure(
+        statusCode,
+        ErrorMessages.getMessage(AppStrings.invalidLoginCredentials),
+      );
+    }
 
     if (message.contains('invalid login credentials') ||
         message.contains('invalid credentials')) {

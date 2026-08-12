@@ -44,6 +44,10 @@ class AuthRestDataSource implements AuthRemoteDataSource {
       _todo('POST /auth/register');
 
   @override
+  Future<bool> isUsernameAvailable(String username) async =>
+      _todo('GET /auth/username-available?username={username}');
+
+  @override
   Future<void> signOut() async => _todo('POST /auth/logout');
 
   @override
