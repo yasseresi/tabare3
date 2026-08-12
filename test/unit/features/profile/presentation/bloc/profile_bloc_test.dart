@@ -282,4 +282,67 @@ void main() {
       verify: (_) => verifyNever(() => updateProfile(any())),
     );
   });
+
+  group('AccountStatusToggled', () {
+    const inactive = ProfileEntity(
+      id: 'user-1',
+      email: 'test@example.com',
+      username: 'testuser',
+      fullName: 'Ahmed Test',
+      phone: '0555123456',
+      dateOfBirth: '1995-05-12',
+      gender: 'male',
+      nationalId: '10101010101010101010',
+      bloodType: 'O+',
+      weight: 80,
+      city: 'Algiers',
+      chronicDiseases: null,
+      avatarUrl: null,
+      isDonor: true,
+      isRecipient: false,
+      isActive: false,
+    );
+
+    blocTest<ProfileBloc, ProfileState>(
+      'persists the new availability and reflects it in the loaded profile',
+      build: () {
+        when(
+          () => updateProfile(any()),
+        ).thenAnswer((_) async => const Right(inactive));
+        return buildBloc();
+      },
+      seed: () => const ProfileLoaded(profile: profile, isEditing: false),
+      act: (bloc) => bloc.add(const AccountStatusToggled(false)),
+      expect: () => const [
+        ProfileLoading(),
+        ProfileLoaded(profile: inactive, isEditing: false),
+      ],
+      verify: (_) => verify(
+        () => updateProfile(
+          any(that: isA<ProfileEntity>().having((p) => p.isActive, 'isActive', false)),
+        ),
+      ).called(1),
+    );
+
+    blocTest<ProfileBloc, ProfileState>(
+      'keeps the profile with a transient error (no blank page) when the '
+      'status update fails',
+      build: () {
+        when(
+          () => updateProfile(any()),
+        ).thenAnswer((_) async => const Left(ServerFailure()));
+        return buildBloc();
+      },
+      seed: () => const ProfileLoaded(profile: profile, isEditing: false),
+      act: (bloc) => bloc.add(const AccountStatusToggled(false)),
+      expect: () => const [
+        ProfileLoading(),
+        ProfileLoaded(
+          profile: profile,
+          isEditing: false,
+          actionError: ServerFailure(),
+        ),
+      ],
+    );
+  });
 }

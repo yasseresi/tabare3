@@ -106,7 +106,15 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     emit(ProfileLoading());
     final result = await updateProfile(updated);
     result.fold(
-      (failure) => emit(ProfileError(failure: failure)),
+      // Keep the profile on-screen and report the failure transiently rather
+      // than replacing the page with a full error state.
+      (failure) => emit(
+        ProfileLoaded(
+          profile: current.profile,
+          isEditing: current.isEditing,
+          actionError: failure,
+        ),
+      ),
       (profile) =>
           emit(ProfileLoaded(profile: profile, isEditing: current.isEditing)),
     );
