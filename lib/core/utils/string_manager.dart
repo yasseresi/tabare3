@@ -415,6 +415,16 @@ class AppStrings {
   static const String scanQrDescription = 'scan_qr_description';
   static const String availabilityUpdated = 'availability_updated';
 
+  // QR redeem flow (scan-first)
+  static const String redeemSuccess = 'redeem_success';
+  static const String enterCodeManually = 'enter_code_manually';
+  static const String qrUnrecognized = 'qr_unrecognized';
+  static const String qrAlreadyUsed = 'qr_already_used';
+  static const String qrExpired = 'qr_expired';
+  static const String appointmentRequired = 'appointment_required';
+  static const String qrInvalid = 'qr_invalid';
+  static const String cameraDenied = 'camera_denied';
+
   // Quran & Hadith — Arabic only, never translated
   static const String quranVerse = 'quran_verse';
   static const String hadithRelief = 'hadith_relief';
