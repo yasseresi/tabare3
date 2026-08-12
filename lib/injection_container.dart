@@ -75,6 +75,7 @@ Future<void> initDonorHome() async {
       cancelAppointment: sl(),
       redeemRequestQr: sl(),
       redeemCampaignQr: sl(),
+      redeemQr: sl(),
       setAvailability: sl(),
     ),
   );

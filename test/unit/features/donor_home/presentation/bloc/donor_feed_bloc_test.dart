@@ -2,6 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:tabare3/core/error/failures.dart';
 import 'package:tabare3/core/usecases/usecase.dart';
 import 'package:tabare3/features/donor_home/domain/entities/donor_feed_entity.dart';
 import 'package:tabare3/features/donor_home/domain/usecases/donor_feed_usecases.dart';
@@ -21,6 +22,8 @@ class MockRedeemRequestDonation extends Mock implements RedeemRequestDonation {}
 class MockRedeemCampaignDonation extends Mock
     implements RedeemCampaignDonation {}
 
+class MockRedeemDonation extends Mock implements RedeemDonation {}
+
 class MockSetDonorAvailability extends Mock implements SetDonorAvailability {}
 
 void main() {
@@ -30,6 +33,7 @@ void main() {
   late MockCancelDonationAppointment cancelAppointment;
   late MockRedeemRequestDonation redeemRequestQr;
   late MockRedeemCampaignDonation redeemCampaignQr;
+  late MockRedeemDonation redeemQr;
   late MockSetDonorAvailability setAvailability;
 
   final hospital = DonorHospitalEntity(
@@ -86,6 +90,7 @@ void main() {
     cancelAppointment: cancelAppointment,
     redeemRequestQr: redeemRequestQr,
     redeemCampaignQr: redeemCampaignQr,
+    redeemQr: redeemQr,
     setAvailability: setAvailability,
   );
 
@@ -117,6 +122,7 @@ void main() {
     cancelAppointment = MockCancelDonationAppointment();
     redeemRequestQr = MockRedeemRequestDonation();
     redeemCampaignQr = MockRedeemCampaignDonation();
+    redeemQr = MockRedeemDonation();
     setAvailability = MockSetDonorAvailability();
   });
 
@@ -206,6 +212,43 @@ void main() {
         records: [record],
         lastMutation: DonorFeedMutation.donationRecorded,
       ),
+    ],
+  );
+
+  blocTest<DonorFeedBloc, DonorFeedState>(
+    'redeems a scanned QR of any kind and refreshes records',
+    build: () {
+      stubLoad();
+      when(() => redeemQr(any())).thenAnswer((_) async => Right(record));
+      return buildBloc();
+    },
+    seed: () => DonorFeedLoaded(feed: feed, records: const []),
+    act: (bloc) => bloc.add(const DonorQrRedeemed('scanned-token')),
+    expect: () => [
+      DonorFeedLoaded(feed: feed, records: const [], isMutating: true),
+      const DonorFeedLoading(),
+      DonorFeedLoaded(
+        feed: feed,
+        records: [record],
+        lastMutation: DonorFeedMutation.donationRecorded,
+      ),
+    ],
+    verify: (_) => verify(() => redeemQr('scanned-token')).called(1),
+  );
+
+  blocTest<DonorFeedBloc, DonorFeedState>(
+    'surfaces a failure when a scanned QR cannot be redeemed',
+    build: () {
+      when(
+        () => redeemQr(any()),
+      ).thenAnswer((_) async => const Left(ValidationFailure(-1, 'qr_invalid')));
+      return buildBloc();
+    },
+    seed: () => DonorFeedLoaded(feed: feed, records: const []),
+    act: (bloc) => bloc.add(const DonorQrRedeemed('bad-token')),
+    expect: () => [
+      DonorFeedLoaded(feed: feed, records: const [], isMutating: true),
+      isA<DonorFeedError>(),
     ],
   );
 }

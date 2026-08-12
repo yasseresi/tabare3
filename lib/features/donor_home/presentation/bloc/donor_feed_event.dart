@@ -63,3 +63,14 @@ class DonorCampaignQrRedeemed extends DonorFeedEvent {
   @override
   List<Object?> get props => [token];
 }
+
+/// Scan-first redemption: the backend infers request vs campaign from the
+/// token, so the UI dispatches one event regardless of QR kind.
+class DonorQrRedeemed extends DonorFeedEvent {
+  final String token;
+
+  const DonorQrRedeemed(this.token);
+
+  @override
+  List<Object?> get props => [token];
+}

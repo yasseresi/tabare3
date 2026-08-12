@@ -18,6 +18,7 @@ class DonorFeedBloc extends Bloc<DonorFeedEvent, DonorFeedState> {
   final CancelDonationAppointment cancelAppointment;
   final RedeemRequestDonation redeemRequestQr;
   final RedeemCampaignDonation redeemCampaignQr;
+  final RedeemDonation redeemQr;
   final SetDonorAvailability setAvailability;
 
   DonorFeedBloc({
@@ -27,6 +28,7 @@ class DonorFeedBloc extends Bloc<DonorFeedEvent, DonorFeedState> {
     required this.cancelAppointment,
     required this.redeemRequestQr,
     required this.redeemCampaignQr,
+    required this.redeemQr,
     required this.setAvailability,
   }) : super(const DonorFeedInitial()) {
     on<DonorFeedRequested>(_onRequested);
@@ -35,6 +37,7 @@ class DonorFeedBloc extends Bloc<DonorFeedEvent, DonorFeedState> {
     on<DonorAppointmentCancelled>(_onAppointmentCancelled);
     on<DonorRequestQrRedeemed>(_onRequestQrRedeemed);
     on<DonorCampaignQrRedeemed>(_onCampaignQrRedeemed);
+    on<DonorQrRedeemed>(_onQrRedeemed);
   }
 
   Future<void> _onRequested(
@@ -102,6 +105,13 @@ class DonorFeedBloc extends Bloc<DonorFeedEvent, DonorFeedState> {
     Emitter<DonorFeedState> emit,
   ) {
     return _redeem(emit, () => redeemCampaignQr(event.token));
+  }
+
+  Future<void> _onQrRedeemed(
+    DonorQrRedeemed event,
+    Emitter<DonorFeedState> emit,
+  ) {
+    return _redeem(emit, () => redeemQr(event.token));
   }
 
   Future<void> _redeem(
