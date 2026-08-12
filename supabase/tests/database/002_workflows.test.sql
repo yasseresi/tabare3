@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(27);
+select plan(28);
 
 select has_column(
   'public',
@@ -252,6 +252,21 @@ select ok(
     )
   ) like '%insert into public.notifications%',
   'cancelling a request notifies the donors whose appointments are voided'
+);
+
+-- When a donor backs out of an appointment, the recipient must be told so they
+-- can chase another donor. cancel_appointment therefore notifies the request
+-- owner.
+select ok(
+  pg_get_functiondef(
+    (
+      select p.oid
+      from pg_proc p
+      join pg_namespace n on n.oid = p.pronamespace
+      where n.nspname = 'public' and p.proname = 'cancel_appointment'
+    )
+  ) like '%insert into public.notifications%',
+  'a donor cancelling their appointment notifies the request owner'
 );
 
 select * from finish();
