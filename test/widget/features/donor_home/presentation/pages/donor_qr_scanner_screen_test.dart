@@ -147,6 +147,34 @@ void main() {
     verify(() => bloc.add(const DonorQrRedeemed('typed-token'))).called(1);
   });
 
+  testWidgets('does not dispatch or spin when the feed is not loaded', (
+    tester,
+  ) async {
+    whenListen(
+      bloc,
+      states.stream,
+      initialState: const DonorFeedError(ValidationFailure(-6, 'offline')),
+    );
+
+    await tester.pumpWidget(
+      wrap(
+        DonorQrScannerScreen(
+          scannerBuilder: (onScanned) => TextButton(
+            onPressed: () => onScanned('scanned-token'),
+            child: const Text('fake scanner'),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('fake scanner'));
+    await tester.pump();
+
+    verifyNever(() => bloc.add(any()));
+    expect(find.byKey(WidgetKeys.donorScannerProgress), findsNothing);
+    expect(find.byKey(WidgetKeys.donorScannerError), findsOneWidget);
+  });
+
   testWidgets('delegates donor navigation back to the enclosing shell', (
     tester,
   ) async {

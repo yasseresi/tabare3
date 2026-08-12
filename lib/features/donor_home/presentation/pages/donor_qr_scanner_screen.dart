@@ -173,6 +173,15 @@ class _DonorQrScannerScreenState extends State<DonorQrScannerScreen> {
   void _redeem(String token) {
     final trimmed = token.trim();
     if (trimmed.isEmpty || _submitting || !mounted) return;
+    // The bloc only accepts a redemption from a settled loaded feed; if it is
+    // still loading or in error the event would be dropped, leaving the scanner
+    // spinning forever. Surface a retry message and keep scanning instead.
+    final state = context.read<DonorFeedBloc>().state;
+    if (state is! DonorFeedLoaded || state.isMutating) {
+      setState(() => _errorMessage = AppStrings.defaultError.tr());
+      unawaited(_controller?.start());
+      return;
+    }
     setState(() {
       _submitting = true;
       _errorMessage = null;
