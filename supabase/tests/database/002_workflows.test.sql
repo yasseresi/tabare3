@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(26);
+select plan(27);
 
 select has_column(
   'public',
@@ -237,6 +237,21 @@ select ok(
     )
   ) like '%request_update%',
   'editing an open request notifies its accepted donors'
+);
+
+-- Cancelling a request voids the donors' appointments; those donors must be
+-- told so they do not travel to a cancelled donation. The RPC therefore writes
+-- a notification for every appointment it cancels.
+select ok(
+  pg_get_functiondef(
+    (
+      select p.oid
+      from pg_proc p
+      join pg_namespace n on n.oid = p.pronamespace
+      where n.nspname = 'public' and p.proname = 'cancel_blood_request'
+    )
+  ) like '%insert into public.notifications%',
+  'cancelling a request notifies the donors whose appointments are voided'
 );
 
 select * from finish();
