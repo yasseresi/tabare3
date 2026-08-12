@@ -128,7 +128,7 @@ void main() {
   );
 
   blocTest<NotificationsBloc, NotificationsState>(
-    'marks a notification as read (stream re-emits the update)',
+    'optimistically marks a notification as read before the write returns',
     build: () {
       when(() => markNotificationAsRead(any())).thenAnswer(
         (_) async => Right(unreadNotification.copyWith(isRead: true)),
@@ -140,13 +140,57 @@ void main() {
       visibleNotifications: [unreadNotification, readNotification],
     ),
     act: (bloc) => bloc.add(const NotificationReadRequested('notification-1')),
-    expect: () => <NotificationsState>[],
+    expect: () => [
+      NotificationsLoaded(
+        notifications: [
+          unreadNotification.copyWith(isRead: true),
+          readNotification,
+        ],
+        visibleNotifications: [
+          unreadNotification.copyWith(isRead: true),
+          readNotification,
+        ],
+      ),
+    ],
     verify: (_) {
       final params =
           verify(() => markNotificationAsRead(captureAny())).captured.single
               as MarkNotificationAsReadParams;
       expect(params.notificationId, 'notification-1');
     },
+  );
+
+  blocTest<NotificationsBloc, NotificationsState>(
+    'reverts the optimistic read when the write fails',
+    build: () {
+      when(
+        () => markNotificationAsRead(any()),
+      ).thenAnswer((_) async => const Left(ServerFailure()));
+      return buildBloc();
+    },
+    seed: () => NotificationsLoaded(
+      notifications: [unreadNotification, readNotification],
+      visibleNotifications: [unreadNotification, readNotification],
+    ),
+    act: (bloc) => bloc.add(const NotificationReadRequested('notification-1')),
+    expect: () => [
+      // Optimistic read...
+      NotificationsLoaded(
+        notifications: [
+          unreadNotification.copyWith(isRead: true),
+          readNotification,
+        ],
+        visibleNotifications: [
+          unreadNotification.copyWith(isRead: true),
+          readNotification,
+        ],
+      ),
+      // ...rolled back after the write fails.
+      NotificationsLoaded(
+        notifications: [unreadNotification, readNotification],
+        visibleNotifications: [unreadNotification, readNotification],
+      ),
+    ],
   );
 
   blocTest<NotificationsBloc, NotificationsState>(

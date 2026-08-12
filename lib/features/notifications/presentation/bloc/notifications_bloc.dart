@@ -90,12 +90,31 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     );
     if (target.isEmpty || target.first.isRead) return;
 
-    // The realtime stream re-emits the updated row, so the read state and
-    // unread badge refresh on their own; only surface a failure here.
+    // Optimistically flip the row to read so the list and unread badge react
+    // instantly, even offline or on a slow link. The realtime stream later
+    // re-emits the same is_read update, which is a no-op against this state.
+    emit(_withRead(current, event.notificationId));
+
     final result = await markNotificationAsRead(
       MarkNotificationAsReadParams(event.notificationId),
     );
-    result.fold((failure) => emit(NotificationsError(failure)), (_) {});
+    // Roll back to the pre-read snapshot if the write never landed.
+    result.fold((_) => emit(current), (_) {});
+  }
+
+  NotificationsLoaded _withRead(NotificationsLoaded current, String id) {
+    final notifications = current.notifications
+        .map(
+          (notification) => notification.id == id
+              ? notification.copyWith(isRead: true)
+              : notification,
+        )
+        .toList();
+    return NotificationsLoaded(
+      notifications: notifications,
+      visibleNotifications: _filterNotifications(notifications, current.query),
+      query: current.query,
+    );
   }
 
   @override
