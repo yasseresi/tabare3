@@ -19,6 +19,8 @@ abstract class DonorFeedRemoteDataSource {
     required String appointmentId,
     required String reason,
   });
+  /// Unified redemption: the backend infers request vs campaign from the token.
+  Future<DonationRecordModel> redeemQr(String token);
   Future<DonationRecordModel> redeemRequestQr(String token);
   Future<DonationRecordModel> redeemCampaignQr(String token);
 }

@@ -9,6 +9,10 @@ const donorAvailabilitySelectColumns =
 
 const compatibleRequestsRpcName = 'compatible_requests_for_donor';
 
+/// Unified redeem dispatcher: resolves request-vs-campaign server-side so the
+/// scan-first donor flow needs no kind picker.
+const redeemDonationQrRpcName = 'redeem_qr';
+
 const requestSelectColumns =
     'id,requested_by,blood_type,urgency,units_needed,units_fulfilled,status,'
     'needed_by,expires_at,notes,created_at,'
@@ -161,6 +165,15 @@ class DonorFeedSupabaseDataSource implements DonorFeedRemoteDataSource {
     );
 
     return _getAppointment(_extractId(response));
+  }
+
+  @override
+  Future<DonationRecordModel> redeemQr(String token) async {
+    final response = await client.rpc(
+      redeemDonationQrRpcName,
+      params: buildRedeemDonationQrRpcPayload(token),
+    );
+    return DonationRecordModel.fromJson(_extractRow(response));
   }
 
   @override

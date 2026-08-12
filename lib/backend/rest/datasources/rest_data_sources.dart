@@ -204,6 +204,10 @@ class DonorFeedRestDataSource implements DonorFeedRemoteDataSource {
   }) async => _todo('POST /appointments/{id}/cancel');
 
   @override
+  Future<DonationRecordModel> redeemQr(String token) async =>
+      _todo('POST /donations/redeem');
+
+  @override
   Future<DonationRecordModel> redeemRequestQr(String token) async =>
       _todo('POST /donations/redeem/request');
 

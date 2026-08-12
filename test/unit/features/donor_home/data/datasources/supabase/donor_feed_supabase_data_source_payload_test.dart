@@ -24,4 +24,8 @@ void main() {
   test('compatibility and eligibility are delegated to one backend RPC', () {
     expect(compatibleRequestsRpcName, 'compatible_requests_for_donor');
   });
+
+  test('unified QR redemption targets the redeem_qr dispatcher RPC', () {
+    expect(redeemDonationQrRpcName, 'redeem_qr');
+  });
 }
