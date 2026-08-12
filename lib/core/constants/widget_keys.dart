@@ -43,6 +43,11 @@ class WidgetKeys {
   );
   static const Key donorNavigationProfile = Key('donor_navigation_profile');
   static const Key donorNotificationsButton = Key('donor_notifications_button');
+  static const Key donorScannerManualToggle = Key('donor_scanner_manual_toggle');
+  static const Key donorScannerManualField = Key('donor_scanner_manual_field');
+  static const Key donorScannerManualSubmit = Key('donor_scanner_manual_submit');
+  static const Key donorScannerError = Key('donor_scanner_error');
+  static const Key donorScannerProgress = Key('donor_scanner_progress');
   static const Key requesterNavigationHome = Key('requester_navigation_home');
   static const Key requesterNavigationRequests = Key(
     'requester_navigation_requests',

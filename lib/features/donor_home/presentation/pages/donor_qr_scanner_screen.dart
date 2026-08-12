@@ -2,19 +2,24 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/error/failures.dart';
 import '../../../../core/presentation/widgets/app_bottom_nav.dart';
 import '../../../../core/presentation/widgets/app_gradient_background.dart';
 import '../../../../core/presentation/widgets/app_header.dart';
 import '../../../../core/presentation/widgets/qr_page_body.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/string_manager.dart';
 import '../../../../core/utils/greeting.dart';
+import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
+import '../bloc/donor_feed_bloc.dart';
 
 typedef DonorScannerBuilder = Widget Function(ValueChanged<String> onScanned);
 
@@ -27,6 +32,9 @@ enum DonorScannerDestination {
   notifications,
 }
 
+/// Scan-first donor redemption: the camera opens immediately, a detected (or
+/// manually entered) token is redeemed through [DonorFeedBloc] with the backend
+/// inferring request vs campaign, and the screen closes itself on success.
 class DonorQrScannerScreen extends StatefulWidget {
   final DonorScannerBuilder? scannerBuilder;
   final ValueChanged<DonorScannerDestination>? onNavigate;
@@ -39,7 +47,10 @@ class DonorQrScannerScreen extends StatefulWidget {
 
 class _DonorQrScannerScreenState extends State<DonorQrScannerScreen> {
   MobileScannerController? _controller;
-  bool _handled = false;
+  final TextEditingController _manualController = TextEditingController();
+  bool _submitting = false;
+  bool _manualOpen = false;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -56,61 +67,89 @@ class _DonorQrScannerScreenState extends State<DonorQrScannerScreen> {
   void dispose() {
     final controller = _controller;
     if (controller != null) unawaited(controller.dispose());
+    _manualController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final scanner =
-        widget.scannerBuilder?.call(_finish) ??
-        MobileScanner(controller: _controller, onDetect: _onDetect);
+        widget.scannerBuilder?.call(_redeem) ??
+        MobileScanner(
+          controller: _controller,
+          onDetect: _onDetect,
+          errorBuilder: (context, error) => _CameraUnavailable(),
+        );
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: ColorManager.transparent,
-        bottomNavigationBar: _ScannerNavigation(onNavigate: _navigate),
-        body: AppGradientBackground(
-          child: SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: AppSize.s402),
-                child: Column(
-                  children: [
-                    AppHeader(
-                      title: welcomeTitle(),
-                      subtitle: AppStrings.donationLifeChance.tr(),
-                      notificationsKey: WidgetKeys.donorNotificationsButton,
-                      onNotifications: () =>
-                          _navigate(DonorScannerDestination.notifications),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppPadding.p10,
-                        ),
-                        child: QrPageBody(
-                          description: AppStrings.scanQrToComplete.tr(),
-                          square: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                  AppSize.radiusXXLarge,
+      child: BlocListener<DonorFeedBloc, DonorFeedState>(
+        listenWhen: (previous, current) =>
+            (current is DonorFeedLoaded &&
+                current.lastMutation == DonorFeedMutation.donationRecorded) ||
+            current is DonorFeedError,
+        listener: _onFeedState,
+        child: Scaffold(
+          backgroundColor: ColorManager.transparent,
+          bottomNavigationBar: _ScannerNavigation(onNavigate: _navigate),
+          body: AppGradientBackground(
+            child: SafeArea(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: AppSize.s402),
+                  child: Column(
+                    children: [
+                      AppHeader(
+                        title: welcomeTitle(),
+                        subtitle: AppStrings.donationLifeChance.tr(),
+                        notificationsKey: WidgetKeys.donorNotificationsButton,
+                        onNotifications: () =>
+                            _navigate(DonorScannerDestination.notifications),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppPadding.p10,
+                          ),
+                          child: QrPageBody(
+                            description: AppStrings.scanQrToComplete.tr(),
+                            square: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    AppSize.radiusXXLarge,
+                                  ),
+                                  child: scanner,
                                 ),
-                                child: scanner,
-                              ),
-                              IgnorePointer(
-                                child: SvgPicture.asset(
-                                  SvgAssets.qrScanFrame,
-                                  fit: BoxFit.contain,
+                                IgnorePointer(
+                                  child: SvgPicture.asset(
+                                    SvgAssets.qrScanFrame,
+                                    fit: BoxFit.contain,
+                                  ),
                                 ),
-                              ),
-                            ],
+                                if (_submitting)
+                                  Center(
+                                    child: CircularProgressIndicator(
+                                      key: WidgetKeys.donorScannerProgress,
+                                      color: ColorManager.primary,
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                      _ScannerFooter(
+                        errorMessage: _errorMessage,
+                        manualOpen: _manualOpen,
+                        controller: _manualController,
+                        submitting: _submitting,
+                        onManualToggle: () =>
+                            setState(() => _manualOpen = true),
+                        onManualSubmit: () => _redeem(_manualController.text),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -126,21 +165,150 @@ class _DonorQrScannerScreenState extends State<DonorQrScannerScreen> {
       if (value != null && value.isNotEmpty) {
         final controller = _controller;
         if (controller != null) await controller.stop();
-        _finish(value);
+        _redeem(value);
         return;
       }
     }
   }
 
-  void _finish(String token) {
-    if (_handled || !mounted) return;
-    _handled = true;
-    Navigator.pop(context, token);
+  void _redeem(String token) {
+    final trimmed = token.trim();
+    if (trimmed.isEmpty || _submitting || !mounted) return;
+    setState(() {
+      _submitting = true;
+      _errorMessage = null;
+    });
+    context.read<DonorFeedBloc>().add(DonorQrRedeemed(trimmed));
+  }
+
+  void _onFeedState(BuildContext context, DonorFeedState state) {
+    if (state is DonorFeedLoaded &&
+        state.lastMutation == DonorFeedMutation.donationRecorded) {
+      Navigator.of(context).maybePop();
+      return;
+    }
+    if (state is DonorFeedError) {
+      setState(() {
+        _submitting = false;
+        _errorMessage = _messageFor(state.failure);
+      });
+      unawaited(_controller?.start());
+    }
+  }
+
+  String _messageFor(Failure failure) {
+    switch (failure.message) {
+      case 'qr_already_used':
+        return AppStrings.qrAlreadyUsed.tr();
+      case 'qr_expired':
+        return AppStrings.qrExpired.tr();
+      case 'appointment_required':
+        return AppStrings.appointmentRequired.tr();
+      case 'qr_invalid':
+        return AppStrings.qrInvalid.tr();
+      default:
+        return failure.message.isNotEmpty
+            ? failure.message
+            : AppStrings.defaultError.tr();
+    }
   }
 
   void _navigate(DonorScannerDestination destination) {
     widget.onNavigate?.call(destination);
     Navigator.maybePop(context);
+  }
+}
+
+class _ScannerFooter extends StatelessWidget {
+  const _ScannerFooter({
+    required this.errorMessage,
+    required this.manualOpen,
+    required this.controller,
+    required this.submitting,
+    required this.onManualToggle,
+    required this.onManualSubmit,
+  });
+
+  final String? errorMessage;
+  final bool manualOpen;
+  final TextEditingController controller;
+  final bool submitting;
+  final VoidCallback onManualToggle;
+  final VoidCallback onManualSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppPadding.p16,
+        vertical: AppPadding.p12,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (errorMessage != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSize.s12),
+              child: Text(
+                errorMessage!,
+                key: WidgetKeys.donorScannerError,
+                textAlign: TextAlign.center,
+                style: getMediumStyle(
+                  fontSize: FontSize.s16,
+                  color: ColorManager.error,
+                ),
+              ),
+            ),
+          if (!manualOpen)
+            TextButton(
+              key: WidgetKeys.donorScannerManualToggle,
+              onPressed: onManualToggle,
+              child: Text(AppStrings.enterCodeManually.tr()),
+            )
+          else ...[
+            TextField(
+              key: WidgetKeys.donorScannerManualField,
+              controller: controller,
+              textAlign: TextAlign.right,
+              decoration: InputDecoration(
+                hintText: AppStrings.requestQrToken.tr(),
+              ),
+            ),
+            const SizedBox(height: AppSize.s12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                key: WidgetKeys.donorScannerManualSubmit,
+                onPressed: submitting ? null : onManualSubmit,
+                child: Text(AppStrings.redeemQr.tr()),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _CameraUnavailable extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: ColorManager.black,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppPadding.p16),
+          child: Text(
+            AppStrings.cameraDenied.tr(),
+            textAlign: TextAlign.center,
+            style: getMediumStyle(
+              fontSize: FontSize.s16,
+              color: ColorManager.white,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
