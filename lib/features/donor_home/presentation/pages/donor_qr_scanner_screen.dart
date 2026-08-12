@@ -7,7 +7,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../../core/constants/widget_keys.dart';
-import '../../../../core/error/failures.dart';
 import '../../../../core/presentation/widgets/app_bottom_nav.dart';
 import '../../../../core/presentation/widgets/app_gradient_background.dart';
 import '../../../../core/presentation/widgets/app_header.dart';
@@ -188,28 +187,15 @@ class _DonorQrScannerScreenState extends State<DonorQrScannerScreen> {
       return;
     }
     if (state is DonorFeedError) {
+      // The failure already carries a localized message (mapped from the
+      // redeem RPC's P0001 code in SupabaseErrorMapper).
       setState(() {
         _submitting = false;
-        _errorMessage = _messageFor(state.failure);
+        _errorMessage = state.failure.message.isNotEmpty
+            ? state.failure.message
+            : AppStrings.defaultError.tr();
       });
       unawaited(_controller?.start());
-    }
-  }
-
-  String _messageFor(Failure failure) {
-    switch (failure.message) {
-      case 'qr_already_used':
-        return AppStrings.qrAlreadyUsed.tr();
-      case 'qr_expired':
-        return AppStrings.qrExpired.tr();
-      case 'appointment_required':
-        return AppStrings.appointmentRequired.tr();
-      case 'qr_invalid':
-        return AppStrings.qrInvalid.tr();
-      default:
-        return failure.message.isNotEmpty
-            ? failure.message
-            : AppStrings.defaultError.tr();
     }
   }
 

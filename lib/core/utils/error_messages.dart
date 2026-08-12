@@ -82,6 +82,12 @@ class ErrorMessages {
     AppStrings.notFoundError: 'البيانات غير موجودة',
     AppStrings.permissionDenied: 'ليس لديك صلاحية للوصول',
 
+    // QR redeem errors (raised as P0001 by the redeem RPCs)
+    AppStrings.qrAlreadyUsed: 'تم استخدام هذا الرمز من قبل.',
+    AppStrings.qrExpired: 'انتهت صلاحية الرمز.',
+    AppStrings.appointmentRequired: 'لا يوجد موعد مؤكد لهذا الطلب.',
+    AppStrings.qrInvalid: 'رمز غير صالح.',
+
     // Storage errors
     AppStrings.storageError: 'خطأ في تخزين الملفات',
     AppStrings.fileTooLarge: 'حجم الملف كبير جداً',

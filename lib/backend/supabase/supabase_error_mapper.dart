@@ -94,9 +94,24 @@ class SupabaseErrorMapper implements BackendErrorMapper {
     );
   }
 
+  /// Domain errors the redeem RPCs raise verbatim via `P0001`. They arrive as
+  /// the raw `PostgrestException.message`, so map them before the generic
+  /// substring checks — otherwise every one collapses into `databaseError`.
+  static const Map<String, String> _redeemErrorMessages = {
+    'qr_already_used': AppStrings.qrAlreadyUsed,
+    'qr_expired': AppStrings.qrExpired,
+    'appointment_required': AppStrings.appointmentRequired,
+    'qr_invalid': AppStrings.qrInvalid,
+  };
+
   Failure _handleDatabaseError(PostgrestException error) {
     final message = error.message.toLowerCase();
     final code = int.tryParse(error.code ?? '') ?? -8;
+
+    final redeemKey = _redeemErrorMessages[error.message];
+    if (redeemKey != null) {
+      return DatabaseFailure(code, ErrorMessages.getMessage(redeemKey));
+    }
 
     if (message.contains('duplicate key') ||
         message.contains('unique constraint') ||
