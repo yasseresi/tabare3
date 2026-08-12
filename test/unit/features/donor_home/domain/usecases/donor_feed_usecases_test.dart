@@ -165,4 +165,16 @@ void main() {
       expect(await redeemCampaign(' campaign-token '), Right(record));
     },
   );
+
+  test('RedeemDonation rejects empty tokens and delegates valid ones', () async {
+    final redeem = RedeemDonation(repository);
+
+    expect(await redeem('   '), isA<Left<Failure, DonationRecordEntity>>());
+
+    when(
+      () => repository.redeemQr('any-token'),
+    ).thenAnswer((_) async => Right(record));
+
+    expect(await redeem(' any-token '), Right(record));
+  });
 }

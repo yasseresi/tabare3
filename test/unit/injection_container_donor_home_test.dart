@@ -28,6 +28,7 @@ void main() {
     expect(sl.isRegistered<CancelDonationAppointment>(), isTrue);
     expect(sl.isRegistered<RedeemRequestDonation>(), isTrue);
     expect(sl.isRegistered<RedeemCampaignDonation>(), isTrue);
+    expect(sl.isRegistered<RedeemDonation>(), isTrue);
     expect(sl.isRegistered<DonorFeedBloc>(), isTrue);
     expect(sl.isRegistered<DonorCardRemoteDataSource>(), isTrue);
     expect(sl.isRegistered<DonorCardRepository>(), isTrue);

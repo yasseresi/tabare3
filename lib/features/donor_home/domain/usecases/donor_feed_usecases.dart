@@ -180,6 +180,25 @@ class RedeemRequestDonation
   }
 }
 
+/// Unified redemption: the backend infers request vs campaign from the token,
+/// so the scan-first flow calls one use case regardless of QR kind.
+class RedeemDonation implements BaseUseCase<DonationRecordEntity, String> {
+  final DonorFeedRepository repository;
+
+  RedeemDonation(this.repository);
+
+  @override
+  Future<Either<Failure, DonationRecordEntity>> call(String token) {
+    final trimmed = token.trim();
+    if (trimmed.isEmpty) {
+      return Future.value(
+        const Left(ValidationFailure(-11, 'رمز التحقق مطلوب')),
+      );
+    }
+    return repository.redeemQr(trimmed);
+  }
+}
+
 class RedeemCampaignDonation
     implements BaseUseCase<DonationRecordEntity, String> {
   final DonorFeedRepository repository;

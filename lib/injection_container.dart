@@ -89,6 +89,7 @@ Future<void> initDonorHome() async {
   sl.registerLazySingleton(() => CancelDonationAppointment(sl()));
   sl.registerLazySingleton(() => RedeemRequestDonation(sl()));
   sl.registerLazySingleton(() => RedeemCampaignDonation(sl()));
+  sl.registerLazySingleton(() => RedeemDonation(sl()));
   sl.registerLazySingleton(() => GetDonorCard(sl()));
   sl.registerLazySingleton<DonorCardRepository>(
     () => DonorCardRepositoryImpl(remoteDataSource: sl()),
