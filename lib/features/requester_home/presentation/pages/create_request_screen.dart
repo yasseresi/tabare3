@@ -16,7 +16,9 @@ import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/constants_manager.dart';
 import '../../../../core/utils/font_manager.dart';
 import '../../../../core/utils/route_manager.dart';
+import '../../../../core/utils/error_messages.dart';
 import '../../../../core/utils/string_manager.dart';
+import '../../../../core/validators/validators.dart';
 import '../../../../core/utils/greeting.dart';
 import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
@@ -391,6 +393,19 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     if (_beneficiaryType == BeneficiaryType.other && patient == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppStrings.patientDetailsRequired.tr())),
+      );
+      return;
+    }
+
+    if (patient != null && !isNationalIdValid(patient.nationalId)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            ErrorMessages.getValidationMessage(
+              ValidationKeys.nationalIdInvalid,
+            ),
+          ),
+        ),
       );
       return;
     }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../../core/presentation/widgets/adaptive_pickers.dart';
 import '../../../../core/presentation/widgets/app_dialog.dart';
 import '../../../../core/presentation/widgets/app_gradient_background.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
@@ -81,12 +82,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _pickDate() async {
-    final picked = await showDatePicker(
+    final picked = await showAdaptiveDatePicker(
       context: context,
       initialDate: _selectedDate ?? DateTime(2000),
       firstDate: DateTime(1920),
       lastDate: DateTime.now(),
-      locale: const Locale('ar'),
     );
     if (picked != null) {
       setState(() {
@@ -440,7 +440,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           obscureSvg: SvgAssets.hidden,
           isPassword: true,
           controller: _passwordController,
-          validator: validatePassword,
+          validator: validateStrongPassword,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
@@ -497,6 +497,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           hintText: AppStrings.nationalId.tr(),
           prefixSvg: SvgAssets.idSerialNumber,
           controller: _nationalIdController,
+          validator: validateNationalIdOptional,
         ),
         const SizedBox(height: AppSize.s15),
         DropdownButtonFormField<String>(

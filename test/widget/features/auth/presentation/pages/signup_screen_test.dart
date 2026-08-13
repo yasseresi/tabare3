@@ -103,8 +103,8 @@ void main() {
     await tester.enterText(fields.at(0), 'Test User');
     await tester.enterText(fields.at(1), 'testuser1');
     await tester.enterText(fields.at(2), '0555123456');
-    await tester.enterText(fields.at(3), 'password1234');
-    await tester.enterText(fields.at(4), 'password1234');
+    await tester.enterText(fields.at(3), 'Str0ng!Passw0rd');
+    await tester.enterText(fields.at(4), 'Str0ng!Passw0rd');
   }
 
   // Gender is a placeholder dropdown on step 2, so it must be picked before the

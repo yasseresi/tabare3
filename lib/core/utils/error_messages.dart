@@ -11,6 +11,9 @@ class ValidationKeys {
   static const String phoneInvalid = AppStrings.phoneInvalid;
   static const String passwordRequired = AppStrings.passwordRequired;
   static const String passwordInvalid = AppStrings.passwordInvalid;
+  static const String passwordWeak = AppStrings.passwordWeak;
+  static const String nationalIdRequired = AppStrings.nationalIdRequired;
+  static const String nationalIdInvalid = AppStrings.nationalIdInvalid;
   static const String dateRequired = AppStrings.dateRequired;
   static const String dateInvalid = AppStrings.dateInvalid;
   static const String genderRequired = AppStrings.genderRequired;
@@ -45,6 +48,10 @@ class ErrorMessages {
     ValidationKeys.phoneInvalid: 'صيغة رقم الجوال غير صحيحة (0XXXXXXXXX)',
     ValidationKeys.passwordRequired: 'يرجى إدخال كلمة المرور',
     ValidationKeys.passwordInvalid: 'يجب أن تكون كلمة المرور 8 أحرف على الأقل',
+    ValidationKeys.passwordWeak:
+        'يجب أن تتكون كلمة المرور من 12 حرفًا على الأقل وتحتوي على حرف كبير وحرف صغير ورقم ورمز خاص',
+    ValidationKeys.nationalIdRequired: 'يرجى إدخال رقم التعريف الوطني',
+    ValidationKeys.nationalIdInvalid: 'يجب أن يتكون رقم التعريف الوطني من 18 رقمًا',
     ValidationKeys.dateRequired: 'يرجى إدخال تاريخ الميلاد',
     ValidationKeys.dateInvalid: 'صيغة التاريخ غير صحيحة (YYYY-MM-DD)',
     ValidationKeys.genderRequired: 'يرجى اختيار الجنس',

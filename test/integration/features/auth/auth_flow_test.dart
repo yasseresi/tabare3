@@ -380,8 +380,8 @@ void main() {
         await tester.enterText(step1Fields.at(0), 'Test User');
         await tester.enterText(step1Fields.at(1), 'testuser1');
         await tester.enterText(step1Fields.at(2), '0555123456');
-        await tester.enterText(step1Fields.at(3), 'password123');
-        await tester.enterText(step1Fields.at(4), 'password123');
+        await tester.enterText(step1Fields.at(3), 'Str0ng!Passw0rd');
+        await tester.enterText(step1Fields.at(4), 'Str0ng!Passw0rd');
 
         await tester.ensureVisible(
           find.widgetWithText(ElevatedButton, 'التالي'),

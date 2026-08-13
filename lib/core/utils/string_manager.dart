@@ -203,6 +203,9 @@ class AppStrings {
   static const String phoneInvalid = 'phone_invalid';
   static const String passwordRequired = 'password_required';
   static const String passwordInvalid = 'password_invalid';
+  static const String passwordWeak = 'password_weak_strength';
+  static const String nationalIdRequired = 'national_id_required';
+  static const String nationalIdInvalid = 'national_id_invalid';
   static const String dateRequired = 'date_required';
   static const String dateInvalid = 'date_invalid';
   static const String genderRequired = 'gender_required';
