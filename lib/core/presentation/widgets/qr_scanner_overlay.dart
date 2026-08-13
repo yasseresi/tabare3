@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../constants/app_dimensions.dart';
 import '../../utils/color_manager.dart';
 import '../../utils/values_manager.dart';
 
@@ -27,7 +28,7 @@ class _QrScannerOverlayState extends State<QrScannerOverlay>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: AppDurations.scannerScanLine,
+      duration: AppDuration.scannerScanLine,
     );
     if (widget.animate) _controller.repeat(reverse: true);
   }
@@ -72,75 +73,73 @@ class _ScannerPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final inset = AppSize.scannerInset;
-    final rect = Rect.fromLTRB(
+    final target = Rect.fromLTRB(
       inset,
       inset,
       size.width - inset,
       size.height - inset,
     );
 
-    final bracketPaint = Paint()
+    _paintCornerBrackets(canvas, target);
+    if (showScanLine) _paintScanLine(canvas, target);
+  }
+
+  void _paintCornerBrackets(Canvas canvas, Rect target) {
+    final paint = Paint()
       ..color = color
       ..strokeWidth = AppSize.scannerCornerStroke
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
 
-    final arm = AppSize.scannerCornerLength;
-    final radius = AppSize.radiusXXLarge;
-
-    // Top-left.
-    _drawCorner(canvas, bracketPaint, rect.topLeft, arm, radius, 1, 1);
-    // Top-right.
-    _drawCorner(canvas, bracketPaint, rect.topRight, arm, radius, -1, 1);
-    // Bottom-right.
-    _drawCorner(canvas, bracketPaint, rect.bottomRight, arm, radius, -1, -1);
-    // Bottom-left.
-    _drawCorner(canvas, bracketPaint, rect.bottomLeft, arm, radius, 1, -1);
-
-    if (!showScanLine) return;
-
-    // Sweeping scan line, fading toward its edges.
-    final y = rect.top + rect.height * progress;
-    final lineRect = Rect.fromLTWH(
-      rect.left,
-      y - AppSize.scannerScanLineHeight / 2,
-      rect.width,
-      AppSize.scannerScanLineHeight,
-    );
-    final linePaint = Paint()
-      ..shader = LinearGradient(
-        colors: [
-          color.withValues(alpha: 0),
-          color,
-          color.withValues(alpha: 0),
-        ],
-      ).createShader(lineRect);
-    canvas.drawRect(lineRect, linePaint);
+    // Each corner is paired with the direction its arms run in, so one bracket
+    // path serves all four.
+    final brackets = <(Offset, Offset)>[
+      (target.topLeft, const Offset(1, 1)),
+      (target.topRight, const Offset(-1, 1)),
+      (target.bottomRight, const Offset(-1, -1)),
+      (target.bottomLeft, const Offset(1, -1)),
+    ];
+    for (final (corner, inward) in brackets) {
+      canvas.drawPath(_bracketPath(corner, inward), paint);
+    }
   }
 
-  void _drawCorner(
-    Canvas canvas,
-    Paint paint,
-    Offset corner,
-    double arm,
-    double radius,
-    double dx,
-    double dy,
-  ) {
-    final path = Path()
+  Path _bracketPath(Offset corner, Offset inward) {
+    final arm = AppSize.scannerCornerLength;
+    final radius = AppSize.radiusXXLarge;
+    return Path()
       // Arm along the horizontal edge.
-      ..moveTo(corner.dx + dx * (radius + arm), corner.dy)
-      ..lineTo(corner.dx + dx * radius, corner.dy)
+      ..moveTo(corner.dx + inward.dx * (radius + arm), corner.dy)
+      ..lineTo(corner.dx + inward.dx * radius, corner.dy)
       // Rounded elbow through the corner point.
       ..quadraticBezierTo(
         corner.dx,
         corner.dy,
         corner.dx,
-        corner.dy + dy * radius,
+        corner.dy + inward.dy * radius,
       )
       // Arm along the vertical edge.
-      ..lineTo(corner.dx, corner.dy + dy * (radius + arm));
-    canvas.drawPath(path, paint);
+      ..lineTo(corner.dx, corner.dy + inward.dy * (radius + arm));
+  }
+
+  /// Sweeping scan line, fading toward its edges.
+  void _paintScanLine(Canvas canvas, Rect target) {
+    final y = target.top + target.height * progress;
+    final lineRect = Rect.fromLTWH(
+      target.left,
+      y - AppSize.scannerScanLineHeight / 2,
+      target.width,
+      AppSize.scannerScanLineHeight,
+    );
+    final paint = Paint()
+      ..shader = LinearGradient(
+        colors: [
+          color.withValues(alpha: AppOpacity.transparent),
+          color,
+          color.withValues(alpha: AppOpacity.transparent),
+        ],
+      ).createShader(lineRect);
+    canvas.drawRect(lineRect, paint);
   }
 
   @override

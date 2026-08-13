@@ -1,4 +1,5 @@
 class AppOpacity {
+  static const double transparent = 0.0;
   static const double faint = 0.04;
   static const double tint = 0.06;
   static const double subtle = 0.05;
@@ -18,4 +19,7 @@ class AppOpacity {
 class AppDuration {
   /// Knob travel of the signup terms toggle, in milliseconds.
   static const int toggle = 150;
+
+  /// One sweep of the QR scanner scan line.
+  static const Duration scannerScanLine = Duration(milliseconds: 2000);
 }

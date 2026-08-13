@@ -185,10 +185,3 @@ class AppSize {
   static const double scannerScanLineHeight = 3.0;
   static const double scannerInset = 24.0;
 }
-
-/// Animation durations.
-class AppDurations {
-  AppDurations._();
-
-  static const Duration scannerScanLine = Duration(milliseconds: 2000);
-}
