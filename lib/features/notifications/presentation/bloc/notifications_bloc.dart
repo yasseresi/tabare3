@@ -24,6 +24,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     required this.markNotificationAsRead,
   }) : super(const NotificationsInitial()) {
     on<NotificationsRequested>(_onRequested);
+    on<NotificationsCleared>(_onCleared);
     on<NotificationsStreamUpdated>(_onStreamUpdated);
     on<NotificationsSearchChanged>(_onSearchChanged);
     on<NotificationReadRequested>(_onReadRequested);
@@ -42,10 +43,27 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     );
   }
 
+  void _onCleared(
+    NotificationsCleared event,
+    Emitter<NotificationsState> emit,
+  ) {
+    // Cancel first: an in-flight emission from the signed-out user's stream
+    // would otherwise repopulate the state we are about to drop.
+    _subscription?.cancel();
+    _subscription = null;
+    emit(const NotificationsInitial());
+  }
+
   void _onStreamUpdated(
     NotificationsStreamUpdated event,
     Emitter<NotificationsState> emit,
   ) {
+    // Cancelling a subscription does not synchronously stop delivery, so an
+    // emission from the signed-out user's stream can still be sitting in the
+    // event queue behind NotificationsCleared. Drop anything that arrives
+    // while no subscription is active.
+    if (_subscription == null) return;
+
     event.result.fold((failure) => emit(NotificationsError(failure)), (
       notifications,
     ) {

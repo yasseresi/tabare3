@@ -74,6 +74,10 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
     return BlocListener<AuthBloc, AuthState>(
       listenWhen: (previous, current) => current is Unauthenticated,
       listener: (context, state) {
+        // The notifications bloc is app-wide and outlives this route, so the
+        // session's notifications have to be dropped here or the next user
+        // inherits them.
+        context.read<NotificationsBloc>().add(const NotificationsCleared());
         showLogoutSuccessDialog(
           context,
           onDismissed: () => Navigator.pushNamedAndRemoveUntil(

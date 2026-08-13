@@ -15,6 +15,15 @@ class NotificationsRequested extends NotificationsEvent {
   const NotificationsRequested();
 }
 
+/// Drops the current session's notifications and closes the realtime stream.
+///
+/// The bloc is app-wide and outlives any one sign-in, so this must run on sign
+/// out — otherwise the next user briefly sees the previous user's unread badge
+/// and notification contents.
+class NotificationsCleared extends NotificationsEvent {
+  const NotificationsCleared();
+}
+
 class NotificationsSearchChanged extends NotificationsEvent {
   final String query;
 

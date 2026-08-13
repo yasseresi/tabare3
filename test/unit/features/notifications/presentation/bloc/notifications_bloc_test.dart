@@ -204,4 +204,59 @@ void main() {
     expect: () => <NotificationsState>[],
     verify: (_) => verifyNever(() => markNotificationAsRead(any())),
   );
+
+  // The bloc is app-wide and outlives any one session, so signing out has to
+  // drop the previous user's notifications. Otherwise the next user sees them
+  // on the bell badge — and in the notifications centre — until the new
+  // stream's first emission lands.
+  group('sign-out teardown', () {
+    blocTest<NotificationsBloc, NotificationsState>(
+      'clearing drops the signed-out user notifications',
+      build: buildBloc,
+      seed: () => NotificationsLoaded(
+        notifications: [unreadNotification, readNotification],
+        visibleNotifications: [unreadNotification, readNotification],
+      ),
+      act: (bloc) => bloc.add(const NotificationsCleared()),
+      expect: () => <NotificationsState>[const NotificationsInitial()],
+    );
+
+    blocTest<NotificationsBloc, NotificationsState>(
+      'clearing stops the previous session stream from emitting',
+      build: buildBloc,
+      setUp: () {
+        stubStream(
+          Stream<Either<Failure, List<NotificationEntity>>>.periodic(
+            const Duration(milliseconds: 10),
+            (_) => Right([unreadNotification]),
+          ),
+        );
+      },
+      act: (bloc) async {
+        bloc.add(const NotificationsRequested());
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        bloc.add(const NotificationsCleared());
+        // Any emission after this point would be the old user's data.
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+      },
+      verify: (bloc) => expect(bloc.state, const NotificationsInitial()),
+    );
+
+    blocTest<NotificationsBloc, NotificationsState>(
+      're-requesting after a clear shows loading rather than stale data',
+      build: buildBloc,
+      seed: () => NotificationsLoaded(
+        notifications: [unreadNotification],
+        visibleNotifications: [unreadNotification],
+      ),
+      act: (bloc) async {
+        bloc.add(const NotificationsCleared());
+        bloc.add(const NotificationsRequested());
+      },
+      expect: () => <NotificationsState>[
+        const NotificationsInitial(),
+        const NotificationsLoading(),
+      ],
+    );
+  });
 }
