@@ -62,6 +62,14 @@ class _DonorHomeScreenState extends State<DonorHomeScreen> {
   _DonorTab _selectedTab = _DonorTab.home;
 
   @override
+  void initState() {
+    super.initState();
+    // Open the app-wide notifications stream now that a user is signed in, so
+    // the bell badge stays live across every screen for this session.
+    context.read<NotificationsBloc>().add(const NotificationsRequested());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listenWhen: (previous, current) => current is Unauthenticated,

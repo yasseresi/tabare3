@@ -17,8 +17,9 @@ class AppPage extends StatelessWidget {
   final List<Widget> children;
   final Future<void> Function()? onRefresh;
 
-  /// Unread notification count forwarded to the header bell badge.
-  final int unreadCount;
+  /// Unread notification count forwarded to the header bell badge. Null lets
+  /// [AppHeader] derive it live from the app-wide [NotificationsBloc].
+  final int? unreadCount;
 
   const AppPage({
     super.key,
@@ -28,7 +29,7 @@ class AppPage extends StatelessWidget {
     this.onNotifications,
     this.notificationsKey,
     this.onRefresh,
-    this.unreadCount = 0,
+    this.unreadCount,
   });
 
   @override

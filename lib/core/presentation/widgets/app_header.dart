@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../features/notifications/presentation/bloc/notifications_bloc.dart';
 import '../../constants/app_dimensions.dart';
 import '../../utils/assets_manager.dart';
 import '../../utils/color_manager.dart';
@@ -22,7 +24,12 @@ class AppHeader extends StatelessWidget {
   final Key? notificationsKey;
 
   /// Unread notification count; a badge is painted on the bell when above zero.
-  final int unreadCount;
+  ///
+  /// When left null the header derives the count live from a [NotificationsBloc]
+  /// found in the widget tree, so the badge appears on every screen that sits
+  /// under the app-wide provider. When no bloc is in scope (e.g. auth screens
+  /// or isolated widget tests) it degrades to zero — no badge.
+  final int? unreadCount;
 
   const AppHeader({
     super.key,
@@ -30,11 +37,29 @@ class AppHeader extends StatelessWidget {
     required this.subtitle,
     this.onNotifications,
     this.notificationsKey,
-    this.unreadCount = 0,
+    this.unreadCount,
   });
 
   @override
   Widget build(BuildContext context) {
+    final explicit = unreadCount;
+    if (explicit != null) return _build(context, explicit);
+
+    // Reactive badge, but only when a NotificationsBloc is actually provided.
+    NotificationsBloc? bloc;
+    try {
+      bloc = context.read<NotificationsBloc>();
+    } catch (_) {
+      bloc = null;
+    }
+    if (bloc == null) return _build(context, 0);
+    return BlocBuilder<NotificationsBloc, NotificationsState>(
+      bloc: bloc,
+      builder: (context, state) => _build(context, state.unreadCountOrZero),
+    );
+  }
+
+  Widget _build(BuildContext context, int unreadCount) {
     // Opaque wash behind the header so list content scrolls out of sight
     // beneath it instead of bleeding through the greeting text.
     return AppGradientBackground(

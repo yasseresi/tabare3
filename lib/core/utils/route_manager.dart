@@ -28,7 +28,6 @@ import '../../features/donor_home/presentation/bloc/donor_card_bloc.dart';
 import '../../features/profile/presentation/bloc/profile_bloc.dart';
 import '../../features/profile/presentation/pages/about_app_screen.dart';
 import '../../features/profile/presentation/pages/profile_screen.dart';
-import '../../features/notifications/presentation/bloc/notifications_bloc.dart';
 import '../../features/notifications/presentation/pages/notifications_center_page.dart';
 
 class Routes {
@@ -90,10 +89,6 @@ class RouteGenerator {
                 create: (_) =>
                     sl<RequestBloc>()..add(const RequestsLoadRequested()),
               ),
-              BlocProvider(
-                create: (_) =>
-                    sl<NotificationsBloc>()..add(const NotificationsRequested()),
-              ),
             ],
             child: const RequesterHomeScreen(),
           ),
@@ -132,11 +127,10 @@ class RouteGenerator {
           ),
         );
       case Routes.notificationsRoute:
+        // Uses the app-wide NotificationsBloc from main.dart; the page's own
+        // initState fires NotificationsRequested to ensure the stream is live.
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => sl<NotificationsBloc>(),
-            child: const NotificationsCenterPage(),
-          ),
+          builder: (_) => const NotificationsCenterPage(),
         );
       case Routes.donorHistoryRoute:
         return MaterialPageRoute(
@@ -163,10 +157,6 @@ class RouteGenerator {
               BlocProvider(
                 create: (_) =>
                     sl<DonorFeedBloc>()..add(const DonorFeedRequested()),
-              ),
-              BlocProvider(
-                create: (_) =>
-                    sl<NotificationsBloc>()..add(const NotificationsRequested()),
               ),
             ],
             child: const DonorHomeScreen(),

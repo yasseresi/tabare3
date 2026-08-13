@@ -45,3 +45,12 @@ class NotificationsError extends NotificationsState {
   @override
   List<Object?> get props => [failure];
 }
+
+extension NotificationsUnreadCount on NotificationsState {
+  /// Unread count for any state; zero unless notifications have loaded. Lets
+  /// the shared header bell derive its badge without pattern-matching states.
+  int get unreadCountOrZero {
+    final state = this;
+    return state is NotificationsLoaded ? state.unreadCount : 0;
+  }
+}
