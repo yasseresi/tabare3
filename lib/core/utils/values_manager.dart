@@ -177,4 +177,18 @@ class AppSize {
 
   /// Figma letter spacing on notification card copy (`0.1051`).
   static const double letterSpacingCard = 0.1051;
+
+  /// QR scanner overlay: corner-bracket arm length, stroke width and the
+  /// height of the sweeping scan line.
+  static const double scannerCornerLength = 32.0;
+  static const double scannerCornerStroke = 4.0;
+  static const double scannerScanLineHeight = 3.0;
+  static const double scannerInset = 24.0;
+}
+
+/// Animation durations.
+class AppDurations {
+  AppDurations._();
+
+  static const Duration scannerScanLine = Duration(milliseconds: 2000);
 }

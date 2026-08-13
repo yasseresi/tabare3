@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../../core/constants/widget_keys.dart';
@@ -11,6 +10,7 @@ import '../../../../core/presentation/widgets/app_bottom_nav.dart';
 import '../../../../core/presentation/widgets/app_gradient_background.dart';
 import '../../../../core/presentation/widgets/app_header.dart';
 import '../../../../core/presentation/widgets/qr_page_body.dart';
+import '../../../../core/presentation/widgets/qr_scanner_overlay.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/color_manager.dart';
 import '../../../../core/utils/font_manager.dart';
@@ -120,11 +120,8 @@ class _DonorQrScannerScreenState extends State<DonorQrScannerScreen> {
                                   ),
                                   child: scanner,
                                 ),
-                                IgnorePointer(
-                                  child: SvgPicture.asset(
-                                    SvgAssets.qrScanFrame,
-                                    fit: BoxFit.contain,
-                                  ),
+                                QrScannerOverlay(
+                                  animate: widget.scannerBuilder == null,
                                 ),
                                 if (_submitting)
                                   Center(
