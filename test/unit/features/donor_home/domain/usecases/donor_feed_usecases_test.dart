@@ -177,4 +177,114 @@ void main() {
 
     expect(await redeem(' any-token '), Right(record));
   });
+
+  test('GetDonorAvailability forwards the repository result', () async {
+    when(
+      () => repository.getAvailability(),
+    ).thenAnswer((_) async => Right(feed.availability));
+
+    final result = await GetDonorAvailability(repository)(NoParams());
+
+    expect(result, Right<Failure, DonorAvailabilityEntity>(feed.availability));
+    verify(() => repository.getAvailability()).called(1);
+  });
+
+  test('GetCompatibleDonationRequests forwards the repository result', () async {
+    when(
+      () => repository.listCompatibleRequests(),
+    ).thenAnswer((_) async => const Right([]));
+
+    final result = await GetCompatibleDonationRequests(repository)(NoParams());
+
+    expect(
+      result,
+      const Right<Failure, List<DonorBloodRequestEntity>>([]),
+    );
+  });
+
+  test('GetAvailableCampaigns forwards the repository result', () async {
+    when(
+      () => repository.listAvailableCampaigns(),
+    ).thenAnswer((_) async => const Right([]));
+
+    final result = await GetAvailableCampaigns(repository)(NoParams());
+
+    expect(
+      result,
+      const Right<Failure, List<DonorCampaignEntity>>([]),
+    );
+  });
+
+  test('GetDonationAppointments forwards the repository result', () async {
+    when(
+      () => repository.listAppointments(),
+    ).thenAnswer((_) async => Right([appointment]));
+
+    final result = await GetDonationAppointments(repository)(NoParams());
+
+    expect(result.getOrElse(() => const []), [appointment]);
+  });
+
+  test('GetDonationRecords forwards the repository result', () async {
+    when(
+      () => repository.listDonationRecords(),
+    ).thenAnswer((_) async => Right([record]));
+
+    final result = await GetDonationRecords(repository)(NoParams());
+
+    expect(result.getOrElse(() => const []), [record]);
+  });
+
+  test('CancelDonationAppointment rejects an empty id before I/O', () async {
+    final result = await CancelDonationAppointment(repository)(
+      const CancelDonationAppointmentParams(
+        appointmentId: '   ',
+        reason: 'sick',
+      ),
+    );
+
+    expect(
+      result.fold((failure) => failure, (_) => null),
+      isA<ValidationFailure>(),
+    );
+    verifyNever(
+      () => repository.cancelAppointment(
+        appointmentId: any(named: 'appointmentId'),
+        reason: any(named: 'reason'),
+      ),
+    );
+  });
+
+  test(
+    'CancelDonationAppointment trims input and returns cancelled state',
+    () async {
+      final cancelled = appointment.copyWith(
+        status: DonationAppointmentStatus.cancelled,
+      );
+      when(
+        () => repository.cancelAppointment(
+          appointmentId: 'appointment-1',
+          reason: 'sick',
+        ),
+      ).thenAnswer((_) async => Right(cancelled));
+
+      final result = await CancelDonationAppointment(repository)(
+        const CancelDonationAppointmentParams(
+          appointmentId: '  appointment-1  ',
+          reason: '  sick  ',
+        ),
+      );
+
+      expect(
+        result.getOrElse(() => appointment).status,
+        DonationAppointmentStatus.cancelled,
+      );
+      verify(
+        () => repository.cancelAppointment(
+          appointmentId: 'appointment-1',
+          reason: 'sick',
+        ),
+      ).called(1);
+    },
+  );
 }

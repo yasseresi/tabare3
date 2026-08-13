@@ -163,4 +163,159 @@ void main() {
       expect(await IssueRequestQr(repository)('request-id'), Right(qr));
     },
   );
+
+  test('GetRecipientRequest forwards a single request by id', () async {
+    when(
+      () => repository.getRequest('request-id'),
+    ).thenAnswer((_) async => Right(request));
+
+    final result = await GetRecipientRequest(repository)('request-id');
+
+    expect(result, Right<Failure, BloodRequestEntity>(request));
+    verify(() => repository.getRequest('request-id')).called(1);
+  });
+
+  test('GetHospitals forwards the repository result', () async {
+    const hospital = HospitalEntity(
+      id: 'hospital-id',
+      wilayaId: 16,
+      nameAr: 'مستشفى',
+      isActive: true,
+    );
+    when(
+      () => repository.listHospitals(),
+    ).thenAnswer((_) async => const Right([hospital]));
+
+    final result = await GetHospitals(repository)(NoParams());
+
+    expect(
+      result,
+      const Right<Failure, List<HospitalEntity>>([hospital]),
+    );
+  });
+
+  test('GetRequestInvitations forwards the repository result', () async {
+    when(
+      () => repository.listInvitations('request-id'),
+    ).thenAnswer((_) async => const Right([]));
+
+    final result = await GetRequestInvitations(repository)('request-id');
+
+    expect(
+      result,
+      const Right<Failure, List<DirectInvitationEntity>>([]),
+    );
+  });
+
+  test(
+    'CreateRecipientRequest forwards a valid for-someone-else draft',
+    () async {
+      final otherDraft = validDraft.copyWith(
+        beneficiaryType: BeneficiaryType.other,
+        patient: const PatientDraft(
+          fullName: 'مريض',
+          nationalId: '123456789012345678',
+          bloodType: 'O+',
+          weight: 70,
+          gender: 'male',
+          dateOfBirth: '1990-01-01',
+        ),
+      );
+      final created = request.copyWith(beneficiaryType: BeneficiaryType.other);
+      when(
+        () => repository.createRequest(otherDraft),
+      ).thenAnswer((_) async => Right(created));
+
+      final result = await CreateRecipientRequest(repository, now: () => now)(
+        otherDraft,
+      );
+
+      expect(result, Right<Failure, BloodRequestEntity>(created));
+      expect(
+        result.getOrElse(() => request).isForSomeoneElse,
+        isTrue,
+      );
+      verify(() => repository.createRequest(otherDraft)).called(1);
+    },
+  );
+
+  test('UpdateRecipientRequest forwards a valid draft', () async {
+    final params = UpdateRequestParams(
+      requestId: 'request-id',
+      draft: validDraft,
+    );
+    final updated = request.copyWith(unitsNeeded: 2);
+    when(
+      () => repository.updateRequest(
+        requestId: 'request-id',
+        draft: validDraft,
+      ),
+    ).thenAnswer((_) async => Right(updated));
+
+    final result = await UpdateRecipientRequest(repository, now: () => now)(
+      params,
+    );
+
+    expect(result, Right<Failure, BloodRequestEntity>(updated));
+    verify(
+      () => repository.updateRequest(requestId: 'request-id', draft: validDraft),
+    ).called(1);
+  });
+
+  test('CancelRecipientRequest rejects an empty reason before I/O', () async {
+    final result = await CancelRecipientRequest(repository)(
+      const CancelRequestParams(requestId: 'request-id', reason: '   '),
+    );
+
+    expect(
+      result.fold((failure) => failure, (_) => null),
+      isA<ValidationFailure>(),
+    );
+    verifyNever(
+      () => repository.cancelRequest(
+        requestId: any(named: 'requestId'),
+        reason: any(named: 'reason'),
+      ),
+    );
+  });
+
+  test('CancelRecipientRequest trims reason and returns cancelled state', () async {
+    final cancelled = request.copyWith(status: BloodRequestStatus.cancelled);
+    when(
+      () => repository.cancelRequest(
+        requestId: 'request-id',
+        reason: 'duplicate',
+      ),
+    ).thenAnswer((_) async => Right(cancelled));
+
+    final result = await CancelRecipientRequest(repository)(
+      const CancelRequestParams(
+        requestId: 'request-id',
+        reason: '  duplicate  ',
+      ),
+    );
+
+    expect(
+      result.getOrElse(() => request).status,
+      BloodRequestStatus.cancelled,
+    );
+    verify(
+      () => repository.cancelRequest(
+        requestId: 'request-id',
+        reason: 'duplicate',
+      ),
+    ).called(1);
+  });
+
+  test('validateRequestDraft rejects blank hospital and blood type', () {
+    expect(
+      validateRequestDraft(validDraft.copyWith(hospitalId: '  '), now),
+      isA<ValidationFailure>(),
+    );
+    expect(
+      validateRequestDraft(validDraft.copyWith(bloodType: '  '), now),
+      isA<ValidationFailure>(),
+    );
+    expect(validateRequestDraft(validDraft, now), isNull);
+  });
 }

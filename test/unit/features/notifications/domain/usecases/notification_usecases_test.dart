@@ -7,6 +7,7 @@ import 'package:tabare3/features/notifications/domain/entities/notification_enti
 import 'package:tabare3/features/notifications/domain/repositories/notification_repository.dart';
 import 'package:tabare3/features/notifications/domain/usecases/get_notifications.dart';
 import 'package:tabare3/features/notifications/domain/usecases/mark_notification_as_read.dart';
+import 'package:tabare3/features/notifications/domain/usecases/watch_notifications.dart';
 
 class MockNotificationRepository extends Mock
     implements NotificationRepository {}
@@ -68,5 +69,19 @@ void main() {
       notification.copyWith(isRead: true),
     );
     verify(() => repository.markAsRead('notification-1')).called(1);
+  });
+
+  test('WatchNotifications streams the repository live results', () async {
+    when(() => repository.watchNotifications()).thenAnswer(
+      (_) => Stream.value(
+        Right<Failure, List<NotificationEntity>>([notification]),
+      ),
+    );
+
+    final event = await WatchNotifications(repository)().first;
+
+    expect(event.isRight(), true);
+    expect(event.getOrElse(() => const []), [notification]);
+    verify(() => repository.watchNotifications()).called(1);
   });
 }
