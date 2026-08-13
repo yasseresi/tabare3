@@ -44,23 +44,22 @@ class AppHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final explicit = unreadCount;
-    if (explicit != null) return _build(context, explicit);
+    if (explicit != null) return _build(explicit);
 
-    // Reactive badge, but only when a NotificationsBloc is actually provided.
-    NotificationsBloc? bloc;
-    try {
-      bloc = context.read<NotificationsBloc>();
-    } catch (_) {
-      bloc = null;
-    }
-    if (bloc == null) return _build(context, 0);
+    // Nullable lookup: resolves to null on routes outside the app-wide
+    // provider (auth screens, isolated widget tests) instead of throwing, so
+    // the badge is simply skipped there. Reading the non-nullable type and
+    // catching would also swallow genuine provider failures.
+    final bloc = context.read<NotificationsBloc?>();
+    if (bloc == null) return _build(0);
+
     return BlocBuilder<NotificationsBloc, NotificationsState>(
       bloc: bloc,
-      builder: (context, state) => _build(context, state.unreadCountOrZero),
+      builder: (context, state) => _build(state.unreadCountOrZero),
     );
   }
 
-  Widget _build(BuildContext context, int unreadCount) {
+  Widget _build(int unreadCount) {
     // Opaque wash behind the header so list content scrolls out of sight
     // beneath it instead of bleeding through the greeting text.
     return AppGradientBackground(
@@ -184,7 +183,6 @@ class _UnreadBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppPadding.p4),
       decoration: BoxDecoration(
         color: ColorManager.error,
-        shape: BoxShape.rectangle,
         borderRadius: BorderRadius.circular(AppSize.s10),
         border: Border.all(color: ColorManager.white, width: AppSize.s2),
       ),
