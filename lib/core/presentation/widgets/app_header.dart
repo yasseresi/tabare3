@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../features/notifications/presentation/bloc/notifications_bloc.dart';
 import '../../constants/app_dimensions.dart';
+import '../../constants/widget_keys.dart';
 import '../../utils/assets_manager.dart';
 import '../../utils/color_manager.dart';
 import '../../utils/constants_manager.dart';
@@ -177,6 +178,7 @@ class _UnreadBadge extends StatelessWidget {
         ? AppStrings.badgeOverflow.tr()
         : '$count';
     return Container(
+      key: WidgetKeys.headerUnreadBadge,
       constraints: const BoxConstraints(minWidth: AppSize.s18),
       height: AppSize.s18,
       padding: const EdgeInsets.symmetric(horizontal: AppPadding.p4),

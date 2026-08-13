@@ -2,6 +2,10 @@ import 'package:flutter/widgets.dart';
 
 /// Stable widget keys for testing. No raw key strings inside views.
 class WidgetKeys {
+  /// Unread-count pill on the shared header bell, present on every screen
+  /// whose header sits under a NotificationsBloc.
+  static const Key headerUnreadBadge = Key('header_unread_badge');
+
   static const profileGradientBackground = Key('profile_gradient_background');
   static const profileNotificationsButton = Key('profile_notifications_button');
   static const profileQrRow = Key('profile_qr_row');
