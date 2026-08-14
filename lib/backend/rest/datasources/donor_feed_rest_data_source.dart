@@ -59,8 +59,10 @@ class DonorFeedRestDataSource implements DonorFeedRemoteDataSource {
   }
 
   @override
-  Future<List<DonationRecordModel>> listDonationRecords() async =>
-      _todo('GET /donations/');
+  Future<List<DonationRecordModel>> listDonationRecords() async {
+    final rows = await _fetchAllPages(RestPaths.donations);
+    return rows.map(_mapDonation).toList(growable: false);
+  }
 
   @override
   Future<DonorAppointmentModel> acceptBloodRequest({
@@ -87,16 +89,38 @@ class DonorFeedRestDataSource implements DonorFeedRemoteDataSource {
   }
 
   @override
-  Future<DonationRecordModel> redeemQr(String token) async =>
-      _todo('POST donation scan');
+  Future<DonationRecordModel> redeemQr(String token) async {
+    // No unified endpoint exists; the scanned URL discriminates request vs
+    // campaign. Manual bare tokens default to the request scan.
+    if (token.contains('campaign')) return redeemCampaignQr(token);
+    return redeemRequestQr(token);
+  }
 
   @override
-  Future<DonationRecordModel> redeemRequestQr(String token) async =>
-      _todo('POST /donations/scan/{token}/');
+  Future<DonationRecordModel> redeemRequestQr(String token) async {
+    // Body variant tolerates a scanned URL or a bare token.
+    final response = await dio.post<Map<String, dynamic>>(
+      RestPaths.donationScan,
+      data: {'token': token},
+    );
+    return _mapDonation(response.data ?? const {});
+  }
 
   @override
-  Future<DonationRecordModel> redeemCampaignQr(String token) async =>
-      _todo('POST /campaigns/scan/{token}/');
+  Future<DonationRecordModel> redeemCampaignQr(String token) async {
+    final response = await dio.post<Map<String, dynamic>>(
+      RestPaths.campaignScan(_bareToken(token)),
+    );
+    return _mapDonation(response.data ?? const {});
+  }
+
+  /// A scanned campaign QR is a URL (`…/campaigns/scan/<token>/`); the campaign
+  /// scan endpoint wants the bare token in the path.
+  String _bareToken(String token) {
+    if (!token.contains('/')) return token;
+    final trimmed = token.replaceAll(RegExp(r'/+$'), '');
+    return trimmed.split('/').last;
+  }
 
   // --- mapping ---
 
@@ -184,6 +208,41 @@ class DonorFeedRestDataSource implements DonorFeedRemoteDataSource {
       url = data['next'] as String?;
     }
     return all;
+  }
+
+  DonationRecordModel _mapDonation(Map<String, dynamic> json) {
+    final requestId = json['request']?.toString();
+    final campaignId = json['campaign']?.toString();
+    return DonationRecordModel(
+      id: json['id']?.toString() ?? '',
+      donorId: json['donor']?.toString() ?? '',
+      source: json['source_type']?.toString() ?? 'request',
+      requestId: requestId,
+      campaignId: campaignId,
+      appointmentId: json['appointment']?.toString(),
+      hospitalId: json['hospital']?.toString(),
+      donatedAt: _asDate(json['donated_at']) ?? DateTime.now(),
+      units: _asInt(json['bags_deducted']) ?? 1,
+      bloodRequest: requestId == null
+          ? null
+          : DonationRecordRequestRefModel(
+              id: requestId,
+              recipient: json['patient_name'] == null
+                  ? null
+                  : DonationRecordRecipientModel(
+                      fullName: json['patient_name'].toString(),
+                    ),
+              hospital: null,
+            ),
+      campaign: campaignId == null
+          ? null
+          : DonationRecordCampaignRefModel(
+              id: campaignId,
+              title: json['campaign_title']?.toString() ?? '',
+              venueName: json['place_label']?.toString(),
+              city: json['wilaya_name']?.toString() ?? '',
+            ),
+    );
   }
 
   DonorHospitalModel _mapHospital(dynamic json) {

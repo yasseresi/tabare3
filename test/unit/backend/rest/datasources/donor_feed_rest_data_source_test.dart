@@ -134,9 +134,57 @@ void main() {
     expect(appt.toEntity().status, DonationAppointmentStatus.cancelled);
   });
 
-  test('remaining methods still throw', () async {
+  test('listDonationRecords maps the paginated donation history', () async {
+    when(() => dio.get<Map<String, dynamic>>(RestPaths.donations)).thenAnswer(
+      (_) async => _res(RestPaths.donations, {
+        'next': null,
+        'results': [
+          {'id': 7, 'donor': 42, 'source_type': 'request', 'request': 5, 'patient_name': 'Sara', 'appointment': 11, 'hospital': 140, 'donated_at': '2026-08-14T10:00:00Z', 'bags_deducted': 1},
+        ],
+      }),
+    );
+
+    final list = await source.listDonationRecords();
+    final d = list.single;
+    expect(d.id, '7');
+    expect(d.toEntity().source, DonationSource.request);
+    expect(d.units, 1);
+    expect(d.requestId, '5');
+    expect(d.bloodRequest?.recipient?.fullName, 'Sara');
+  });
+
+  test('redeemRequestQr posts the token to the body scan', () async {
+    when(() => dio.post<Map<String, dynamic>>(RestPaths.donationScan, data: any(named: 'data')))
+        .thenAnswer((_) async => _res(RestPaths.donationScan, {'id': 7, 'donor': 42, 'source_type': 'request', 'donated_at': '2026-08-14T10:00:00Z', 'bags_deducted': 1}));
+
+    final d = await source.redeemRequestQr('https://x/appointments/scan/abc/');
+    expect(d.id, '7');
+    final body = verify(() => dio.post<Map<String, dynamic>>(RestPaths.donationScan, data: captureAny(named: 'data'))).captured.single as Map<String, dynamic>;
+    expect(body['token'], 'https://x/appointments/scan/abc/'); // body variant strips server-side
+  });
+
+  test('redeemCampaignQr extracts the bare token from a scanned URL', () async {
+    when(() => dio.post<Map<String, dynamic>>(RestPaths.campaignScan('tok9')))
+        .thenAnswer((_) async => _res(RestPaths.campaignScan('tok9'), {'id': 8, 'donor': 42, 'source_type': 'campaign', 'campaign': 3, 'campaign_title': 'Drive', 'donated_at': '2026-08-14T10:00:00Z', 'bags_deducted': 1}));
+
+    final d = await source.redeemCampaignQr('https://x/campaigns/scan/tok9/');
+    expect(d.campaignId, '3');
+    verify(() => dio.post<Map<String, dynamic>>(RestPaths.campaignScan('tok9'))).called(1);
+  });
+
+  test('redeemQr routes campaign URLs to the campaign scan', () async {
+    when(() => dio.post<Map<String, dynamic>>(RestPaths.campaignScan('c1')))
+        .thenAnswer((_) async => _res(RestPaths.campaignScan('c1'), {'id': 8, 'donor': 42, 'source_type': 'campaign', 'donated_at': '2026-08-14T10:00:00Z', 'bags_deducted': 1}));
+    when(() => dio.post<Map<String, dynamic>>(RestPaths.donationScan, data: any(named: 'data')))
+        .thenAnswer((_) async => _res(RestPaths.donationScan, {'id': 7, 'donor': 42, 'source_type': 'request', 'donated_at': '2026-08-14T10:00:00Z', 'bags_deducted': 1}));
+
+    final campaign = await source.redeemQr('https://x/campaigns/scan/c1/');
+    expect(campaign.toEntity().source, DonationSource.campaign);
+    final request = await source.redeemQr('https://x/appointments/scan/r1/');
+    expect(request.toEntity().source, DonationSource.request);
+  });
+
+  test('listAvailableCampaigns still throws', () async {
     expect(() => source.listAvailableCampaigns(), throwsA(isA<UnimplementedError>()));
-    expect(() => source.listDonationRecords(), throwsA(isA<UnimplementedError>()));
-    expect(() => source.redeemRequestQr('t'), throwsA(isA<UnimplementedError>()));
   });
 }
