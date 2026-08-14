@@ -11,6 +11,7 @@ import '../../features/profile/data/datasources/profile_remote_data_source.dart'
 import '../../features/requester_home/data/datasources/request_remote_data_source.dart';
 import 'datasources/auth_rest_data_source.dart';
 import 'datasources/profile_rest_data_source.dart';
+import 'datasources/request_rest_data_source.dart';
 import 'datasources/rest_data_sources.dart';
 import 'reference/reference_remote_data_source.dart';
 import 'reference/reference_resolver.dart';

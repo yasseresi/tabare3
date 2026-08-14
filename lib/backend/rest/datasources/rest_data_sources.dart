@@ -6,9 +6,6 @@ import '../../../features/donor_home/data/models/donor_card_models.dart';
 import '../../../features/donor_home/data/models/donor_feed_models.dart';
 import '../../../features/notifications/data/datasources/notification_remote_data_source.dart';
 import '../../../features/notifications/data/models/notification_model.dart';
-import '../../../features/requester_home/data/datasources/request_remote_data_source.dart';
-import '../../../features/requester_home/domain/entities/blood_request_entity.dart';
-import '../../../features/requester_home/data/models/request_models.dart';
 
 /// REST implementations of the feature data source contracts.
 ///
@@ -22,62 +19,6 @@ import '../../../features/requester_home/data/models/request_models.dart';
 
 Never _todo(String endpoint) =>
     throw UnimplementedError('REST backend: $endpoint not implemented yet');
-
-class RequestRestDataSource implements RequestRemoteDataSource {
-  RequestRestDataSource(this.dio);
-
-  final Dio dio;
-
-  @override
-  Future<List<BloodRequestModel>> listOwnRequests() async =>
-      _todo('GET /requests?mine=true');
-
-  @override
-  Future<BloodRequestModel> getRequest(String requestId) async =>
-      _todo('GET /requests/{id}');
-
-  @override
-  Future<List<HospitalModel>> listHospitals() async => _todo('GET /hospitals');
-
-  @override
-  Future<BloodRequestModel> createRequest(RequestDraft draft) async =>
-      _todo('POST /requests');
-
-  @override
-  Future<BloodRequestModel> updateRequest({
-    required String requestId,
-    required RequestDraft draft,
-  }) async => _todo('PATCH /requests/{id}');
-
-  @override
-  Future<BloodRequestModel> cancelRequest({
-    required String requestId,
-    required String reason,
-  }) async => _todo('POST /requests/{id}/cancel');
-
-  @override
-  Future<List<RequestDonorModel>> listRequestDonors(String requestId) async =>
-      _todo('GET /requests/{id}/donors');
-
-  @override
-  Future<List<CompatibleDonorModel>> listCompatibleDonors(
-    String requestId,
-  ) async => _todo('GET /requests/{id}/compatible-donors');
-
-  @override
-  Future<List<DirectInvitationModel>> listInvitations(String requestId) async =>
-      _todo('GET /requests/{id}/invitations');
-
-  @override
-  Future<void> inviteDonor({
-    required String requestId,
-    required String donorId,
-  }) async => _todo('POST /requests/{id}/invitations');
-
-  @override
-  Future<IssuedRequestQrModel> issueRequestQr(String requestId) async =>
-      _todo('POST /requests/{id}/qr');
-}
 
 class NotificationRestDataSource implements NotificationRemoteDataSource {
   NotificationRestDataSource(this.dio);
