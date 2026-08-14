@@ -10,6 +10,7 @@ import '../../features/notifications/data/datasources/notification_remote_data_s
 import '../../features/profile/data/datasources/profile_remote_data_source.dart';
 import '../../features/requester_home/data/datasources/request_remote_data_source.dart';
 import 'datasources/auth_rest_data_source.dart';
+import 'datasources/donor_card_rest_data_source.dart';
 import 'datasources/donor_feed_rest_data_source.dart';
 import 'datasources/profile_rest_data_source.dart';
 import 'datasources/request_rest_data_source.dart';

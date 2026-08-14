@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
 
-import '../../../features/donor_home/data/datasources/donor_card_remote_data_source.dart';
-import '../../../features/donor_home/data/models/donor_card_models.dart';
 import '../../../features/notifications/data/datasources/notification_remote_data_source.dart';
 import '../../../features/notifications/data/models/notification_model.dart';
 
@@ -36,12 +34,4 @@ class NotificationRestDataSource implements NotificationRemoteDataSource {
       _todo('STREAM /notifications');
 }
 
-class DonorCardRestDataSource implements DonorCardRemoteDataSource {
-  DonorCardRestDataSource(this.dio);
-
-  final Dio dio;
-
-  @override
-  Future<DonorCardModel> getDonorCard() async => _todo('GET /donors/me/card');
-}
 

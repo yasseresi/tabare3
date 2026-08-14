@@ -18,6 +18,7 @@ import '../../features/profile/data/datasources/supabase/profile_supabase_data_s
 import '../../features/requester_home/data/datasources/request_remote_data_source.dart';
 import '../../features/requester_home/data/datasources/supabase/request_supabase_data_source.dart';
 import '../rest/datasources/auth_rest_data_source.dart';
+import '../rest/datasources/donor_card_rest_data_source.dart';
 import '../rest/datasources/donor_feed_rest_data_source.dart';
 import '../rest/datasources/profile_rest_data_source.dart';
 import '../rest/datasources/request_rest_data_source.dart';
