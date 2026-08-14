@@ -6,16 +6,15 @@ import '../constants/rest_paths.dart';
 
 /// REST implementation of [DonorFeedRemoteDataSource] against the Django backend.
 ///
-/// Feed core is live (availability, compatible requests); appointments,
-/// campaigns, donation history and QR redemption land in later tasks and still
-/// throw. The `donor_feed` flag stays on Supabase until the whole surface is done.
+/// The full donor surface is implemented: availability, compatible requests,
+/// campaigns, appointments (list/accept/cancel), donation history, and QR
+/// redemption (request + campaign). Status vocabularies are translated to the
+/// app's enums; fields Django does not expose (campaign published/created dates,
+/// blood-types-needed) use documented fallbacks.
 class DonorFeedRestDataSource implements DonorFeedRemoteDataSource {
   DonorFeedRestDataSource(this.dio);
 
   final Dio dio;
-
-  Never _todo(String endpoint) =>
-      throw UnimplementedError('REST backend: $endpoint not implemented yet');
 
   @override
   Future<DonorAvailabilityModel> getAvailability() async {
@@ -48,8 +47,15 @@ class DonorFeedRestDataSource implements DonorFeedRemoteDataSource {
   // --- later tasks ---
 
   @override
-  Future<List<DonorCampaignModel>> listAvailableCampaigns() async =>
-      _todo('GET /feed/campaigns/');
+  Future<List<DonorCampaignModel>> listAvailableCampaigns() async {
+    // /feed/campaigns/ returns a plain array (published campaigns for the donor).
+    final response = await dio.get<List<dynamic>>(RestPaths.feedCampaigns);
+    final rows = response.data ?? const [];
+    return rows
+        .whereType<Map<String, dynamic>>()
+        .map(_mapCampaign)
+        .toList(growable: false);
+  }
 
   @override
   Future<List<DonorAppointmentModel>> listAppointments() async {
@@ -209,6 +215,38 @@ class DonorFeedRestDataSource implements DonorFeedRemoteDataSource {
     }
     return all;
   }
+
+  DonorCampaignModel _mapCampaign(Map<String, dynamic> json) {
+    final wilaya = json['wilaya'];
+    final startsAt = _asDate(json['starts_at']) ?? DateTime.now();
+    return DonorCampaignModel(
+      id: json['id']?.toString() ?? '',
+      createdBy: null,
+      organizerName: json['organizer_label']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      description: json['description']?.toString(),
+      venueName: json['location_text']?.toString(),
+      city: wilaya is Map<String, dynamic>
+          ? (wilaya['name_ar']?.toString() ?? '')
+          : '',
+      wilayaId: wilaya is Map<String, dynamic> ? (_asInt(wilaya['id']) ?? 0) : 0,
+      hospitalId: json['hospital']?.toString(),
+      bloodTypesNeeded: null, // urgent cases accept every group; no field
+      status: _mapCampaignStatus(json['status']?.toString()),
+      startsAt: startsAt,
+      endsAt: _asDate(json['ends_at']) ?? startsAt,
+      publishedAt: null, // not exposed by the campaign serializer
+      createdAt: startsAt, // no created_at field; the start is the best proxy
+    );
+  }
+
+  /// Django `draft/published/ended` → the app's `upcoming/active/completed`.
+  String _mapCampaignStatus(String? status) => switch (status) {
+    'draft' => 'upcoming',
+    'published' => 'active',
+    'ended' => 'completed',
+    _ => 'active',
+  };
 
   DonationRecordModel _mapDonation(Map<String, dynamic> json) {
     final requestId = json['request']?.toString();

@@ -184,7 +184,54 @@ void main() {
     expect(request.toEntity().source, DonationSource.request);
   });
 
-  test('listAvailableCampaigns still throws', () async {
-    expect(() => source.listAvailableCampaigns(), throwsA(isA<UnimplementedError>()));
+  test('listAvailableCampaigns maps the array + translates status', () async {
+    Future<DonorCampaignStatus> statusFor(String django) async {
+      when(() => dio.get<List<dynamic>>(RestPaths.feedCampaigns)).thenAnswer(
+        (_) async => _res(RestPaths.feedCampaigns, [
+          {
+            'id': 3,
+            'title': 'Drive',
+            'organizer_label': 'جمعية',
+            'location_text': 'Hall A',
+            'wilaya': {'id': 16, 'name_ar': 'الجزائر'},
+            'hospital': 140,
+            'status': django,
+            'starts_at': '2026-09-01T09:00:00Z',
+            'ends_at': '2026-09-01T17:00:00Z',
+          },
+        ]),
+      );
+      final list = await source.listAvailableCampaigns();
+      return list.single.toEntity().status;
+    }
+
+    expect(await statusFor('published'), DonorCampaignStatus.active);
+    expect(await statusFor('ended'), DonorCampaignStatus.completed);
+    expect(await statusFor('draft'), DonorCampaignStatus.upcoming);
+  });
+
+  test('campaign maps organizer/venue/wilaya', () async {
+    when(() => dio.get<List<dynamic>>(RestPaths.feedCampaigns)).thenAnswer(
+      (_) async => _res(RestPaths.feedCampaigns, [
+        {
+          'id': 3,
+          'title': 'Drive',
+          'organizer_label': 'جمعية',
+          'location_text': 'Hall A',
+          'wilaya': {'id': 16, 'name_ar': 'الجزائر'},
+          'hospital': 140,
+          'status': 'published',
+          'starts_at': '2026-09-01T09:00:00Z',
+          'ends_at': '2026-09-01T17:00:00Z',
+        },
+      ]),
+    );
+
+    final c = (await source.listAvailableCampaigns()).single;
+    expect(c.organizerName, 'جمعية');
+    expect(c.venueName, 'Hall A');
+    expect(c.city, 'الجزائر');
+    expect(c.wilayaId, 16);
+    expect(c.hospitalId, '140');
   });
 }
