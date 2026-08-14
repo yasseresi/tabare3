@@ -14,18 +14,17 @@ import '../reference/reference_resolver.dart';
 /// status vocabulary differs (`active/completed/cancelled` vs the app's
 /// `open/fulfilled/cancelled/expired`), so responses are mapped field-by-field.
 ///
-/// Read path (`listOwnRequests`, `getRequest`) is implemented; the write /
-/// donor-matching / invitation / QR methods land in later migration slices and
-/// still throw until then — the `requests` feature flag stays on Supabase until
-/// the whole surface is done.
+/// The full surface is implemented: read (list/detail/hospitals), write
+/// (create/update/cancel), donor matching (`matching-donors`), accepted donors
+/// (`/appointments/?request=`), invitations (`/invitations/`, invite), and the
+/// request QR (`qr_token`, embedded in the request resource). Where Django
+/// exposes no equivalent field (invitation expiry, donor cooldown, a
+/// QR-specific expiry) a documented fallback is used.
 class RequestRestDataSource implements RequestRemoteDataSource {
   RequestRestDataSource(this.dio, {required this.reference});
 
   final Dio dio;
   final ReferenceResolver reference;
-
-  Never _todo(String endpoint) =>
-      throw UnimplementedError('REST backend: $endpoint not implemented yet');
 
   @override
   Future<List<BloodRequestModel>> listOwnRequests() async {
@@ -119,46 +118,124 @@ class RequestRestDataSource implements RequestRemoteDataSource {
   }
 
   @override
-  Future<List<RequestDonorModel>> listRequestDonors(String requestId) async =>
-      _todo('GET /requests/{id}/ donors');
+  Future<List<RequestDonorModel>> listRequestDonors(String requestId) async {
+    // Accepted donors are the appointments booked against this request.
+    final rows = await _fetchAllPages(
+      RestPaths.appointments,
+      query: {'request': requestId},
+    );
+    return rows.map(_mapRequestDonor).toList(growable: false);
+  }
 
   @override
   Future<List<CompatibleDonorModel>> listCompatibleDonors(
     String requestId,
-  ) async => _todo('GET /requests/{id}/matching-donors/');
+  ) async {
+    final rows = await _fetchAllPages(RestPaths.requestMatchingDonors(requestId));
+    return Future.wait(rows.map(_mapCompatibleDonor));
+  }
 
   @override
-  Future<List<DirectInvitationModel>> listInvitations(String requestId) async =>
-      _todo('GET /invitations/');
+  Future<List<DirectInvitationModel>> listInvitations(String requestId) async {
+    final rows = await _fetchAllPages(
+      RestPaths.invitations,
+      query: {'request': requestId},
+    );
+    return rows.map(_mapInvitation).toList(growable: false);
+  }
 
   @override
   Future<void> inviteDonor({
     required String requestId,
     required String donorId,
-  }) async => _todo('POST /requests/{id}/invite/');
+  }) async {
+    await dio.post<Map<String, dynamic>>(
+      RestPaths.requestInvite(requestId),
+      data: {'donor_id': donorId},
+    );
+  }
 
   @override
-  Future<IssuedRequestQrModel> issueRequestQr(String requestId) async =>
-      _todo('POST request QR');
+  Future<IssuedRequestQrModel> issueRequestQr(String requestId) async {
+    // The QR token is embedded in the request resource; no separate call.
+    final response = await dio.get<Map<String, dynamic>>(
+      RestPaths.request(requestId),
+    );
+    final json = response.data ?? const {};
+    return IssuedRequestQrModel(
+      token: json['qr_token']?.toString() ?? '',
+      // Django exposes no QR-specific expiry; the request deadline bounds it.
+      expiresAt: _asDate(json['deadline']) ?? DateTime.now(),
+    );
+  }
 
   // --- mapping ---
 
   /// Follows DRF `next` links, accumulating every page's `results`. The
   /// hospitals list is paged (28+ per wilaya, 343 total), so a single page is
   /// not enough for the dropdown.
-  Future<List<Map<String, dynamic>>> _fetchAllPages(String path) async {
+  Future<List<Map<String, dynamic>>> _fetchAllPages(
+    String path, {
+    Map<String, dynamic>? query,
+  }) async {
     final all = <Map<String, dynamic>>[];
     String? url = path;
+    var params = query;
     while (url != null) {
-      final response = await dio.get<Map<String, dynamic>>(url);
+      final response = await dio.get<Map<String, dynamic>>(
+        url,
+        queryParameters: params,
+      );
       final data = response.data ?? const {};
       final results = data['results'];
       if (results is List) {
         all.addAll(results.whereType<Map<String, dynamic>>());
       }
       url = data['next'] as String?;
+      params = null; // the `next` URL already carries the query
     }
     return all;
+  }
+
+  RequestDonorModel _mapRequestDonor(Map<String, dynamic> json) =>
+      RequestDonorModel(
+        donorId: json['donor']?.toString() ?? '',
+        fullName: json['donor_name']?.toString() ?? '',
+        bloodType: _label(json['blood_type']),
+        appointmentId: json['id']?.toString() ?? '',
+        status: json['status']?.toString() ?? '',
+        scheduledAt: _asDate(json['created_at']) ?? DateTime.now(),
+        completedAt: _asDate(json['completed_at']),
+      );
+
+  Future<CompatibleDonorModel> _mapCompatibleDonor(
+    Map<String, dynamic> json,
+  ) async => CompatibleDonorModel(
+    donorId: json['id']?.toString() ?? '',
+    fullName: json['full_name']?.toString() ?? '',
+    bloodType: _label(json['blood_type']),
+    // PublicDonor exposes the wilaya name, not its id — resolve it back.
+    wilayaId: await reference.wilayaIdForName(
+          json['wilaya_name']?.toString() ?? '',
+        ) ??
+        0,
+    cooldownUntil: null, // not exposed by the matching endpoint
+  );
+
+  DirectInvitationModel _mapInvitation(Map<String, dynamic> json) {
+    final sentAt = _asDate(json['sent_at']) ?? DateTime.now();
+    return DirectInvitationModel(
+      invitationId: json['id']?.toString() ?? '',
+      donorId: json['donor']?.toString() ?? '',
+      fullName: json['donor_name']?.toString() ?? '',
+      bloodType: _label(json['blood_type']),
+      status: json['status']?.toString() ?? '',
+      appointmentId: json['appointment']?.toString(),
+      // Django does not expose an invitation expiry; fall back to sent time.
+      expiresAt: sentAt,
+      respondedAt: _asDate(json['responded_at']),
+      createdAt: sentAt,
+    );
   }
 
   BloodRequestModel _mapRequest(Map<String, dynamic> json) {

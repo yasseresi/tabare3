@@ -218,10 +218,82 @@ void main() {
     expect(body.containsKey('blood_type'), isFalse); // not editable via PATCH
   });
 
-  test('donor-matching / invite / QR still throw until their task lands', () async {
-    expect(() => source.listCompatibleDonors('5'), throwsA(isA<UnimplementedError>()));
-    expect(() => source.inviteDonor(requestId: '5', donorId: '9'),
-        throwsA(isA<UnimplementedError>()));
-    expect(() => source.issueRequestQr('5'), throwsA(isA<UnimplementedError>()));
+  test('listCompatibleDonors maps PublicDonor, resolving wilaya name→id', () async {
+    when(() => dio.get<Map<String, dynamic>>(
+          RestPaths.requestMatchingDonors('5'),
+          queryParameters: null,
+        )).thenAnswer(
+      (_) async => _res(RestPaths.requestMatchingDonors('5'), {
+        'next': null,
+        'results': [
+          {'id': 9, 'full_name': 'Ali', 'blood_type': {'label': 'O+'}, 'wilaya_name': 'الجزائر', 'level': 2},
+        ],
+      }),
+    );
+
+    final donors = await source.listCompatibleDonors('5');
+    expect(donors.single.donorId, '9');
+    expect(donors.single.wilayaId, 16); // name → id
+    expect(donors.single.bloodType, 'O+');
+  });
+
+  test('listRequestDonors reads appointments filtered by request', () async {
+    when(() => dio.get<Map<String, dynamic>>(
+          RestPaths.appointments,
+          queryParameters: {'request': '5'},
+        )).thenAnswer(
+      (_) async => _res(RestPaths.appointments, {
+        'next': null,
+        'results': [
+          {'id': 11, 'donor': 9, 'donor_name': 'Ali', 'blood_type': {'label': 'O+'}, 'status': 'accepted', 'created_at': '2026-08-14T10:00:00Z'},
+        ],
+      }),
+    );
+
+    final donors = await source.listRequestDonors('5');
+    expect(donors.single.appointmentId, '11');
+    expect(donors.single.donorId, '9');
+  });
+
+  test('listInvitations reads /invitations/?request and maps', () async {
+    when(() => dio.get<Map<String, dynamic>>(
+          RestPaths.invitations,
+          queryParameters: {'request': '5'},
+        )).thenAnswer(
+      (_) async => _res(RestPaths.invitations, {
+        'next': null,
+        'results': [
+          {'id': 3, 'donor': 9, 'donor_name': 'Ali', 'blood_type': {'label': 'O+'}, 'status': 'pending', 'appointment': null, 'sent_at': '2026-08-14T10:00:00Z', 'responded_at': null},
+        ],
+      }),
+    );
+
+    final invites = await source.listInvitations('5');
+    expect(invites.single.invitationId, '3');
+    expect(invites.single.donorId, '9');
+  });
+
+  test('inviteDonor posts donor_id to the invite endpoint', () async {
+    when(() => dio.post<Map<String, dynamic>>(RestPaths.requestInvite('5'), data: any(named: 'data')))
+        .thenAnswer((_) async => _res(RestPaths.requestInvite('5'), {'id': 3}));
+
+    await source.inviteDonor(requestId: '5', donorId: '9');
+
+    final body = verify(
+      () => dio.post<Map<String, dynamic>>(RestPaths.requestInvite('5'), data: captureAny(named: 'data')),
+    ).captured.single as Map<String, dynamic>;
+    expect(body['donor_id'], '9');
+  });
+
+  test('issueRequestQr reads the embedded qr_token', () async {
+    when(() => dio.get<Map<String, dynamic>>(RestPaths.request('5'))).thenAnswer(
+      (_) async => _res(RestPaths.request('5'), {
+        ..._requestJson(),
+        'qr_token': '44d99124-289c-4a10-be10-a8a117a29e28',
+      }),
+    );
+
+    final qr = await source.issueRequestQr('5');
+    expect(qr.token, '44d99124-289c-4a10-be10-a8a117a29e28');
   });
 }
