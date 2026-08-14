@@ -10,6 +10,8 @@ import '../../features/notifications/data/datasources/notification_remote_data_s
 import '../../features/profile/data/datasources/profile_remote_data_source.dart';
 import '../../features/requester_home/data/datasources/request_remote_data_source.dart';
 import 'datasources/rest_data_sources.dart';
+import 'reference/reference_remote_data_source.dart';
+import 'reference/reference_resolver.dart';
 import 'rest_client.dart';
 import 'rest_error_mapper.dart';
 import 'token_store.dart';
@@ -44,6 +46,12 @@ class RestBackend implements Backend {
     sl.registerLazySingleton<Dio>(() => dio);
     sl.registerLazySingleton<RestClientFactory>(() => _clientFactory);
     sl.registerLazySingleton<TokenStore>(() => _clientFactory.tokenStore);
+
+    // Reference resolvers (REST-only: id lookups for register / request create).
+    sl.registerLazySingleton<ReferenceRemoteDataSource>(
+      () => ReferenceRestDataSource(sl()),
+    );
+    sl.registerLazySingleton<ReferenceResolver>(() => ReferenceResolver(sl()));
 
     sl.registerLazySingleton<AuthRemoteDataSource>(
       () => AuthRestDataSource(sl()),

@@ -18,6 +18,8 @@ import '../../features/profile/data/datasources/supabase/profile_supabase_data_s
 import '../../features/requester_home/data/datasources/request_remote_data_source.dart';
 import '../../features/requester_home/data/datasources/supabase/request_supabase_data_source.dart';
 import '../rest/datasources/rest_data_sources.dart';
+import '../rest/reference/reference_remote_data_source.dart';
+import '../rest/reference/reference_resolver.dart';
 import '../rest/rest_client.dart';
 import '../rest/token_store.dart';
 import 'backend_feature.dart';
@@ -74,6 +76,15 @@ class HybridBackend implements Backend {
     }
     if (!sl.isRegistered<TokenStore>()) {
       sl.registerLazySingleton<TokenStore>(() => _clientFactory.tokenStore);
+    }
+    // Reference resolvers (REST-only: id lookups for register / request create).
+    if (!sl.isRegistered<ReferenceRemoteDataSource>()) {
+      sl.registerLazySingleton<ReferenceRemoteDataSource>(
+        () => ReferenceRestDataSource(sl()),
+      );
+    }
+    if (!sl.isRegistered<ReferenceResolver>()) {
+      sl.registerLazySingleton<ReferenceResolver>(() => ReferenceResolver(sl()));
     }
 
     sl.registerLazySingleton<AuthRemoteDataSource>(
