@@ -12,6 +12,7 @@ import '../../features/requester_home/data/datasources/request_remote_data_sourc
 import 'datasources/rest_data_sources.dart';
 import 'rest_client.dart';
 import 'rest_error_mapper.dart';
+import 'token_store.dart';
 
 /// Custom REST backend — scaffold for the migration off Supabase.
 ///
@@ -42,6 +43,7 @@ class RestBackend implements Backend {
 
     sl.registerLazySingleton<Dio>(() => dio);
     sl.registerLazySingleton<RestClientFactory>(() => _clientFactory);
+    sl.registerLazySingleton<TokenStore>(() => _clientFactory.tokenStore);
 
     sl.registerLazySingleton<AuthRemoteDataSource>(
       () => AuthRestDataSource(sl()),

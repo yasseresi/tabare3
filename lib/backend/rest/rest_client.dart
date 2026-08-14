@@ -2,55 +2,66 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../core/constants/env_constants.dart';
+import 'auth_interceptor.dart';
+import 'token_store.dart';
 
 const String contentTypeHeader = 'content-type';
 const String acceptHeader = 'accept';
-const String authorizationHeader = 'authorization';
 const String applicationJson = 'application/json';
 
 const Duration restTimeout = Duration(seconds: 120);
 
 /// Builds the configured [Dio] instance for the custom REST backend.
 ///
-/// Access-token handling lives here so no data source ever deals with headers.
+/// Token handling (attach + refresh) lives in [AuthInterceptor], so no data
+/// source ever deals with headers or the `401` refresh dance.
 class RestClientFactory {
-  RestClientFactory({String? baseUrl, Dio? dio})
-    : _baseUrl = baseUrl ?? EnvConstants.apiBaseUrl,
-      _dio = dio ?? Dio();
+  RestClientFactory({
+    String? baseUrl,
+    TokenStore? tokenStore,
+    Dio? dio,
+    void Function()? onAuthExpired,
+  }) : _baseUrl = baseUrl ?? EnvConstants.apiBaseUrl,
+       _tokenStore = tokenStore ?? SecureTokenStore(),
+       _dio = dio ?? Dio(),
+       _onAuthExpired = onAuthExpired;
 
   final String _baseUrl;
+  final TokenStore _tokenStore;
   final Dio _dio;
+  final void Function()? _onAuthExpired;
 
-  String? _accessToken;
-
-  /// Stores the token attached to every subsequent request.
-  void setAccessToken(String? token) {
-    _accessToken = token;
-  }
+  TokenStore get tokenStore => _tokenStore;
 
   Dio build() {
-    _dio.options = BaseOptions(
+    final options = BaseOptions(
       baseUrl: _baseUrl,
-      headers: {contentTypeHeader: applicationJson, acceptHeader: applicationJson},
+      headers: {
+        contentTypeHeader: applicationJson,
+        acceptHeader: applicationJson,
+      },
       connectTimeout: restTimeout,
       sendTimeout: restTimeout,
       receiveTimeout: restTimeout,
     );
+    _dio.options = options;
+
+    // Bare client for refresh + replay — no AuthInterceptor, so a failing
+    // refresh cannot recurse.
+    final refreshClient = Dio(options);
 
     _dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) {
-          final token = _accessToken;
-          if (token != null && token.isNotEmpty) {
-            options.headers[authorizationHeader] = 'Bearer $token';
-          }
-          handler.next(options);
-        },
+      AuthInterceptor(
+        tokenStore: _tokenStore,
+        refreshClient: refreshClient,
+        onAuthExpired: _onAuthExpired,
       ),
     );
 
     if (!kReleaseMode) {
-      _dio.interceptors.add(LogInterceptor(requestBody: true, responseBody: true));
+      _dio.interceptors.add(
+        LogInterceptor(requestBody: true, responseBody: true),
+      );
     }
 
     return _dio;
