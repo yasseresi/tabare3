@@ -9,6 +9,7 @@ import '../../features/donor_home/data/datasources/donor_feed_remote_data_source
 import '../../features/notifications/data/datasources/notification_remote_data_source.dart';
 import '../../features/profile/data/datasources/profile_remote_data_source.dart';
 import '../../features/requester_home/data/datasources/request_remote_data_source.dart';
+import 'datasources/auth_rest_data_source.dart';
 import 'datasources/rest_data_sources.dart';
 import 'reference/reference_remote_data_source.dart';
 import 'reference/reference_resolver.dart';
@@ -54,7 +55,7 @@ class RestBackend implements Backend {
     sl.registerLazySingleton<ReferenceResolver>(() => ReferenceResolver(sl()));
 
     sl.registerLazySingleton<AuthRemoteDataSource>(
-      () => AuthRestDataSource(sl()),
+      () => AuthRestDataSource(sl(), tokenStore: sl(), reference: sl()),
     );
     sl.registerLazySingleton<ProfileRemoteDataSource>(
       () => ProfileRestDataSource(sl()),

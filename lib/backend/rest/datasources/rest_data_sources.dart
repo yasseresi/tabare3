@@ -1,8 +1,5 @@
 import 'package:dio/dio.dart';
 
-import '../../../features/auth/data/datasources/auth_remote_data_source.dart';
-import '../../../features/auth/data/models/user_model.dart';
-import '../../../features/auth/domain/repositories/auth_repository.dart';
 import '../../../features/donor_home/data/datasources/donor_card_remote_data_source.dart';
 import '../../../features/donor_home/data/datasources/donor_feed_remote_data_source.dart';
 import '../../../features/donor_home/data/models/donor_card_models.dart';
@@ -27,38 +24,6 @@ import '../../../features/requester_home/data/models/request_models.dart';
 
 Never _todo(String endpoint) =>
     throw UnimplementedError('REST backend: $endpoint not implemented yet');
-
-class AuthRestDataSource implements AuthRemoteDataSource {
-  AuthRestDataSource(this.dio);
-
-  final Dio dio;
-
-  @override
-  Future<UserModel> signIn({
-    required String username,
-    required String password,
-  }) async => _todo('POST /auth/login');
-
-  @override
-  Future<UserModel> signUp({required SignupParams params}) async =>
-      _todo('POST /auth/register');
-
-  @override
-  Future<bool> isUsernameAvailable(String username) async =>
-      _todo('GET /auth/username-available?username={username}');
-
-  @override
-  Future<void> signOut() async => _todo('POST /auth/logout');
-
-  @override
-  Future<UserModel?> getCurrentUser() async => _todo('GET /auth/me');
-
-  @override
-  Future<UserModel> updateUserRole({
-    required bool isDonor,
-    required bool isRecipient,
-  }) async => _todo('PATCH /users/me/roles');
-}
 
 class ProfileRestDataSource implements ProfileRemoteDataSource {
   ProfileRestDataSource(this.dio);

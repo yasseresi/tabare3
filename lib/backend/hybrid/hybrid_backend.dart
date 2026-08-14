@@ -17,6 +17,7 @@ import '../../features/profile/data/datasources/profile_remote_data_source.dart'
 import '../../features/profile/data/datasources/supabase/profile_supabase_data_source.dart';
 import '../../features/requester_home/data/datasources/request_remote_data_source.dart';
 import '../../features/requester_home/data/datasources/supabase/request_supabase_data_source.dart';
+import '../rest/datasources/auth_rest_data_source.dart';
 import '../rest/datasources/rest_data_sources.dart';
 import '../rest/reference/reference_remote_data_source.dart';
 import '../rest/reference/reference_resolver.dart';
@@ -89,7 +90,7 @@ class HybridBackend implements Backend {
 
     sl.registerLazySingleton<AuthRemoteDataSource>(
       () => _rest(BackendFeature.auth)
-          ? AuthRestDataSource(sl())
+          ? AuthRestDataSource(sl(), tokenStore: sl(), reference: sl())
           : AuthSupabaseDataSource(client: sl()),
     );
     sl.registerLazySingleton<ProfileRemoteDataSource>(
