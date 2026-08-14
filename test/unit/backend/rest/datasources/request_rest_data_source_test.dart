@@ -255,6 +255,29 @@ void main() {
     expect(donors.single.donorId, '9');
   });
 
+  test('translates Django cancellation statuses without throwing', () async {
+    Future<DonationAppointmentStatus> statusFor(String django) async {
+      when(() => dio.get<Map<String, dynamic>>(
+            RestPaths.appointments,
+            queryParameters: {'request': '5'},
+          )).thenAnswer(
+        (_) async => _res(RestPaths.appointments, {
+          'next': null,
+          'results': [
+            {'id': 11, 'donor': 9, 'donor_name': 'Ali', 'blood_type': {'label': 'O+'}, 'status': django, 'created_at': '2026-08-14T10:00:00Z'},
+          ],
+        }),
+      );
+      final donors = await source.listRequestDonors('5');
+      return donors.single.toEntity().status; // must not throw
+    }
+
+    expect(await statusFor('cancelled_by_donor'), DonationAppointmentStatus.cancelled);
+    expect(await statusFor('cancelled_by_recipient'), DonationAppointmentStatus.cancelled);
+    expect(await statusFor('auto_cancelled'), DonationAppointmentStatus.cancelled);
+    expect(await statusFor('completed'), DonationAppointmentStatus.completed);
+  });
+
   test('listInvitations reads /invitations/?request and maps', () async {
     when(() => dio.get<Map<String, dynamic>>(
           RestPaths.invitations,

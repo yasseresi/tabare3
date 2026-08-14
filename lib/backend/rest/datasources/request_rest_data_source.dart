@@ -203,10 +203,25 @@ class RequestRestDataSource implements RequestRemoteDataSource {
         fullName: json['donor_name']?.toString() ?? '',
         bloodType: _label(json['blood_type']),
         appointmentId: json['id']?.toString() ?? '',
-        status: json['status']?.toString() ?? '',
+        status: _mapAppointmentStatus(json['status']?.toString()),
         scheduledAt: _asDate(json['created_at']) ?? DateTime.now(),
         completedAt: _asDate(json['completed_at']),
       );
+
+  /// Django appointment vocabulary → the app's `DonationAppointmentStatus`.
+  /// Django splits cancellation three ways (`cancelled_by_donor`,
+  /// `cancelled_by_recipient`, `auto_cancelled`); the app has a single
+  /// `cancelled`. Anything unknown maps to `pending` so `toEntity()` never
+  /// throws on an unrecognised status.
+  String _mapAppointmentStatus(String? status) => switch (status) {
+    'pending' => 'pending',
+    'completed' => 'completed',
+    'cancelled_by_donor' ||
+    'cancelled_by_recipient' ||
+    'auto_cancelled' ||
+    'cancelled' => 'cancelled',
+    _ => 'pending',
+  };
 
   Future<CompatibleDonorModel> _mapCompatibleDonor(
     Map<String, dynamic> json,
