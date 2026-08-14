@@ -14,6 +14,7 @@ import 'hybrid/hybrid_backend.dart';
 const Set<BackendFeature> _restFeatures = {
   BackendFeature.auth,
   BackendFeature.profile,
+  BackendFeature.requests,
 };
 
 final Backend activeBackend = HybridBackend(restFeatures: _restFeatures);
