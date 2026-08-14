@@ -45,8 +45,10 @@ class RequestRestDataSource implements RequestRemoteDataSource {
   }
 
   @override
-  Future<List<HospitalModel>> listHospitals() async =>
-      _todo('GET /references/hospitals/ (paginated)');
+  Future<List<HospitalModel>> listHospitals() async {
+    final rows = await _fetchAllPages(RestPaths.refHospitals);
+    return rows.map(_mapHospital).toList(growable: false);
+  }
 
   @override
   Future<BloodRequestModel> createRequest(RequestDraft draft) async =>
@@ -88,6 +90,24 @@ class RequestRestDataSource implements RequestRemoteDataSource {
       _todo('POST request QR');
 
   // --- mapping ---
+
+  /// Follows DRF `next` links, accumulating every page's `results`. The
+  /// hospitals list is paged (28+ per wilaya, 343 total), so a single page is
+  /// not enough for the dropdown.
+  Future<List<Map<String, dynamic>>> _fetchAllPages(String path) async {
+    final all = <Map<String, dynamic>>[];
+    String? url = path;
+    while (url != null) {
+      final response = await dio.get<Map<String, dynamic>>(url);
+      final data = response.data ?? const {};
+      final results = data['results'];
+      if (results is List) {
+        all.addAll(results.whereType<Map<String, dynamic>>());
+      }
+      url = data['next'] as String?;
+    }
+    return all;
+  }
 
   BloodRequestModel _mapRequest(Map<String, dynamic> json) {
     final hospital = json['hospital'];

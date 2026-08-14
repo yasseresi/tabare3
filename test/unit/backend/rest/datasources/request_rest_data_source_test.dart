@@ -109,6 +109,36 @@ void main() {
     expect(r.toEntity().beneficiaryType, BeneficiaryType.self);
   });
 
+  test('listHospitals follows pagination and maps every page', () async {
+    const page2 = 'https://x/api/v1/references/hospitals/?page=2';
+    when(() => dio.get<Map<String, dynamic>>(RestPaths.refHospitals)).thenAnswer(
+      (_) async => _res(RestPaths.refHospitals, {
+        'count': 2,
+        'next': page2,
+        'results': [
+          {'id': 140, 'name': 'مستشفى الجزائر', 'wilaya': 16, 'is_active': true},
+        ],
+      }),
+    );
+    when(() => dio.get<Map<String, dynamic>>(page2)).thenAnswer(
+      (_) async => _res(page2, {
+        'count': 2,
+        'next': null,
+        'results': [
+          {'id': 141, 'name': 'مستشفى وهران', 'wilaya': 31, 'is_active': false},
+        ],
+      }),
+    );
+
+    final hospitals = await source.listHospitals();
+
+    expect(hospitals, hasLength(2)); // both pages
+    expect(hospitals[0].id, '140');
+    expect(hospitals[0].nameAr, 'مستشفى الجزائر');
+    expect(hospitals[1].wilayaId, 31);
+    expect(hospitals[1].isActive, isFalse);
+  });
+
   test('write methods still throw until their slice lands', () async {
     expect(() => source.createRequest(
       const RequestDraft(
@@ -118,6 +148,7 @@ void main() {
         unitsNeeded: 1,
       ),
     ), throwsA(isA<UnimplementedError>()));
-    expect(() => source.listHospitals(), throwsA(isA<UnimplementedError>()));
+    expect(() => source.cancelRequest(requestId: '1', reason: 'x'),
+        throwsA(isA<UnimplementedError>()));
   });
 }
