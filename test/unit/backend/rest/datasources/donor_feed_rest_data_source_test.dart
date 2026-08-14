@@ -92,8 +92,51 @@ void main() {
     expect(r.toEntity().priority, DonorRequestPriority.urgent);
   });
 
-  test('later-task methods still throw', () async {
-    expect(() => source.listAppointments(), throwsA(isA<UnimplementedError>()));
+  test('listAppointments maps the paginated viewset + status vocab', () async {
+    Future<DonationAppointmentStatus> statusFor(String django) async {
+      when(() => dio.get<Map<String, dynamic>>(RestPaths.appointments)).thenAnswer(
+        (_) async => _res(RestPaths.appointments, {
+          'next': null,
+          'results': [
+            {'id': 11, 'donor': 42, 'request': 5, 'blood_type': {'label': 'O+'}, 'status': django, 'created_at': '2026-08-14T10:00:00Z'},
+          ],
+        }),
+      );
+      final list = await source.listAppointments();
+      return list.single.toEntity().status; // must not throw
+    }
+
+    expect(await statusFor('pending'), DonationAppointmentStatus.pending);
+    expect(await statusFor('cancelled_by_donor'), DonationAppointmentStatus.cancelled);
+    expect(await statusFor('auto_cancelled'), DonationAppointmentStatus.cancelled);
+    expect(await statusFor('completed'), DonationAppointmentStatus.completed);
+  });
+
+  test('acceptBloodRequest posts to accept with no body', () async {
+    when(() => dio.post<Map<String, dynamic>>(RestPaths.requestAccept('5'))).thenAnswer(
+      (_) async => _res(RestPaths.requestAccept('5'),
+          {'id': 11, 'donor': 42, 'request': 5, 'status': 'pending', 'created_at': '2026-08-14T10:00:00Z'}),
+    );
+
+    final appt = await source.acceptBloodRequest(requestId: '5', scheduledAt: DateTime(2026, 9, 1));
+    expect(appt.id, '11');
+    expect(appt.bloodRequest?.id, '5');
+    verify(() => dio.post<Map<String, dynamic>>(RestPaths.requestAccept('5'))).called(1);
+  });
+
+  test('cancelAppointment posts to the cancel endpoint', () async {
+    when(() => dio.post<Map<String, dynamic>>(RestPaths.appointmentCancel('11'))).thenAnswer(
+      (_) async => _res(RestPaths.appointmentCancel('11'),
+          {'id': 11, 'donor': 42, 'status': 'cancelled_by_donor', 'created_at': '2026-08-14T10:00:00Z', 'cancelled_at': '2026-08-14T11:00:00Z'}),
+    );
+
+    final appt = await source.cancelAppointment(appointmentId: '11', reason: 'busy');
+    expect(appt.toEntity().status, DonationAppointmentStatus.cancelled);
+  });
+
+  test('remaining methods still throw', () async {
+    expect(() => source.listAvailableCampaigns(), throwsA(isA<UnimplementedError>()));
+    expect(() => source.listDonationRecords(), throwsA(isA<UnimplementedError>()));
     expect(() => source.redeemRequestQr('t'), throwsA(isA<UnimplementedError>()));
   });
 }

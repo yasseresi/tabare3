@@ -52,8 +52,11 @@ class DonorFeedRestDataSource implements DonorFeedRemoteDataSource {
       _todo('GET /feed/campaigns/');
 
   @override
-  Future<List<DonorAppointmentModel>> listAppointments() async =>
-      _todo('GET /appointments/mine/');
+  Future<List<DonorAppointmentModel>> listAppointments() async {
+    // Paginated viewset, scoped server-side to the donor's own appointments.
+    final rows = await _fetchAllPages(RestPaths.appointments);
+    return rows.map(_mapAppointment).toList(growable: false);
+  }
 
   @override
   Future<List<DonationRecordModel>> listDonationRecords() async =>
@@ -63,13 +66,25 @@ class DonorFeedRestDataSource implements DonorFeedRemoteDataSource {
   Future<DonorAppointmentModel> acceptBloodRequest({
     required String requestId,
     required DateTime scheduledAt,
-  }) async => _todo('POST /requests/{id}/accept/');
+  }) async {
+    // Django sets the schedule itself; the accept endpoint takes no body.
+    final response = await dio.post<Map<String, dynamic>>(
+      RestPaths.requestAccept(requestId),
+    );
+    return _mapAppointment(response.data ?? const {});
+  }
 
   @override
   Future<DonorAppointmentModel> cancelAppointment({
     required String appointmentId,
     required String reason,
-  }) async => _todo('POST /appointments/{id}/cancel/');
+  }) async {
+    // Django's donor-cancel takes no body (fixed −5 pts, reason recorded server-side).
+    final response = await dio.post<Map<String, dynamic>>(
+      RestPaths.appointmentCancel(appointmentId),
+    );
+    return _mapAppointment(response.data ?? const {});
+  }
 
   @override
   Future<DonationRecordModel> redeemQr(String token) async =>
@@ -118,6 +133,58 @@ class DonorFeedRestDataSource implements DonorFeedRemoteDataSource {
         notes: json['notes']?.toString(),
         createdAt: _asDate(json['created_at']) ?? DateTime.now(),
       );
+
+  DonorAppointmentModel _mapAppointment(Map<String, dynamic> json) =>
+      DonorAppointmentModel(
+        id: json['id']?.toString() ?? '',
+        donorId: json['donor']?.toString() ?? '',
+        // The Appointment serializer has no scheduled_at; it is booked on create.
+        scheduledAt: _asDate(json['created_at']) ?? DateTime.now(),
+        status: _mapAppointmentStatus(json['status']?.toString()),
+        completedAt: _asDate(json['completed_at']),
+        cancelledAt: _asDate(json['cancelled_at']),
+        cancelReason: json['cancel_reason']?.toString(),
+        createdAt: _asDate(json['created_at']) ?? DateTime.now(),
+        // The serializer exposes only request id + hospital_name (no urgency /
+        // needed_by / hospital object), so the ref is minimal.
+        bloodRequest: json['request'] == null
+            ? null
+            : DonorAppointmentRequestRefModel(
+                id: json['request'].toString(),
+                hospital: null,
+                bloodType: _label(json['blood_type']),
+                urgency: 'normal',
+                neededBy: null,
+              ),
+        campaign: null,
+      );
+
+  /// Django appointment vocabulary → the app's `DonationAppointmentStatus`.
+  /// Django splits cancellation three ways; the app has a single `cancelled`.
+  String _mapAppointmentStatus(String? status) => switch (status) {
+    'pending' => 'pending',
+    'completed' => 'completed',
+    'cancelled_by_donor' ||
+    'cancelled_by_recipient' ||
+    'auto_cancelled' ||
+    'cancelled' => 'cancelled',
+    _ => 'pending',
+  };
+
+  Future<List<Map<String, dynamic>>> _fetchAllPages(String path) async {
+    final all = <Map<String, dynamic>>[];
+    String? url = path;
+    while (url != null) {
+      final response = await dio.get<Map<String, dynamic>>(url);
+      final data = response.data ?? const {};
+      final results = data['results'];
+      if (results is List) {
+        all.addAll(results.whereType<Map<String, dynamic>>());
+      }
+      url = data['next'] as String?;
+    }
+    return all;
+  }
 
   DonorHospitalModel _mapHospital(dynamic json) {
     final map = json is Map<String, dynamic> ? json : const <String, dynamic>{};
