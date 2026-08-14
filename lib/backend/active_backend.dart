@@ -16,6 +16,7 @@ const Set<BackendFeature> _restFeatures = {
   BackendFeature.profile,
   BackendFeature.requests,
   BackendFeature.donorFeed,
+  BackendFeature.donorCard,
 };
 
 final Backend activeBackend = HybridBackend(restFeatures: _restFeatures);
