@@ -114,18 +114,18 @@ void main() {
   });
 
   group('signUp', () {
-    test('maps names/city/blood to backend ids, then signs in', () async {
+    test('maps names/city/blood to ids; uses tokens from the register response', () async {
       when(
         () => dio.post<Map<String, dynamic>>(RestPaths.register, data: any(named: 'data')),
-      ).thenAnswer((_) async => _res(RestPaths.register, _profileJson));
-      when(
-        () => dio.post<Map<String, dynamic>>(RestPaths.login, data: any(named: 'data')),
       ).thenAnswer(
-        (_) async => _res(RestPaths.login, {'access': 'a1', 'refresh': 'r1'}),
+        (_) async => _res(RestPaths.register, {
+          'user': _profileJson,
+          'access': 'a1',
+          'refresh': 'r1',
+        }),
       );
-      stubProfile();
 
-      await source.signUp(
+      final user = await source.signUp(
         params: SignupParams(
           username: 'ahmed',
           fullName: 'Ahmed Ben Ali',
@@ -155,6 +155,13 @@ void main() {
       expect(body['date_of_birth'], '1990-03-07');
       expect(body['weight_kg'], '72.0');
       expect(body['password_confirm'], 'pw');
+
+      // Tokens came from register; no extra login round-trip.
+      expect(tokens.access, 'a1');
+      expect(user.username, 'ahmed');
+      verifyNever(
+        () => dio.post<Map<String, dynamic>>(RestPaths.login, data: any(named: 'data')),
+      );
     });
   });
 

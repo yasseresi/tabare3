@@ -47,11 +47,18 @@ class AuthRestDataSource implements AuthRemoteDataSource {
 
   @override
   Future<UserModel> signUp({required SignupParams params}) async {
-    await dio.post<Map<String, dynamic>>(
+    final response = await dio.post<Map<String, dynamic>>(
       RestPaths.register,
       data: await _registerBody(params),
     );
-    // Register returns the user but not tokens; sign in to obtain them.
+    final data = response.data ?? const {};
+    // Register returns `{user, access, refresh}` — use them directly. Fall back
+    // to an explicit sign-in only if a future backend stops returning tokens.
+    final user = data['user'];
+    if (data['access'] is String && user is Map<String, dynamic>) {
+      await _persistTokens(data);
+      return _mapProfile(user);
+    }
     return signIn(username: params.username, password: params.password);
   }
 
