@@ -63,7 +63,7 @@ class RestBackend implements Backend {
       () => ProfileRestDataSource(sl(), reference: sl()),
     );
     sl.registerLazySingleton<RequestRemoteDataSource>(
-      () => RequestRestDataSource(sl()),
+      () => RequestRestDataSource(sl(), reference: sl()),
     );
     sl.registerLazySingleton<NotificationRemoteDataSource>(
       () => NotificationRestDataSource(sl()),

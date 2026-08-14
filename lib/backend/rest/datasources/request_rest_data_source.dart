@@ -4,6 +4,7 @@ import '../../../features/requester_home/data/datasources/request_remote_data_so
 import '../../../features/requester_home/data/models/request_models.dart';
 import '../../../features/requester_home/domain/entities/blood_request_entity.dart';
 import '../constants/rest_paths.dart';
+import '../reference/reference_resolver.dart';
 
 /// REST implementation of [RequestRemoteDataSource] against the Django backend.
 ///
@@ -18,9 +19,10 @@ import '../constants/rest_paths.dart';
 /// still throw until then — the `requests` feature flag stays on Supabase until
 /// the whole surface is done.
 class RequestRestDataSource implements RequestRemoteDataSource {
-  RequestRestDataSource(this.dio);
+  RequestRestDataSource(this.dio, {required this.reference});
 
   final Dio dio;
+  final ReferenceResolver reference;
 
   Never _todo(String endpoint) =>
       throw UnimplementedError('REST backend: $endpoint not implemented yet');
@@ -51,20 +53,70 @@ class RequestRestDataSource implements RequestRemoteDataSource {
   }
 
   @override
-  Future<BloodRequestModel> createRequest(RequestDraft draft) async =>
-      _todo('POST /requests/');
+  Future<BloodRequestModel> createRequest(RequestDraft draft) async {
+    final response = await dio.post<Map<String, dynamic>>(
+      RestPaths.requests,
+      data: await _createBody(draft),
+    );
+    return _mapRequest(response.data ?? const {});
+  }
 
   @override
   Future<BloodRequestModel> updateRequest({
     required String requestId,
     required RequestDraft draft,
-  }) async => _todo('PATCH /requests/{id}/');
+  }) async {
+    // PATCH only accepts hospital/priority/bags_required/deadline/notes.
+    final response = await dio.patch<Map<String, dynamic>>(
+      RestPaths.request(requestId),
+      data: {
+        'hospital': int.tryParse(draft.hospitalId),
+        'priority': draft.priority.databaseValue,
+        'bags_required': draft.unitsNeeded,
+        'deadline': _isoDate(draft.neededBy),
+        'notes': draft.notes,
+      },
+    );
+    return _mapRequest(response.data ?? const {});
+  }
 
   @override
   Future<BloodRequestModel> cancelRequest({
     required String requestId,
     required String reason,
-  }) async => _todo('POST /requests/{id}/cancel/');
+  }) async {
+    final response = await dio.post<Map<String, dynamic>>(
+      RestPaths.requestCancel(requestId),
+      data: {'reason': reason},
+    );
+    return _mapRequest(response.data ?? const {});
+  }
+
+  Future<Map<String, dynamic>> _createBody(RequestDraft draft) async {
+    final patient = draft.patient;
+    return {
+      'request_for': draft.beneficiaryType.databaseValue,
+      'hospital': int.tryParse(draft.hospitalId),
+      'blood_type': await reference.bloodTypeIdForLabel(draft.bloodType),
+      'priority': draft.priority.databaseValue,
+      'bags_required': draft.unitsNeeded,
+      'deadline': _isoDate(draft.neededBy),
+      'notes': draft.notes,
+      if (patient != null) ...{
+        'patient_name': patient.fullName,
+        'patient_gender': patient.gender,
+        'patient_date_of_birth': patient.dateOfBirth,
+        'patient_weight_kg': patient.weight.toString(),
+      },
+    };
+  }
+
+  String? _isoDate(DateTime? d) {
+    if (d == null) return null;
+    return '${d.year.toString().padLeft(4, '0')}-'
+        '${d.month.toString().padLeft(2, '0')}-'
+        '${d.day.toString().padLeft(2, '0')}';
+  }
 
   @override
   Future<List<RequestDonorModel>> listRequestDonors(String requestId) async =>

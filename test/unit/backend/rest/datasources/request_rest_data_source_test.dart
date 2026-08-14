@@ -3,9 +3,23 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tabare3/backend/rest/constants/rest_paths.dart';
 import 'package:tabare3/backend/rest/datasources/request_rest_data_source.dart';
+import 'package:tabare3/backend/rest/reference/reference_models.dart';
+import 'package:tabare3/backend/rest/reference/reference_remote_data_source.dart';
+import 'package:tabare3/backend/rest/reference/reference_resolver.dart';
 import 'package:tabare3/features/requester_home/domain/entities/blood_request_entity.dart';
 
 class MockDio extends Mock implements Dio {}
+
+class FakeReferenceDataSource implements ReferenceRemoteDataSource {
+  @override
+  Future<List<WilayaRef>> listWilayas() async => const [
+    WilayaRef(id: 16, code: '16', nameAr: 'الجزائر', nameFr: 'Alger', nameEn: 'Algiers'),
+  ];
+  @override
+  Future<List<BloodTypeRef>> listBloodTypes() async => const [
+    BloodTypeRef(id: 7, label: 'O+'),
+  ];
+}
 
 Response<Map<String, dynamic>> _res(String path, Map<String, dynamic> body) =>
     Response(
@@ -46,7 +60,10 @@ void main() {
 
   setUp(() {
     dio = MockDio();
-    source = RequestRestDataSource(dio);
+    source = RequestRestDataSource(
+      dio,
+      reference: ReferenceResolver(FakeReferenceDataSource()),
+    );
   });
 
   test('listOwnRequests unwraps the paginated results and maps each', () async {
@@ -139,16 +156,72 @@ void main() {
     expect(hospitals[1].isActive, isFalse);
   });
 
-  test('write methods still throw until their slice lands', () async {
-    expect(() => source.createRequest(
-      const RequestDraft(
-        hospitalId: '1',
+  test('createRequest maps the draft to the Django body (blood label→id)', () async {
+    when(() => dio.post<Map<String, dynamic>>(RestPaths.requests, data: any(named: 'data')))
+        .thenAnswer((_) async => _res(RestPaths.requests, _requestJson()));
+
+    await source.createRequest(
+      RequestDraft(
+        hospitalId: '140',
         bloodType: 'O+',
-        priority: RequestPriority.normal,
-        unitsNeeded: 1,
+        priority: RequestPriority.urgent,
+        unitsNeeded: 2,
+        neededBy: DateTime(2026, 9, 1),
+        notes: 'help',
       ),
-    ), throwsA(isA<UnimplementedError>()));
-    expect(() => source.cancelRequest(requestId: '1', reason: 'x'),
+    );
+
+    final body = verify(
+      () => dio.post<Map<String, dynamic>>(RestPaths.requests, data: captureAny(named: 'data')),
+    ).captured.single as Map<String, dynamic>;
+    expect(body['request_for'], 'self');
+    expect(body['hospital'], 140); // string id → int
+    expect(body['blood_type'], 7); // label → id
+    expect(body['priority'], 'urgent');
+    expect(body['bags_required'], 2);
+    expect(body['deadline'], '2026-09-01');
+  });
+
+  test('cancelRequest posts the reason and maps the result', () async {
+    when(() => dio.post<Map<String, dynamic>>(RestPaths.requestCancel('5'), data: any(named: 'data')))
+        .thenAnswer((_) async => _res(RestPaths.requestCancel('5'), _requestJson(status: 'cancelled')));
+
+    final r = await source.cancelRequest(requestId: '5', reason: 'no longer needed');
+
+    final body = verify(
+      () => dio.post<Map<String, dynamic>>(RestPaths.requestCancel('5'), data: captureAny(named: 'data')),
+    ).captured.single as Map<String, dynamic>;
+    expect(body['reason'], 'no longer needed');
+    expect(r.toEntity().status, BloodRequestStatus.cancelled);
+  });
+
+  test('updateRequest PATCHes the editable fields only', () async {
+    when(() => dio.patch<Map<String, dynamic>>(RestPaths.request('5'), data: any(named: 'data')))
+        .thenAnswer((_) async => _res(RestPaths.request('5'), _requestJson()));
+
+    await source.updateRequest(
+      requestId: '5',
+      draft: const RequestDraft(
+        hospitalId: '140',
+        bloodType: 'O+',
+        priority: RequestPriority.semiUrgent,
+        unitsNeeded: 4,
+      ),
+    );
+
+    final body = verify(
+      () => dio.patch<Map<String, dynamic>>(RestPaths.request('5'), data: captureAny(named: 'data')),
+    ).captured.single as Map<String, dynamic>;
+    expect(body['hospital'], 140);
+    expect(body['priority'], 'semi_urgent');
+    expect(body['bags_required'], 4);
+    expect(body.containsKey('blood_type'), isFalse); // not editable via PATCH
+  });
+
+  test('donor-matching / invite / QR still throw until their task lands', () async {
+    expect(() => source.listCompatibleDonors('5'), throwsA(isA<UnimplementedError>()));
+    expect(() => source.inviteDonor(requestId: '5', donorId: '9'),
         throwsA(isA<UnimplementedError>()));
+    expect(() => source.issueRequestQr('5'), throwsA(isA<UnimplementedError>()));
   });
 }

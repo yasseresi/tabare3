@@ -102,7 +102,7 @@ class HybridBackend implements Backend {
     );
     sl.registerLazySingleton<RequestRemoteDataSource>(
       () => _rest(BackendFeature.requests)
-          ? RequestRestDataSource(sl())
+          ? RequestRestDataSource(sl(), reference: sl())
           : RequestSupabaseDataSource(client: sl()),
     );
     sl.registerLazySingleton<NotificationRemoteDataSource>(
