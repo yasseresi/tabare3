@@ -6,8 +6,6 @@ import '../../../features/donor_home/data/models/donor_card_models.dart';
 import '../../../features/donor_home/data/models/donor_feed_models.dart';
 import '../../../features/notifications/data/datasources/notification_remote_data_source.dart';
 import '../../../features/notifications/data/models/notification_model.dart';
-import '../../../features/profile/data/datasources/profile_remote_data_source.dart';
-import '../../../features/profile/data/models/profile_model.dart';
 import '../../../features/requester_home/data/datasources/request_remote_data_source.dart';
 import '../../../features/requester_home/domain/entities/blood_request_entity.dart';
 import '../../../features/requester_home/data/models/request_models.dart';
@@ -24,29 +22,6 @@ import '../../../features/requester_home/data/models/request_models.dart';
 
 Never _todo(String endpoint) =>
     throw UnimplementedError('REST backend: $endpoint not implemented yet');
-
-class ProfileRestDataSource implements ProfileRemoteDataSource {
-  ProfileRestDataSource(this.dio);
-
-  final Dio dio;
-
-  @override
-  Future<ProfileModel> getProfile() async => _todo('GET /users/me');
-
-  @override
-  Future<ProfileModel> updateProfile(ProfileModel profile) async =>
-      _todo('PATCH /users/me');
-
-  @override
-  Future<ProfileModel> changeRole({
-    required bool isDonor,
-    required bool isRecipient,
-  }) async => _todo('PATCH /users/me/roles');
-
-  @override
-  Future<String> uploadAvatar(String filePath) async =>
-      _todo('POST /users/me/avatar');
-}
 
 class RequestRestDataSource implements RequestRemoteDataSource {
   RequestRestDataSource(this.dio);

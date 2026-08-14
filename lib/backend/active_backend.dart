@@ -11,6 +11,9 @@ import 'hybrid/hybrid_backend.dart';
 ///
 /// Empty set == fully on Supabase (behaviour identical to the old
 /// `SupabaseBackend`).
-const Set<BackendFeature> _restFeatures = {BackendFeature.auth};
+const Set<BackendFeature> _restFeatures = {
+  BackendFeature.auth,
+  BackendFeature.profile,
+};
 
 final Backend activeBackend = HybridBackend(restFeatures: _restFeatures);
