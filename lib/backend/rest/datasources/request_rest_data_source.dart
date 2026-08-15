@@ -5,6 +5,8 @@ import '../../../features/requester_home/data/models/request_models.dart';
 import '../../../features/requester_home/domain/entities/blood_request_entity.dart';
 import '../constants/rest_paths.dart';
 import '../reference/reference_resolver.dart';
+import '../rest_error_mapper.dart' show RestValidationException;
+import '../rest_paginator.dart';
 
 /// REST implementation of [RequestRemoteDataSource] against the Django backend.
 ///
@@ -47,7 +49,7 @@ class RequestRestDataSource implements RequestRemoteDataSource {
 
   @override
   Future<List<HospitalModel>> listHospitals() async {
-    final rows = await _fetchAllPages(RestPaths.refHospitals);
+    final rows = await fetchAllPages(dio,RestPaths.refHospitals);
     return rows.map(_mapHospital).toList(growable: false);
   }
 
@@ -93,10 +95,14 @@ class RequestRestDataSource implements RequestRemoteDataSource {
 
   Future<Map<String, dynamic>> _createBody(RequestDraft draft) async {
     final patient = draft.patient;
+    final bloodTypeId = await reference.bloodTypeIdForLabel(draft.bloodType);
+    if (bloodTypeId == null) {
+      throw RestValidationException('Unknown blood type: ${draft.bloodType}');
+    }
     return {
       'request_for': draft.beneficiaryType.databaseValue,
       'hospital': int.tryParse(draft.hospitalId),
-      'blood_type': await reference.bloodTypeIdForLabel(draft.bloodType),
+      'blood_type': bloodTypeId,
       'priority': draft.priority.databaseValue,
       'bags_required': draft.unitsNeeded,
       'deadline': _isoDate(draft.neededBy),
@@ -120,7 +126,7 @@ class RequestRestDataSource implements RequestRemoteDataSource {
   @override
   Future<List<RequestDonorModel>> listRequestDonors(String requestId) async {
     // Accepted donors are the appointments booked against this request.
-    final rows = await _fetchAllPages(
+    final rows = await fetchAllPages(dio,
       RestPaths.appointments,
       query: {'request': requestId},
     );
@@ -131,13 +137,13 @@ class RequestRestDataSource implements RequestRemoteDataSource {
   Future<List<CompatibleDonorModel>> listCompatibleDonors(
     String requestId,
   ) async {
-    final rows = await _fetchAllPages(RestPaths.requestMatchingDonors(requestId));
+    final rows = await fetchAllPages(dio,RestPaths.requestMatchingDonors(requestId));
     return Future.wait(rows.map(_mapCompatibleDonor));
   }
 
   @override
   Future<List<DirectInvitationModel>> listInvitations(String requestId) async {
-    final rows = await _fetchAllPages(
+    final rows = await fetchAllPages(dio,
       RestPaths.invitations,
       query: {'request': requestId},
     );
@@ -170,32 +176,6 @@ class RequestRestDataSource implements RequestRemoteDataSource {
   }
 
   // --- mapping ---
-
-  /// Follows DRF `next` links, accumulating every page's `results`. The
-  /// hospitals list is paged (28+ per wilaya, 343 total), so a single page is
-  /// not enough for the dropdown.
-  Future<List<Map<String, dynamic>>> _fetchAllPages(
-    String path, {
-    Map<String, dynamic>? query,
-  }) async {
-    final all = <Map<String, dynamic>>[];
-    String? url = path;
-    var params = query;
-    while (url != null) {
-      final response = await dio.get<Map<String, dynamic>>(
-        url,
-        queryParameters: params,
-      );
-      final data = response.data ?? const {};
-      final results = data['results'];
-      if (results is List) {
-        all.addAll(results.whereType<Map<String, dynamic>>());
-      }
-      url = data['next'] as String?;
-      params = null; // the `next` URL already carries the query
-    }
-    return all;
-  }
 
   RequestDonorModel _mapRequestDonor(Map<String, dynamic> json) =>
       RequestDonorModel(

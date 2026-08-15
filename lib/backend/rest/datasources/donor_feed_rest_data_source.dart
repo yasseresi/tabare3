@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../../../features/donor_home/data/datasources/donor_feed_remote_data_source.dart';
 import '../../../features/donor_home/data/models/donor_feed_models.dart';
 import '../constants/rest_paths.dart';
+import '../rest_paginator.dart';
 
 /// REST implementation of [DonorFeedRemoteDataSource] against the Django backend.
 ///
@@ -60,13 +61,13 @@ class DonorFeedRestDataSource implements DonorFeedRemoteDataSource {
   @override
   Future<List<DonorAppointmentModel>> listAppointments() async {
     // Paginated viewset, scoped server-side to the donor's own appointments.
-    final rows = await _fetchAllPages(RestPaths.appointments);
+    final rows = await fetchAllPages(dio,RestPaths.appointments);
     return rows.map(_mapAppointment).toList(growable: false);
   }
 
   @override
   Future<List<DonationRecordModel>> listDonationRecords() async {
-    final rows = await _fetchAllPages(RestPaths.donations);
+    final rows = await fetchAllPages(dio,RestPaths.donations);
     return rows.map(_mapDonation).toList(growable: false);
   }
 
@@ -97,9 +98,15 @@ class DonorFeedRestDataSource implements DonorFeedRemoteDataSource {
   @override
   Future<DonationRecordModel> redeemQr(String token) async {
     // No unified endpoint exists; the scanned URL discriminates request vs
-    // campaign. Manual bare tokens default to the request scan.
-    if (token.contains('campaign')) return redeemCampaignQr(token);
+    // campaign by its path (`…/campaigns/scan/<token>`). Manual bare tokens have
+    // no path and default to the request scan.
+    if (_isCampaignUrl(token)) return redeemCampaignQr(token);
     return redeemRequestQr(token);
+  }
+
+  bool _isCampaignUrl(String token) {
+    final lower = token.toLowerCase();
+    return lower.contains('/campaigns/') || lower.contains('/campaign/');
   }
 
   @override
@@ -200,21 +207,6 @@ class DonorFeedRestDataSource implements DonorFeedRemoteDataSource {
     'cancelled' => 'cancelled',
     _ => 'pending',
   };
-
-  Future<List<Map<String, dynamic>>> _fetchAllPages(String path) async {
-    final all = <Map<String, dynamic>>[];
-    String? url = path;
-    while (url != null) {
-      final response = await dio.get<Map<String, dynamic>>(url);
-      final data = response.data ?? const {};
-      final results = data['results'];
-      if (results is List) {
-        all.addAll(results.whereType<Map<String, dynamic>>());
-      }
-      url = data['next'] as String?;
-    }
-    return all;
-  }
 
   DonorCampaignModel _mapCampaign(Map<String, dynamic> json) {
     final wilaya = json['wilaya'];

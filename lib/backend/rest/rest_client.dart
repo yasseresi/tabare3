@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../core/constants/env_constants.dart';
 import 'auth_interceptor.dart';
+import 'logging_interceptor.dart';
 import 'token_store.dart';
 
 const String contentTypeHeader = 'content-type';
@@ -46,6 +47,9 @@ class RestClientFactory {
     );
     _dio.options = options;
 
+    // Idempotent: a second build() must not stack duplicate interceptors.
+    _dio.interceptors.clear();
+
     // Bare client for refresh + replay — no AuthInterceptor, so a failing
     // refresh cannot recurse.
     final refreshClient = Dio(options);
@@ -58,10 +62,9 @@ class RestClientFactory {
       ),
     );
 
+    // Debug-only logger that masks the bearer token, passwords, and JWTs.
     if (!kReleaseMode) {
-      _dio.interceptors.add(
-        LogInterceptor(requestBody: true, responseBody: true),
-      );
+      _dio.interceptors.add(const RedactingLogInterceptor());
     }
 
     return _dio;

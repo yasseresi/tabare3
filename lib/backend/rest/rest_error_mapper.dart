@@ -5,6 +5,17 @@ import '../../core/error/failures.dart';
 import '../../core/utils/error_messages.dart';
 import '../../core/utils/string_manager.dart';
 
+/// Raised client-side when a request can't be built because a value could not
+/// be mapped to what the backend expects (e.g. an unknown wilaya/blood-type
+/// that has no id). Surfaced as a [ValidationFailure] so the user gets a clear,
+/// field-level message instead of an opaque server 400.
+class RestValidationException implements Exception {
+  const RestValidationException(this.message);
+  final String message;
+  @override
+  String toString() => 'RestValidationException: $message';
+}
+
 /// Maps [DioException]s from the custom REST backend to domain [Failure]s.
 ///
 /// Mirrors what `SupabaseErrorMapper` does for the Supabase SDK, so the rest of
@@ -17,6 +28,13 @@ class RestErrorMapper implements BackendErrorMapper {
     Object error, {
     BackendOperation operation = BackendOperation.generic,
   }) {
+    if (error is RestValidationException) {
+      // The exception message is diagnostic; the user sees the localized string.
+      return ValidationFailure(
+        422,
+        ErrorMessages.getMessage(AppStrings.missingRequiredFields),
+      );
+    }
     if (error is! DioException) return null;
 
     switch (error.type) {

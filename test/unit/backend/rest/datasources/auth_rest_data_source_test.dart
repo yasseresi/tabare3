@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tabare3/backend/rest/constants/rest_paths.dart';
 import 'package:tabare3/backend/rest/datasources/auth_rest_data_source.dart';
+import 'package:tabare3/backend/rest/rest_error_mapper.dart' show RestValidationException;
 import 'package:tabare3/backend/rest/reference/reference_models.dart';
 import 'package:tabare3/backend/rest/reference/reference_remote_data_source.dart';
 import 'package:tabare3/backend/rest/reference/reference_resolver.dart';
@@ -161,6 +162,28 @@ void main() {
       expect(user.username, 'ahmed');
       verifyNever(
         () => dio.post<Map<String, dynamic>>(RestPaths.login, data: any(named: 'data')),
+      );
+    });
+
+    test('fails fast with a validation error when the wilaya is unknown', () async {
+      expect(
+        () => source.signUp(
+          params: SignupParams(
+            username: 'ahmed',
+            fullName: 'Ahmed Ben Ali',
+            password: 'pw',
+            phone: '0555123456',
+            dateOfBirth: DateTime(1990, 3, 7),
+            gender: 'male',
+            bloodType: 'O+',
+            city: 'مدينة غير معروفة', // not in the reference data
+            weight: 72,
+          ),
+        ),
+        throwsA(isA<RestValidationException>()),
+      );
+      verifyNever(
+        () => dio.post<Map<String, dynamic>>(RestPaths.register, data: any(named: 'data')),
       );
     });
   });

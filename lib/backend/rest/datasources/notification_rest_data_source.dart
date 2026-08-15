@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import '../../../features/notifications/data/datasources/notification_remote_data_source.dart';
 import '../../../features/notifications/data/models/notification_model.dart';
 import '../constants/rest_paths.dart';
+import '../rest_paginator.dart';
 
 /// How often [NotificationRestDataSource.watchNotifications] re-fetches. The
 /// Django backend has no realtime channel, so the live Supabase stream becomes
@@ -22,7 +23,7 @@ class NotificationRestDataSource implements NotificationRemoteDataSource {
 
   @override
   Future<List<NotificationModel>> listNotifications() async {
-    final rows = await _fetchAllPages(RestPaths.notifications);
+    final rows = await fetchAllPages(dio, RestPaths.notifications);
     return rows.map(_map).toList(growable: false);
   }
 
@@ -65,21 +66,6 @@ class NotificationRestDataSource implements NotificationRemoteDataSource {
     );
 
     return controller.stream;
-  }
-
-  Future<List<Map<String, dynamic>>> _fetchAllPages(String path) async {
-    final all = <Map<String, dynamic>>[];
-    String? url = path;
-    while (url != null) {
-      final response = await dio.get<Map<String, dynamic>>(url);
-      final data = response.data ?? const {};
-      final results = data['results'];
-      if (results is List) {
-        all.addAll(results.whereType<Map<String, dynamic>>());
-      }
-      url = data['next'] as String?;
-    }
-    return all;
   }
 
   NotificationModel _map(Map<String, dynamic> json) {

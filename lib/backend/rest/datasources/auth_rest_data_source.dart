@@ -5,6 +5,7 @@ import '../../../features/auth/data/models/user_model.dart';
 import '../../../features/auth/domain/repositories/auth_repository.dart';
 import '../constants/rest_paths.dart';
 import '../reference/reference_resolver.dart';
+import '../rest_error_mapper.dart' show RestValidationException;
 import '../token_store.dart';
 
 /// The app authenticates by username; the Django API only knows email. Usernames
@@ -97,6 +98,14 @@ class AuthRestDataSource implements AuthRemoteDataSource {
 
   Future<Map<String, dynamic>> _registerBody(SignupParams params) async {
     final names = _splitName(params.fullName);
+    final wilayaId = await reference.wilayaIdForName(params.city);
+    final bloodTypeId = await reference.bloodTypeIdForLabel(params.bloodType);
+    if (wilayaId == null) {
+      throw RestValidationException('Unknown wilaya: ${params.city}');
+    }
+    if (bloodTypeId == null) {
+      throw RestValidationException('Unknown blood type: ${params.bloodType}');
+    }
     return {
       'first_name': names.$1,
       'last_name': names.$2,
@@ -104,8 +113,8 @@ class AuthRestDataSource implements AuthRemoteDataSource {
       'phone': params.phone,
       'gender': params.gender,
       'date_of_birth': _isoDate(params.dateOfBirth),
-      'wilaya': await reference.wilayaIdForName(params.city),
-      'blood_type': await reference.bloodTypeIdForLabel(params.bloodType),
+      'wilaya': wilayaId,
+      'blood_type': bloodTypeId,
       'weight_kg': params.weight?.toString(),
       'password': params.password,
       'password_confirm': params.password,
