@@ -8,6 +8,7 @@ import 'package:tabare3/features/profile/domain/entities/profile_entity.dart';
 import 'package:tabare3/features/profile/domain/usecases/change_role.dart';
 import 'package:tabare3/features/profile/domain/usecases/get_cached_profile.dart';
 import 'package:tabare3/features/profile/domain/usecases/get_profile.dart';
+import 'package:tabare3/features/profile/domain/usecases/set_account_status.dart';
 import 'package:tabare3/features/profile/domain/usecases/update_profile.dart';
 import 'package:tabare3/features/profile/domain/usecases/upload_avatar.dart';
 import 'package:tabare3/features/profile/presentation/bloc/profile_bloc.dart';
@@ -20,6 +21,8 @@ class MockUpdateProfile extends Mock implements UpdateProfile {}
 
 class MockChangeRole extends Mock implements ChangeRole {}
 
+class MockSetAccountStatus extends Mock implements SetAccountStatus {}
+
 class MockUploadAvatar extends Mock implements UploadAvatar {}
 
 void main() {
@@ -27,6 +30,7 @@ void main() {
   late MockGetCachedProfile getCachedProfile;
   late MockUpdateProfile updateProfile;
   late MockChangeRole changeRole;
+  late MockSetAccountStatus setAccountStatus;
   late MockUploadAvatar uploadAvatar;
 
   const profile = ProfileEntity(
@@ -61,6 +65,7 @@ void main() {
     getCachedProfile = MockGetCachedProfile();
     updateProfile = MockUpdateProfile();
     changeRole = MockChangeRole();
+    setAccountStatus = MockSetAccountStatus();
     uploadAvatar = MockUploadAvatar();
     // Default: no cache. Individual tests override for cache-first behavior.
     when(() => getCachedProfile()).thenAnswer((_) async => null);
@@ -71,6 +76,7 @@ void main() {
     getCachedProfile: getCachedProfile,
     updateProfile: updateProfile,
     changeRole: changeRole,
+    setAccountStatus: setAccountStatus,
     uploadAvatar: uploadAvatar,
   );
 
@@ -107,9 +113,7 @@ void main() {
       build: () {
         final refreshed = profile.copyWith(fullName: 'Refreshed Name');
         when(() => getCachedProfile()).thenAnswer((_) async => profile);
-        when(
-          () => getProfile(any()),
-        ).thenAnswer((_) async => Right(refreshed));
+        when(() => getProfile(any())).thenAnswer((_) async => Right(refreshed));
         return buildBloc();
       },
       act: (bloc) => bloc.add(const LoadProfile()),
@@ -307,7 +311,7 @@ void main() {
       'persists the new availability and reflects it in the loaded profile',
       build: () {
         when(
-          () => updateProfile(any()),
+          () => setAccountStatus(false),
         ).thenAnswer((_) async => const Right(inactive));
         return buildBloc();
       },
@@ -317,11 +321,7 @@ void main() {
         ProfileLoading(),
         ProfileLoaded(profile: inactive, isEditing: false),
       ],
-      verify: (_) => verify(
-        () => updateProfile(
-          any(that: isA<ProfileEntity>().having((p) => p.isActive, 'isActive', false)),
-        ),
-      ).called(1),
+      verify: (_) => verify(() => setAccountStatus(false)).called(1),
     );
 
     blocTest<ProfileBloc, ProfileState>(
@@ -329,7 +329,7 @@ void main() {
       'status update fails',
       build: () {
         when(
-          () => updateProfile(any()),
+          () => setAccountStatus(false),
         ).thenAnswer((_) async => const Left(ServerFailure()));
         return buildBloc();
       },

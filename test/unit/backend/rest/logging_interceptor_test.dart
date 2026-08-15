@@ -29,7 +29,11 @@ void main() {
   test('masks passwords and tokens in a request body', () {
     final lines = _capture(() {
       interceptor.onRequest(
-        req({'email': 'a@b.dz', 'password': 'hunter2', 'password_confirm': 'hunter2'}),
+        req({
+          'email': 'a@b.dz',
+          'password': 'hunter2',
+          'password_confirm': 'hunter2',
+        }),
         RequestInterceptorHandler(),
       );
     });
@@ -61,5 +65,27 @@ void main() {
     expect(out, isNot(contains('JWT_REFRESH')));
     expect(out, isNot(contains('inner')));
     expect(out, contains('***'));
+  });
+
+  test('masks path and query tokens in request and response URLs', () {
+    const secret = 'REDEEM_SECRET';
+    final options = RequestOptions(
+      baseUrl: 'https://api.test',
+      path: '/campaigns/scan/$secret/',
+      queryParameters: const {'token': secret, 'page': 2},
+    );
+
+    final lines = _capture(() {
+      interceptor.onRequest(options, RequestInterceptorHandler());
+      interceptor.onResponse(
+        Response<dynamic>(requestOptions: options, statusCode: 200),
+        ResponseInterceptorHandler(),
+      );
+    });
+
+    final out = lines.join('\n');
+    expect(out, isNot(contains(secret)));
+    expect(out, contains('/campaigns/scan/***/'));
+    expect(out, contains('page=2'));
   });
 }

@@ -11,6 +11,7 @@ import 'package:tabare3/features/profile/domain/entities/profile_entity.dart';
 import 'package:tabare3/features/profile/domain/usecases/change_role.dart';
 import 'package:tabare3/features/profile/domain/usecases/get_cached_profile.dart';
 import 'package:tabare3/features/profile/domain/usecases/get_profile.dart';
+import 'package:tabare3/features/profile/domain/usecases/set_account_status.dart';
 import 'package:tabare3/features/profile/domain/usecases/update_profile.dart';
 import 'package:tabare3/features/profile/domain/usecases/upload_avatar.dart';
 import 'package:tabare3/features/profile/presentation/bloc/profile_bloc.dart';
@@ -27,6 +28,8 @@ class MockUpdateProfile extends Mock implements UpdateProfile {}
 
 class MockChangeRole extends Mock implements ChangeRole {}
 
+class MockSetAccountStatus extends Mock implements SetAccountStatus {}
+
 class MockUploadAvatar extends Mock implements UploadAvatar {}
 
 void main() {
@@ -34,6 +37,7 @@ void main() {
   late MockGetCachedProfile getCachedProfile;
   late MockUpdateProfile updateProfile;
   late MockChangeRole changeRole;
+  late MockSetAccountStatus setAccountStatus;
   late MockUploadAvatar uploadAvatar;
 
   const profile = ProfileEntity(
@@ -69,6 +73,7 @@ void main() {
     getCachedProfile = MockGetCachedProfile();
     updateProfile = MockUpdateProfile();
     changeRole = MockChangeRole();
+    setAccountStatus = MockSetAccountStatus();
     uploadAvatar = MockUploadAvatar();
 
     when(() => getCachedProfile.call()).thenAnswer((_) async => null);
@@ -82,6 +87,9 @@ void main() {
       () => changeRole.call(any()),
     ).thenAnswer((_) async => const Right(profile));
     when(
+      () => setAccountStatus.call(any()),
+    ).thenAnswer((_) async => const Right(profile));
+    when(
       () => uploadAvatar.call(any()),
     ).thenAnswer((_) async => const Right('https://example.com/avatar.png'));
   });
@@ -92,6 +100,7 @@ void main() {
       getCachedProfile: getCachedProfile,
       updateProfile: updateProfile,
       changeRole: changeRole,
+      setAccountStatus: setAccountStatus,
       uploadAvatar: uploadAvatar,
     )..add(LoadProfile());
   }
@@ -158,10 +167,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(
-        find.byKey(WidgetKeys.profileGradientBackground),
-        findsOneWidget,
-      );
+      expect(find.byKey(WidgetKeys.profileGradientBackground), findsOneWidget);
       final background = tester.widget<DecoratedBox>(
         find
             .descendant(
@@ -253,6 +259,31 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.camera_alt_rounded), findsOneWidget);
+    });
+
+    testWidgets('avatar tap explains that photo support is coming later', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          BlocProvider(
+            create: (_) => buildProfileBloc(),
+            child: const ProfileScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('تعديل'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(WidgetKeys.profileAvatarPicker));
+      await tester.pump();
+
+      expect(
+        find.text('ستتوفر إمكانية تغيير الصورة الشخصية في تحديث قادم.'),
+        findsOneWidget,
+      );
+      verifyNever(() => uploadAvatar.call(any()));
     });
 
     testWidgets('tapping save changes dispatches SaveProfile', (tester) async {

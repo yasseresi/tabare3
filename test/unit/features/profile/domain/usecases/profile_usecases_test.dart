@@ -7,6 +7,7 @@ import 'package:tabare3/features/profile/domain/entities/profile_entity.dart';
 import 'package:tabare3/features/profile/domain/repositories/profile_repository.dart';
 import 'package:tabare3/features/profile/domain/usecases/change_role.dart';
 import 'package:tabare3/features/profile/domain/usecases/get_profile.dart';
+import 'package:tabare3/features/profile/domain/usecases/set_account_status.dart';
 import 'package:tabare3/features/profile/domain/usecases/update_profile.dart';
 import 'package:tabare3/features/profile/domain/usecases/upload_avatar.dart';
 
@@ -79,6 +80,20 @@ void main() {
       final result = await usecase(params);
 
       expect(result, equals(const Right<Failure, ProfileEntity>(profile)));
+    });
+  });
+
+  group('SetAccountStatus', () {
+    test('should persist account status through repository', () async {
+      final usecase = SetAccountStatus(repository);
+      when(
+        () => repository.setAccountStatus(false),
+      ).thenAnswer((_) async => const Right(profile));
+
+      final result = await usecase(false);
+
+      expect(result, equals(const Right<Failure, ProfileEntity>(profile)));
+      verify(() => repository.setAccountStatus(false)).called(1);
     });
   });
 

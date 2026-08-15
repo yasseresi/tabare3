@@ -69,6 +69,14 @@ class ProfileRestDataSource implements ProfileRemoteDataSource {
   }
 
   @override
+  Future<ProfileModel> setAccountStatus(bool isActive) async {
+    final response = await dio.post<Map<String, dynamic>>(
+      RestPaths.toggleStatus,
+    );
+    return _mapProfile(response.data ?? const {});
+  }
+
+  @override
   Future<ProfileModel> changeRole({
     required bool isDonor,
     required bool isRecipient,

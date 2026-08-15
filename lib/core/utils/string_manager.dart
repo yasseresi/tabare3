@@ -191,6 +191,7 @@ class AppStrings {
   static const String storageError = 'storage_error';
   static const String fileTooLarge = 'file_too_large';
   static const String imageTooLarge = 'image_too_large';
+  static const String avatarComingSoon = 'avatar_coming_soon';
   static const String serverError = 'server_error';
   static const String defaultError = 'default_error';
 

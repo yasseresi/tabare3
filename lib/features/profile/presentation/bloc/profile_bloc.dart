@@ -4,6 +4,7 @@ import '../../../../core/usecases/usecase.dart';
 import '../../domain/usecases/change_role.dart';
 import '../../domain/usecases/get_cached_profile.dart';
 import '../../domain/usecases/get_profile.dart';
+import '../../domain/usecases/set_account_status.dart';
 import '../../domain/usecases/update_profile.dart';
 import '../../domain/usecases/upload_avatar.dart';
 import 'profile_event.dart';
@@ -17,6 +18,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final GetCachedProfile getCachedProfile;
   final UpdateProfile updateProfile;
   final ChangeRole changeRole;
+  final SetAccountStatus setAccountStatus;
   final UploadAvatar uploadAvatar;
 
   ProfileBloc({
@@ -24,6 +26,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     required this.getCachedProfile,
     required this.updateProfile,
     required this.changeRole,
+    required this.setAccountStatus,
     required this.uploadAvatar,
   }) : super(ProfileInitial()) {
     on<LoadProfile>(_onLoadProfile);
@@ -49,15 +52,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     }
 
     final result = await getProfile(NoParams());
-    result.fold(
-      (failure) {
-        // Keep the cached view on-screen if the refresh fails. Keyed off
-        // `cached` rather than the current state, which a concurrent event
-        // could have changed.
-        if (cached == null) emit(ProfileError(failure: failure));
-      },
-      (profile) => emit(ProfileLoaded(profile: profile, isEditing: false)),
-    );
+    result.fold((failure) {
+      // Keep the cached view on-screen if the refresh fails. Keyed off
+      // `cached` rather than the current state, which a concurrent event
+      // could have changed.
+      if (cached == null) emit(ProfileError(failure: failure));
+    }, (profile) => emit(ProfileLoaded(profile: profile, isEditing: false)));
   }
 
   void _onToggleEditMode(ToggleEditMode event, Emitter<ProfileState> emit) {
@@ -101,10 +101,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ) async {
     final current = state;
     if (current is! ProfileLoaded) return;
+    if (current.profile.isActive == event.isActive) return;
 
-    final updated = current.profile.copyWith(isActive: event.isActive);
     emit(ProfileLoading());
-    final result = await updateProfile(updated);
+    final result = await setAccountStatus(event.isActive);
     result.fold(
       // Keep the profile on-screen and report the failure transiently rather
       // than replacing the page with a full error state.

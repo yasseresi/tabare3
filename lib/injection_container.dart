@@ -41,6 +41,7 @@ import 'features/profile/domain/repositories/profile_repository.dart';
 import 'features/profile/domain/usecases/change_role.dart';
 import 'features/profile/domain/usecases/get_cached_profile.dart';
 import 'features/profile/domain/usecases/get_profile.dart';
+import 'features/profile/domain/usecases/set_account_status.dart';
 import 'features/profile/domain/usecases/update_profile.dart';
 import 'features/profile/domain/usecases/upload_avatar.dart';
 import 'features/profile/presentation/bloc/profile_bloc.dart';
@@ -160,6 +161,7 @@ Future<void> initProfile() async {
       getCachedProfile: sl(),
       updateProfile: sl(),
       changeRole: sl(),
+      setAccountStatus: sl(),
       uploadAvatar: sl(),
     ),
   );
@@ -168,6 +170,7 @@ Future<void> initProfile() async {
   sl.registerLazySingleton(() => GetCachedProfile(sl()));
   sl.registerLazySingleton(() => UpdateProfile(sl()));
   sl.registerLazySingleton(() => ChangeRole(sl()));
+  sl.registerLazySingleton(() => SetAccountStatus(sl()));
   sl.registerLazySingleton(() => UploadAvatar(sl()));
 
   sl.registerLazySingleton<ProfileRepository>(

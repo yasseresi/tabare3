@@ -142,6 +142,25 @@ void main() {
     });
   });
 
+  group('setAccountStatus', () {
+    test('should persist account status and cache server result', () async {
+      final inactiveModel = profileModel.copyWith(isActive: false);
+      final inactiveEntity = profileEntity.copyWith(isActive: false);
+      when(
+        () => remoteDataSource.setAccountStatus(false),
+      ).thenAnswer((_) async => inactiveModel);
+      when(
+        () => localDataSource.cacheProfile(inactiveModel),
+      ).thenAnswer((_) async {});
+
+      final result = await repository.setAccountStatus(false);
+
+      expect(result, equals(Right(inactiveEntity)));
+      verify(() => remoteDataSource.setAccountStatus(false)).called(1);
+      verify(() => localDataSource.cacheProfile(inactiveModel)).called(1);
+    });
+  });
+
   group('changeRole', () {
     test('should change role and cache result', () async {
       when(
@@ -170,7 +189,9 @@ void main() {
     });
 
     test('should return null when nothing is cached', () async {
-      when(() => localDataSource.getLastProfile()).thenAnswer((_) async => null);
+      when(
+        () => localDataSource.getLastProfile(),
+      ).thenAnswer((_) async => null);
 
       expect(await repository.getCachedProfile(), isNull);
     });

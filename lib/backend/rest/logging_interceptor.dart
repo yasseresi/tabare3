@@ -24,16 +24,19 @@ class RedactingLogInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    debugPrint('→ ${options.method} ${options.uri}');
+    debugPrint('→ ${options.method} ${_redactUri(options.uri)}');
     final body = _redact(options.data);
     if (body != null) debugPrint('  body: $body');
     handler.next(options);
   }
 
   @override
-  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
     debugPrint(
-      '← ${response.statusCode} ${response.requestOptions.uri}',
+      '← ${response.statusCode} ${_redactUri(response.requestOptions.uri)}',
     );
     final body = _redact(response.data);
     if (body != null) debugPrint('  body: $body');
@@ -43,7 +46,7 @@ class RedactingLogInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     debugPrint(
-      '✗ ${err.response?.statusCode ?? err.type} ${err.requestOptions.uri}',
+      '✗ ${err.response?.statusCode ?? err.type} ${_redactUri(err.requestOptions.uri)}',
     );
     handler.next(err);
   }
@@ -67,5 +70,24 @@ class RedactingLogInterceptor extends Interceptor {
       }
     }
     return data;
+  }
+
+  Uri _redactUri(Uri uri) {
+    final segments = uri.pathSegments.toList();
+    for (var index = 0; index < segments.length - 1; index++) {
+      if (segments[index] == 'scan' && segments[index + 1].isNotEmpty) {
+        segments[index + 1] = _mask;
+      }
+    }
+    final query = <String, String>{
+      for (final entry in uri.queryParameters.entries)
+        entry.key: _sensitiveKeys.contains(entry.key.toLowerCase())
+            ? _mask
+            : entry.value,
+    };
+    return uri.replace(
+      pathSegments: segments,
+      queryParameters: query.isEmpty ? null : query,
+    );
   }
 }

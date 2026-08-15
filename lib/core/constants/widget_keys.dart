@@ -9,6 +9,7 @@ class WidgetKeys {
   static const profileGradientBackground = Key('profile_gradient_background');
   static const profileNotificationsButton = Key('profile_notifications_button');
   static const profileQrRow = Key('profile_qr_row');
+  static const profileAvatarPicker = Key('profile_avatar_picker');
   static const Key splashProgressBar = Key('splash_progress_bar');
   static const Key loginContentArea = Key('login_content_area');
   static const Key signupTermsToggle = Key('signup_terms_toggle');
@@ -47,9 +48,13 @@ class WidgetKeys {
   );
   static const Key donorNavigationProfile = Key('donor_navigation_profile');
   static const Key donorNotificationsButton = Key('donor_notifications_button');
-  static const Key donorScannerManualToggle = Key('donor_scanner_manual_toggle');
+  static const Key donorScannerManualToggle = Key(
+    'donor_scanner_manual_toggle',
+  );
   static const Key donorScannerManualField = Key('donor_scanner_manual_field');
-  static const Key donorScannerManualSubmit = Key('donor_scanner_manual_submit');
+  static const Key donorScannerManualSubmit = Key(
+    'donor_scanner_manual_submit',
+  );
   static const Key donorScannerError = Key('donor_scanner_error');
   static const Key donorScannerProgress = Key('donor_scanner_progress');
   static const Key requesterNavigationHome = Key('requester_navigation_home');

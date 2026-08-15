@@ -119,6 +119,7 @@
   "request_accepted": "Request accepted successfully",
   "request_cancelled": "Request cancelled successfully",
   "profile_updated": "Profile updated successfully",
+  "avatar_coming_soon": "Profile photo changes will be available in a future update.",
   "edit_success": "Modified successfully",
   "confirm_logout": "Are you sure you want to log out?",
   "confirm_logout_message": "Your current session will end and you will need to sign in again to access your account.",

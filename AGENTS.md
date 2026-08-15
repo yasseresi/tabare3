@@ -133,7 +133,9 @@ lib/features/<feature>/
 - Publishable key: `sb_publishable_1n_-1Jz7yiiERq3odEIPOg_0eKi2ly1`
 - Config: `.env` (SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY), loaded via `String.fromEnvironment`
 - Use RLS policies on every table. Use migrations for DDL; `execute_sql` for DML/debug.
-- Profile creation: `handle_new_user()` trigger on `auth.users` INSERT populates `public.users` from `raw_user_meta_data` (migration 00003).
+- REST profile mode is exclusive (`donor` or `recipient`). The domain's legacy
+  `isDonor`/`isRecipient` booleans are a compatibility adapter and must map to
+  exactly one active role; switching mode is a server-managed operation.
 
 ## Memory (MANDATORY — run FIRST every session)
 1. **claude-mem** — `/recall` or `mcp__claude-mem__*` search → prior session actions (files, commands, edits).

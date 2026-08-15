@@ -60,6 +60,17 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }
 
   @override
+  Future<Either<Failure, ProfileEntity>> setAccountStatus(bool isActive) async {
+    try {
+      final updated = await remoteDataSource.setAccountStatus(isActive);
+      await localDataSource.cacheProfile(updated);
+      return Right(updated.toEntity());
+    } catch (e) {
+      return Left(ErrorHandler.handle(e));
+    }
+  }
+
+  @override
   Future<Either<Failure, ProfileEntity>> changeRole({
     required bool isDonor,
     required bool isRecipient,

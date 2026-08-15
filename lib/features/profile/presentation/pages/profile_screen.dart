@@ -5,7 +5,6 @@ import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart' as intl;
 
 import '../../../../core/constants/app_dimensions.dart';
@@ -82,9 +81,9 @@ class ProfileScreen extends StatelessWidget {
 
   void _profileListener(BuildContext context, ProfileState state) {
     if (state is ProfileLoaded && state.actionError != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(state.actionError!.message)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(state.actionError!.message)));
     }
     if (state is ProfileRoleChanged) {
       final route = state.profile.isDonor
@@ -587,7 +586,12 @@ class _AvatarPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: isEditing ? () => _pickImage(context) : null,
+      key: WidgetKeys.profileAvatarPicker,
+      onTap: isEditing
+          ? () => ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(AppStrings.avatarComingSoon.tr())),
+            )
+          : null,
       child: Container(
         width: AppSize.s96,
         height: AppSize.s96,
@@ -648,24 +652,6 @@ class _AvatarPicker extends StatelessWidget {
       );
     }
     return _FallbackAvatar(profile.fullName);
-  }
-
-  Future<void> _pickImage(BuildContext context) async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked == null || !context.mounted) return;
-
-    final file = File(picked.path);
-    final length = await file.length();
-    if (length > AppConstants.maxAvatarBytes) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(AppStrings.imageTooLarge.tr())));
-      return;
-    }
-    if (!context.mounted) return;
-    context.read<ProfileBloc>().add(AvatarSelected(picked.path));
   }
 }
 

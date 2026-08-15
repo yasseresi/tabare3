@@ -10,6 +10,7 @@ abstract class ProfileRepository {
 
   Future<Either<Failure, ProfileEntity>> getProfile();
   Future<Either<Failure, ProfileEntity>> updateProfile(ProfileEntity profile);
+  Future<Either<Failure, ProfileEntity>> setAccountStatus(bool isActive);
   Future<Either<Failure, ProfileEntity>> changeRole({
     required bool isDonor,
     required bool isRecipient,
