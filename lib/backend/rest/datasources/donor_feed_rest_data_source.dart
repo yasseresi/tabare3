@@ -25,8 +25,11 @@ class DonorFeedRestDataSource implements DonorFeedRemoteDataSource {
 
   @override
   Future<DonorAvailabilityModel> setAvailability(bool isAvailable) async {
-    // Django exposes a *toggle*, not a setter: flip only when the current state
-    // differs from the desired one, so repeat calls are idempotent.
+    // Accepted design: Django has no separate "available for donation" concept —
+    // availability *is* the account's business `status`. So this flips
+    // `toggle-status`, i.e. activates/deactivates the account (a manual
+    // deactivation can carry Django's inactivity penalty). Flip only when the
+    // current state differs, so repeat calls are idempotent.
     final current = await getAvailability();
     if (current.isAvailableForDonation != isAvailable) {
       await dio.post<Map<String, dynamic>>(RestPaths.toggleStatus);
