@@ -1,304 +1,218 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class DonorAppointmentsScreen extends StatefulWidget {
-  const DonorAppointmentsScreen({super.key});
+import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/presentation/widgets/app_dialog.dart';
+import '../../../../core/presentation/widgets/app_empty_state.dart';
+import '../../../../core/presentation/widgets/app_gradient_background.dart';
+import '../../../../core/presentation/widgets/app_page.dart';
+import '../../../../core/presentation/widgets/app_pill_button.dart';
+import '../../../../core/presentation/widgets/app_section_header.dart';
+import '../../../../core/presentation/widgets/app_tag_pill.dart';
+import '../../../../core/presentation/widgets/hero_banner.dart';
+import '../../../../core/presentation/widgets/request_card.dart';
+import '../../../../core/utils/assets_manager.dart';
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/route_manager.dart';
+import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/greeting.dart';
+import '../../../../core/utils/values_manager.dart';
+import '../../domain/entities/donor_feed_entity.dart';
+import '../bloc/donor_feed_bloc.dart';
+import '../widgets/donor_request_card.dart';
 
-  @override
-  State<DonorAppointmentsScreen> createState() => _DonorAppointmentsScreenState();
-}
+class DonorAppointmentsScreen extends StatelessWidget {
+  final VoidCallback? onNotifications;
 
-class _DonorAppointmentsScreenState extends State<DonorAppointmentsScreen> {
-  final bool _hasAppointments = true; // Toggle for empty state demo
-
-  void _showCancelConfirmationDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-          child: Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.warning_rounded, color: Colors.red, size: 80),
-                const SizedBox(height: 20),
-                const Text(
-                  'هل أنت متأكد من إلغاء هذا الطلب؟',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 15),
-                const Text(
-                  'إلغاء للطلب سيتم إشعار صاحب الطلب بأنك غير مستعد للتبرع بالدم.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: Colors.grey, height: 1.5),
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      // Handle cancellation logic here
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B1D1D),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                    ),
-                    child: const Text('تأكيد', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                    ),
-                    child: const Text('إلغاء', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  const DonorAppointmentsScreen({super.key, this.onNotifications});
 
   @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20),
-              child: Column(
-                children: [
-                  // Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'مرحباً، أحمد',
-                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            'كل تبرع بالدم هو فرصة جديدة للحياة',
-                            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(color: Color(0xFFF5F5F5), shape: BoxShape.circle),
-                        child: const Icon(Icons.notifications_none_rounded, color: Colors.black),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  // Red Banner Card
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF8B1D1D),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Text(
-                                'مواعيدي',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                'إدارة ومتابعة جميع مواعيد التبرع بالدم الخاصة بك بسهولة، والاطلاع على تفاصيل المواعيد القادمة والسابقة.',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.white70,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        const Icon(Icons.local_hospital_rounded, color: Colors.white, size: 60),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Text(
-              'المواعيد القادمة',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 15),
-            Expanded(
-              child: _hasAppointments ? _buildAppointmentsList() : _buildEmptyState(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAppointmentsList() {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      children: [
-        _buildAppointmentCard(
-          hospital: 'مستشفى مصطفى باشا',
-          patientName: 'علي بن محمد',
-          deadline: '15 جانفي 2026',
-          bagsInfo: 'تم توفير 1 من 3 أكياس',
-          progress: 0.33,
-        ),
-        const SizedBox(height: 20),
-        _buildAppointmentCard(
-          hospital: 'مستشفى مصطفى باشا',
-          patientName: 'علي بن محمد',
-          deadline: '15 جانفي 2026',
-          bagsInfo: 'تم توفير 1 من 3 أكياس',
-          progress: 0.33,
-        ),
-        const SizedBox(height: 100),
-      ],
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const SizedBox(height: 40),
-          const Icon(Icons.assignment_rounded, size: 100, color: Colors.grey),
-          const SizedBox(height: 40),
-          const Text(
-            'لا توجد مواعيد قادمة',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 15),
-          const Text(
-            'ليس لديك أي موعد تبرع مجدول حالياً. يمكنك استعراض الطلبات المتاحة وحجز موعد جديد للمساهمة في مساعدة المحتاجين.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, color: Colors.grey, height: 1.5),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAppointmentCard({
-    required String hospital,
-    required String patientName,
-    required String deadline,
-    required String bagsInfo,
-    required double progress,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: BlocBuilder<DonorFeedBloc, DonorFeedState>(
+        builder: (context, state) {
+          if (state is DonorFeedInitial || state is DonorFeedLoading) {
+            return const AppGradientBackground(
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+          if (state is DonorFeedError) {
+            return AppGradientBackground(
+              child: Center(child: Text(state.failure.message)),
+            );
+          }
+          final loaded = state as DonorFeedLoaded;
+          final appointments = loaded.feed.appointments;
+          return AppPage(
+            title: welcomeTitle(),
+            subtitle: AppStrings.donationLifeChance.tr(),
+            notificationsKey: WidgetKeys.donorNotificationsButton,
+            onNotifications:
+                onNotifications ??
+                () => Navigator.pushNamed(context, Routes.notificationsRoute),
+            onRefresh: () async {
+              context.read<DonorFeedBloc>().add(const DonorFeedRequested());
+            },
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.assignment_rounded, color: Colors.grey, size: 40),
-                  const SizedBox(width: 12),
-                  Text(
-                    hospital,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              HeroBanner(
+                title: AppStrings.myAppointments.tr(),
+                message: AppStrings.appointmentsDescription.tr(),
+              ),
+              const SizedBox(height: AppSize.s12),
+              // Figma keeps the section title above the empty state.
+              AppSectionHeader(
+                title: AppStrings.upcomingAppointments.tr(),
+                centered: true,
+              ),
+              const SizedBox(height: AppSize.s10),
+              if (appointments.isEmpty)
+                AppEmptyState(
+                  illustration: ImageAssets.appointmentAvatar,
+                  title: AppStrings.noUpcomingAppointments.tr(),
+                  message: AppStrings.noAppointmentsDescription.tr(),
+                )
+              else ...[
+                ...appointments.map(
+                  (appointment) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppPadding.p15),
+                    child: _AppointmentCard(
+                      appointment: appointment,
+                      disabled: loaded.isMutating,
+                    ),
                   ),
-                ],
-              ),
-              Container(
-                width: 12,
-                height: 12,
-                decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-              ),
+                ),
+              ],
             ],
-          ),
-          const SizedBox(height: 20),
-          _buildInfoRow('المريض', patientName, valueColor: Colors.red),
-          _buildInfoRow('آخر أجل', deadline, valueColor: Colors.red),
-          _buildInfoRow('أكياس الدم', bagsInfo, valueColor: Colors.grey),
-          const SizedBox(height: 10),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 8,
-              backgroundColor: const Color(0xFFEEEEEE),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B1D1D)),
-            ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: 150,
-            height: 45,
-            child: ElevatedButton(
-              onPressed: _showCancelConfirmationDialog,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[600],
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-              ),
-              child: const Text('إلغاء', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
+}
 
-  Widget _buildInfoRow(String label, String value, {Color? valueColor}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-          Text(
-            value,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: valueColor ?? Colors.black),
+class _AppointmentCard extends StatelessWidget {
+  final DonorAppointmentEntity appointment;
+  final bool disabled;
+
+  const _AppointmentCard({required this.appointment, required this.disabled});
+
+  @override
+  Widget build(BuildContext context) {
+    final request = appointment.bloodRequest;
+    final campaign = appointment.campaign;
+    final title =
+        request?.hospital?.nameAr ??
+        campaign?.title ??
+        AppStrings.appointments.tr();
+    final canCancel =
+        appointment.status == DonationAppointmentStatus.pending ||
+        appointment.status == DonationAppointmentStatus.confirmed;
+    final dateFormat = DateFormat(AppConstants.requestDateFormat);
+    final timeFormat = DateFormat(AppConstants.requestTimeFormat);
+    final scheduled = appointment.scheduledAt.toLocal();
+    return RequestCard(
+      avatar: ImageAssets.appointmentAvatar,
+      title: title,
+      // Figma shows a single urgency chip; the appointment status is conveyed
+      // by the card living under `المواعيد القادمة`.
+      tags: [
+        if (request != null)
+          AppTagPill(
+            label: donorPriorityLabel(request.priority),
+            dotColor: donorPriorityColor(request.priority),
+            labelColor: ColorManager.textMuted,
+            dotTrailing: true,
+          )
+        else
+          _statusPill(appointment.status),
+      ],
+      // Figma also lists `المريض` and `تم توفير … أكياس` here, but the
+      // appointment's request reference carries neither the patient name nor
+      // the unit counts, so those rows stay out until the entity grows them.
+      details: [
+        if (request != null)
+          RequestCardDetail(
+            label: AppStrings.bloodType.tr(),
+            value: request.bloodType,
+            labelColor: ColorManager.textMuted,
+            valueColor: ColorManager.primary,
           ),
-        ],
+        RequestCardDetail(
+          label: AppStrings.scheduledAt.tr(),
+          value:
+              '${dateFormat.format(scheduled)} ${timeFormat.format(scheduled)}',
+          labelColor: ColorManager.textMuted,
+        ),
+        if (request?.neededBy != null)
+          RequestCardDetail(
+            label: AppStrings.lastDeadline.tr(),
+            value: dateFormat.format(request!.neededBy!.toLocal()),
+            labelColor: ColorManager.textMuted,
+          ),
+      ],
+      footer: canCancel
+          ? AppPillButton(
+              label: AppStrings.cancel.tr(),
+              buttonKey: WidgetKeys.appointmentCancelButton,
+              onPressed: disabled
+                  ? null
+                  : () => _confirmCancellation(context, appointment.id),
+            )
+          : null,
+    );
+  }
+
+  Widget _statusPill(DonationAppointmentStatus status) {
+    final (label, color) = switch (status) {
+      DonationAppointmentStatus.pending => (
+        AppStrings.pending.tr(),
+        ColorManager.urgencyUrgent,
+      ),
+      DonationAppointmentStatus.confirmed => (
+        AppStrings.accepted.tr(),
+        ColorManager.success,
+      ),
+      DonationAppointmentStatus.completed => (
+        AppStrings.doneStatus.tr(),
+        ColorManager.success,
+      ),
+      DonationAppointmentStatus.cancelled => (
+        AppStrings.cancelled.tr(),
+        ColorManager.urgencyCritical,
+      ),
+    };
+    return AppTagPill(label: label, dotColor: color);
+  }
+
+  Future<void> _confirmCancellation(
+    BuildContext context,
+    String appointmentId,
+  ) async {
+    final bloc = context.read<DonorFeedBloc>();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierColor: ColorManager.dialogScrim,
+      builder: (dialogContext) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AppDialog.warning(
+          title: AppStrings.confirmCancelRequest.tr(),
+          message: AppStrings.cancelRequestNotice.tr(),
+          actionLabel: AppStrings.confirm.tr(),
+          actionKey: WidgetKeys.appointmentCancelConfirmButton,
+          onAction: () => Navigator.pop(dialogContext, true),
+          secondaryLabel: AppStrings.cancel.tr(),
+          onSecondaryAction: () => Navigator.pop(dialogContext, false),
+        ),
+      ),
+    );
+    if (confirmed != true) return;
+    bloc.add(
+      DonorAppointmentCancelled(
+        appointmentId: appointmentId,
+        reason: AppStrings.cancelRequestNotice.tr(),
       ),
     );
   }

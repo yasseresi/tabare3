@@ -1,4 +1,18 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../../../core/utils/assets_manager.dart';
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/font_manager.dart';
+import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/styles_manager.dart';
+import '../../../../core/utils/values_manager.dart';
+import '../../domain/entities/donor_card_entity.dart';
+import '../bloc/donor_card_bloc.dart';
+import '../widgets/donor_card_theme.dart';
 
 class DonorCardInfoScreen extends StatelessWidget {
   const DonorCardInfoScreen({super.key});
@@ -7,212 +21,336 @@ class DonorCardInfoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: const Color(0xFF1A1A1A),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                // Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          'مرحباً، أحمد',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          'كل تبرع بالدم هو فرصة جديدة للحياة',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.notifications_none_rounded, color: Colors.white),
-                      ),
-                    ),
+      child: DonorCardBackground(
+        child: Material(
+          type: MaterialType.transparency,
+          child: SafeArea(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: AppSize.s402),
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppPadding.p10,
+                    vertical: AppPadding.p20,
+                  ),
+                  children: const [
+                    Center(child: _DonorCardBadgeChip()),
+                    SizedBox(height: AppSize.s15),
+                    _Mascot(),
+                    SizedBox(height: AppSize.s15),
+                    _ExplanationCard(),
+                    SizedBox(height: AppSize.s15),
+                    _PointRulesCard(),
+                    SizedBox(height: AppSize.s15),
+                    _LevelsCard(),
                   ],
                 ),
-                const SizedBox(height: 30),
-                // Title Badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.card_giftcard, color: Colors.deepPurple, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'بطاقة المتبرع',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                // Purple Drop Character
-                Image.asset(
-                  'assets/images/avatar.png',
-                  height: 164,
-                  width: 150,
-                  errorBuilder: (context, error, stackTrace) => const Icon(
-                    Icons.water_drop,
-                    size: 150,
-                    color: Colors.deepPurpleAccent,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                // Info Section
-                _buildSection(
-                  title: 'ماهي بطاقة المتبرع',
-                  content:
-                      'بطاقة المتبرع هي ملفك الشخصي التفاعلي داخل المنصة، حيث تعرض مستوى عطائك، عدد تبرعاتك، النقاط التي حصلت عليها، والإنجازات التي حققتها خلال رحلتك الإنسانية. اكسب النقاط من خلال التبرع والالتزام والمشاركة، وارتق عبر خمسة مستويات تعكس مدى تأثيرك في المجتمع، فمع كل تبرع جديد تقترب أكثر من تحقيق إنجازات أكبر والوصول إلى لقب "أسطورة التبرع". لأن كل قطرة دم تمنح الأمل وتساهم في إنقاذ الأرواح.',
-                ),
-                const SizedBox(height: 30),
-                // How to earn points
-                _buildSectionTitle('كيف تكسب النقاط'),
-                const SizedBox(height: 15),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  alignment: WrapAlignment.center,
-                  children: [
-                    _buildPointChip('التبرع بالدم', '+8', Colors.green),
-                    _buildPointChip('الالتزام بالموعد', '+2', Colors.green),
-                    _buildPointChip('الالغاء', '-5', Colors.red),
-                    _buildPointChip('التبرع المستعجل', '+10', Colors.green),
-                    _buildPointChip('3 اشهر و الحساب مغلق', '-3', Colors.red),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                // Levels
-                _buildSectionTitle('المستويات'),
-                const SizedBox(height: 15),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: Column(
-                    children: [
-                      _buildLevelRow('قطرة امل', '0-10'),
-                      const Divider(color: Colors.white10, height: 20),
-                      _buildLevelRow('متبرع نشط', '10-50'),
-                      const Divider(color: Colors.white10, height: 20),
-                      _buildLevelRow('متبرع ملتزم', '50-90'),
-                      const Divider(color: Colors.white10, height: 20),
-                      _buildLevelRow('متبرع متميز', '90-120'),
-                      const Divider(color: Colors.white10, height: 20),
-                      _buildLevelRow('تستحق جائزة', '+120'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 40),
-              ],
+              ),
             ),
           ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildSection({required String title, required String content}) {
-    return Column(
-      children: [
-        _buildSectionTitle(title),
-        const SizedBox(height: 15),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: Text(
-            content,
-            textAlign: TextAlign.justify,
-            style: const TextStyle(color: Colors.grey, height: 1.6, fontSize: 14),
-          ),
-        ),
-      ],
-    );
-  }
+class _Mascot extends StatelessWidget {
+  const _Mascot();
 
-  Widget _buildSectionTitle(String title) {
+  @override
+  Widget build(BuildContext context) {
     return Center(
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.deepPurpleAccent,
-        ),
+      child: Image.asset(
+        ImageAssets.donorMascot,
+        width: AppSize.s150,
+        height: AppSize.s164,
+        fit: BoxFit.contain,
       ),
     );
   }
+}
 
-  Widget _buildPointChip(String label, String value, Color color) {
+class _DonorCardBadgeChip extends StatelessWidget {
+  const _DonorCardBadgeChip();
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppPadding.p17,
+        vertical: AppPadding.p7,
+      ),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        color: ColorManager.white,
+        borderRadius: BorderRadius.circular(AppSize.radiusCircle),
+        border: Border.all(color: ColorManager.donorCardChipBorder),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            label,
-            style: const TextStyle(color: Colors.black, fontSize: 12),
+            AppStrings.donorCard.tr(),
+            style: getSemiBoldStyle(
+              fontSize: FontSize.s14,
+              color: ColorManager.black,
+              lineHeight: LineHeight.h20,
+            ),
           ),
-          const SizedBox(width: 5),
-          Text(
-            value,
-            style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
+          const SizedBox(width: AppSize.s8),
+          SvgPicture.asset(
+            SvgAssets.giftCard,
+            width: AppSize.s20,
+            height: AppSize.s20,
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildLevelRow(String label, String range) {
+class _ExplanationCard extends StatelessWidget {
+  const _ExplanationCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return DonorCardPanel(
+      child: Column(
+        children: [
+          Text(
+            AppStrings.whatIsDonorCard.tr(),
+            textAlign: TextAlign.center,
+            style: getBoldStyle(
+              fontSize: FontSize.s16,
+              color: ColorManager.donorCardAccent,
+              lineHeight: LineHeight.h20,
+            ),
+          ),
+          const SizedBox(height: AppSize.s16),
+          Text(
+            AppStrings.donorCardExplanation.tr(),
+            textAlign: TextAlign.center,
+            style: getSemiBoldStyle(
+              fontSize: FontSize.s14,
+              color: ColorManager.white,
+              lineHeight: LineHeight.h20,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PointRulesCard extends StatelessWidget {
+  const _PointRulesCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return DonorCardPanel(
+      child: Column(
+        children: [
+          Text(
+            AppStrings.howToEarnPoints.tr(),
+            textAlign: TextAlign.center,
+            style: getBoldStyle(
+              fontSize: FontSize.s16,
+              color: ColorManager.donorCardAccent,
+              lineHeight: LineHeight.h20,
+            ),
+          ),
+          const SizedBox(height: AppSize.s16),
+          Wrap(
+            spacing: AppSize.s10,
+            runSpacing: AppSize.s10,
+            alignment: WrapAlignment.center,
+            children: const [
+              _PointRuleChip(
+                amount: AppConstants.pointsCancellation,
+                labelKey: AppStrings.cancellationLabel,
+              ),
+              _PointRuleChip(
+                amount: AppConstants.pointsKeptAppointment,
+                labelKey: AppStrings.appointmentCommitment,
+              ),
+              _PointRuleChip(
+                amount: AppConstants.pointsNormalDonation,
+                labelKey: AppStrings.bloodDonation,
+              ),
+              _PointRuleChip(
+                amount: AppConstants.pointsInactiveThreeMonths,
+                labelKey: AppStrings.threeMonthsInactive,
+              ),
+              _PointRuleChip(
+                amount: AppConstants.pointsUrgentDonation,
+                labelKey: AppStrings.urgentDonation,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// `+8 التبرع بالدم` chip: the signed amount is green when it earns points and
+/// red when it costs them.
+class _PointRuleChip extends StatelessWidget {
+  final int amount;
+  final String labelKey;
+
+  const _PointRuleChip({required this.amount, required this.labelKey});
+
+  @override
+  Widget build(BuildContext context) {
+    final earns = amount > 0;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppPadding.p12,
+        vertical: AppPadding.p6,
+      ),
+      decoration: BoxDecoration(
+        color: ColorManager.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSize.radiusCircle),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            earns ? '+$amount' : '$amount',
+            textAlign: TextAlign.center,
+            style: getRegularStyle(
+              fontSize: FontSize.s12,
+              color: earns
+                  ? ColorManager.success
+                  : ColorManager.urgencyCritical,
+              lineHeight: LineHeight.h16,
+            ),
+          ),
+          const SizedBox(width: AppSize.s5),
+          Text(
+            labelKey.tr(),
+            textAlign: TextAlign.center,
+            style: getRegularStyle(
+              fontSize: FontSize.s12,
+              color: ColorManager.donorCardChipLabel,
+              lineHeight: LineHeight.h16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LevelsCard extends StatelessWidget {
+  const _LevelsCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return DonorCardPanel(
+      child: BlocBuilder<DonorCardBloc, DonorCardState>(
+        builder: (context, state) {
+          Widget body;
+          if (state is DonorCardInitial || state is DonorCardLoading) {
+            body = Center(
+              child: CircularProgressIndicator(
+                color: ColorManager.donorCardAccent,
+              ),
+            );
+          } else if (state is DonorCardError) {
+            body = Text(
+              state.failure.message,
+              style: getMediumStyle(
+                fontSize: FontSize.s14,
+                color: ColorManager.white,
+              ),
+            );
+          } else {
+            final levels = (state as DonorCardLoaded).card.levels;
+            body = Column(
+              children: [
+                for (var index = 0; index < levels.length; index++) ...[
+                  if (index > 0) const SizedBox(height: AppSize.s16),
+                  _LevelRow(
+                    level: levels[index],
+                    next: index + 1 < levels.length ? levels[index + 1] : null,
+                  ),
+                ],
+              ],
+            );
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                AppStrings.levels.tr(),
+                style: getBoldStyle(
+                  fontSize: FontSize.s16,
+                  color: ColorManager.white,
+                  lineHeight: LineHeight.h24,
+                ),
+              ),
+              const SizedBox(height: AppSize.s16),
+              body,
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// `● قطرة امل ……… 0-10` row. The last level has no upper bound, so it renders
+/// as `+120`.
+class _LevelRow extends StatelessWidget {
+  final DonorLevelEntity level;
+  final DonorLevelEntity? next;
+
+  const _LevelRow({required this.level, required this.next});
+
+  @override
+  Widget build(BuildContext context) {
+    final range = next == null
+        ? '+${level.minPoints}'
+        : '${level.minPoints}-${next!.minPoints}';
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            const Icon(Icons.circle, size: 8, color: Colors.deepPurpleAccent),
-            const SizedBox(width: 10),
-            Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          ],
+        Flexible(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: AppSize.s8,
+                height: AppSize.s8,
+                decoration: BoxDecoration(
+                  color: ColorManager.donorCardLevelDot,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: AppSize.s10),
+              Flexible(
+                child: Text(
+                  level.nameAr,
+                  style: getMediumStyle(
+                    fontSize: FontSize.s14,
+                    color: ColorManager.white,
+                    lineHeight: LineHeight.h14,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-        Text(range, style: const TextStyle(color: Colors.deepPurpleAccent, fontWeight: FontWeight.bold)),
+        Text(
+          range,
+          style: getMediumStyle(
+            fontSize: FontSize.s14,
+            color: ColorManager.donorCardAccent,
+            lineHeight: LineHeight.h14,
+          ),
+        ),
       ],
     );
   }

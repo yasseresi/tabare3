@@ -1,0 +1,156 @@
+import 'dart:async';
+
+import 'package:dartz/dartz.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/error/failures.dart';
+import '../../domain/entities/notification_entity.dart';
+import '../../domain/usecases/mark_notification_as_read.dart';
+import '../../domain/usecases/watch_notifications.dart';
+import 'notifications_event.dart';
+import 'notifications_state.dart';
+
+export 'notifications_event.dart';
+export 'notifications_state.dart';
+
+class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
+  final WatchNotifications watchNotifications;
+  final MarkNotificationAsRead markNotificationAsRead;
+
+  StreamSubscription<Either<Failure, List<NotificationEntity>>>? _subscription;
+
+  NotificationsBloc({
+    required this.watchNotifications,
+    required this.markNotificationAsRead,
+  }) : super(const NotificationsInitial()) {
+    on<NotificationsRequested>(_onRequested);
+    on<NotificationsCleared>(_onCleared);
+    on<NotificationsStreamUpdated>(_onStreamUpdated);
+    on<NotificationsSearchChanged>(_onSearchChanged);
+    on<NotificationReadRequested>(_onReadRequested);
+  }
+
+  void _onRequested(
+    NotificationsRequested event,
+    Emitter<NotificationsState> emit,
+  ) {
+    if (state is NotificationsInitial) emit(const NotificationsLoading());
+    // Managed subscription (not emit.forEach) so the search/read handlers stay
+    // responsive while the realtime stream runs for the bloc's whole lifetime.
+    _subscription?.cancel();
+    _subscription = watchNotifications().listen(
+      (result) => add(NotificationsStreamUpdated(result)),
+    );
+  }
+
+  void _onCleared(
+    NotificationsCleared event,
+    Emitter<NotificationsState> emit,
+  ) {
+    // Cancel first: an in-flight emission from the signed-out user's stream
+    // would otherwise repopulate the state we are about to drop.
+    _subscription?.cancel();
+    _subscription = null;
+    emit(const NotificationsInitial());
+  }
+
+  void _onStreamUpdated(
+    NotificationsStreamUpdated event,
+    Emitter<NotificationsState> emit,
+  ) {
+    // Cancelling a subscription does not synchronously stop delivery, so an
+    // emission from the signed-out user's stream can still be sitting in the
+    // event queue behind NotificationsCleared. Drop anything that arrives
+    // while no subscription is active.
+    if (_subscription == null) return;
+
+    event.result.fold((failure) => emit(NotificationsError(failure)), (
+      notifications,
+    ) {
+      final current = state;
+      final query = current is NotificationsLoaded ? current.query : '';
+      emit(
+        NotificationsLoaded(
+          notifications: notifications,
+          visibleNotifications: _filterNotifications(notifications, query),
+          query: query,
+        ),
+      );
+    });
+  }
+
+  void _onSearchChanged(
+    NotificationsSearchChanged event,
+    Emitter<NotificationsState> emit,
+  ) {
+    final current = state;
+    if (current is! NotificationsLoaded) return;
+
+    final filtered = _filterNotifications(current.notifications, event.query);
+    emit(
+      NotificationsLoaded(
+        notifications: current.notifications,
+        visibleNotifications: filtered,
+        query: event.query,
+      ),
+    );
+  }
+
+  Future<void> _onReadRequested(
+    NotificationReadRequested event,
+    Emitter<NotificationsState> emit,
+  ) async {
+    final current = state;
+    if (current is! NotificationsLoaded) return;
+
+    final target = current.notifications.where(
+      (notification) => notification.id == event.notificationId,
+    );
+    if (target.isEmpty || target.first.isRead) return;
+
+    // Optimistically flip the row to read so the list and unread badge react
+    // instantly, even offline or on a slow link. The realtime stream later
+    // re-emits the same is_read update, which is a no-op against this state.
+    emit(_withRead(current, event.notificationId));
+
+    final result = await markNotificationAsRead(
+      MarkNotificationAsReadParams(event.notificationId),
+    );
+    // Roll back to the pre-read snapshot if the write never landed.
+    result.fold((_) => emit(current), (_) {});
+  }
+
+  NotificationsLoaded _withRead(NotificationsLoaded current, String id) {
+    final notifications = current.notifications
+        .map(
+          (notification) => notification.id == id
+              ? notification.copyWith(isRead: true)
+              : notification,
+        )
+        .toList();
+    return NotificationsLoaded(
+      notifications: notifications,
+      visibleNotifications: _filterNotifications(notifications, current.query),
+      query: current.query,
+    );
+  }
+
+  @override
+  Future<void> close() {
+    _subscription?.cancel();
+    return super.close();
+  }
+}
+
+List<NotificationEntity> _filterNotifications(
+  List<NotificationEntity> notifications,
+  String query,
+) {
+  final normalized = query.trim().toLowerCase();
+  if (normalized.isEmpty) return notifications;
+
+  return notifications.where((notification) {
+    final haystack = '${notification.title} ${notification.body}'.toLowerCase();
+    return haystack.contains(normalized);
+  }).toList();
+}

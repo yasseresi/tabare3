@@ -1,11 +1,54 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tabare3/features/profile/presentation/pages/requester_profile_screen.dart';
-import 'requests_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/presentation/widgets/app_bottom_nav.dart';
+import '../../../../core/presentation/widgets/app_button.dart';
+import '../../../../core/presentation/widgets/app_gradient_background.dart';
+import '../../../../core/presentation/widgets/app_page.dart';
+import '../../../../core/presentation/widgets/app_section_header.dart';
+import '../../../../core/presentation/widgets/app_tag_pill.dart';
+import '../../../../core/presentation/widgets/hadith_stats_card.dart';
+import '../../../../core/utils/assets_manager.dart';
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/presentation/widgets/logout_dialog.dart';
+import '../../../../core/utils/route_manager.dart';
+import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/greeting.dart';
+import '../../../../core/utils/values_manager.dart';
+import '../../../../injection_container.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../profile/presentation/bloc/profile_bloc.dart';
+import '../../../profile/presentation/pages/requester_profile_screen.dart';
+import '../../../profile/presentation/pages/about_app_screen.dart';
+import '../../../notifications/presentation/bloc/notifications_bloc.dart';
+import '../../../notifications/presentation/pages/notifications_center_page.dart';
+import '../../domain/entities/blood_request_entity.dart';
+import '../bloc/request_bloc.dart';
+import '../bloc/request_detail_bloc.dart';
+import '../widgets/requester_request_card.dart';
 import 'create_request_screen.dart';
 import 'donor_history_screen.dart';
-import 'notifications_screen.dart';
 import 'edit_request_screen.dart';
+import 'request_detail_screen.dart';
+import 'requester_qr_screen.dart';
+import 'requests_screen.dart';
+
+enum _RequesterTab {
+  home,
+  requests,
+  create,
+  donors,
+  profile,
+  notifications,
+  about,
+  edit,
+  detail,
+  qr,
+}
 
 class RequesterHomeScreen extends StatefulWidget {
   const RequesterHomeScreen({super.key});
@@ -15,529 +58,362 @@ class RequesterHomeScreen extends StatefulWidget {
 }
 
 class _RequesterHomeScreenState extends State<RequesterHomeScreen> {
-  int _selectedIndex = 0;
-  final bool _hasRequests = true;
+  _RequesterTab _selectedTab = _RequesterTab.home;
+  BloodRequestEntity? _editingRequest;
+  BloodRequestEntity? _detailRequest;
+
+  @override
+  void initState() {
+    super.initState();
+    // Open the app-wide notifications stream now that a user is signed in, so
+    // the bell badge stays live across every screen for this session.
+    context.read<NotificationsBloc>().add(const NotificationsRequested());
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: _buildBody(),
-      bottomNavigationBar: _buildBottomNav(),
+    return BlocListener<AuthBloc, AuthState>(
+      listenWhen: (previous, current) => current is Unauthenticated,
+      listener: (context, state) {
+        // The notifications bloc is app-wide and outlives this route, so the
+        // session's notifications have to be dropped here or the next user
+        // inherits them.
+        context.read<NotificationsBloc>().add(const NotificationsCleared());
+        showLogoutSuccessDialog(
+          context,
+          onDismissed: () => Navigator.pushNamedAndRemoveUntil(
+            context,
+            Routes.welcomeRoute,
+            (route) => false,
+          ),
+        );
+      },
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Scaffold(
+          body: _buildBody(),
+          bottomNavigationBar: _RequesterNavigation(
+            selectedTab: _selectedTab,
+            onSelected: (tab) => setState(() => _selectedTab = tab),
+          ),
+        ),
+      ),
     );
   }
 
   Widget _buildBody() {
-    switch (_selectedIndex) {
-      case 0:
-        return _buildHomeView();
-      case 1:
-        return const RequestsScreen();
-      case 2:
-        return CreateRequestScreen(
-          onSuccess: () {
-            setState(() {
-              _selectedIndex = 1;
-            });
-          },
-        );
-      case 3:
-        return const DonorHistoryScreen();
-      case 4:
-        return const RequesterProfileScreen();
-      default:
-        return _buildHomeView();
+    return switch (_selectedTab) {
+      _RequesterTab.home => _RequesterOverview(
+        onCreate: () => setState(() => _selectedTab = _RequesterTab.create),
+        onNotifications: () =>
+            setState(() => _selectedTab = _RequesterTab.notifications),
+        onViewAll: () => setState(() => _selectedTab = _RequesterTab.requests),
+        onEdit: (request) {
+          setState(() {
+            _editingRequest = request;
+            _selectedTab = _RequesterTab.edit;
+          });
+        },
+        onDetail: _openDetail,
+      ),
+      _RequesterTab.requests => RequestsScreen(
+        onNotifications: () =>
+            setState(() => _selectedTab = _RequesterTab.notifications),
+        onEdit: (request) {
+          setState(() {
+            _editingRequest = request;
+            _selectedTab = _RequesterTab.edit;
+          });
+        },
+        onDetail: _openDetail,
+      ),
+      _RequesterTab.create => CreateRequestScreen(
+        onSuccess: () {
+          setState(() => _selectedTab = _RequesterTab.requests);
+        },
+        onNotifications: () =>
+            setState(() => _selectedTab = _RequesterTab.notifications),
+        onProfile: () => setState(() => _selectedTab = _RequesterTab.profile),
+      ),
+      _RequesterTab.donors => DonorHistoryScreen(
+        onNotifications: () =>
+            setState(() => _selectedTab = _RequesterTab.notifications),
+        onDetail: _openDetail,
+      ),
+      _RequesterTab.profile => BlocProvider(
+        create: (_) => sl<ProfileBloc>()..add(const LoadProfile()),
+        child: RequesterProfileScreen(
+          onAbout: () => setState(() => _selectedTab = _RequesterTab.about),
+          onNotifications: () =>
+              setState(() => _selectedTab = _RequesterTab.notifications),
+          onQrCode: () => setState(() => _selectedTab = _RequesterTab.qr),
+        ),
+      ),
+      _RequesterTab.qr => BlocProvider(
+        create: (_) => sl<RequestDetailBloc>(),
+        child: Builder(
+          builder: (context) => RequesterQrScreen(
+            request: _activeRequest(context),
+            onNotifications: () =>
+                setState(() => _selectedTab = _RequesterTab.notifications),
+          ),
+        ),
+      ),
+      _RequesterTab.notifications => BlocProvider.value(
+        value: context.read<NotificationsBloc>(),
+        child: const NotificationsCenterPage(),
+      ),
+      _RequesterTab.about => AboutAppScreen(
+        onBack: () => setState(() => _selectedTab = _RequesterTab.profile),
+      ),
+      _RequesterTab.edit =>
+        _editingRequest == null
+            ? RequestsScreen(
+                onNotifications: () =>
+                    setState(() => _selectedTab = _RequesterTab.notifications),
+                onDetail: _openDetail,
+              )
+            : EditRequestScreen(
+                request: _editingRequest!,
+                onComplete: () {
+                  setState(() {
+                    _editingRequest = null;
+                    _selectedTab = _RequesterTab.requests;
+                  });
+                },
+                onNotifications: () {
+                  setState(() => _selectedTab = _RequesterTab.notifications);
+                },
+              ),
+      _RequesterTab.detail =>
+        _detailRequest == null
+            ? RequestsScreen(
+                onNotifications: () =>
+                    setState(() => _selectedTab = _RequesterTab.notifications),
+                onDetail: _openDetail,
+              )
+            : BlocProvider(
+                create: (_) => sl<RequestDetailBloc>(),
+                child: RequestDetailScreen(
+                  request: _detailRequest!,
+                  onNotifications: () => setState(
+                    () => _selectedTab = _RequesterTab.notifications,
+                  ),
+                ),
+              ),
+    };
+  }
+
+  /// The request a recipient QR should be issued against — their single open
+  /// request, since the schema allows only one at a time.
+  BloodRequestEntity? _activeRequest(BuildContext context) {
+    final requests = context.read<RequestBloc>().state.requests;
+    for (final request in requests) {
+      if (request.isActive) return request;
     }
+    return null;
   }
 
-  Widget _buildHomeView() {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-                // Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'مرحباً، أحمد',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Text(
-                          'نتمنى لك الشفاء العاجل',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const NotificationsScreen(),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFF5F5F5),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.notifications_none_rounded, color: Colors.black),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                // Stats Card
-                _buildStatsCard(),
-                const SizedBox(height: 30),
-                // Content based on state
-                if (!_hasRequests)
-                  _buildEmptyState()
-                else
-                  _buildActiveState(),
-                const SizedBox(height: 100),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+  void _openDetail(BloodRequestEntity request) {
+    setState(() {
+      _detailRequest = request;
+      _selectedTab = _RequesterTab.detail;
+    });
   }
+}
 
-  Widget _buildStatsCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: _hasRequests ? const Color(0xFFE8F5E9) : const Color(0xFFFFEBEE),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _hasRequests ? 'طلبك مفعل' : 'ليس لديك أي طلبات',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: _hasRequests ? Colors.green : Colors.red,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.circle,
-                      size: 8,
-                      color: _hasRequests ? Colors.green : Colors.red,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'قال رسول الله ﷺ:',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF8B1D1D),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      '«عجبًا لأمر المؤمن، إن أمره كله خير، وليس ذاك لأحد إلا للمؤمن، إن أصابته سراء شكر فكان خيرًا له، وإن أصابته ضراء صبر فكان خيرًا له»',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey,
-                        height: 1.4,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                flex: 1,
-                child: Image.asset(
-                  'assets/images/demo.png',
-                  height: 100,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.bloodtype, color: Color(0xFF8B1D1D), size: 80),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildStatItem('01', 'عدد الطلبات'),
-              _buildStatItem('05', 'المتبرعين المستجيبين'),
-              _buildStatItem('02', 'الطلبات المكتملة'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+class _RequesterOverview extends StatelessWidget {
+  final VoidCallback onCreate;
+  final VoidCallback onNotifications;
+  final VoidCallback onViewAll;
+  final ValueChanged<BloodRequestEntity> onEdit;
+  final ValueChanged<BloodRequestEntity> onDetail;
 
-  Widget _buildStatItem(String value, String label) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.grey,
-          ),
-        ),
-      ],
-    );
-  }
+  const _RequesterOverview({
+    required this.onCreate,
+    required this.onNotifications,
+    required this.onViewAll,
+    required this.onEdit,
+    required this.onDetail,
+  });
 
-  Widget _buildEmptyState() {
-    return Column(
-      children: [
-        const SizedBox(height: 40),
-        Center(
-          child: SizedBox(
-            width: 200,
-            height: 50,
-            child: ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _selectedIndex = 2;
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8B1D1D),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              child: const Text(
-                'إنشاء طلب',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RequestBloc, RequestState>(
+      builder: (context, state) {
+        if (state.status == RequestViewStatus.initial ||
+            state.status == RequestViewStatus.loading) {
+          return const AppGradientBackground(
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (state.status == RequestViewStatus.failure) {
+          return AppGradientBackground(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(state.errorMessage ?? AppStrings.error.tr()),
+                  const SizedBox(height: AppSize.s12),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<RequestBloc>().add(
+                        const RequestsLoadRequested(),
+                      );
+                    },
+                    child: Text(AppStrings.retryAgain.tr()),
+                  ),
+                ],
               ),
             ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActiveState() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          );
+        }
+        final requests = state.requests;
+        final notificationsState = context.watch<NotificationsBloc>().state;
+        final unreadCount = notificationsState is NotificationsLoaded
+            ? notificationsState.unreadCount
+            : 0;
+        return AppPage(
+          title: welcomeTitle(),
+          subtitle: AppStrings.getWellSoon.tr(),
+          unreadCount: unreadCount,
+          onNotifications: onNotifications,
+          onRefresh: () async {
+            context.read<RequestBloc>().add(const RequestsLoadRequested());
+          },
           children: [
-            const Text(
-              'طلباتي',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+            _RequestStatsCard(requests: requests),
+            const SizedBox(height: AppSize.s12),
+            if (requests.isEmpty)
+              Center(
+                child: SizedBox(
+                  width: AppSize.s174,
+                  child: AppButton.primary(
+                    label: AppStrings.createRequest.tr(),
+                    onPressed: onCreate,
+                  ),
+                ),
+              )
+            else ...[
+              AppSectionHeader(
+                title: AppStrings.myRequests.tr(),
+                actionLabel: AppStrings.viewAll.tr(),
+                onAction: onViewAll,
               ),
-            ),
-            TextButton(
-              onPressed: () => setState(() => _selectedIndex = 1),
-              child: const Text(
-                'عرض الكل',
-                style: TextStyle(color: Color(0xFF8B1D1D)),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        _buildRequestCard(),
-      ],
-    );
-  }
-
-  Widget _buildRequestCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.asset(
-                        'assets/images/icon8.png',
-                        fit: BoxFit.cover,
-                        filterQuality: FilterQuality.high,
+              const SizedBox(height: AppSize.s10),
+              ...requests
+                  .take(AppConstants.paginationLimit)
+                  .map(
+                    (request) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppPadding.p15),
+                      child: RequesterRequestCard(
+                        request: request,
+                        ownerName: currentUserFullName(),
+                        onEdit: () => onEdit(request),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'علي بن محمد',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  _buildBadge('حرج', Colors.red),
-                  const SizedBox(width: 8),
-                  _buildBadge('مفعل', Colors.green),
-                ],
-              ),
             ],
-          ),
-          const SizedBox(height: 20),
-          _buildInfoRow('فصيلة الدم', 'O+'),
-          _buildInfoRow('تاريخ الطلب', '01 جانفي 2026'),
-          _buildInfoRow('آخر أجل', '15 جانفي 2026'),
-          _buildInfoRow('مستشفى مصطفى باشا', 'الجزائر'),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text(
-                'تم توفير 1 من 3 أكياس',
-                style: TextStyle(fontSize: 13, color: Colors.grey),
-              ),
-              Text(
-                '1/3',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF8B1D1D)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: LinearProgressIndicator(
-              value: 0.33,
-              minHeight: 8,
-              backgroundColor: const Color(0xFFEEEEEE),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B1D1D)),
-            ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: 150,
-            height: 45,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const EditRequestScreen()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[600],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-              child: const Text(
-                'تعديل الطلب',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
+}
 
-  Widget _buildBadge(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(width: 4),
-          Icon(Icons.circle, size: 6, color: color),
-        ],
-      ),
-    );
-  }
+class _RequestStatsCard extends StatelessWidget {
+  final List<BloodRequestEntity> requests;
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
-  }
+  const _RequestStatsCard({required this.requests});
 
-  Widget _buildBottomNav() {
-    return Container(
-      height: 80,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
+  @override
+  Widget build(BuildContext context) {
+    final active = requests
+        .where((request) => request.status == BloodRequestStatus.open)
+        .length;
+    final completed = requests
+        .where((request) => request.status == BloodRequestStatus.fulfilled)
+        .length;
+    final hasRequests = requests.isNotEmpty;
+    final statusColor = hasRequests
+        ? ColorManager.success
+        : ColorManager.urgencyCritical;
+    return HadithStatsCard(
+      statusPill: AppTagPill(
+        label: hasRequests
+            ? AppStrings.requestActive.tr()
+            : AppStrings.noRequestsYou.tr(),
+        dotColor: statusColor,
+        background: statusColor.withValues(alpha: AppOpacity.tint),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem('assets/icons/icon1.svg', 0),
-          _buildNavItem('assets/icons/icon2.svg', 1),
-          _buildPlusItem('assets/icons/icon3.svg', 2),
-          _buildNavItem('assets/icons/icon4.svg', 3),
-          _buildNavItem('assets/icons/icon5.svg', 4),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(String assetPath, int index) {
-    bool isSelected = _selectedIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedIndex = index),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF8B1D1D) : Colors.transparent,
-          borderRadius: BorderRadius.circular(15),
+      hadithBody: AppStrings.hadithBelieverAffair.tr(),
+      stats: [
+        HadithStat(
+          label: AppStrings.requestsCount.tr(),
+          value: requests.length.toString(),
         ),
-        child: SvgPicture.asset(
-          assetPath,
-          colorFilter: ColorFilter.mode(
-            isSelected ? Colors.white : Colors.grey,
-            BlendMode.srcIn,
-          ),
-          width: 24,
-          height: 24,
+        HadithStat(
+          label: AppStrings.respondingDonors.tr(),
+          value: active.toString(),
         ),
-      ),
+        HadithStat(
+          label: AppStrings.completedRequests.tr(),
+          value: completed.toString(),
+        ),
+      ],
     );
   }
+}
 
-  Widget _buildPlusItem(String assetPath, int index) {
-    bool isSelected = _selectedIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedIndex = index),
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF8B1D1D) : Colors.transparent,
-          border: Border.all(
-            color: isSelected ? const Color(0xFF8B1D1D) : Colors.grey[300]!,
-          ),
-          borderRadius: BorderRadius.circular(12),
+class _RequesterNavigation extends StatelessWidget {
+  final _RequesterTab selectedTab;
+  final ValueChanged<_RequesterTab> onSelected;
+
+  const _RequesterNavigation({
+    required this.selectedTab,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBottomNav(
+      items: [
+        AppBottomNavItem(
+          itemKey: WidgetKeys.requesterNavigationHome,
+          asset: SvgAssets.navHome,
+          selected: selectedTab == _RequesterTab.home,
+          onTap: () => onSelected(_RequesterTab.home),
         ),
-        child: SvgPicture.asset(
-          assetPath,
-          colorFilter: ColorFilter.mode(
-            isSelected ? Colors.white : Colors.grey,
-            BlendMode.srcIn,
-          ),
-          width: 24,
-          height: 24,
+        AppBottomNavItem(
+          itemKey: WidgetKeys.requesterNavigationRequests,
+          asset: SvgAssets.navRequests,
+          selected:
+              selectedTab == _RequesterTab.requests ||
+              selectedTab == _RequesterTab.edit ||
+              selectedTab == _RequesterTab.detail,
+          onTap: () => onSelected(_RequesterTab.requests),
         ),
-      ),
+        AppBottomNavItem(
+          itemKey: WidgetKeys.requesterNavigationCreate,
+          asset: SvgAssets.navAdd,
+          selected: selectedTab == _RequesterTab.create,
+          onTap: () => onSelected(_RequesterTab.create),
+        ),
+        AppBottomNavItem(
+          asset: SvgAssets.navHistory,
+          selected: selectedTab == _RequesterTab.donors,
+          onTap: () => onSelected(_RequesterTab.donors),
+        ),
+        AppBottomNavItem(
+          itemKey: WidgetKeys.requesterNavigationProfile,
+          asset: SvgAssets.navPerson,
+          selected:
+              selectedTab == _RequesterTab.profile ||
+              selectedTab == _RequesterTab.about ||
+              selectedTab == _RequesterTab.qr,
+          onTap: () => onSelected(_RequesterTab.profile),
+        ),
+      ],
     );
   }
 }

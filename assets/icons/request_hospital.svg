@@ -1,0 +1,10 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="medical-icon:hospital" clip-path="url(#clip0_900_318)">
+<path id="Vector" d="M17.6903 0.348125C17.6903 0.348125 2.44406 0.343437 2.44844 0.348125C1.04312 0.348125 0.253125 1.07469 0.253125 2.55875V17.8606C0.253125 19.2491 0.963438 19.9759 2.3675 19.9759H17.7341C19.1381 19.9759 19.8494 19.2853 19.8494 17.8606V2.55875C19.8497 1.11062 19.1384 0.348125 17.6903 0.348125ZM15.0831 16.76H12.4887V11.1912H7.64656V16.76H5.0525V4.3425H7.64656V9.04656H12.4887V4.3425H15.0831V16.76Z" fill="#5A5A5A"/>
+</g>
+<defs>
+<clipPath id="clip0_900_318">
+<rect width="20" height="20" fill="white"/>
+</clipPath>
+</defs>
+</svg>

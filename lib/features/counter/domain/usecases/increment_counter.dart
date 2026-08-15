@@ -4,7 +4,7 @@ import '../../../../core/usecases/usecase.dart';
 import '../entities/counter_entity.dart';
 import '../repositories/counter_repository.dart';
 
-class IncrementCounter implements UseCase<CounterEntity, NoParams> {
+class IncrementCounter implements BaseUseCase<CounterEntity, NoParams> {
   final CounterRepository repository;
 
   IncrementCounter(this.repository);

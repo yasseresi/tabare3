@@ -1,82 +1,200 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart' as intl;
+
+import '../../../../core/constants/algerian_wilayas.dart';
+import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/presentation/widgets/adaptive_pickers.dart';
+import '../../../../core/presentation/widgets/app_dialog.dart';
+import '../../../../core/presentation/widgets/app_page.dart';
+import '../../../../core/presentation/widgets/app_text_field.dart';
+import '../../../../core/presentation/widgets/hero_banner.dart';
+import '../../../../core/presentation/widgets/searchable_wilaya_field.dart';
+import '../../../../core/utils/assets_manager.dart';
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/font_manager.dart';
+import '../../../../core/utils/route_manager.dart';
+import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/greeting.dart';
+import '../../../../core/utils/styles_manager.dart';
+import '../../../../core/utils/values_manager.dart';
+import '../../domain/entities/blood_request_entity.dart';
+import '../bloc/request_bloc.dart';
+import '../widgets/request_form_fields.dart';
 
 class EditRequestScreen extends StatefulWidget {
-  const EditRequestScreen({super.key});
+  final BloodRequestEntity request;
+  final VoidCallback? onComplete;
+  final VoidCallback? onNotifications;
+
+  const EditRequestScreen({
+    super.key,
+    required this.request,
+    this.onComplete,
+    this.onNotifications,
+  });
 
   @override
   State<EditRequestScreen> createState() => _EditRequestScreenState();
 }
 
 class _EditRequestScreenState extends State<EditRequestScreen> {
-  String _selectedUrgency = 'حرج';
-  bool _requestStatus = true;
+  late final TextEditingController _unitsController;
+  late final TextEditingController _notesController;
+  final _wilayaController = TextEditingController();
+  // Null when the request has no hospital attached — the user must pick one
+  // before the edit can be submitted.
+  String? _hospitalId;
+  late String _bloodType;
+  late RequestPriority _priority;
+  DateTime? _neededBy;
 
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+  @override
+  void initState() {
+    super.initState();
+    _hospitalId = widget.request.hospital?.id;
+    _bloodType = widget.request.bloodType;
+    _priority = widget.request.priority;
+    _neededBy = widget.request.neededBy;
+    _unitsController = TextEditingController(
+      text: widget.request.unitsNeeded.toString(),
+    );
+    _notesController = TextEditingController(text: widget.request.notes);
+  }
+
+  @override
+  void dispose() {
+    _unitsController.dispose();
+    _notesController.dispose();
+    _wilayaController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<RequestBloc, RequestState>(
+      listenWhen: (previous, current) => previous.status != current.status,
+      listener: (context, state) {
+        if (state.status == RequestViewStatus.success) {
+          _showSuccessDialog();
+        } else if (state.status == RequestViewStatus.failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage ?? AppStrings.defaultError.tr()),
+            ),
+          );
+        }
+      },
+      builder: (context, state) {
+        final hospitals = _visibleHospitals(state);
+        final neededBy = _neededBy;
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: Scaffold(
+            backgroundColor: ColorManager.transparent,
+            body: AppPage(
+              title: welcomeTitle(),
+              subtitle: AppStrings.getWellSoon.tr(),
+              notificationsKey: WidgetKeys.requesterNotificationsButton,
+              onNotifications:
+                  widget.onNotifications ??
+                  () => Navigator.pushNamed(context, Routes.notificationsRoute),
               children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF4CAF50),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check,
-                    color: Colors.white,
-                    size: 50,
-                  ),
+                HeroBanner(
+                  title: AppStrings.editRequestBanner.tr(),
+                  message: AppStrings.requestFormDescription.tr(),
                 ),
-                const SizedBox(height: 25),
-                const Text(
-                  'تم التعديل بنجاح',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey,
-                  ),
+                const SizedBox(height: AppSize.s12),
+                RequestUrgencySelector<RequestPriority>(
+                  title: AppStrings.urgencyLevel.tr(),
+                  selected: _priority,
+                  unselectedBackground: ColorManager.surfaceLight,
+                  onSelected: (priority) => setState(() => _priority = priority),
+                  options: RequestPriority.values
+                      .map(
+                        (priority) => RequestUrgencyOption(
+                          value: priority,
+                          label: _priorityLabel(priority).tr(),
+                          dotColor: _priorityColor(priority),
+                        ),
+                      )
+                      .toList(),
                 ),
-                const SizedBox(height: 10),
-                Image.asset(
-                  'assets/images/icon6.png',
-                  height: 60,
-                  fit: BoxFit.contain,
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: 200,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Close dialog
-                      Navigator.pop(context); // Go back to requests/home
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B1D1D),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
+                const SizedBox(height: AppSize.s12),
+                RequestFormSection(
+                  children: [
+                    AppTextField(
+                      key: WidgetKeys.requestUnitsField,
+                      hintText: AppStrings.bagsRequired.tr(),
+                      prefixSvg: SvgAssets.requestBags,
+                      controller: _unitsController,
+                      keyboardType: TextInputType.number,
                     ),
-                    child: const Text(
-                      'الصفحة الرئيسية',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    SearchableWilayaField(controller: _wilayaController),
+                    RequestDropdownField<String>(
+                      fieldKey: WidgetKeys.requestHospitalField,
+                      value: hospitals.any(
+                        (hospital) => hospital.id == _hospitalId,
+                      )
+                          ? _hospitalId
+                          : null,
+                      hintText: AppStrings.hospitalNameField.tr(),
+                      prefixSvg: SvgAssets.requestHospital,
+                      items: hospitals
+                          .map(
+                            (hospital) => DropdownMenuItem(
+                              value: hospital.id,
+                              child: Text(
+                                hospital.nameAr,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => _hospitalId = value);
+                        }
+                      },
                     ),
-                  ),
+                    RequestPickerField(
+                      label: neededBy == null
+                          ? AppStrings.deadlineField.tr()
+                          : intl.DateFormat(
+                              AppConstants.requestDateFormat,
+                            ).format(neededBy.toLocal()),
+                      prefixSvg: SvgAssets.calendarDate,
+                      isPlaceholder: neededBy == null,
+                      onTap: () => _pickDeadline(context),
+                    ),
+                    AppTextField(
+                      key: WidgetKeys.requestNotesField,
+                      hintText: AppStrings.notes.tr(),
+                      prefixSvg: SvgAssets.requestNote,
+                      controller: _notesController,
+                      isMultiline: true,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSize.s12),
+                _RequestStatusToggle(
+                  isActive: widget.request.isActive,
+                  onChanged: state.status == RequestViewStatus.submitting
+                      ? null
+                      : (_) => _showCancellationDialog(),
+                ),
+                const SizedBox(height: AppSize.s12),
+                RequestFooterButtons(
+                  clearLabel: AppStrings.clearFields.tr(),
+                  onClear: _clear,
+                  actionLabel: AppStrings.save.tr(),
+                  actionKey: WidgetKeys.requestEditSaveButton,
+                  isBusy: state.status == RequestViewStatus.submitting,
+                  onAction: state.status == RequestViewStatus.submitting
+                      ? null
+                      : _submit,
                 ),
               ],
             ),
@@ -86,255 +204,206 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Directionality(
+  /// Hospitals narrowed to the wilaya typed into the Figma `الولاية` field —
+  /// a view-level filter over the list the bloc already loaded.
+  List<HospitalEntity> _visibleHospitals(RequestState state) {
+    final index = algerianWilayas.indexOf(_wilayaController.text.trim());
+    if (index < AppSize.s0) return state.hospitals;
+    final wilayaId = index + AppSize.s1.toInt();
+    return state.hospitals
+        .where((hospital) => hospital.wilayaId == wilayaId)
+        .toList();
+  }
+
+  Future<void> _pickDeadline(BuildContext context) async {
+    final now = DateTime.now();
+    final firstDate = now.add(
+      const Duration(days: AppConstants.requestCalendarStartOffsetDays),
+    );
+    final selected = await showAdaptiveDatePicker(
+      context: context,
+      initialDate: _neededBy ?? firstDate,
+      firstDate: firstDate,
+      lastDate: now.add(
+        const Duration(days: AppConstants.requestCalendarRangeDays),
+      ),
+    );
+    if (selected != null && mounted) {
+      setState(() => _neededBy = selected);
+    }
+  }
+
+  void _clear() {
+    setState(() {
+      _hospitalId = widget.request.hospital?.id;
+      _bloodType = widget.request.bloodType;
+      _priority = widget.request.priority;
+      _neededBy = widget.request.neededBy;
+      _wilayaController.clear();
+      _unitsController.text = widget.request.unitsNeeded.toString();
+      _notesController.text = widget.request.notes ?? '';
+    });
+  }
+
+  Future<void> _showSuccessDialog() async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: ColorManager.dialogScrim,
+      builder: (dialogContext) => Directionality(
         textDirection: TextDirection.rtl,
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-                // Header with Back Button
-                _buildHeader(context),
-                const SizedBox(height: 30),
-                // Red Banner Card
-                _buildBanner(),
-                const SizedBox(height: 30),
-                // Urgency Degree
-                const Center(
-                  child: Text(
-                    'درجة الاستعجال',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildUrgencyBadge('حرج', Colors.red),
-                    const SizedBox(width: 15),
-                    _buildUrgencyBadge('مستعجل', Colors.orange),
-                    const SizedBox(width: 15),
-                    _buildUrgencyBadge('عادي', Colors.green),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                // Form Fields
-                _buildTextField('عدد الأكياس المطلوبة', Icons.tag),
-                const SizedBox(height: 15),
-                _buildTextField('الولاية', Icons.map_outlined, isDropdown: true),
-                const SizedBox(height: 15),
-                _buildTextField('اسم المستشفى', Icons.local_hospital_outlined),
-                const SizedBox(height: 15),
-                _buildTextField('تاريخ آخر أجل', Icons.calendar_today_outlined),
-                const SizedBox(height: 15),
-                _buildTextField('ملاحظات', Icons.sticky_note_2_outlined, isMultiline: true),
-                const SizedBox(height: 30),
-                // Request Status Toggle
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Switch(
-                        value: _requestStatus,
-                        onChanged: (value) {
-                          setState(() {
-                            _requestStatus = value;
-                          });
-                        },
-                        activeColor: Colors.green,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          const Text(
-                            'حالة الطلب',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                          ),
-                          Text(
-                            _requestStatus ? 'نشط / اغلاق' : 'غير نشط',
-                            style: const TextStyle(color: Colors.grey, fontSize: 11),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                // Bottom Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 55,
-                        child: ElevatedButton(
-                          onPressed: _showSuccessDialog,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF8B1D1D),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          child: const Text(
-                            'حفظ',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: SizedBox(
-                        height: 55,
-                        child: OutlinedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFFEEEEEE)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          child: const Text(
-                            'إلغاء',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 40),
-              ],
-            ),
-          ),
+        child: AppDialog.success(
+          title: AppStrings.editSuccess.tr(),
+          actionLabel: AppStrings.homePage.tr(),
+          onAction: () {
+            Navigator.pop(dialogContext);
+            if (widget.onComplete != null) {
+              widget.onComplete!();
+            } else {
+              Navigator.maybePop(context);
+            }
+          },
         ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'مرحباً، أحمد',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            Text(
-              'تعديل طلب التبرع',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
-            ),
-          ],
+  void _submit() {
+    final units = int.tryParse(_unitsController.text.trim());
+    final hospitalId = _hospitalId;
+    if (units == null || units <= AppSize.s0 || hospitalId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.requiredRequestFields.tr())),
+      );
+      return;
+    }
+
+    context.read<RequestBloc>().add(
+      RequestUpdateSubmitted(
+        requestId: widget.request.id,
+        draft: RequestDraft(
+          hospitalId: hospitalId,
+          bloodType: _bloodType,
+          priority: _priority,
+          unitsNeeded: units,
+          neededBy: _neededBy,
+          notes: _notesController.text.trim(),
         ),
-        GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: Color(0xFFF5F5F5),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black, size: 20),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildBanner() {
+  Future<void> _showCancellationDialog() async {
+    final reason = await showDialog<String>(
+      context: context,
+      builder: (_) => const _CancellationDialog(),
+    );
+
+    if (reason != null && mounted) {
+      context.read<RequestBloc>().add(
+        RequestCancelSubmitted(requestId: widget.request.id, reason: reason),
+      );
+    }
+  }
+}
+
+/// Figma `Button - Mode`: the `حالة الطلب` label with the active/closed switch
+/// that opens the cancellation flow.
+class _RequestStatusToggle extends StatelessWidget {
+  final bool isActive;
+  final ValueChanged<bool>? onChanged;
+
+  const _RequestStatusToggle({required this.isActive, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.only(
+        top: AppPadding.p20,
+        bottom: AppPadding.p21,
+        left: AppPadding.p20,
+        right: AppPadding.p20,
+      ),
       decoration: BoxDecoration(
-        color: const Color(0xFF8B1D1D),
-        borderRadius: BorderRadius.circular(30),
+        border: Border(
+          bottom: BorderSide(
+            color: ColorManager.surfaceLight,
+            width: AppSize.s1,
+          ),
+        ),
       ),
       child: Row(
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  'تعديل طلب تبرع بالدم',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                  AppStrings.requestStatus.tr(),
+                  style: getMediumStyle(
+                    fontSize: FontSize.s15,
+                    color: ColorManager.black,
                   ),
                 ),
-                SizedBox(height: 8),
                 Text(
-                  'أدخل بيانات طلبك بدقة لمساعدتنا في العثور على متبرعين متوافقين مع فصيلة الدم المطلوبة وفي أقرب وقت ممكن.',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.white70,
-                    height: 1.4,
+                  AppStrings.activeOrClosed.tr(),
+                  style: getMediumStyle(
+                    fontSize: FontSize.s12,
+                    color: ColorManager.navInactive,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 10),
-          const Icon(Icons.bloodtype, color: Colors.white, size: 60),
+          _StatusSwitch(isActive: isActive, onChanged: onChanged),
         ],
       ),
     );
   }
+}
 
-  Widget _buildUrgencyBadge(String label, Color color) {
-    bool isSelected = _selectedUrgency == label;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedUrgency = label),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? color : Colors.grey[300]!,
-            width: 1,
-          ),
-        ),
-        child: Row(
+class _StatusSwitch extends StatelessWidget {
+  final bool isActive;
+  final ValueChanged<bool>? onChanged;
+
+  const _StatusSwitch({required this.isActive, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final action = onChanged;
+    return InkWell(
+      key: WidgetKeys.requestCancelButton,
+      onTap: action == null ? null : () => action(!isActive),
+      borderRadius: BorderRadius.circular(AppSize.radiusCircle),
+      child: SizedBox(
+        width: AppSize.s44,
+        height: AppSize.s24,
+        child: Stack(
           children: [
-            Icon(Icons.circle, size: 8, color: color),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? color : Colors.grey,
-                fontWeight: FontWeight.bold,
+            Container(
+              width: AppSize.s44,
+              height: AppSize.s24,
+              decoration: BoxDecoration(
+                color: isActive
+                    ? ColorManager.success
+                    : ColorManager.toggleTrack,
+                borderRadius: BorderRadius.circular(AppSize.radiusCircle),
+              ),
+            ),
+            Positioned(
+              top: AppSize.s2,
+              left: isActive ? AppSize.s2 : AppSize.s22,
+              child: Container(
+                width: AppSize.s20,
+                height: AppSize.s20,
+                decoration: BoxDecoration(
+                  color: ColorManager.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: ColorManager.toggleKnobBorder,
+                    width: AppSize.s1,
+                  ),
+                ),
               ),
             ),
           ],
@@ -342,23 +411,86 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
       ),
     );
   }
+}
 
-  Widget _buildTextField(String hint, IconData icon, {bool isMultiline = false, bool isDropdown = false}) {
-    return TextField(
-      maxLines: isMultiline ? 4 : 1,
-      readOnly: isDropdown,
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Colors.grey),
-        prefixIcon: isDropdown ? const Icon(Icons.keyboard_arrow_down, color: Colors.grey) : null,
-        suffixIcon: Icon(icon, color: Colors.grey),
-        filled: true,
-        fillColor: const Color(0xFFF5F5F5),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide.none,
+class _CancellationDialog extends StatefulWidget {
+  const _CancellationDialog();
+
+  @override
+  State<_CancellationDialog> createState() => _CancellationDialogState();
+}
+
+class _CancellationDialogState extends State<_CancellationDialog> {
+  final _reasonController = TextEditingController();
+  String? _validationMessage;
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(AppStrings.cancelRequest.tr()),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              AppStrings.confirmCancelRequest.tr(),
+              textAlign: TextAlign.right,
+            ),
+            const SizedBox(height: AppSize.s16),
+            TextField(
+              key: WidgetKeys.requestCancelReasonField,
+              controller: _reasonController,
+              maxLines: AppSize.s3.toInt(),
+              textAlign: TextAlign.right,
+              decoration: InputDecoration(
+                labelText: AppStrings.cancellationReason.tr(),
+                errorText: _validationMessage,
+              ),
+            ),
+          ],
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(AppStrings.cancel.tr()),
+        ),
+        ElevatedButton(
+          key: WidgetKeys.requestCancelConfirmButton,
+          onPressed: _confirm,
+          child: Text(AppStrings.confirm.tr()),
+        ),
+      ],
     );
   }
+
+  void _confirm() {
+    final reason = _reasonController.text.trim();
+    if (reason.isEmpty) {
+      setState(
+        () => _validationMessage = AppStrings.cancellationReasonRequired.tr(),
+      );
+      return;
+    }
+    Navigator.pop(context, reason);
+  }
 }
+
+String _priorityLabel(RequestPriority priority) => switch (priority) {
+  RequestPriority.normal => AppStrings.normal,
+  RequestPriority.semiUrgent => AppStrings.semiUrgent,
+  RequestPriority.urgent => AppStrings.veryUrgent,
+};
+
+Color _priorityColor(RequestPriority priority) => switch (priority) {
+  RequestPriority.normal => ColorManager.urgencyNormal,
+  RequestPriority.semiUrgent => ColorManager.urgencyUrgent,
+  RequestPriority.urgent => ColorManager.urgencyCritical,
+};

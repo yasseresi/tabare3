@@ -1,424 +1,564 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart' as intl;
+
+import '../../../../core/constants/algerian_wilayas.dart';
+import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/presentation/widgets/adaptive_pickers.dart';
+import '../../../../core/presentation/widgets/app_dialog.dart';
+import '../../../../core/presentation/widgets/app_page.dart';
+import '../../../../core/presentation/widgets/app_text_field.dart';
+import '../../../../core/presentation/widgets/hero_banner.dart';
+import '../../../../core/presentation/widgets/searchable_wilaya_field.dart';
+import '../../../../core/utils/assets_manager.dart';
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/font_manager.dart';
+import '../../../../core/utils/route_manager.dart';
+import '../../../../core/utils/error_messages.dart';
+import '../../../../core/utils/string_manager.dart';
+import '../../../../core/validators/validators.dart';
+import '../../../../core/utils/greeting.dart';
+import '../../../../core/utils/styles_manager.dart';
+import '../../../../core/utils/values_manager.dart';
+import '../../domain/entities/blood_request_entity.dart';
+import '../bloc/request_bloc.dart';
+import '../widgets/request_form_fields.dart';
 
 class CreateRequestScreen extends StatefulWidget {
   final VoidCallback? onSuccess;
-  const CreateRequestScreen({super.key, this.onSuccess});
+  final VoidCallback? onNotifications;
+  final VoidCallback? onProfile;
+
+  const CreateRequestScreen({
+    super.key,
+    this.onSuccess,
+    this.onNotifications,
+    this.onProfile,
+  });
 
   @override
   State<CreateRequestScreen> createState() => _CreateRequestScreenState();
 }
 
 class _CreateRequestScreenState extends State<CreateRequestScreen> {
-  String _selectedUrgency = 'عادي';
+  final _unitsController = TextEditingController();
+  final _notesController = TextEditingController();
+  final _wilayaController = TextEditingController();
+  final _patientNameController = TextEditingController();
+  final _patientNationalIdController = TextEditingController();
+  final _patientWeightController = TextEditingController();
+  final _patientChronicDiseasesController = TextEditingController();
+  String? _hospitalId;
+  String? _bloodType;
+  DateTime? _neededBy;
+  DateTime? _patientDateOfBirth;
+  String _patientGender = AppConstants.genderMale;
+  BeneficiaryType _beneficiaryType = BeneficiaryType.self;
+  RequestPriority _priority = RequestPriority.normal;
+
+  /// The third-party flow is two Figma screens: the patient identity step and
+  /// the request step. The `for myself` flow only ever shows the second one.
+  bool _isPatientStep = false;
 
   @override
   void initState() {
     super.initState();
-    // Show the "Before" popup after the screen is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showBeforeDialog();
+      if (mounted) _showProfileNotice();
     });
   }
 
-  void _showBeforeDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.warning_rounded,
-                  color: Colors.red,
-                  size: 80,
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'بيانات الملف الشخصي',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(height: 15),
-                const Text(
-                  'يتم تعبئة بيانات هذا الطلب تلقائيًا من ملفك الشخصي. يرجى تحديث بياناتك إذا طرأ عليها أي تغيير.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B1D1D),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                    ),
-                    child: const Text(
-                      'تأكيد',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                    ),
-                    child: const Text(
-                      'تحديث الملف الشخصي',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF4CAF50),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check,
-                    color: Colors.white,
-                    size: 50,
-                  ),
-                ),
-                const SizedBox(height: 25),
-                const Text(
-                  'تم إنشاء طلب التبرع بنجاح',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Image.asset(
-                  'assets/images/icon6.png',
-                  height: 60,
-                  fit: BoxFit.contain,
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: 200,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Close dialog
-                      if (widget.onSuccess != null) {
-                        widget.onSuccess!();
-                      } else {
-                        Navigator.pop(context); // Go back to home
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B1D1D),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: const Text(
-                      'طلباتي',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+  @override
+  void dispose() {
+    _unitsController.dispose();
+    _notesController.dispose();
+    _wilayaController.dispose();
+    _patientNameController.dispose();
+    _patientNationalIdController.dispose();
+    _patientWeightController.dispose();
+    _patientChronicDiseasesController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Directionality(
-        textDirection: TextDirection.rtl,
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-                // Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'مرحباً، أحمد',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Text(
-                          'نتمنى لك الشفاء العاجل',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF5F5F5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.notifications_none_rounded, color: Colors.black),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                // Red Banner Card
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF8B1D1D),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              'إنشاء طلب تبرع بالدم',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              'أدخل بيانات طلبك بدقة لمساعدتنا في العثور على متبرعين متوافقين مع فصيلة الدم المطلوبة وفي أقرب وقت ممكن.',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.white70,
-                                height: 1.4,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Image.asset(
-                        'assets/images/icon7.png',
-                        height: 80,
-                        fit: BoxFit.contain,
-                        filterQuality: FilterQuality.high,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                // Urgency Degree
-                const Center(
-                  child: Text(
-                    'درجة الاستعجال',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildUrgencyBadge('حرج', Colors.red),
-                    const SizedBox(width: 15),
-                    _buildUrgencyBadge('مستعجل', Colors.orange),
-                    const SizedBox(width: 15),
-                    _buildUrgencyBadge('عادي', Colors.green),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                // Form Fields
-                _buildTextField('عدد الأكياس المطلوبة', Icons.tag),
-                const SizedBox(height: 15),
-                _buildTextField('الولاية', Icons.map_outlined, isDropdown: true),
-                const SizedBox(height: 15),
-                _buildTextField('اسم المستشفى', Icons.local_hospital_outlined),
-                const SizedBox(height: 15),
-                _buildTextField('تاريخ آخر أجل', Icons.calendar_today_outlined),
-                const SizedBox(height: 15),
-                _buildTextField('ملاحظات', Icons.sticky_note_2_outlined, isMultiline: true),
-                const SizedBox(height: 30),
-                // Bottom Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 55,
-                        child: ElevatedButton(
-                          onPressed: _showSuccessDialog,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF8B1D1D),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          child: const Text(
-                            'التالي',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: SizedBox(
-                        height: 55,
-                        child: OutlinedButton(
-                          onPressed: () {},
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFFEEEEEE)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          child: const Text(
-                            'محو',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 40),
-              ],
+    return BlocConsumer<RequestBloc, RequestState>(
+      listenWhen: (previous, current) =>
+          previous.status != current.status &&
+          current.status != RequestViewStatus.loading,
+      listener: (context, state) {
+        if (state.status == RequestViewStatus.success) {
+          _showSuccessDialog();
+        } else if (state.status == RequestViewStatus.failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.errorMessage ?? AppStrings.defaultError.tr()),
+            ),
+          );
+        }
+      },
+      builder: (context, state) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: Scaffold(
+            backgroundColor: ColorManager.transparent,
+            body: AppPage(
+              title: welcomeTitle(),
+              subtitle: AppStrings.getWellSoon.tr(),
+              notificationsKey: WidgetKeys.requesterNotificationsButton,
+              onNotifications:
+                  widget.onNotifications ??
+                  () => Navigator.pushNamed(context, Routes.notificationsRoute),
+              children: _isPatientStep
+                  ? _buildPatientStep()
+                  : _buildRequestStep(state),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildUrgencyBadge(String label, Color color) {
-    bool isSelected = _selectedUrgency == label;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedUrgency = label),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? color : Colors.grey[300]!,
-            width: 1,
+  /// Figma `776:188` — the third-party patient identity step.
+  List<Widget> _buildPatientStep() {
+    final dateOfBirth = _patientDateOfBirth;
+    return [
+      HeroBanner(
+        title: AppStrings.createRequestBanner.tr(),
+        message: AppStrings.otherRequestDescription.tr(),
+      ),
+      const SizedBox(height: AppSize.s12),
+      RequestFormSection(
+        hintColor: ColorManager.lightGrey,
+        children: [
+          AppTextField(
+            hintText: AppStrings.username.tr(),
+            prefixSvg: SvgAssets.person,
+            controller: _patientNameController,
           ),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.circle, size: 8, color: color),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? color : Colors.grey,
-                fontWeight: FontWeight.bold,
+          AppTextField(
+            hintText: AppStrings.nationalId.tr(),
+            prefixSvg: SvgAssets.idSerialNumber,
+            controller: _patientNationalIdController,
+            keyboardType: TextInputType.number,
+          ),
+          RequestDropdownField<String>(
+            value: _patientGender,
+            hintText: AppStrings.gender.tr(),
+            prefixSvg: SvgAssets.person,
+            items: [
+              DropdownMenuItem(
+                value: AppConstants.genderMale,
+                child: Text(AppStrings.male.tr()),
               ),
+              DropdownMenuItem(
+                value: AppConstants.genderFemale,
+                child: Text(AppStrings.female.tr()),
+              ),
+            ],
+            onChanged: (value) =>
+                setState(() => _patientGender = value ?? _patientGender),
+          ),
+          RequestPickerField(
+            label: dateOfBirth == null
+                ? AppStrings.dateOfBirth.tr()
+                : intl.DateFormat(
+                    AppConstants.requestDateFormat,
+                  ).format(dateOfBirth.toLocal()),
+            prefixSvg: SvgAssets.calendarDate,
+            isPlaceholder: dateOfBirth == null,
+            onTap: () => _pickPatientDateOfBirth(context),
+          ),
+          AppTextField(
+            hintText: AppStrings.weight.tr(),
+            prefixSvg: SvgAssets.weight,
+            controller: _patientWeightController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          ),
+          RequestDropdownField<String>(
+            value: _bloodType,
+            hintText: AppStrings.bloodType.tr(),
+            prefixSvg: SvgAssets.bloodType,
+            items: supportedBloodTypes
+                .map(
+                  (bloodType) =>
+                      DropdownMenuItem(value: bloodType, child: Text(bloodType)),
+                )
+                .toList(),
+            onChanged: (value) => setState(() => _bloodType = value),
+          ),
+          AppTextField(
+            hintText: AppStrings.chronicDiseases.tr(),
+            prefixSvg: SvgAssets.illnesses,
+            controller: _patientChronicDiseasesController,
+            isMultiline: true,
+          ),
+        ],
+      ),
+      const SizedBox(height: AppSize.s12),
+      RequestFooterButtons(
+        clearLabel: AppStrings.clearFields.tr(),
+        onClear: _clear,
+        actionLabel: AppStrings.next.tr(),
+        onAction: () => setState(() => _isPatientStep = false),
+      ),
+    ];
+  }
+
+  /// Figma `774:79` (for myself) and `776:342` (for someone else).
+  List<Widget> _buildRequestStep(RequestState state) {
+    final isForOther = _beneficiaryType == BeneficiaryType.other;
+    final hospitals = _visibleHospitals(state);
+    final neededBy = _neededBy;
+    return [
+      HeroBanner(
+        title: AppStrings.createRequestBanner.tr(),
+        message: isForOther
+            ? AppStrings.otherRequestDescription.tr()
+            : AppStrings.requestFormDescription.tr(),
+      ),
+      const SizedBox(height: AppSize.s12),
+      RequestUrgencySelector<RequestPriority>(
+        title: AppStrings.urgencyLevel.tr(),
+        selected: _priority,
+        unselectedBackground: ColorManager.white,
+        onSelected: (priority) => setState(() => _priority = priority),
+        options: _priorityOptions(),
+      ),
+      const SizedBox(height: AppSize.s12),
+      RequestFormSection(
+        children: [
+          AppTextField(
+            key: WidgetKeys.requestUnitsField,
+            hintText: AppStrings.bagsRequired.tr(),
+            prefixSvg: SvgAssets.requestBags,
+            controller: _unitsController,
+            keyboardType: TextInputType.number,
+          ),
+          if (!isForOther)
+            SearchableWilayaField(controller: _wilayaController),
+          RequestDropdownField<String>(
+            fieldKey: WidgetKeys.requestHospitalField,
+            value: hospitals.any((hospital) => hospital.id == _hospitalId)
+                ? _hospitalId
+                : null,
+            hintText: AppStrings.hospitalNameField.tr(),
+            prefixSvg: SvgAssets.requestHospital,
+            items: hospitals
+                .map(
+                  (hospital) => DropdownMenuItem(
+                    value: hospital.id,
+                    child: Text(
+                      hospital.nameAr,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                )
+                .toList(),
+            onChanged: (value) => setState(() => _hospitalId = value),
+          ),
+          if (!isForOther)
+            RequestDropdownField<String>(
+              fieldKey: WidgetKeys.requestBloodTypeField,
+              value: _bloodType,
+              hintText: AppStrings.bloodType.tr(),
+              prefixSvg: SvgAssets.bloodType,
+              items: supportedBloodTypes
+                  .map(
+                    (bloodType) => DropdownMenuItem(
+                      value: bloodType,
+                      child: Text(bloodType),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) => setState(() => _bloodType = value),
             ),
-          ],
+          RequestPickerField(
+            label: neededBy == null
+                ? AppStrings.deadlineField.tr()
+                : intl.DateFormat(
+                    AppConstants.requestDateFormat,
+                  ).format(neededBy.toLocal()),
+            prefixSvg: SvgAssets.calendarDate,
+            isPlaceholder: neededBy == null,
+            onTap: () => _pickDeadline(context),
+          ),
+          AppTextField(
+            key: WidgetKeys.requestNotesField,
+            hintText: isForOther
+                ? AppStrings.requestReason.tr()
+                : AppStrings.notes.tr(),
+            prefixSvg: SvgAssets.requestNote,
+            controller: _notesController,
+            isMultiline: true,
+          ),
+        ],
+      ),
+      if (state.hospitals.isEmpty &&
+          state.status != RequestViewStatus.loading) ...[
+        const SizedBox(height: AppSize.s12),
+        Text(
+          AppStrings.noVerifiedHospitals.tr(),
+          textAlign: TextAlign.center,
+          style: getRegularStyle(
+            fontSize: FontSize.s12,
+            color: ColorManager.error,
+          ),
+        ),
+      ],
+      const SizedBox(height: AppSize.s12),
+      RequestFooterButtons(
+        clearLabel: AppStrings.clearFields.tr(),
+        onClear: _clear,
+        actionLabel: AppStrings.next.tr(),
+        actionKey: WidgetKeys.requestSubmitButton,
+        isBusy: state.status == RequestViewStatus.submitting,
+        onAction:
+            state.status == RequestViewStatus.submitting ||
+                state.hospitals.isEmpty
+            ? null
+            : _submit,
+      ),
+    ];
+  }
+
+  List<RequestUrgencyOption<RequestPriority>> _priorityOptions() =>
+      RequestPriority.values
+          .map(
+            (priority) => RequestUrgencyOption(
+              value: priority,
+              label: _priorityLabel(priority).tr(),
+              dotColor: _priorityColor(priority),
+            ),
+          )
+          .toList();
+
+  /// Hospitals narrowed to the wilaya typed into the Figma `الولاية` field —
+  /// a view-level filter over the list the bloc already loaded.
+  List<HospitalEntity> _visibleHospitals(RequestState state) {
+    final index = algerianWilayas.indexOf(_wilayaController.text.trim());
+    if (index < AppSize.s0.toInt()) return state.hospitals;
+    final wilayaId = index + AppSize.s1.toInt();
+    return state.hospitals
+        .where((hospital) => hospital.wilayaId == wilayaId)
+        .toList();
+  }
+
+  Future<void> _pickDeadline(BuildContext context) async {
+    final now = DateTime.now();
+    final firstDate = now.add(
+      const Duration(days: AppConstants.requestCalendarStartOffsetDays),
+    );
+    final selected = await showAdaptiveDatePicker(
+      context: context,
+      initialDate: _neededBy ?? firstDate,
+      firstDate: firstDate,
+      lastDate: now.add(
+        const Duration(days: AppConstants.requestCalendarRangeDays),
+      ),
+    );
+    if (selected != null && mounted) {
+      setState(() => _neededBy = selected);
+    }
+  }
+
+  Future<void> _pickPatientDateOfBirth(BuildContext context) async {
+    final now = DateTime.now();
+    final selected = await showAdaptiveDatePicker(
+      context: context,
+      initialDate: _patientDateOfBirth ?? now,
+      firstDate: DateTime(now.year - AppConstants.maxDonorAge),
+      lastDate: now,
+    );
+    if (selected != null && mounted) {
+      setState(() => _patientDateOfBirth = selected);
+    }
+  }
+
+  void _submit() {
+    final units = int.tryParse(_unitsController.text.trim());
+    if (_hospitalId == null ||
+        _bloodType == null ||
+        units == null ||
+        units <= AppSize.s0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.requiredRequestFields.tr())),
+      );
+      return;
+    }
+
+    final patient = _patientDraftOrNull();
+    if (_beneficiaryType == BeneficiaryType.other && patient == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.patientDetailsRequired.tr())),
+      );
+      return;
+    }
+
+    if (patient != null && !isNationalIdValid(patient.nationalId)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            ErrorMessages.getValidationMessage(
+              ValidationKeys.nationalIdInvalid,
+            ),
+          ),
+        ),
+      );
+      return;
+    }
+
+    context.read<RequestBloc>().add(
+      RequestCreateSubmitted(
+        RequestDraft(
+          hospitalId: _hospitalId!,
+          beneficiaryType: _beneficiaryType,
+          patient: patient,
+          bloodType: _bloodType!,
+          priority: _priority,
+          unitsNeeded: units,
+          neededBy: _neededBy,
+          notes: _notesController.text.trim(),
         ),
       ),
     );
   }
 
-  Widget _buildTextField(String hint, IconData icon, {bool isMultiline = false, bool isDropdown = false}) {
-    return TextField(
-      maxLines: isMultiline ? 4 : 1,
-      readOnly: isDropdown,
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Colors.grey),
-        prefixIcon: isDropdown ? const Icon(Icons.keyboard_arrow_down, color: Colors.grey) : null,
-        suffixIcon: Icon(icon, color: Colors.grey),
-        filled: true,
-        fillColor: const Color(0xFFF5F5F5),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide.none,
+  PatientDraft? _patientDraftOrNull() {
+    final weight = double.tryParse(_patientWeightController.text.trim());
+    if (_beneficiaryType != BeneficiaryType.other ||
+        _bloodType == null ||
+        _patientNameController.text.trim().isEmpty ||
+        _patientNationalIdController.text.trim().isEmpty ||
+        weight == null ||
+        weight <= AppSize.s0 ||
+        _patientDateOfBirth == null) {
+      return null;
+    }
+    return PatientDraft(
+      fullName: _patientNameController.text.trim(),
+      nationalId: _patientNationalIdController.text.trim(),
+      bloodType: _bloodType!,
+      weight: weight,
+      chronicDiseases: _patientChronicDiseasesController.text.trim(),
+      gender: _patientGender,
+      dateOfBirth: intl.DateFormat(
+        AppConstants.requestPatientDateFormat,
+      ).format(_patientDateOfBirth!),
+    );
+  }
+
+  void _clear() {
+    setState(() {
+      _hospitalId = null;
+      _bloodType = null;
+      _neededBy = null;
+      _priority = RequestPriority.normal;
+      _unitsController.clear();
+      _notesController.clear();
+      _wilayaController.clear();
+      _patientNameController.clear();
+      _patientNationalIdController.clear();
+      _patientWeightController.clear();
+      _patientChronicDiseasesController.clear();
+      _patientDateOfBirth = null;
+      _patientGender = AppConstants.genderMale;
+    });
+  }
+
+  void _showProfileNotice() {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: ColorManager.dialogScrim,
+      builder: (dialogContext) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AppDialog.warning(
+          title: AppStrings.profileDataTitle.tr(),
+          message: AppStrings.profileDataNotice.tr(),
+          actionLabel: AppStrings.confirm.tr(),
+          onAction: () {
+            Navigator.pop(dialogContext);
+            _showBeneficiaryDialog();
+          },
+          secondaryLabel: AppStrings.updateProfile.tr(),
+          onSecondaryAction: () {
+            Navigator.pop(dialogContext);
+            (widget.onProfile ??
+                    () => Navigator.pushNamed(
+                      context,
+                      Routes.requesterProfileRoute,
+                    ))
+                .call();
+          },
+        ),
+      ),
+    );
+  }
+
+  void _showBeneficiaryDialog() {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: ColorManager.dialogScrim,
+      builder: (dialogContext) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AppDialog.warning(
+          title: AppStrings.requestBeneficiaryTitle.tr(),
+          message: AppStrings.requestBeneficiaryBody.tr(),
+          actionLabel: AppStrings.requestForSelf.tr(),
+          actionKey: WidgetKeys.requestForSelfButton,
+          onAction: () {
+            setState(() {
+              _beneficiaryType = BeneficiaryType.self;
+              _isPatientStep = false;
+            });
+            Navigator.pop(dialogContext);
+          },
+          secondaryLabel: AppStrings.requestForOther.tr(),
+          secondaryKey: WidgetKeys.requestForOtherButton,
+          onSecondaryAction: () {
+            setState(() {
+              _beneficiaryType = BeneficiaryType.other;
+              _isPatientStep = true;
+            });
+            Navigator.pop(dialogContext);
+          },
+        ),
+      ),
+    );
+  }
+
+  void _showSuccessDialog() {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: ColorManager.dialogScrim,
+      builder: (dialogContext) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AppDialog.success(
+          title: AppStrings.requestCreated.tr(),
+          actionLabel: AppStrings.myRequests.tr(),
+          onAction: () {
+            Navigator.pop(dialogContext);
+            widget.onSuccess?.call();
+          },
         ),
       ),
     );
   }
 }
+
+String _priorityLabel(RequestPriority priority) => switch (priority) {
+  RequestPriority.normal => AppStrings.normal,
+  RequestPriority.semiUrgent => AppStrings.semiUrgent,
+  RequestPriority.urgent => AppStrings.veryUrgent,
+};
+
+Color _priorityColor(RequestPriority priority) => switch (priority) {
+  RequestPriority.normal => ColorManager.urgencyNormal,
+  RequestPriority.semiUrgent => ColorManager.urgencyUrgent,
+  RequestPriority.urgent => ColorManager.urgencyCritical,
+};

@@ -1,30 +1,108 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
+import 'package:mocktail/mocktail.dart';
 
-import 'package:tabare3/main.dart';
+import 'package:tabare3/core/constants/widget_keys.dart';
+import 'package:tabare3/core/usecases/usecase.dart';
+import 'package:tabare3/features/auth/domain/repositories/auth_repository.dart';
+import 'package:tabare3/features/auth/domain/usecases/check_username_availability.dart';
+import 'package:tabare3/features/auth/domain/usecases/get_current_session.dart';
+import 'package:tabare3/features/auth/domain/usecases/login_with_email_password.dart';
+import 'package:tabare3/features/auth/domain/usecases/sign_out.dart';
+import 'package:tabare3/features/auth/domain/usecases/signup_with_email_password.dart';
+import 'package:tabare3/features/auth/domain/usecases/update_user_role.dart';
+import 'package:tabare3/core/session/session_manager.dart';
+import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:tabare3/features/splash/presentation/pages/splash_screen.dart';
+import 'package:dartz/dartz.dart';
+
+class MockLoginWithUsernamePassword extends Mock
+    implements LoginWithUsernamePassword {}
+
+class MockSignupWithUsernamePassword extends Mock
+    implements SignupWithUsernamePassword {}
+
+class MockCheckUsernameAvailability extends Mock
+    implements CheckUsernameAvailability {}
+
+class MockSignOut extends Mock implements SignOut {}
+
+class MockGetCurrentSession extends Mock implements GetCurrentSession {}
+
+class MockUpdateUserRole extends Mock implements UpdateUserRole {}
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  final sl = GetIt.instance;
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  setUpAll(() {
+    registerFallbackValue(
+      SignupParams(
+        username: 'fallback',
+        fullName: 'fallback',
+        password: 'fallback',
+        phone: '0000',
+        dateOfBirth: DateTime(2000),
+        gender: 'male',
+        bloodType: 'O+',
+        city: 'fallback',
+      ),
+    );
+    registerFallbackValue(
+      LoginParams(username: 'fallback', password: 'fallback'),
+    );
+    registerFallbackValue(NoParams());
+    registerFallbackValue(
+      const UpdateRoleParams(isDonor: false, isRecipient: false),
+    );
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  setUp(() {
+    sl.reset();
+    sl.registerFactory(
+      () => AuthBloc(
+        loginWithUsernamePassword: sl(),
+        signupWithUsernamePassword: sl(),
+        checkUsernameAvailability: sl(),
+        signOutUseCase: sl(),
+        getCurrentSession: sl(),
+        updateUserRole: sl(),
+        sessionManager: sl(),
+      ),
+    );
+    sl.registerLazySingleton(() => SessionManager());
+    sl.registerLazySingleton<LoginWithUsernamePassword>(
+      () => MockLoginWithUsernamePassword(),
+    );
+    sl.registerLazySingleton<SignupWithUsernamePassword>(
+      () => MockSignupWithUsernamePassword(),
+    );
+    sl.registerLazySingleton<CheckUsernameAvailability>(
+      () => MockCheckUsernameAvailability(),
+    );
+    sl.registerLazySingleton<SignOut>(() => MockSignOut());
+    sl.registerLazySingleton<GetCurrentSession>(() => MockGetCurrentSession());
+    sl.registerLazySingleton<UpdateUserRole>(() => MockUpdateUserRole());
+  });
+
+  testWidgets('SplashScreen renders logo and progress bar', (tester) async {
+    when(
+      () => sl<GetCurrentSession>().call(any()),
+    ).thenAnswer((_) async => const Right(null));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: const SplashScreen(),
+        onGenerateRoute: (_) => MaterialPageRoute(
+          builder: (_) => const Scaffold(body: SizedBox.shrink()),
+        ),
+      ),
+    );
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.byType(Image), findsWidgets);
+    expect(find.byKey(WidgetKeys.splashProgressBar), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 3));
   });
 }

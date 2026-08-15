@@ -1,276 +1,350 @@
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
-import 'donor_card_info_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import '../../../../core/utils/assets_manager.dart';
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/constants_manager.dart';
+import '../../../../core/utils/font_manager.dart';
+import '../../../../core/utils/route_manager.dart';
+import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/styles_manager.dart';
+import '../../../../core/utils/values_manager.dart';
+import '../../domain/entities/donor_card_entity.dart';
+import '../bloc/donor_card_bloc.dart';
+import '../widgets/donor_card_theme.dart';
 
 class DonorCardScreen extends StatelessWidget {
-  const DonorCardScreen({super.key});
+  final VoidCallback? onInfo;
+
+  const DonorCardScreen({super.key, this.onInfo});
 
   @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: const Color(0xFF1A1A1A), // Dark background from image
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                // Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          'مرحباً، أحمد',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          'كل تبرع بالدم هو فرصة جديدة للحياة',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
+      child: DonorCardBackground(
+        child: Material(
+          type: MaterialType.transparency,
+          child: SafeArea(
+            child: BlocBuilder<DonorCardBloc, DonorCardState>(
+              builder: (context, state) {
+                if (state is DonorCardInitial || state is DonorCardLoading) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: ColorManager.donorCardAccent,
                     ),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.notifications_none_rounded, color: Colors.white),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                // Title Badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.card_giftcard, color: Colors.deepPurple, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'بطاقة المتبرع',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                // Purple Drop Character
-                Image.asset(
-                  'assets/images/avatar.png',
-                  height: 164,
-                  width: 150,
-                  errorBuilder: (context, error, stackTrace) => const Icon(
-                    Icons.water_drop,
-                    size: 150,
-                    color: Colors.deepPurpleAccent,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Level Chips
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  alignment: WrapAlignment.center,
-                  children: [
-                    _buildLevelChip('قطرة امل', false),
-                    _buildLevelChip('متبرع نشط', true),
-                    _buildLevelChip('متبرع ملتزم', false),
-                    _buildLevelChip('متبرع متميز', false),
-                    _buildLevelChip('تستحق جائزة', false),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                // Active Level Card
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(25),
-                    border: Border.all(color: Colors.deepPurpleAccent.withOpacity(0.3)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'متبرع نشط',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          _buildPointsBadge('18 نقطة'),
-                        ],
-                      ),
-                      const SizedBox(height: 15),
-                      const Text(
-                        'كل تبرع يقربك من مستوى جديد ويزيد من تأثيرك في إنقاذ الأرواح، لأن العطاء المستمر يستحق التقدير والاحتفاء.',
-                        style: TextStyle(color: Colors.grey, height: 1.5, fontSize: 13),
-                      ),
-                      const SizedBox(height: 20),
-                      // Progress Bar
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: LinearProgressIndicator(
-                          value: 0.6,
-                          minHeight: 12,
-                          backgroundColor: Colors.white.withOpacity(0.1),
-                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          Text('10 نقطة', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                          Text('12 نقطة للمستوى التالي', style: TextStyle(color: Colors.deepPurpleAccent, fontSize: 12)),
-                          Text('30 نقطة', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                const Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    'الشارات المتحصل عليها',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
-                ),
-                const SizedBox(height: 15),
-                Row(
-                  children: [
-                    Expanded(child: _buildBadgeCard('قطرة امل', '10 نقطة')),
-                    const SizedBox(width: 15),
-                    Expanded(child: _buildBadgeCard('متبرع نشط', '50 نقطة')),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                // Info Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 55,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const DonorCardInfoScreen()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurpleAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: const Text(
-                      'ماهي بطاقة المتبرع',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-              ],
+                  );
+                }
+                if (state is DonorCardError) {
+                  return _ErrorState(message: state.failure.message);
+                }
+                return _DonorCardContent(
+                  card: (state as DonorCardLoaded).card,
+                  onInfo: onInfo,
+                );
+              },
             ),
           ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildLevelChip(String label, bool isActive) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-      decoration: BoxDecoration(
-        color: isActive ? Colors.deepPurpleAccent.withOpacity(0.2) : Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isActive ? Colors.deepPurpleAccent : Colors.transparent,
+class _DonorCardContent extends StatelessWidget {
+  final DonorCardEntity card;
+  final VoidCallback? onInfo;
+
+  const _DonorCardContent({required this.card, this.onInfo});
+
+  @override
+  Widget build(BuildContext context) {
+    final current = card.currentLevel;
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: AppSize.s402),
+        child: ListView(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppPadding.p10,
+            vertical: AppPadding.p20,
+          ),
+          children: [
+            const Center(child: _DonorCardBadgeButton()),
+            const SizedBox(height: AppSize.s15),
+            Center(
+              child: Image.asset(
+                ImageAssets.donorMascot,
+                width: AppSize.s150,
+                height: AppSize.s164,
+                fit: BoxFit.contain,
+              ),
+            ),
+            const SizedBox(height: AppSize.s15),
+            Wrap(
+              spacing: AppSize.s10,
+              runSpacing: AppSize.s10,
+              alignment: WrapAlignment.center,
+              children: [
+                for (final level in card.levels)
+                  DonorLevelChip(
+                    label: level.nameAr,
+                    active: level == current,
+                  ),
+              ],
+            ),
+            const SizedBox(height: AppSize.s15),
+            _LevelProgressCard(card: card),
+            const SizedBox(height: AppSize.s15),
+            Text(
+              AppStrings.earnedBadges.tr(),
+              textAlign: TextAlign.center,
+              style: getSemiBoldStyle(
+                fontSize: FontSize.s16,
+                color: ColorManager.white,
+                lineHeight: LineHeight.h28,
+              ),
+            ),
+            const SizedBox(height: AppSize.s15),
+            if (card.badges.isEmpty)
+              Text(
+                AppStrings.notAvailable.tr(),
+                textAlign: TextAlign.center,
+                style: getMediumStyle(
+                  fontSize: FontSize.s14,
+                  color: ColorManager.lightGrey,
+                ),
+              )
+            else
+              Wrap(
+                spacing: AppSize.s20,
+                runSpacing: AppSize.s20,
+                alignment: WrapAlignment.center,
+                children: [
+                  for (final badge in card.badges) _BadgeTile(badge: badge),
+                ],
+              ),
+            const SizedBox(height: AppSize.s15),
+            Center(
+              child: DonorCardButton(
+                label: AppStrings.whatIsDonorCard.tr(),
+                onPressed: () {
+                  if (onInfo != null) {
+                    onInfo!();
+                    return;
+                  }
+                  Navigator.pushNamed(context, Routes.donorCardInfoRoute);
+                },
+              ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+/// White `بطاقة المتبرع` chip with the gift-card glyph, sitting above the
+/// mascot.
+class _DonorCardBadgeButton extends StatelessWidget {
+  const _DonorCardBadgeButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppPadding.p17,
+        vertical: AppPadding.p7,
+      ),
+      decoration: BoxDecoration(
+        color: ColorManager.white,
+        borderRadius: BorderRadius.circular(AppSize.radiusCircle),
+        border: Border.all(color: ColorManager.donorCardChipBorder),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.circle, size: 8, color: isActive ? Colors.deepPurpleAccent : Colors.grey),
-          const SizedBox(width: 8),
           Text(
-            label,
-            style: TextStyle(
-              color: isActive ? Colors.white : Colors.grey,
-              fontSize: 12,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            AppStrings.donorCard.tr(),
+            style: getSemiBoldStyle(
+              fontSize: FontSize.s14,
+              color: ColorManager.black,
+              lineHeight: LineHeight.h20,
             ),
+          ),
+          const SizedBox(width: AppSize.s8),
+          SvgPicture.asset(
+            SvgAssets.giftCard,
+            width: AppSize.s20,
+            height: AppSize.s20,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LevelProgressCard extends StatelessWidget {
+  final DonorCardEntity card;
+
+  const _LevelProgressCard({required this.card});
+
+  @override
+  Widget build(BuildContext context) {
+    final current = card.currentLevel;
+    final next = card.nextLevel;
+    final remaining = next == null ? 0 : next.minPoints - card.totalPoints;
+    return DonorCardPanel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: Text(
+                  current?.nameAr ?? AppStrings.notAvailable.tr(),
+                  style: getSemiBoldStyle(
+                    fontSize: FontSize.s24,
+                    color: ColorManager.white,
+                    lineHeight: LineHeight.h28,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSize.s10),
+              DonorPointsChip(
+                label: AppStrings.pointsCount.tr(
+                  namedArgs: {
+                    LocalizationArgs.count: card.totalPoints.toString(),
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSize.s20),
+          Text(
+            AppStrings.levelProgressDescription.tr(),
+            style: getMediumStyle(
+              fontSize: FontSize.s12,
+              color: ColorManager.white,
+            ),
+          ),
+          const SizedBox(height: AppSize.s16),
+          DonorLevelProgressBar(value: card.levelProgress),
+          const SizedBox(height: AppSize.s16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                AppStrings.pointsCount.tr(
+                  namedArgs: {
+                    LocalizationArgs.count: (current?.minPoints ?? 0).toString(),
+                  },
+                ),
+                style: _boundaryStyle,
+              ),
+              Flexible(
+                child: Text(
+                  next == null
+                      ? AppStrings.deserveReward.tr()
+                      : AppStrings.pointsForNextLevel.tr(
+                          namedArgs: {
+                            LocalizationArgs.count: remaining.toString(),
+                          },
+                        ),
+                  textAlign: TextAlign.center,
+                  style: getMediumStyle(
+                    fontSize: FontSize.s14,
+                    color: ColorManager.donorCardAccent,
+                    lineHeight: LineHeight.h14,
+                  ),
+                ),
+              ),
+              Text(
+                AppStrings.pointsCount.tr(
+                  namedArgs: {
+                    LocalizationArgs.count: (next?.minPoints ?? card.totalPoints)
+                        .toString(),
+                  },
+                ),
+                style: _boundaryStyle,
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPointsBadge(String points) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.deepPurpleAccent.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Text(
-        points,
-        style: const TextStyle(color: Colors.deepPurpleAccent, fontWeight: FontWeight.bold, fontSize: 12),
+  TextStyle get _boundaryStyle => getMediumStyle(
+    fontSize: FontSize.s14,
+    color: ColorManager.white,
+    lineHeight: LineHeight.h14,
+  );
+}
+
+class _BadgeTile extends StatelessWidget {
+  final DonorBadgeEntity badge;
+
+  const _BadgeTile({required this.badge});
+
+  @override
+  Widget build(BuildContext context) {
+    return DonorCardPanel(
+      width: AppSize.s181,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (badge.threshold != null)
+            DonorPointsChip(
+              label: AppStrings.pointsCount.tr(
+                namedArgs: {
+                  LocalizationArgs.count: badge.threshold!.toString(),
+                },
+              ),
+            ),
+          const SizedBox(height: AppSize.s10),
+          Image.asset(
+            ImageAssets.badgeTrophy,
+            width: AppSize.s80,
+            height: AppSize.s80,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(height: AppSize.s10),
+          Text(
+            badge.nameAr,
+            textAlign: TextAlign.center,
+            style: getSemiBoldStyle(
+              fontSize: FontSize.s20,
+              color: ColorManager.white,
+              lineHeight: LineHeight.h28,
+            ),
+          ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildBadgeCard(String title, String points) {
-    return Container(
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(25),
-      ),
+class _ErrorState extends StatelessWidget {
+  final String message;
+
+  const _ErrorState({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Align(
-            alignment: Alignment.topLeft,
-            child: _buildPointsBadge(points),
-          ),
-          Image.asset(
-            'assets/images/reward.png',
-            height: 60,
-            errorBuilder: (context, error, stackTrace) => const Icon(
-              Icons.emoji_events_rounded,
-              size: 60,
-              color: Colors.deepPurpleAccent,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          Text(message, style: TextStyle(color: ColorManager.white)),
+          const SizedBox(height: AppSize.s12),
+          ElevatedButton(
+            onPressed: () {
+              context.read<DonorCardBloc>().add(const DonorCardRequested());
+            },
+            child: Text(AppStrings.retryAgain.tr()),
           ),
         ],
       ),

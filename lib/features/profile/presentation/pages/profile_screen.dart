@@ -1,479 +1,739 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
-import 'package:tabare3/features/auth/presentation/pages/role_selection_screen.dart';
-import 'package:tabare3/features/donor_home/presentation/pages/donor_card_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart' as intl;
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/presentation/widgets/app_gradient_background.dart';
+import '../../../../core/presentation/widgets/app_header.dart';
+import '../../../../core/presentation/widgets/logout_dialog.dart';
+import '../../../../core/utils/constants_manager.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../../core/utils/assets_manager.dart';
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/font_manager.dart';
+import '../../../../core/utils/route_manager.dart';
+import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/styles_manager.dart';
+import '../../../../core/utils/values_manager.dart';
+import '../../domain/entities/profile_entity.dart';
+import '../bloc/profile_bloc.dart';
+import '../widgets/profile_field_editors.dart';
+import '../widgets/profile_widgets.dart';
 
-  @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
+class ProfileScreen extends StatelessWidget {
+  final bool showRecipientIdentityDetails;
+  final VoidCallback? onAbout;
+  final VoidCallback? onDonorCard;
+  final VoidCallback? onNotifications;
+  final VoidCallback? onQrCode;
 
-class _ProfileScreenState extends State<ProfileScreen> {
-  bool _isEditing = false;
-  bool _accountStatus = true;
-
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.logout_rounded,
-                  color: Color(0xFF8B1D1D),
-                  size: 80,
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'هل أنت متأكد من تسجيل الخروج؟',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 15),
-                const Text(
-                  'نتطلع إلى رؤيتك مجدداً، شكراً لمساهمتك في دعم مجتمع التبرع بالدم.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF8B1D1D),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                    ),
-                    child: const Text(
-                      'تسجيل الخروج',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.grey),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                    ),
-                    child: const Text(
-                      'إلغاء',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showLanguageDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'اختر اللغة',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-                _buildLanguageOption('العربية', true),
-                _buildLanguageOption('English', false),
-                _buildLanguageOption('Français', false),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
+  const ProfileScreen({
+    super.key,
+    this.showRecipientIdentityDetails = true,
+    this.onAbout,
+    this.onDonorCard,
+    this.onNotifications,
+    this.onQrCode,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Directionality(
-        textDirection: TextDirection.rtl,
-        child: SafeArea(
-          child: SingleChildScrollView(
+    return Directionality(
+      textDirection: appTextDirection(context),
+      child: Scaffold(
+        backgroundColor: ColorManager.scaffoldBg,
+        body: AppGradientBackground(
+          key: WidgetKeys.profileGradientBackground,
+          child: BlocConsumer<ProfileBloc, ProfileState>(
+            listener: _profileListener,
+            builder: (context, state) {
+              if (state is ProfileLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (state is ProfileLoaded) {
+                return _ProfileContent(
+                  profile: state.profile,
+                  isEditing: state.isEditing,
+                  pendingAvatarPath: state.pendingAvatarPath,
+                  showRecipientIdentityDetails: showRecipientIdentityDetails,
+                  onAbout: onAbout,
+                  onDonorCard: onDonorCard,
+                  onNotifications: onNotifications,
+                  onQrCode: onQrCode,
+                );
+              }
+              if (state is ProfileError) {
+                return Center(child: Text(state.failure.message));
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _profileListener(BuildContext context, ProfileState state) {
+    if (state is ProfileLoaded && state.actionError != null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(state.actionError!.message)));
+    }
+    if (state is ProfileRoleChanged) {
+      final route = state.profile.isDonor
+          ? Routes.donorHomeRoute
+          : Routes.requesterHomeRoute;
+      Navigator.pushNamedAndRemoveUntil(context, route, (route) => false);
+    }
+  }
+}
+
+class _ProfileContent extends StatelessWidget {
+  final ProfileEntity profile;
+  final bool isEditing;
+  final String? pendingAvatarPath;
+  final bool showRecipientIdentityDetails;
+  final VoidCallback? onAbout;
+  final VoidCallback? onDonorCard;
+  final VoidCallback? onNotifications;
+  final VoidCallback? onQrCode;
+
+  const _ProfileContent({
+    required this.profile,
+    required this.isEditing,
+    required this.pendingAvatarPath,
+    required this.showRecipientIdentityDetails,
+    required this.onAbout,
+    required this.onDonorCard,
+    required this.onNotifications,
+    required this.onQrCode,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: AppPadding.p32),
+      child: Column(
+        children: [
+          _buildHeader(context),
+          // Figma floats the header over the page and starts the content at
+          // y=150; the inline header measures 128.
+          const SizedBox(height: AppSize.s22),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppPadding.p10),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 20),
-                // Header
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'الملف الشخصي',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _isEditing = !_isEditing;
-                          });
-                        },
-                        icon: Icon(_isEditing ? Icons.check : Icons.edit_outlined),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                // Profile Image and Info
-                _buildProfileHeader(),
-                const SizedBox(height: 30),
-                // Quick Actions
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildQuickAction(
-                        icon: Icons.credit_card,
-                        label: 'بطاقة المتبرع',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const DonorCardScreen()),
-                          );
-                        },
-                      ),
-                      _buildQuickAction(
-                        icon: Icons.history,
-                        label: 'السجل',
-                        onTap: () {},
-                      ),
-                      _buildQuickAction(
-                        icon: Icons.notifications_none,
-                        label: 'الإشعارات',
-                        onTap: () {},
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                // Main Info Sections
-                _buildSection(
-                  title: 'المعلومات الشخصية',
-                  child: _buildPersonalInfo(),
-                ),
-                const SizedBox(height: 20),
-                _buildSection(
-                  title: 'إعدادات الحساب',
-                  child: _buildAccountSettings(),
-                ),
-                const SizedBox(height: 20),
-                _buildSection(
-                  title: 'عن التطبيق',
-                  child: _buildAboutSection(),
-                ),
-                const SizedBox(height: 40),
-                // Logout Button
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: ElevatedButton(
-                      onPressed: _showLogoutDialog,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFFEBEE),
-                        foregroundColor: const Color(0xFF8B1D1D),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.logout_rounded),
-                          SizedBox(width: 10),
-                          Text(
-                            'تسجيل الخروج',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 100),
+                _buildAvatarSection(context),
+                const SizedBox(height: AppSize.s12),
+                _buildAccountSection(context),
+                const SizedBox(height: AppSize.s12),
+                _buildPersonalSection(context),
+                // Edit mode drops the read-only QR and app-info groups.
+                if (!isEditing) ...[
+                  if (onQrCode != null) ...[
+                    const SizedBox(height: AppSize.s12),
+                    _buildQrSection(context),
+                  ],
+                  const SizedBox(height: AppSize.s12),
+                  _buildAppSection(context),
+                ],
               ],
             ),
+          ),
+          const SizedBox(height: AppSize.s40),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    final subtitle = profile.isDonor
+        ? AppStrings.donationLifeChance.tr()
+        : AppStrings.getWellSoon.tr();
+    final firstName = profile.fullName.split(' ').first;
+
+    return AppHeader(
+      title: '${AppStrings.welcome.tr()}، $firstName',
+      subtitle: subtitle,
+      notificationsKey: WidgetKeys.profileNotificationsButton,
+      onNotifications:
+          onNotifications ??
+          () => Navigator.pushNamed(context, Routes.notificationsRoute),
+    );
+  }
+
+  Widget _buildAvatarSection(BuildContext context) {
+    return Column(
+      children: [
+        _AvatarPicker(
+          profile: profile,
+          isEditing: isEditing,
+          pendingAvatarPath: pendingAvatarPath,
+        ),
+        const SizedBox(height: AppSize.s16),
+        Text(
+          profile.fullName,
+          style: getSemiBoldStyle(
+            fontSize: FontSize.s20,
+            color: ColorManager.textPrimary,
+            lineHeight: LineHeight.h28,
+          ),
+        ),
+        Text(
+          profile.username,
+          style: getRegularStyle(
+            fontSize: FontSize.s14,
+            color: ColorManager.lightGrey,
+            lineHeight: LineHeight.h20,
+          ),
+        ),
+        const SizedBox(height: AppSize.s5),
+        _buildActionButtons(context),
+      ],
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    if (isEditing) {
+      return _ProfileChip(
+        label: AppStrings.saveChanges.tr(),
+        icon: SvgAssets.profileEdit,
+        iconSize: AppSize.s15,
+        onTap: () => context.read<ProfileBloc>().add(SaveProfile(profile)),
+      );
+    }
+
+    final editChip = _ProfileChip(
+      label: AppStrings.edit.tr(),
+      icon: SvgAssets.profileEdit,
+      onTap: () => context.read<ProfileBloc>().add(const ToggleEditMode()),
+    );
+
+    if (!profile.isDonor) return editChip;
+
+    // Figma renders `تعديل` on the reading side and `بطاقة المتبرع` after it.
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        editChip,
+        const SizedBox(width: AppSize.s12),
+        _ProfileChip(
+          label: AppStrings.donorCard.tr(),
+          icon: SvgAssets.giftCard,
+          iconWidth: AppSize.s16_67,
+          iconHeight: AppSize.s12_5,
+          onTap:
+              onDonorCard ??
+              () => Navigator.pushNamed(context, Routes.donorCardRoute),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAccountSection(BuildContext context) {
+    return ProfileSection(
+      title: AppStrings.accountInfo.tr(),
+      children: [
+        ProfileRow(
+          label: AppStrings.phoneNumberLabel.tr(),
+          value: profile.phone,
+          icon: SvgAssets.profilePhone,
+          onTap: _editTap(
+            context,
+            AppStrings.phoneNumberLabel.tr(),
+            profile.phone,
+            (v) => _updateProfile(context, phone: v),
+          ),
+        ),
+        ProfileRow(
+          label: AppStrings.accountType.tr(),
+          value: _roleLabel(profile),
+          icon: SvgAssets.profileAccountType,
+          trailing: isEditing
+              ? const ProfileRowChevron(pointsDown: true)
+              : null,
+          onTap: isEditing ? () => _showRoleBottomSheet(context) : null,
+        ),
+        AccountStatusToggle(
+          value: profile.isActive,
+          onChanged: (v) =>
+              context.read<ProfileBloc>().add(AccountStatusToggled(v)),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPersonalSection(BuildContext context) {
+    return ProfileSection(
+      title: AppStrings.personalInfo.tr(),
+      children: [
+        // Identity fields are read-only, so edit mode drops them entirely.
+        if (showRecipientIdentityDetails && !isEditing) ...[
+          ProfileRow(
+            label: AppStrings.dateOfBirth.tr(),
+            value: _formattedBirthDate(context),
+            icon: SvgAssets.profileBirthDate,
+          ),
+          ProfileRow(
+            label: AppStrings.gender.tr(),
+            value: profile.gender == AppConstants.genderFemale
+                ? AppStrings.female.tr()
+                : AppStrings.male.tr(),
+            icon: SvgAssets.profileGender,
+          ),
+          ProfileRow(
+            label: AppStrings.nationalId.tr(),
+            value: profile.nationalId ?? AppStrings.notAvailable.tr(),
+            icon: SvgAssets.profileNationalId,
+            stackValue: true,
+          ),
+          ProfileRow(
+            label: AppStrings.bloodType.tr(),
+            value: profile.bloodType,
+            icon: SvgAssets.profileBloodType,
+          ),
+        ],
+        ProfileRow(
+          label: AppStrings.weight.tr(),
+          value: profile.weight != null
+              ? '${profile.weight} ${AppStrings.kg.tr()}'
+              : '',
+          icon: SvgAssets.profileWeight,
+          onTap: isEditing
+              ? () => ProfileFieldEditors.pickWeight(
+                  context,
+                  profile.weight,
+                  (v) => _updateProfile(context, weight: v),
+                )
+              : null,
+        ),
+        ProfileRow(
+          label: AppStrings.governorate.tr(),
+          value: profile.city,
+          icon: SvgAssets.profileWilaya,
+          onTap: isEditing
+              ? () => ProfileFieldEditors.pickWilaya(
+                  context,
+                  profile.city,
+                  (v) => _updateProfile(context, city: v),
+                )
+              : null,
+        ),
+        ProfileRow(
+          label: AppStrings.chronicDiseases.tr(),
+          value: profile.chronicDiseases ?? AppStrings.notAvailable.tr(),
+          icon: SvgAssets.profileDiseases,
+          height: AppSize.s105,
+          onTap: _editTap(
+            context,
+            AppStrings.chronicDiseases.tr(),
+            profile.chronicDiseases ?? '',
+            (v) => _updateProfile(context, chronicDiseases: v),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formattedBirthDate(BuildContext context) {
+    final parsed = DateTime.tryParse(profile.dateOfBirth);
+    if (parsed == null) return profile.dateOfBirth;
+    return intl.DateFormat.yMMMMd(context.locale.languageCode).format(parsed);
+  }
+
+  Widget _buildQrSection(BuildContext context) {
+    return ProfileSection(
+      title: AppStrings.qrSection.tr(),
+      children: [
+        ProfileRow(
+          key: WidgetKeys.profileQrRow,
+          label: profile.isDonor
+              ? AppStrings.scanQrCode.tr()
+              : AppStrings.qrSection.tr(),
+          value: '',
+          icon: SvgAssets.profileQr,
+          trailing: const ProfileRowChevron(),
+          onTap: onQrCode,
+        ),
+      ],
+    );
+  }
+
+  /// Figma renders the app-info group as a bare card with no section title.
+  Widget _buildAppSection(BuildContext context) {
+    return ProfileSection(
+      children: [
+        ProfileRow(
+          label: AppStrings.appInfo.tr(),
+          value: '',
+          icon: SvgAssets.profileInfo,
+          trailing: const ProfileRowChevron(),
+          onTap:
+              onAbout ??
+              () => Navigator.pushNamed(context, Routes.aboutAppRoute),
+        ),
+        ProfileRow(
+          label: AppStrings.logout.tr(),
+          value: '',
+          icon: SvgAssets.profileLogout,
+          onTap: () => _showLogoutDialog(context),
+        ),
+      ],
+    );
+  }
+
+  VoidCallback? _editTap(
+    BuildContext context,
+    String label,
+    String initialValue,
+    void Function(String) onSaved,
+  ) => isEditing
+      ? () => _editField(context, label, initialValue, onSaved)
+      : null;
+
+  String _roleLabel(ProfileEntity profile) {
+    if (profile.isDonor) return AppStrings.iAmDonor.tr();
+    if (profile.isRecipient) return AppStrings.iNeedBlood.tr();
+    return '';
+  }
+
+  void _updateProfile(
+    BuildContext context, {
+    String? fullName,
+    String? phone,
+    double? weight,
+    String? city,
+    String? chronicDiseases,
+  }) {
+    final updated = profile.copyWith(
+      fullName: fullName ?? profile.fullName,
+      phone: phone ?? profile.phone,
+      weight: weight ?? profile.weight,
+      city: city ?? profile.city,
+      chronicDiseases: chronicDiseases == null
+          ? profile.chronicDiseases
+          : (chronicDiseases.isEmpty ? null : chronicDiseases),
+    );
+    context.read<ProfileBloc>().add(ProfileFieldChanged(updated));
+  }
+
+  void _editField(
+    BuildContext context,
+    String label,
+    String initialValue,
+    ValueChanged<String> onChanged,
+  ) {
+    final controller = TextEditingController(text: initialValue);
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          left: AppPadding.p20,
+          right: AppPadding.p20,
+          top: AppPadding.p20,
+        ),
+        child: Directionality(
+          textDirection: appTextDirection(context),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: getBoldStyle(
+                  fontSize: FontSize.s18,
+                  color: ColorManager.textPrimary,
+                ),
+              ),
+              const SizedBox(height: AppSize.s16),
+              TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                  hintText: label,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppSize.s16),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSize.s16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    onChanged(controller.text);
+                    Navigator.pop(context);
+                  },
+                  child: Text(AppStrings.save.tr()),
+                ),
+              ),
+              const SizedBox(height: AppSize.s20),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildProfileHeader() {
-    return Column(
-      children: [
-        Stack(
+  void _showRoleBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (sheetContext) => Directionality(
+        textDirection: appTextDirection(context),
+        child: Padding(
+          padding: const EdgeInsets.all(AppPadding.p24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.warning_rounded,
+                color: Colors.red,
+                size: AppSize.s80,
+              ),
+              const SizedBox(height: AppSize.s20),
+              Text(
+                AppStrings.confirmRoleUpdate.tr(),
+                textAlign: TextAlign.center,
+                style: getBoldStyle(
+                  fontSize: FontSize.s20,
+                  color: ColorManager.textSecondary,
+                ),
+              ),
+              const SizedBox(height: AppSize.s15),
+              Text(
+                AppStrings.roleSwitchWarning.tr(),
+                textAlign: TextAlign.center,
+                style: getBoldStyle(
+                  fontSize: FontSize.s16,
+                  color: ColorManager.textSecondary,
+                ),
+              ),
+              const SizedBox(height: AppSize.s30),
+              SizedBox(
+                width: AppSize.s220,
+                height: AppSize.s50,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(sheetContext);
+                    context.read<ProfileBloc>().add(
+                      const ChangeRoleRequested(
+                        isDonor: false,
+                        isRecipient: true,
+                      ),
+                    );
+                  },
+                  child: Text(AppStrings.iNeedBlood.tr()),
+                ),
+              ),
+              const SizedBox(height: AppSize.s10),
+              SizedBox(
+                width: AppSize.s220,
+                height: AppSize.s50,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pop(sheetContext);
+                    context.read<ProfileBloc>().add(
+                      const ChangeRoleRequested(
+                        isDonor: true,
+                        isRecipient: false,
+                      ),
+                    );
+                  },
+                  child: Text(AppStrings.iAmDonor.tr()),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: ColorManager.dialogScrim,
+      builder: (dialogContext) => LogoutDialog(
+        title: AppStrings.confirmLogout.tr(),
+        message: AppStrings.confirmLogoutMessage.tr(),
+        confirmLabel: AppStrings.logout.tr(),
+        cancelLabel: AppStrings.cancel.tr(),
+        onConfirm: () => context.read<AuthBloc>().add(SignOutRequested()),
+      ),
+    );
+  }
+}
+
+class _AvatarPicker extends StatelessWidget {
+  final ProfileEntity profile;
+  final bool isEditing;
+  final String? pendingAvatarPath;
+
+  const _AvatarPicker({
+    required this.profile,
+    required this.isEditing,
+    required this.pendingAvatarPath,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      key: WidgetKeys.profileAvatarPicker,
+      onTap: isEditing
+          ? () => ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(AppStrings.avatarComingSoon.tr())),
+            )
+          : null,
+      child: Container(
+        width: AppSize.s96,
+        height: AppSize.s96,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: ColorManager.surface,
+          border: Border.all(color: ColorManager.white, width: AppSize.s4),
+          boxShadow: [
+            BoxShadow(
+              color: ColorManager.black.withValues(alpha: AppOpacity.subtle),
+              blurRadius: AppSize.s2,
+              offset: const Offset(AppSize.s0, AppSize.s1),
+            ),
+          ],
+        ),
+        child: ClipOval(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              _buildImage(),
+              // Edit mode reveals a camera affordance inside the circle so the
+              // user knows the picture is tappable.
+              if (isEditing)
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: ColorManager.black.withValues(
+                      alpha: AppOpacity.avatarScrim,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.camera_alt_rounded,
+                    color: ColorManager.white,
+                    size: AppSize.s28,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImage() {
+    // A freshly picked file previews immediately from disk while it uploads.
+    if (pendingAvatarPath != null) {
+      return Image.file(
+        File(pendingAvatarPath!),
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _FallbackAvatar(profile.fullName),
+      );
+    }
+    if (profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: profile.avatarUrl!,
+        fit: BoxFit.cover,
+        placeholder: (_, __) => _FallbackAvatar(profile.fullName),
+        errorWidget: (_, __, ___) => _FallbackAvatar(profile.fullName),
+      );
+    }
+    return _FallbackAvatar(profile.fullName);
+  }
+}
+
+class _FallbackAvatar extends StatelessWidget {
+  final String fullName;
+
+  const _FallbackAvatar(this.fullName);
+
+  @override
+  Widget build(BuildContext context) {
+    final initial = fullName.isNotEmpty ? fullName[0].toUpperCase() : '?';
+    return Center(
+      child: Text(
+        initial,
+        style: getSemiBoldStyle(
+          fontSize: FontSize.s40,
+          color: ColorManager.primaryDark,
+        ),
+      ),
+    );
+  }
+}
+
+/// Figma `Address Row > Button`: white pill with an `#E8EFF3` hairline, 17/7
+/// padding and the glyph trailing the label.
+class _ProfileChip extends StatelessWidget {
+  final String label;
+  final String icon;
+  final double? iconSize;
+  final double? iconWidth;
+  final double? iconHeight;
+  final VoidCallback onTap;
+
+  const _ProfileChip({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+    this.iconSize,
+    this.iconWidth,
+    this.iconHeight,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppPadding.p17,
+          vertical: AppPadding.p7,
+        ),
+        decoration: BoxDecoration(
+          color: ColorManager.white,
+          borderRadius: BorderRadius.circular(AppSize.radiusCircle),
+          border: Border.all(color: ColorManager.donorCardChipBorder),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF8B1D1D), width: 2),
-                image: const DecorationImage(
-                  image: AssetImage('assets/images/demo.png'),
-                  fit: BoxFit.cover,
+            Text(
+              label,
+              style: getSemiBoldStyle(
+                fontSize: FontSize.s14,
+                color: ColorManager.black,
+                lineHeight: LineHeight.h20,
+              ),
+            ),
+            const SizedBox(width: AppSize.s8),
+            SizedBox(
+              width: AppSize.s20,
+              height: AppSize.s20,
+              child: Center(
+                child: SvgPicture.asset(
+                  icon,
+                  width: iconWidth ?? iconSize ?? AppSize.s20,
+                  height: iconHeight ?? iconSize ?? AppSize.s20,
                 ),
               ),
             ),
-            if (_isEditing)
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF8B1D1D),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
-                ),
-              ),
           ],
         ),
-        const SizedBox(height: 15),
-        const Text(
-          'أحمد لوصيف',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        const Text(
-          'كل تبرع بالدم هو فرصة جديدة للحياة',
-          style: TextStyle(fontSize: 14, color: Colors.grey),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildQuickAction({required IconData icon, required String label, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Icon(icon, color: const Color(0xFF8B1D1D)),
-          ),
-          const SizedBox(height: 8),
-          Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-        ],
       ),
-    );
-  }
-
-  Widget _buildSection({required String title, required Widget child}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 15),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: child,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPersonalInfo() {
-    return Column(
-      children: [
-        _buildInfoRow('الاسم الكامل', 'أحمد لوصيف', Icons.person_outline),
-        const Divider(height: 30),
-        _buildInfoRow('تاريخ الميلاد', '12 ماي 1995', Icons.calendar_today_outlined),
-        const Divider(height: 30),
-        _buildInfoRow('فصيلة الدم', 'O+', Icons.opacity),
-        const Divider(height: 30),
-        _buildInfoRow('الولاية', 'قسنطينة', Icons.location_on_outlined, isDropdown: _isEditing),
-      ],
-    );
-  }
-
-  Widget _buildAccountSettings() {
-    return Column(
-      children: [
-        _buildInfoRow('رقم الهاتف', '0676 24 41 89', Icons.phone_outlined),
-        const Divider(height: 30),
-        _buildInfoRow(
-          'نوع الحساب',
-          'أحتاج دم / أنا متبرع',
-          Icons.person_pin_outlined,
-          isDropdown: _isEditing,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const RoleSelectionScreen()),
-            );
-          },
-        ),
-        const Divider(height: 30),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Switch(
-              value: _accountStatus,
-              onChanged: (value) {
-                setState(() {
-                  _accountStatus = value;
-                });
-              },
-              activeColor: Colors.green,
-            ),
-            Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const Text('حالة الحساب', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    Text(
-                      _accountStatus ? 'نشط / غير متاح حالياً' : 'غير نشط',
-                      style: const TextStyle(color: Colors.grey, fontSize: 11),
-                      textAlign: TextAlign.right,
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 15),
-                const Icon(Icons.power_settings_new_rounded, color: Colors.grey),
-              ],
-            ),
-          ],
-        ),
-        const Divider(height: 30),
-        _buildInfoRow('تغيير اللغة', 'العربية', Icons.language_outlined, isDropdown: true, onTap: _showLanguageDialog),
-      ],
-    );
-  }
-
-  Widget _buildAboutSection() {
-    return Column(
-      children: [
-        _buildInfoRow('من نحن', '', Icons.info_outline),
-        const Divider(height: 30),
-        _buildInfoRow('سياسة الخصوصية', '', Icons.privacy_tip_outlined),
-        const Divider(height: 30),
-        _buildInfoRow('قيم التطبيق', '', Icons.star_outline),
-      ],
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value, IconData icon, {bool isDropdown = false, VoidCallback? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          if (isDropdown && _isEditing)
-            const Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 20)
-          else if (onTap != null)
-            const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.grey, size: 16)
-          else
-            const SizedBox(),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                    if (value.isNotEmpty)
-                      Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                const SizedBox(width: 15),
-                Icon(icon, color: Colors.grey, size: 22),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLanguageOption(String title, bool isSelected) {
-    return ListTile(
-      title: Text(title, textAlign: TextAlign.right),
-      trailing: isSelected ? const Icon(Icons.check, color: Color(0xFF8B1D1D)) : null,
-      onTap: () => Navigator.pop(context),
     );
   }
 }

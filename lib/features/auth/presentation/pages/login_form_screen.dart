@@ -1,6 +1,24 @@
+
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/presentation/widgets/app_dialog.dart';
+import '../../../../core/presentation/widgets/app_gradient_background.dart';
+import '../../../../core/presentation/widgets/app_text_field.dart';
+import '../../../../core/presentation/widgets/loading_overlay.dart';
+import '../../../../core/utils/assets_manager.dart';
+import '../../../../core/utils/color_manager.dart';
+import '../../../../core/utils/font_manager.dart';
+import '../../../../core/utils/route_manager.dart';
+import '../../../../core/utils/string_manager.dart';
+import '../../../../core/utils/styles_manager.dart';
+import '../../../../core/utils/values_manager.dart';
+import '../../../../core/validators/validators.dart';
+import '../../../../injection_container.dart';
+import '../bloc/auth_bloc.dart';
 import 'role_selection_screen.dart';
-import 'signup_screen.dart';
 
 class LoginFormScreen extends StatefulWidget {
   const LoginFormScreen({super.key});
@@ -10,162 +28,232 @@ class LoginFormScreen extends StatefulWidget {
 }
 
 class _LoginFormScreenState extends State<LoginFormScreen> {
-  bool _rememberMe = false;
-  bool _obscurePassword = true;
+  final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        final theme = Theme.of(context);
-        return Dialog(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.secondary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.check, color: Colors.white, size: 50),
-                ),
-                const SizedBox(height: 25),
-                Text(
-                  'لقد سجلت الدخول بنجاح إلى تطبيق',
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyLarge?.copyWith(color: Colors.grey),
-                ),
-                const SizedBox(height: 10),
-                Image.asset(
-                  'assets/images/icon6.png',
-                  height: 60,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.bloodtype_outlined, size: 60, color: Color(0xFF8B1D1D)),
-                ),
-                const SizedBox(height: 30),
-                  SizedBox(
-                  width: 200,
-                  child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => const RoleSelectionScreen()),
-                      (route) => false,
-                    );
-                  },
-                  child: const Text('الصفحة الرئيسية'),
-                ), 
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _dispatchLogin(AuthBloc bloc) {
+    if (!_formKey.currentState!.validate()) return;
+    bloc.add(
+      LoginRequested(
+        username: _usernameController.text.trim(),
+        password: _passwordController.text,
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      body: Directionality(
-        textDirection: TextDirection.rtl,
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 30.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                Image.asset(
-                  'assets/images/icon6.png',
-                  height: 60,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.bloodtype_outlined, size: 60, color: Color(0xFF8B1D1D)),
-                ),
-                const SizedBox(height: 20),
-                Image.asset(
-                  'assets/images/demo1.png',
-                  height: 180,
-                  errorBuilder: (context, error, stackTrace) => Icon(
-                    Icons.assignment_ind_outlined,
-                    color: theme.primaryColor,
-                    size: 120,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Text('تسجيل الدخول', style: theme.textTheme.displaySmall),
-                const SizedBox(height: 30),
-                const TextField(
-                  decoration: InputDecoration(
-                    hintText: 'اسم المستخدم',
-                    prefixIcon: Icon(Icons.person_outline),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    hintText: '..........',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+    return BlocProvider(
+      create: (_) => sl<AuthBloc>(),
+      child: BlocConsumer<AuthBloc, AuthState>(
+        listener: _authListener,
+        builder: (context, state) {
+          return LoadingOverlay(
+            visible: state is AuthLoading,
+            message: AppStrings.loggingIn.tr(),
+            child: Scaffold(
+              backgroundColor: ColorManager.transparent,
+              body: Directionality(
+                textDirection: TextDirection.rtl,
+                child: AppGradientBackground(
+                  child: SafeArea(
+                    child: Center(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppPadding.p10,
+                          vertical: AppPadding.p32,
+                        ),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            maxWidth: AppSize.s402,
+                          ),
+                          child: Form(key: _formKey, child: _buildForm(context)),
+                        ),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
                     ),
                   ),
                 ),
-                const SizedBox(height: 15),
-                Row(
-                  children: [
-                    Text('تذكرني في المرة القادمة', style: theme.textTheme.bodyMedium),
-                    const Spacer(),
-                    Transform.scale(
-                      scale: 0.8,
-                      child: Switch(
-                        value: _rememberMe,
-                        onChanged: (value) => setState(() => _rememberMe = value),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: _showSuccessDialog,
-                  child: const Text('تسجيل الدخول'),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('ليس لديك حساب؟ ', style: theme.textTheme.bodyMedium),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const SignUpScreen()),
-                        );
-                      },
-                      child: Text(
-                        'إنشاء حساب',
-                        style: TextStyle(color: theme.primaryColor, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-              ],
+              ),
             ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildForm(BuildContext context) {
+    return Column(
+      children: [
+        Image.asset(
+          ImageAssets.logo76,
+          width: AppSize.s76,
+          height: AppSize.s76,
+          errorBuilder: (_, _, _) => Icon(
+            Icons.bloodtype_outlined,
+            color: ColorManager.primary,
+            size: AppSize.s76,
+          ),
+        ),
+        const SizedBox(height: AppSize.s12),
+        Image.asset(
+          ImageAssets.loginIllustration,
+          width: AppSize.s170,
+          height: AppSize.s169,
+          errorBuilder: (_, _, _) => Icon(
+            Icons.assignment_ind_outlined,
+            color: ColorManager.primary,
+            size: AppSize.s120,
+          ),
+        ),
+        const SizedBox(height: AppSize.s12),
+        Text(
+          AppStrings.login.tr(),
+          textAlign: TextAlign.center,
+          style: getBoldStyle(
+            fontSize: FontSize.s30,
+            color: ColorManager.black,
+          ),
+        ),
+        const SizedBox(height: AppSize.s12),
+        Padding(
+          key: WidgetKeys.loginContentArea,
+          padding: const EdgeInsets.symmetric(horizontal: AppPadding.p32),
+          child: Column(
+            children: [
+              AppTextField(
+                hintText: AppStrings.username.tr(),
+                prefixSvg: SvgAssets.person,
+                controller: _usernameController,
+                keyboardType: TextInputType.text,
+                validator: validateUsername,
+              ),
+              const SizedBox(height: AppSize.s16),
+              AppTextField(
+                hintText: AppStrings.passwordMask.tr(),
+                prefixSvg: SvgAssets.password,
+                obscureSvg: SvgAssets.hidden,
+                isPassword: true,
+                controller: _passwordController,
+                validator: validatePassword,
+              ),
+              const SizedBox(height: AppSize.s30),
+              _LoginButton(
+                onPressed: () => _dispatchLogin(context.read<AuthBloc>()),
+              ),
+              const SizedBox(height: AppSize.s5),
+              const _SignupLink(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _authListener(BuildContext context, AuthState state) {
+    if (state is Authenticated) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: ColorManager.dialogScrim,
+        builder: (_) => AppDialog.success(
+          title: AppStrings.loginSuccess.tr(),
+          actionLabel: AppStrings.homePage.tr(),
+          onAction: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
+              (route) => false,
+            );
+          },
+        ),
+      );
+    } else if (state is AuthError) {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        barrierColor: ColorManager.dialogScrim,
+        builder: (_) => AppDialog.error(
+          title: AppStrings.loginError.tr(),
+          message: state.failure.message,
+          actionLabel: AppStrings.retryAgain.tr(),
+          onAction: () => Navigator.pop(context),
+        ),
+      );
+    }
+  }
+}
+
+class _LoginButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _LoginButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: ColorManager.primary,
+          foregroundColor: ColorManager.white,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppPadding.p50,
+            vertical: AppPadding.p18,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSize.radiusButton),
+          ),
+        ),
+        child: Text(
+          AppStrings.login.tr(),
+          style: getMediumStyle(
+            fontSize: FontSize.s19,
+            color: ColorManager.white,
+            lineHeight: FontSize.s19,
           ),
         ),
       ),
+    );
+  }
+}
+
+class _SignupLink extends StatelessWidget {
+  const _SignupLink();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          '${AppStrings.noAccount.tr()} ',
+          style: getRegularStyle(
+            fontSize: FontSize.s12,
+            color: ColorManager.textMuted,
+            lineHeight: LineHeight.h16,
+          ),
+        ),
+        GestureDetector(
+          onTap: () => Navigator.pushNamed(context, Routes.signupRoute),
+          child: Text(
+            AppStrings.signup.tr(),
+            style: getBoldStyle(
+              fontSize: FontSize.s12,
+              color: ColorManager.primary,
+              lineHeight: LineHeight.h16,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
