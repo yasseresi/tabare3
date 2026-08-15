@@ -60,3 +60,8 @@ coverage/
 graphify-out/
 .opencode/node_modules/
 docs/
+
+# Supabase CLI local cache + local dev secrets (never commit)
+supabase/.temp/
+supabase/.branches/
+**/start-secrets/

@@ -60,16 +60,25 @@ void main() {
 
   setUp(() {
     dio = MockDio();
+    when(() => dio.options).thenReturn(BaseOptions(baseUrl: 'https://x/api/v1'));
     source = RequestRestDataSource(
       dio,
       reference: ReferenceResolver(FakeReferenceDataSource()),
     );
   });
 
-  test('listOwnRequests unwraps the paginated results and maps each', () async {
+  test('listOwnRequests follows pagination (not just page 1)', () async {
+    const page2 = 'https://x/api/v1/requests/?page=2';
     when(() => dio.get<Map<String, dynamic>>(RestPaths.requests)).thenAnswer(
       (_) async => _res(RestPaths.requests, {
-        'count': 1,
+        'count': 2,
+        'next': page2,
+        'results': [_requestJson()],
+      }),
+    );
+    when(() => dio.get<Map<String, dynamic>>(page2)).thenAnswer(
+      (_) async => _res(page2, {
+        'count': 2,
         'next': null,
         'results': [_requestJson()],
       }),
@@ -77,8 +86,8 @@ void main() {
 
     final list = await source.listOwnRequests();
 
-    expect(list, hasLength(1));
-    final r = list.single;
+    expect(list, hasLength(2)); // both pages
+    final r = list.first;
     expect(r.id, '5');
     expect(r.requestedBy, '42');
     expect(r.bloodType, 'O+'); // nested label

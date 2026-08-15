@@ -35,6 +35,17 @@ class RestClientFactory {
   TokenStore get tokenStore => _tokenStore;
 
   Dio build() {
+    // In release, refuse a non-HTTPS base URL: login credentials and the
+    // bearer/refresh JWTs must never travel in cleartext. Debug allows http for
+    // local backends.
+    assert(
+      kReleaseMode ? _baseUrl.startsWith('https://') : true,
+      'API_BASE_URL must use https in release builds (got: $_baseUrl)',
+    );
+    if (kReleaseMode && !_baseUrl.startsWith('https://')) {
+      throw StateError('Insecure API_BASE_URL in release build');
+    }
+
     final options = BaseOptions(
       baseUrl: _baseUrl,
       headers: {

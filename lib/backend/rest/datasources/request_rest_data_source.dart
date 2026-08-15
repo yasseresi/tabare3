@@ -30,13 +30,10 @@ class RequestRestDataSource implements RequestRemoteDataSource {
 
   @override
   Future<List<BloodRequestModel>> listOwnRequests() async {
-    final response = await dio.get<Map<String, dynamic>>(RestPaths.requests);
-    final results = response.data?['results'];
-    if (results is! List) return const [];
-    return results
-        .whereType<Map<String, dynamic>>()
-        .map(_mapRequest)
-        .toList(growable: false);
+    // Paginated: follow every page, like the other list endpoints — a single
+    // page would silently drop a requester's older requests.
+    final rows = await fetchAllPages(dio, RestPaths.requests);
+    return rows.map(_mapRequest).toList(growable: false);
   }
 
   @override

@@ -4,6 +4,7 @@ import '../../../features/profile/data/datasources/profile_remote_data_source.da
 import '../../../features/profile/data/models/profile_model.dart';
 import '../constants/rest_paths.dart';
 import '../reference/reference_resolver.dart';
+import '../rest_error_mapper.dart' show RestValidationException;
 import 'auth_rest_data_source.dart' show emailToUsername;
 
 /// Thrown when the app asks for a capability the REST backend does not expose.
@@ -37,6 +38,16 @@ class ProfileRestDataSource implements ProfileRemoteDataSource {
 
   @override
   Future<ProfileModel> updateProfile(ProfileModel profile) async {
+    // Resolve + guard before PATCHing: sending a null FK would 400 or, worse,
+    // null out the user's stored wilaya/blood type. Mirrors createRequest/signUp.
+    final wilayaId = await reference.wilayaIdForName(profile.city);
+    final bloodTypeId = await reference.bloodTypeIdForLabel(profile.bloodType);
+    if (wilayaId == null) {
+      throw RestValidationException('Unknown wilaya: ${profile.city}');
+    }
+    if (bloodTypeId == null) {
+      throw RestValidationException('Unknown blood type: ${profile.bloodType}');
+    }
     final response = await dio.patch<Map<String, dynamic>>(
       RestPaths.profile,
       data: {
@@ -44,8 +55,8 @@ class ProfileRestDataSource implements ProfileRemoteDataSource {
         'phone': profile.phone,
         'gender': profile.gender,
         'date_of_birth': profile.dateOfBirth,
-        'wilaya': await reference.wilayaIdForName(profile.city),
-        'blood_type': await reference.bloodTypeIdForLabel(profile.bloodType),
+        'wilaya': wilayaId,
+        'blood_type': bloodTypeId,
         'weight_kg': profile.weight?.toString(),
         // The app edits chronic diseases as free text; Django keeps free-text
         // entries as `custom_conditions` (per-account, not added to the shared

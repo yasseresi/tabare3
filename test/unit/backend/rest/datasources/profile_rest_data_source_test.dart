@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tabare3/backend/rest/constants/rest_paths.dart';
 import 'package:tabare3/backend/rest/datasources/profile_rest_data_source.dart';
+import 'package:tabare3/backend/rest/rest_error_mapper.dart' show RestValidationException;
 import 'package:tabare3/backend/rest/reference/reference_models.dart';
 import 'package:tabare3/backend/rest/reference/reference_remote_data_source.dart';
 import 'package:tabare3/backend/rest/reference/reference_resolver.dart';
@@ -126,6 +127,27 @@ void main() {
       () => source.uploadAvatar('/tmp/x.png'),
       throwsA(isA<UnsupportedRestOperation>()),
     );
+  });
+
+  test('updateProfile fails fast (no PATCH) when the wilaya is unknown', () async {
+    expect(
+      () => source.updateProfile(
+        const ProfileModel(
+          id: '42',
+          email: 'ahmed@tabara3.dz',
+          username: 'ahmed',
+          fullName: 'Ahmed Ben Ali',
+          phone: '0555123456',
+          dateOfBirth: '1990-03-07',
+          gender: 'male',
+          bloodType: 'O+',
+          weight: 72,
+          city: 'مدينة غير معروفة', // not in reference data
+        ),
+      ),
+      throwsA(isA<RestValidationException>()),
+    );
+    verifyNever(() => dio.patch<Map<String, dynamic>>(RestPaths.profile, data: any(named: 'data')));
   });
 
   test('getProfile joins known + custom conditions into free text', () async {

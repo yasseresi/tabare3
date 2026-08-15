@@ -28,6 +28,7 @@ void main() {
 
   setUp(() {
     dio = MockDio();
+    when(() => dio.options).thenReturn(BaseOptions(baseUrl: 'https://x/api/v1'));
     source = NotificationRestDataSource(dio);
   });
 
