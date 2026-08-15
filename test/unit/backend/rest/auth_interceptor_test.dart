@@ -130,4 +130,129 @@ void main() {
     expect(store.cleared, isTrue);
     expect(expired, isTrue);
   });
+
+  test('a burst of concurrent 401s triggers a single refresh', () async {
+    final store = FakeTokenStore(access: 'expired', refresh: 'r1');
+    var refreshCalls = 0;
+
+    final refreshAdapter = RoutingAdapter()
+      // side-effect count of the refresh POST
+      ..on((o) {
+        if (o.path == RestPaths.refresh) refreshCalls++;
+        return o.path == RestPaths.refresh;
+      }, 200, {'access': 'a2', 'refresh': 'r2'})
+      // the replayed request (carries the new bearer) succeeds
+      ..on((o) => o.path == RestPaths.profile, 200, {'ok': true});
+    final refreshClient = Dio(BaseOptions(baseUrl: 'https://x/api/v1'))
+      ..httpClientAdapter = refreshAdapter;
+
+    // Protected endpoint 401s only for the stale token; the fresh one passes.
+    final protectedAdapter = RoutingAdapter()
+      ..on(
+        (o) => o.path == RestPaths.profile &&
+            o.headers[authorizationHeader] == 'Bearer expired',
+        401,
+        {'detail': 'expired'},
+      )
+      ..on((o) => o.path == RestPaths.profile, 200, {'ok': true});
+    final dio = buildProtected(
+      protectedAdapter,
+      AuthInterceptor(tokenStore: store, refreshClient: refreshClient),
+    );
+
+    final results = await Future.wait([
+      dio.get<dynamic>(RestPaths.profile),
+      dio.get<dynamic>(RestPaths.profile),
+      dio.get<dynamic>(RestPaths.profile),
+    ]);
+
+    expect(results.every((r) => r.statusCode == 200), isTrue);
+    expect(refreshCalls, 1); // one refresh shared across the burst
+    expect(store.access, 'a2');
+  });
+
+  test('a replay that 401s again propagates without a second refresh', () async {
+    final store = FakeTokenStore(access: 'expired', refresh: 'r1');
+    var refreshCalls = 0;
+
+    final refreshAdapter = RoutingAdapter()
+      ..on((o) {
+        if (o.path == RestPaths.refresh) refreshCalls++;
+        return o.path == RestPaths.refresh;
+      }, 200, {'access': 'a2'})
+      // even the replayed request 401s (token still rejected)
+      ..on((o) => o.path == RestPaths.profile, 401, {'detail': 'nope'});
+    final refreshClient = Dio(BaseOptions(baseUrl: 'https://x/api/v1'))
+      ..httpClientAdapter = refreshAdapter;
+
+    final protectedAdapter = RoutingAdapter()
+      ..on((o) => o.path == RestPaths.profile, 401, {'detail': 'expired'});
+    final dio = buildProtected(
+      protectedAdapter,
+      AuthInterceptor(tokenStore: store, refreshClient: refreshClient),
+    );
+
+    await expectLater(
+      dio.get<dynamic>(RestPaths.profile),
+      throwsA(isA<DioException>()),
+    );
+    expect(refreshCalls, 1); // exactly one refresh, no infinite loop
+  });
+
+  test('non-401 errors pass through untouched (no refresh)', () async {
+    final store = FakeTokenStore(access: 'a1', refresh: 'r1');
+    var refreshCalls = 0;
+
+    final refreshAdapter = RoutingAdapter()
+      ..on((o) {
+        if (o.path == RestPaths.refresh) refreshCalls++;
+        return o.path == RestPaths.refresh;
+      }, 200, {'access': 'a2'});
+    final refreshClient = Dio(BaseOptions(baseUrl: 'https://x/api/v1'))
+      ..httpClientAdapter = refreshAdapter;
+
+    final protectedAdapter = RoutingAdapter()
+      ..on((o) => o.path == RestPaths.profile, 500, {'detail': 'boom'});
+    final dio = buildProtected(
+      protectedAdapter,
+      AuthInterceptor(tokenStore: store, refreshClient: refreshClient),
+    );
+
+    await expectLater(
+      dio.get<dynamic>(RestPaths.profile),
+      throwsA(isA<DioException>()),
+    );
+    expect(refreshCalls, 0);
+  });
+
+  test('onRequest attaches the bearer only when a token is stored', () async {
+    final adapter = RoutingAdapter()
+      ..on((o) => o.path == RestPaths.profile, 200, {'ok': true});
+    final refreshClient = Dio(BaseOptions(baseUrl: 'https://x/api/v1'))
+      ..httpClientAdapter = adapter;
+
+    // token present
+    final withToken = FakeTokenStore(access: 'a1', refresh: 'r1');
+    final dio1 = buildProtected(
+      RoutingAdapter()
+        ..on((o) {
+          expect(o.headers[authorizationHeader], 'Bearer a1');
+          return o.path == RestPaths.profile;
+        }, 200, {'ok': true}),
+      AuthInterceptor(tokenStore: withToken, refreshClient: refreshClient),
+    );
+    await dio1.get<dynamic>(RestPaths.profile);
+
+    // no token
+    final noToken = FakeTokenStore();
+    final dio2 = buildProtected(
+      RoutingAdapter()
+        ..on((o) {
+          expect(o.headers.containsKey(authorizationHeader), isFalse);
+          return o.path == RestPaths.profile;
+        }, 200, {'ok': true}),
+      AuthInterceptor(tokenStore: noToken, refreshClient: refreshClient),
+    );
+    await dio2.get<dynamic>(RestPaths.profile);
+  });
 }

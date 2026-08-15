@@ -57,6 +57,22 @@ class AuthInterceptor extends QueuedInterceptor {
       return handler.next(err);
     }
 
+    // QueuedInterceptor serialises onError, so a burst of 401s arrives one at a
+    // time. If a preceding request already refreshed the token, the stored
+    // access no longer matches the one this request sent — just replay with the
+    // fresh token instead of refreshing again (single refresh per burst).
+    final usedToken = _bearerOf(request);
+    final currentAccess = await _tokenStore.readAccess();
+    if (currentAccess != null &&
+        currentAccess.isNotEmpty &&
+        currentAccess != usedToken) {
+      try {
+        return handler.resolve(await _replay(request, currentAccess));
+      } on DioException catch (retryErr) {
+        return handler.next(retryErr);
+      }
+    }
+
     final refresh = await _tokenStore.readRefresh();
     if (refresh == null || refresh.isEmpty) {
       await _expire();
@@ -85,6 +101,14 @@ class AuthInterceptor extends QueuedInterceptor {
       await _expire();
       return handler.next(err);
     }
+  }
+
+  /// The bare access token this request carried (without the `Bearer ` prefix),
+  /// used to detect whether the token was refreshed by a concurrent request.
+  String? _bearerOf(RequestOptions request) {
+    final header = request.headers[authorizationHeader]?.toString();
+    if (header == null) return null;
+    return header.startsWith('Bearer ') ? header.substring(7) : header;
   }
 
   Future<Response<dynamic>> _replay(
