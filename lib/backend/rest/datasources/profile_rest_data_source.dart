@@ -47,6 +47,11 @@ class ProfileRestDataSource implements ProfileRemoteDataSource {
         'wilaya': await reference.wilayaIdForName(profile.city),
         'blood_type': await reference.bloodTypeIdForLabel(profile.bloodType),
         'weight_kg': profile.weight?.toString(),
+        // The app edits chronic diseases as free text; Django keeps free-text
+        // entries as `custom_conditions` (per-account, not added to the shared
+        // list). No id matching, so `condition_ids` stays empty.
+        'condition_ids': const <int>[],
+        'custom_conditions': _splitConditions(profile.chronicDiseases),
       },
     );
     return _mapProfile(response.data ?? const {});
@@ -98,7 +103,33 @@ class ProfileRestDataSource implements ProfileRemoteDataSource {
       isDonor: mode == 'donor',
       isRecipient: mode == 'recipient',
       isActive: (json['status']?.toString() ?? 'active') == 'active',
+      chronicDiseases: _joinConditions(json),
     );
+  }
+
+  /// Django exposes known conditions as `conditions` (objects with `name_ar`)
+  /// and free-text ones as `chronic_conditions` (strings). The app shows both
+  /// as one free-text field, so they are joined.
+  String? _joinConditions(Map<String, dynamic> json) {
+    final names = <String>[
+      ...?(json['conditions'] as List<dynamic>?)
+          ?.whereType<Map<String, dynamic>>()
+          .map((c) => c['name_ar']?.toString() ?? '')
+          .where((s) => s.isNotEmpty),
+      ...?(json['chronic_conditions'] as List<dynamic>?)
+          ?.map((c) => c.toString())
+          .where((s) => s.isNotEmpty),
+    ];
+    return names.isEmpty ? null : names.join('، ');
+  }
+
+  List<String> _splitConditions(String? text) {
+    if (text == null || text.trim().isEmpty) return const [];
+    return text
+        .split(RegExp('[،,]'))
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList(growable: false);
   }
 
   double? _asDouble(dynamic v) {

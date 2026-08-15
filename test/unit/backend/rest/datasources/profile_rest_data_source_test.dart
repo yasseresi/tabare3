@@ -127,4 +127,46 @@ void main() {
       throwsA(isA<UnsupportedRestOperation>()),
     );
   });
+
+  test('getProfile joins known + custom conditions into free text', () async {
+    when(() => dio.get<Map<String, dynamic>>(RestPaths.profile)).thenAnswer(
+      (_) async => _res(RestPaths.profile, {
+        ..._profileJson,
+        'conditions': [
+          {'id': 1, 'name_ar': 'السكري'},
+        ],
+        'chronic_conditions': ['حساسية'],
+      }),
+    );
+
+    final p = await source.getProfile();
+    expect(p.chronicDiseases, 'السكري، حساسية');
+  });
+
+  test('updateProfile sends free-text chronic diseases as custom_conditions', () async {
+    when(() => dio.patch<Map<String, dynamic>>(RestPaths.profile, data: any(named: 'data')))
+        .thenAnswer((_) async => _res(RestPaths.profile, _profileJson));
+
+    await source.updateProfile(
+      const ProfileModel(
+        id: '42',
+        email: 'ahmed@tabara3.dz',
+        username: 'ahmed',
+        fullName: 'Ahmed Ben Ali',
+        phone: '0555123456',
+        dateOfBirth: '1990-03-07',
+        gender: 'male',
+        bloodType: 'O+',
+        weight: 72,
+        city: 'الجزائر',
+        chronicDiseases: 'السكري، حساسية',
+      ),
+    );
+
+    final body = verify(
+      () => dio.patch<Map<String, dynamic>>(RestPaths.profile, data: captureAny(named: 'data')),
+    ).captured.single as Map<String, dynamic>;
+    expect(body['custom_conditions'], ['السكري', 'حساسية']);
+    expect(body['condition_ids'], isEmpty);
+  });
 }
