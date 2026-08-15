@@ -63,7 +63,8 @@ class AuthInterceptor extends QueuedInterceptor {
     // fresh token instead of refreshing again (single refresh per burst).
     final usedToken = _bearerOf(request);
     final currentAccess = await _tokenStore.readAccess();
-    if (currentAccess != null &&
+    if (usedToken != null &&
+        currentAccess != null &&
         currentAccess.isNotEmpty &&
         currentAccess != usedToken) {
       try {
