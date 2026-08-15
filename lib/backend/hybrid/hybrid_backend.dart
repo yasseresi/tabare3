@@ -22,7 +22,7 @@ import '../rest/datasources/donor_card_rest_data_source.dart';
 import '../rest/datasources/donor_feed_rest_data_source.dart';
 import '../rest/datasources/profile_rest_data_source.dart';
 import '../rest/datasources/request_rest_data_source.dart';
-import '../rest/datasources/rest_data_sources.dart';
+import '../rest/datasources/notification_rest_data_source.dart';
 import '../rest/reference/reference_remote_data_source.dart';
 import '../rest/reference/reference_resolver.dart';
 import '../rest/rest_client.dart';

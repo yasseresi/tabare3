@@ -14,18 +14,16 @@ import 'datasources/donor_card_rest_data_source.dart';
 import 'datasources/donor_feed_rest_data_source.dart';
 import 'datasources/profile_rest_data_source.dart';
 import 'datasources/request_rest_data_source.dart';
-import 'datasources/rest_data_sources.dart';
+import 'datasources/notification_rest_data_source.dart';
 import 'reference/reference_remote_data_source.dart';
 import 'reference/reference_resolver.dart';
 import 'rest_client.dart';
 import 'rest_error_mapper.dart';
 import 'token_store.dart';
 
-/// Custom REST backend — scaffold for the migration off Supabase.
-///
-/// Endpoints are not implemented yet (see `datasources/rest_data_sources.dart`),
-/// but the wiring is complete: switching `lib/backend/active_backend.dart` to
-/// `RestBackend()` compiles and boots without touching any feature code.
+/// Custom REST backend — the full Django REST implementation of every feature
+/// data source. Point `lib/backend/active_backend.dart` at `RestBackend()` for
+/// an all-REST build (the migration reaches this once Supabase is retired).
 class RestBackend implements Backend {
   RestBackend({RestClientFactory? clientFactory})
     : _clientFactory = clientFactory ?? RestClientFactory();

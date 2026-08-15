@@ -84,15 +84,5 @@ void main() {
       expect(sl<DonorFeedRemoteDataSource>(), isNotNull);
     });
 
-    test('unimplemented endpoints fail loudly instead of silently', () async {
-      final backend = RestBackend();
-      await backend.initialize();
-      await init(backend);
-
-      expect(
-        () => sl<NotificationRemoteDataSource>().listNotifications(),
-        throwsA(isA<UnimplementedError>()),
-      );
-    });
   });
 }
