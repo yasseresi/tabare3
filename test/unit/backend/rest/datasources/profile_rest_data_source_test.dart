@@ -150,6 +150,27 @@ void main() {
     verifyNever(() => dio.patch<Map<String, dynamic>>(RestPaths.profile, data: any(named: 'data')));
   });
 
+  test('updateProfile fails fast (no PATCH) when the blood type is unknown', () async {
+    expect(
+      () => source.updateProfile(
+        const ProfileModel(
+          id: '42',
+          email: 'ahmed@tabara3.dz',
+          username: 'ahmed',
+          fullName: 'Ahmed Ben Ali',
+          phone: '0555123456',
+          dateOfBirth: '1990-03-07',
+          gender: 'male',
+          bloodType: 'ZZ', // valid city, unresolvable blood type
+          weight: 72,
+          city: 'الجزائر',
+        ),
+      ),
+      throwsA(isA<RestValidationException>()),
+    );
+    verifyNever(() => dio.patch<Map<String, dynamic>>(RestPaths.profile, data: any(named: 'data')));
+  });
+
   test('getProfile joins known + custom conditions into free text', () async {
     when(() => dio.get<Map<String, dynamic>>(RestPaths.profile)).thenAnswer(
       (_) async => _res(RestPaths.profile, {

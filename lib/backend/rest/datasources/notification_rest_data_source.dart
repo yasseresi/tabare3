@@ -27,20 +27,6 @@ class NotificationRestDataSource implements NotificationRemoteDataSource {
     return rows.map(_map).toList(growable: false);
   }
 
-  /// First page only — used by the 30s poll so a user with many notifications
-  /// doesn't walk every page each tick just to refresh the list + badge.
-  Future<List<NotificationModel>> _listFirstPage() async {
-    final response = await dio.get<Map<String, dynamic>>(
-      RestPaths.notifications,
-    );
-    final results = response.data?['results'];
-    if (results is! List) return const [];
-    return results
-        .whereType<Map<String, dynamic>>()
-        .map(_map)
-        .toList(growable: false);
-  }
-
   @override
   Future<NotificationModel> markAsRead(String notificationId) async {
     final response = await dio.post<Map<String, dynamic>>(
@@ -61,7 +47,7 @@ class NotificationRestDataSource implements NotificationRemoteDataSource {
 
     Future<void> tick() async {
       try {
-        final list = await _listFirstPage();
+        final list = await listNotifications();
         if (!closed) controller.add(list);
       } catch (error, stack) {
         if (!closed) controller.addError(error, stack);
