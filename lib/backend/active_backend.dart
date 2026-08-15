@@ -1,23 +1,13 @@
 import '../core/backend/backend.dart';
-import 'hybrid/backend_feature.dart';
-import 'hybrid/hybrid_backend.dart';
+import 'rest/rest_backend.dart';
 
 /// The backend the app runs against.
 ///
-/// During the Supabase → REST migration this is a [HybridBackend]: features
-/// listed in [_restFeatures] are served by the REST API, everything else stays
-/// on Supabase. Flip a feature by adding its [BackendFeature] here once its REST
-/// data source is implemented and verified live.
+/// **Full cutover:** the app now runs entirely on the Django REST API. Every
+/// feature data source is served by [RestBackend]; Supabase is no longer booted
+/// or called at runtime.
 ///
-/// Empty set == fully on Supabase (behaviour identical to the old
-/// `SupabaseBackend`).
-const Set<BackendFeature> _restFeatures = {
-  BackendFeature.auth,
-  BackendFeature.profile,
-  BackendFeature.requests,
-  BackendFeature.donorFeed,
-  BackendFeature.donorCard,
-  BackendFeature.notifications,
-};
-
-final Backend activeBackend = HybridBackend(restFeatures: _restFeatures);
+/// `HybridBackend` (with a `BackendFeature` set) remains in the tree as a
+/// per-feature rollback path until the Supabase data sources are deleted in the
+/// follow-up. To fall back, swap this line for a `HybridBackend(restFeatures:…)`.
+final Backend activeBackend = RestBackend();
