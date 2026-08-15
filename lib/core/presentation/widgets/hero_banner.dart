@@ -46,8 +46,7 @@ class HeroBanner extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SizedBox(
-            width: AppSize.s200,
+          Expanded(
             child: Column(
               children: [
                 Text(

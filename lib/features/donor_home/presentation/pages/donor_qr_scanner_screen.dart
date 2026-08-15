@@ -194,7 +194,7 @@ class _DonorQrScannerScreenState extends State<DonorQrScannerScreen> {
     }
     if (state is DonorFeedError) {
       // The failure already carries a localized message (mapped from the
-      // redeem RPC's P0001 code in SupabaseErrorMapper).
+      // backend's scan error by RestErrorMapper).
       setState(() {
         _submitting = false;
         _errorMessage = state.failure.message.isNotEmpty

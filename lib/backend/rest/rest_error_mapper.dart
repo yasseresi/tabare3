@@ -16,10 +16,8 @@ class RestValidationException implements Exception {
   String toString() => 'RestValidationException: $message';
 }
 
-/// Maps [DioException]s from the custom REST backend to domain [Failure]s.
-///
-/// Mirrors what `SupabaseErrorMapper` does for the Supabase SDK, so the rest of
-/// the app sees the same failure types regardless of the active backend.
+/// Maps [DioException]s from the Django REST backend to domain [Failure]s, so
+/// the rest of the app only ever sees vendor-neutral failure types.
 class RestErrorMapper implements BackendErrorMapper {
   const RestErrorMapper();
 

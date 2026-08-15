@@ -2,8 +2,8 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:supabase_flutter/supabase_flutter.dart' show AuthException;
-import 'package:tabare3/backend/supabase/supabase_error_mapper.dart';
+import 'package:dio/dio.dart';
+import 'package:tabare3/backend/rest/rest_error_mapper.dart';
 import 'package:tabare3/core/error/error_handler.dart';
 import 'package:tabare3/core/error/failures.dart';
 import 'package:tabare3/core/utils/error_messages.dart';
@@ -155,11 +155,20 @@ void main() {
 
   group('sign-in failure disclosure', () {
     // The repository is the seam that tells the mapper which operation is
-    // running. With the real Supabase mapper installed, a GoTrue answer that
-    // names the missing user has to come out of login as the generic message —
-    // and out of signup unchanged.
+    // running. With the REST mapper installed, a 4xx on the login path must come
+    // out as the generic message; on signup it stays a field-level validation
+    // error the user can act on.
+    DioException dioStatus(int status) => DioException(
+      requestOptions: RequestOptions(path: '/'),
+      type: DioExceptionType.badResponse,
+      response: Response<void>(
+        requestOptions: RequestOptions(path: '/'),
+        statusCode: status,
+      ),
+    );
+
     setUp(() {
-      ErrorHandler.configure(const SupabaseErrorMapper());
+      ErrorHandler.configure(const RestErrorMapper());
       when(() => mockNetworkInfo.isConnected).thenAnswer((_) async => true);
     });
 
@@ -171,7 +180,7 @@ void main() {
           username: any(named: 'username'),
           password: any(named: 'password'),
         ),
-      ).thenThrow(AuthException('User not found', statusCode: '400'));
+      ).thenThrow(dioStatus(400));
 
       final result = await repository.loginWithUsernamePassword(
         username: 'ghost',
@@ -184,10 +193,10 @@ void main() {
       );
     });
 
-    test('signup keeps the actionable "already registered" message', () async {
+    test('signup surfaces a field-level validation error, not the generic one', () async {
       when(
         () => mockDataSource.signUp(params: any(named: 'params')),
-      ).thenThrow(AuthException('User already registered', statusCode: '400'));
+      ).thenThrow(dioStatus(400));
 
       final result = await repository.signupWithUsernamePassword(
         params: SignupParams(
@@ -204,7 +213,7 @@ void main() {
 
       expect(
         result.fold((f) => f.message, (_) => null),
-        ErrorMessages.getMessage(AppStrings.userAlreadyRegistered),
+        ErrorMessages.getMessage(AppStrings.missingRequiredFields),
       );
     });
   });
