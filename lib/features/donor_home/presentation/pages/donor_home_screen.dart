@@ -291,17 +291,21 @@ class _DonorOverview extends StatelessWidget {
             else
               ...feed.compatibleRequests
                   .take(AppConstants.paginationLimit)
-                  .map(
-                    (request) => Padding(
+                  .map((request) {
+                    final accepted = feed.committedRequestIds.contains(
+                      request.id,
+                    );
+                    return Padding(
                       padding: const EdgeInsets.only(bottom: AppPadding.p15),
                       child: DonorRequestCard(
                         request: request,
-                        onAccept: loaded.isMutating
+                        isAccepted: accepted,
+                        onAccept: (loaded.isMutating || accepted)
                             ? null
                             : () => acceptDonorRequest(context, request.id),
                       ),
-                    ),
-                  ),
+                    );
+                  }),
           ],
         );
       },

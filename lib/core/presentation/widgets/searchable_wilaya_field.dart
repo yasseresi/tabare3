@@ -14,7 +14,16 @@ class SearchableWilayaField extends StatelessWidget {
   final TextEditingController? controller;
   final String? Function(String?)? validator;
 
-  const SearchableWilayaField({super.key, this.controller, this.validator});
+  /// Fired whenever the selected wilaya text changes, so the parent can rebuild
+  /// dependent fields (e.g. narrow the hospital list to the chosen wilaya).
+  final ValueChanged<String>? onChanged;
+
+  const SearchableWilayaField({
+    super.key,
+    this.controller,
+    this.validator,
+    this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -83,5 +92,6 @@ class SearchableWilayaField extends StatelessWidget {
 
   void _syncExternalController(String value) {
     controller?.text = value;
+    onChanged?.call(value);
   }
 }

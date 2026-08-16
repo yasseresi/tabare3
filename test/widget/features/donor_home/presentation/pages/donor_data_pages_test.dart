@@ -193,6 +193,43 @@ void main() {
     expect(find.text('A+'), findsOneWidget);
   });
 
+  testWidgets(
+    'a request with an active appointment shows accepted, not the accept action',
+    (tester) async {
+      // loadedState pairs request-1 with a confirmed appointment for it.
+      await pumpPage(tester, const DonorRequestsScreen());
+
+      expect(find.text('تم القبول'), findsOneWidget);
+      expect(find.text('قبول الطلب'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'a request whose appointment was cancelled can be accepted again',
+    (tester) async {
+      when(() => bloc.state).thenReturn(
+        DonorFeedLoaded(
+          feed: DonorFeedEntity(
+            availability: loadedState.feed.availability,
+            compatibleRequests: [request],
+            availableCampaigns: const [],
+            appointments: [
+              appointment.copyWith(
+                status: DonationAppointmentStatus.cancelled,
+              ),
+            ],
+          ),
+          records: const [],
+        ),
+      );
+
+      await pumpPage(tester, const DonorRequestsScreen());
+
+      expect(find.text('قبول الطلب'), findsOneWidget);
+      expect(find.text('تم القبول'), findsNothing);
+    },
+  );
+
   testWidgets('donor request notifications stay delegated to the donor shell', (
     tester,
   ) async {

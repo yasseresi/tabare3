@@ -295,4 +295,20 @@ abstract class DonorFeedEntity with _$DonorFeedEntity {
   }
 
   bool get hasBlockingAppointment => activeAppointment != null;
+
+  /// Request ids the donor has already committed to via a non-cancelled
+  /// appointment (pending / confirmed / completed). The feed keeps returning
+  /// these while the request stays active, so the UI uses this to drop the
+  /// accept action and keep acceptance idempotent.
+  Set<String> get committedRequestIds {
+    final ids = <String>{};
+    for (final appointment in appointments) {
+      final requestId = appointment.bloodRequest?.id;
+      if (requestId == null) continue;
+      if (appointment.status != DonationAppointmentStatus.cancelled) {
+        ids.add(requestId);
+      }
+    }
+    return ids;
+  }
 }

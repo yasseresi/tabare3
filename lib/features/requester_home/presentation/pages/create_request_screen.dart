@@ -246,14 +246,20 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             controller: _unitsController,
             keyboardType: TextInputType.number,
           ),
-          if (!isForOther)
-            SearchableWilayaField(controller: _wilayaController),
+          SearchableWilayaField(
+            controller: _wilayaController,
+            // Wilaya drives the hospital list; rebuild and drop any stale
+            // hospital picked under the previous wilaya.
+            onChanged: (_) => setState(() => _hospitalId = null),
+          ),
           RequestDropdownField<String>(
             fieldKey: WidgetKeys.requestHospitalField,
             value: hospitals.any((hospital) => hospital.id == _hospitalId)
                 ? _hospitalId
                 : null,
-            hintText: AppStrings.hospitalNameField.tr(),
+            hintText: _wilayaSelected
+                ? AppStrings.hospitalNameField.tr()
+                : AppStrings.selectWilayaFirst.tr(),
             prefixSvg: SvgAssets.requestHospital,
             items: hospitals
                 .map(
@@ -325,6 +331,18 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             color: ColorManager.error,
           ),
         ),
+      ] else if (_wilayaSelected &&
+          hospitals.isEmpty &&
+          state.status != RequestViewStatus.loading) ...[
+        const SizedBox(height: AppSize.s12),
+        Text(
+          AppStrings.noHospitalsInWilaya.tr(),
+          textAlign: TextAlign.center,
+          style: getRegularStyle(
+            fontSize: FontSize.s12,
+            color: ColorManager.error,
+          ),
+        ),
       ],
       const SizedBox(height: AppSize.s12),
       RequestFooterButtons(
@@ -353,11 +371,16 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
           )
           .toList();
 
+  /// True once the field holds a recognised wilaya name.
+  bool get _wilayaSelected =>
+      algerianWilayas.contains(_wilayaController.text.trim());
+
   /// Hospitals narrowed to the wilaya typed into the Figma `الولاية` field —
-  /// a view-level filter over the list the bloc already loaded.
+  /// a view-level filter over the list the bloc already loaded. Empty until a
+  /// wilaya is chosen so the picker never lists every hospital in the country.
   List<HospitalEntity> _visibleHospitals(RequestState state) {
     final index = algerianWilayas.indexOf(_wilayaController.text.trim());
-    if (index < AppSize.s0.toInt()) return state.hospitals;
+    if (index < AppSize.s0.toInt()) return const [];
     final wilayaId = index + AppSize.s1.toInt();
     return state.hospitals
         .where((hospital) => hospital.wilayaId == wilayaId)
