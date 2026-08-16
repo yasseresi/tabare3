@@ -43,6 +43,18 @@ class UsernameTaken extends AuthState {
   List<Object?> get props => [username];
 }
 
+/// The username cleared the availability check (or the check failed and is
+/// treated advisorily as free). Emitted so the sign-up form can advance past
+/// step 1 only once the "Next" tap's check has come back.
+class UsernameAvailable extends AuthState {
+  final String username;
+
+  const UsernameAvailable(this.username);
+
+  @override
+  List<Object?> get props => [username];
+}
+
 class Unauthenticated extends AuthState {}
 
 class RoleUpdated extends AuthState {

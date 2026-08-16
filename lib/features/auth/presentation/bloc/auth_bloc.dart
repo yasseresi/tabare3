@@ -82,9 +82,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
   }
 
-  /// Blur-time check. Stays silent unless the username is taken: no loading
-  /// state, and no state at all on the happy path, so it cannot interrupt
-  /// whatever the user is typing next.
+  /// "Next"-time check on sign-up step 1. Emits [UsernameTaken] to hold the
+  /// user on the field, or [UsernameAvailable] to let the form advance. The
+  /// check is advisory: a failure (offline, RPC missing) is treated as free so
+  /// it never blocks progress, with the backend's uniqueness error remaining
+  /// authoritative at submit. No loading state — the form spins its own button.
   Future<void> _onUsernameCheckRequested(
     UsernameCheckRequested event,
     Emitter<AuthState> emit,
@@ -94,9 +96,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     final availability = await checkUsernameAvailability(username);
     final isTaken = availability.fold((_) => false, (available) => !available);
-    if (isTaken) {
-      emit(UsernameTaken(username));
-    }
+    emit(isTaken ? UsernameTaken(username) : UsernameAvailable(username));
   }
 
   Future<void> _onSignOutRequested(

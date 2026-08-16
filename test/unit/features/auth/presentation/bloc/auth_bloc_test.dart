@@ -198,14 +198,14 @@ void main() {
     );
 
     blocTest<AuthBloc, AuthState>(
-      'stays silent when the username is free',
+      'reports the username available when it is free',
       build: () => bloc,
       act: (bloc) => bloc.add(const UsernameCheckRequested('testuser')),
-      expect: () => <AuthState>[],
+      expect: () => [const UsernameAvailable('testuser')],
     );
 
     blocTest<AuthBloc, AuthState>(
-      'stays silent when the check fails',
+      'treats a failed check as available so it never blocks progress',
       build: () {
         when(
           () => mockCheckUsername(any()),
@@ -213,7 +213,7 @@ void main() {
         return bloc;
       },
       act: (bloc) => bloc.add(const UsernameCheckRequested('testuser')),
-      expect: () => <AuthState>[],
+      expect: () => [const UsernameAvailable('testuser')],
     );
 
     blocTest<AuthBloc, AuthState>(

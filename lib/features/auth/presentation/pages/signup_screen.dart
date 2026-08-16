@@ -43,6 +43,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   /// itself carries the error; it clears as soon as a different one is typed.
   String? _takenUsername;
 
+  /// True while the step-1 "Next" tap is waiting on the username availability
+  /// check. Spins the button and swallows repeat taps until the result lands.
+  bool _checkingUsername = false;
+
   final _usernameController = TextEditingController();
   final _fullNameController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -72,8 +76,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void _nextStep() {
+    if (_checkingUsername) return;
     if (!_formKey.currentState!.validate()) return;
-    if (_currentStep < 3) {
+    if (_currentStep == 1) {
+      // Only leave step 1 once the backend confirms the username is free, so
+      // the collision is reported here on "Next" rather than on field blur.
+      setState(() => _checkingUsername = true);
+      context.read<AuthBloc>().add(
+        UsernameCheckRequested(_usernameController.text.trim()),
+      );
+    } else if (_currentStep < 3) {
       setState(() => _currentStep++);
     } else {
       if (!_agreeToTerms) return;
@@ -287,7 +299,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: (_currentStep == 3 && !_agreeToTerms) ? null : _nextStep,
+        onPressed: (_checkingUsername || (_currentStep == 3 && !_agreeToTerms))
+            ? null
+            : _nextStep,
         style: ElevatedButton.styleFrom(
           backgroundColor: ColorManager.primary,
           foregroundColor: ColorManager.white,
@@ -304,9 +318,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
             lineHeight: LineHeight.h24,
           ),
         ),
-        child: Text(
-          _currentStep == 3 ? AppStrings.signup.tr() : AppStrings.next.tr(),
-        ),
+        child: _checkingUsername
+            ? SizedBox(
+                width: AppSize.s20,
+                height: AppSize.s20,
+                child: CircularProgressIndicator(
+                  strokeWidth: AppSize.s2,
+                  valueColor: AlwaysStoppedAnimation<Color>(ColorManager.white),
+                ),
+              )
+            : Text(
+                _currentStep == 3
+                    ? AppStrings.signup.tr()
+                    : AppStrings.next.tr(),
+              ),
       ),
     );
   }
@@ -409,21 +434,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
           validator: validateFullName,
         ),
         const SizedBox(height: AppSize.s15),
-        Focus(
-          // Check on blur as well as on submit, so a collision is reported
-          // before the user has filled in the other two steps.
-          onFocusChange: (hasFocus) {
-            if (hasFocus) return;
-            final username = _usernameController.text.trim();
-            if (username.isEmpty) return;
-            context.read<AuthBloc>().add(UsernameCheckRequested(username));
-          },
-          child: AppTextField(
-            hintText: AppStrings.username.tr(),
-            prefixSvg: SvgAssets.person,
-            controller: _usernameController,
-            validator: _validateUsernameField,
-          ),
+        AppTextField(
+          hintText: AppStrings.username.tr(),
+          prefixSvg: SvgAssets.person,
+          controller: _usernameController,
+          validator: _validateUsernameField,
         ),
         const SizedBox(height: AppSize.s15),
         AppTextField(
@@ -603,10 +618,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
           },
         ),
       );
+    } else if (state is UsernameAvailable) {
+      // The step-1 "Next" check cleared: drop the spinner and advance. Ignore
+      // it in any other context (it can only fire from that tap).
+      if (_checkingUsername) {
+        setState(() {
+          _checkingUsername = false;
+          _currentStep = 2;
+        });
+      }
     } else if (state is UsernameTaken) {
-      // The check runs on submit from step 3, so walk the user back to the
-      // field that has to change and let the form paint the error on it.
+      // Fires from the step-1 "Next" check or the final submit; either way walk
+      // the user back to the field that has to change and paint the error on it.
       setState(() {
+        _checkingUsername = false;
         _takenUsername = state.username;
         _currentStep = 1;
       });
