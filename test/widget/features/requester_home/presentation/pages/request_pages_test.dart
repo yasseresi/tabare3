@@ -5,9 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tabare3/core/constants/widget_keys.dart';
+import 'package:tabare3/core/session/session_manager.dart';
 import 'package:tabare3/core/usecases/usecase.dart';
+import 'package:tabare3/features/auth/domain/entities/user_entity.dart';
 import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:tabare3/features/notifications/presentation/bloc/notifications_bloc.dart';
+import 'package:tabare3/injection_container.dart';
 import 'package:tabare3/features/requester_home/domain/entities/blood_request_entity.dart';
 import 'package:tabare3/features/requester_home/domain/usecases/request_usecases.dart';
 import 'package:tabare3/features/requester_home/presentation/bloc/request_bloc.dart';
@@ -537,6 +540,93 @@ void main() {
     expect(captured.bloodType, 'O+');
     expect(captured.unitsNeeded, 2);
   });
+
+  testWidgets(
+    'self request locks blood type to the profile value and submits it',
+    (tester) async {
+      when(() => getRequests(any())).thenAnswer((_) async => const Right([]));
+      when(
+        () => createRequest(any()),
+      ).thenAnswer((invocation) async => Right(request));
+
+      sl.registerLazySingleton(() => SessionManager());
+      sl<SessionManager>().setUser(
+        const UserEntity(
+          id: 'recipient-id',
+          email: 'me@example.com',
+          username: 'me',
+          fullName: 'Me',
+          isRecipient: true,
+          bloodType: 'AB-',
+        ),
+      );
+      addTearDown(() => sl.reset());
+
+      await pumpTestApp(
+        tester,
+        BlocProvider(
+          create: (_) => buildBloc(),
+          child: const CreateRequestScreen(),
+        ),
+      );
+
+      await tester.tap(find.text('تأكيد'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(WidgetKeys.requestForSelfButton));
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.byKey(WidgetKeys.requestHospitalField),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(find.byKey(WidgetKeys.requestHospitalField));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(WidgetKeys.requestHospitalField));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('مستشفى مصطفى باشا').last);
+      await tester.pumpAndSettle();
+
+      // Blood type is shown read-only from the profile — no dropdown to open.
+      await tester.scrollUntilVisible(
+        find.byKey(WidgetKeys.requestBloodTypeField),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('AB-'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(WidgetKeys.requestBloodTypeField),
+          matching: find.byType(DropdownButtonFormField<String>),
+        ),
+        findsNothing,
+      );
+
+      await tester.scrollUntilVisible(
+        find.byKey(WidgetKeys.requestUnitsField),
+        -200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(find.byKey(WidgetKeys.requestUnitsField));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(WidgetKeys.requestUnitsField), '2');
+      await tester.scrollUntilVisible(
+        find.byKey(WidgetKeys.requestSubmitButton),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(find.byKey(WidgetKeys.requestSubmitButton));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(WidgetKeys.requestSubmitButton));
+      await tester.pumpAndSettle();
+
+      final captured =
+          verify(() => createRequest(captureAny())).captured.single
+              as RequestDraft;
+      expect(captured.beneficiaryType, BeneficiaryType.self);
+      expect(captured.bloodType, 'AB-');
+    },
+  );
 
   testWidgets('edit request submits the existing request id and new values', (
     tester,

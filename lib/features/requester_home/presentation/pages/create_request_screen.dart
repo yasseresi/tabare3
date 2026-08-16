@@ -65,9 +65,18 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   @override
   void initState() {
     super.initState();
+    // A self request always uses the signed-in user's own blood type, so seed
+    // it from the profile up front (the field is read-only in that flow).
+    _bloodType = _profileBloodType();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _showProfileNotice();
     });
+  }
+
+  /// Signed-in user's blood type, or null when the profile has none on record.
+  String? _profileBloodType() {
+    final bloodType = currentUserBloodType();
+    return bloodType.isEmpty ? null : bloodType;
   }
 
   @override
@@ -260,21 +269,30 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             onChanged: (value) => setState(() => _hospitalId = value),
           ),
           if (!isForOther)
-            RequestDropdownField<String>(
-              fieldKey: WidgetKeys.requestBloodTypeField,
-              value: _bloodType,
-              hintText: AppStrings.bloodType.tr(),
-              prefixSvg: SvgAssets.bloodType,
-              items: supportedBloodTypes
-                  .map(
-                    (bloodType) => DropdownMenuItem(
-                      value: bloodType,
-                      child: Text(bloodType),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (value) => setState(() => _bloodType = value),
-            ),
+            // The blood type comes from the signed-in profile and cannot be
+            // edited here; fall back to a picker only when it is missing.
+            if (_profileBloodType() != null)
+              RequestReadOnlyField(
+                fieldKey: WidgetKeys.requestBloodTypeField,
+                label: _bloodType ?? _profileBloodType()!,
+                prefixSvg: SvgAssets.bloodType,
+              )
+            else
+              RequestDropdownField<String>(
+                fieldKey: WidgetKeys.requestBloodTypeField,
+                value: _bloodType,
+                hintText: AppStrings.bloodType.tr(),
+                prefixSvg: SvgAssets.bloodType,
+                items: supportedBloodTypes
+                    .map(
+                      (bloodType) => DropdownMenuItem(
+                        value: bloodType,
+                        child: Text(bloodType),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) => setState(() => _bloodType = value),
+              ),
           RequestPickerField(
             label: neededBy == null
                 ? AppStrings.deadlineField.tr()
@@ -453,7 +471,11 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   void _clear() {
     setState(() {
       _hospitalId = null;
-      _bloodType = null;
+      // Keep the profile-driven blood type on a self request; clearing it would
+      // leave the read-only field empty and block submission.
+      _bloodType = _beneficiaryType == BeneficiaryType.self
+          ? _profileBloodType()
+          : null;
       _neededBy = null;
       _priority = RequestPriority.normal;
       _unitsController.clear();
@@ -514,6 +536,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             setState(() {
               _beneficiaryType = BeneficiaryType.self;
               _isPatientStep = false;
+              // Self request: lock the blood type to the profile value.
+              _bloodType = _profileBloodType();
             });
             Navigator.pop(dialogContext);
           },
@@ -523,6 +547,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             setState(() {
               _beneficiaryType = BeneficiaryType.other;
               _isPatientStep = true;
+              // Other request: the patient picks their own blood type.
+              _bloodType = null;
             });
             Navigator.pop(dialogContext);
           },

@@ -168,6 +168,38 @@ class RequestPickerField extends StatelessWidget {
   }
 }
 
+/// Non-interactive field that renders a value the user cannot change — used for
+/// the self-request blood type, which is taken from the signed-in profile.
+class RequestReadOnlyField extends StatelessWidget {
+  final String label;
+  final String prefixSvg;
+  final Key? fieldKey;
+
+  const RequestReadOnlyField({
+    super.key,
+    required this.label,
+    required this.prefixSvg,
+    this.fieldKey,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InputDecorator(
+      key: fieldKey,
+      decoration: InputDecoration(
+        prefixIcon: RequestFieldIcon(asset: prefixSvg),
+      ),
+      child: Text(
+        label,
+        style: getRegularStyle(
+          fontSize: FontSize.s16,
+          color: ColorManager.textPrimary,
+        ),
+      ),
+    );
+  }
+}
+
 /// Figma `Tags Grid`: the `درجة الاستعجال` caption over three urgency chips
 /// spread across the row.
 class RequestUrgencySelector<T> extends StatelessWidget {
