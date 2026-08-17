@@ -22,6 +22,15 @@ String currentUserBloodType() {
   return sl<SessionManager>().currentUser?.bloodType.trim() ?? '';
 }
 
+/// 1-based Algerian wilaya id of the signed-in user, or null when unknown.
+///
+/// Guards against the service locator not having a [SessionManager] registered
+/// (e.g. in widget tests that skip DI setup) so callers always get a value.
+int? currentUserWilayaId() {
+  if (!sl.isRegistered<SessionManager>()) return null;
+  return sl<SessionManager>().currentUser?.wilayaId;
+}
+
 /// Localized header greeting for the signed-in user, e.g. `مرحباً، أحمد`.
 ///
 /// Falls back to a plain welcome when no user name is available (e.g. before a

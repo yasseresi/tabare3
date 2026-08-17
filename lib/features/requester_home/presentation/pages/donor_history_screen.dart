@@ -34,6 +34,7 @@ class DonorHistoryScreen extends StatefulWidget {
 
 class _DonorHistoryScreenState extends State<DonorHistoryScreen> {
   bool _showCompleted = true;
+  bool _donorsRequested = false;
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +42,18 @@ class _DonorHistoryScreenState extends State<DonorHistoryScreen> {
       textDirection: TextDirection.rtl,
       child: BlocBuilder<RequestBloc, RequestState>(
         builder: (context, state) {
+          // Fetch donors once the requests exist. Re-arms after a refresh
+          // (which resets donorsLoaded) so the tab stays in sync.
+          if (state.donorsLoaded) {
+            _donorsRequested = false;
+          } else if (!_donorsRequested && state.requests.isNotEmpty) {
+            _donorsRequested = true;
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => context.read<RequestBloc>().add(
+                const RequestDonorsLoadRequested(),
+              ),
+            );
+          }
           if (state.status == RequestViewStatus.initial ||
               state.status == RequestViewStatus.loading) {
             return const AppGradientBackground(
@@ -82,28 +95,77 @@ class _DonorHistoryScreenState extends State<DonorHistoryScreen> {
                 onChanged: (value) => setState(() => _showCompleted = value),
               ),
               const SizedBox(height: AppSize.s12),
-              if (state.requests.isEmpty)
-                AppEmptyState(
-                  title: AppStrings.noRequestsYet.tr(),
-                  message: AppStrings.noRequestsDescription.tr(),
-                )
-              else
-                ...state.requests.map(
-                  (request) => Padding(
-                    padding: const EdgeInsets.only(bottom: AppPadding.p12),
-                    child: _DonorHistoryCard(
-                      request: request,
-                      isCompleted: _showCompleted,
-                      onDetail: widget.onDetail,
-                    ),
-                  ),
-                ),
+              ..._buildDonorList(state),
             ],
           );
         },
       ),
     );
   }
+
+  /// Donor cards for the active tab. Completed tab shows donors who finished
+  /// the donation (appointment completed after QR validation); the accepted
+  /// tab shows donors who accepted a request but have not yet donated.
+  List<Widget> _buildDonorList(RequestState state) {
+    // Only a pending fetch spins; with no requests there is nothing to load, so
+    // fall through to the (empty) donor list rather than spinning forever.
+    if (!state.donorsLoaded && state.requests.isNotEmpty) {
+      return const [
+        Padding(
+          padding: EdgeInsets.only(top: AppPadding.p20),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      ];
+    }
+
+    final pairs = <_DonorEntry>[];
+    for (final request in state.requests) {
+      for (final donor in state.donorsByRequestId[request.id] ?? const []) {
+        final isCompleted =
+            donor.status == DonationAppointmentStatus.completed;
+        final isAccepted =
+            donor.status == DonationAppointmentStatus.pending ||
+            donor.status == DonationAppointmentStatus.confirmed;
+        if (_showCompleted ? isCompleted : isAccepted) {
+          pairs.add(_DonorEntry(request: request, donor: donor));
+        }
+      }
+    }
+
+    if (pairs.isEmpty) {
+      return [
+        AppEmptyState(
+          title: _showCompleted
+              ? AppStrings.noCompletedDonors.tr()
+              : AppStrings.noAcceptedDonors.tr(),
+          message: AppStrings.donorsEmptyDescription.tr(),
+        ),
+      ];
+    }
+
+    return pairs
+        .map(
+          (entry) => Padding(
+            padding: const EdgeInsets.only(bottom: AppPadding.p12),
+            child: _DonorHistoryCard(
+              request: entry.request,
+              donor: entry.donor,
+              isCompleted: _showCompleted,
+              onDetail: widget.onDetail,
+            ),
+          ),
+        )
+        .toList();
+  }
+}
+
+/// A donor paired with the request they responded to, so the card can show
+/// both the hospital and the donor.
+class _DonorEntry {
+  final BloodRequestEntity request;
+  final RequestDonorEntity donor;
+
+  const _DonorEntry({required this.request, required this.donor});
 }
 
 /// Figma `Frame 1000009037`: two 110x42 pills, `المقبولين` on the leading
@@ -183,18 +245,22 @@ class _HistoryTab extends StatelessWidget {
 /// donation date and location rows.
 class _DonorHistoryCard extends StatelessWidget {
   final BloodRequestEntity request;
+  final RequestDonorEntity donor;
   final bool isCompleted;
   final ValueChanged<BloodRequestEntity>? onDetail;
 
   const _DonorHistoryCard({
     required this.request,
+    required this.donor,
     required this.isCompleted,
     this.onDetail,
   });
 
   @override
   Widget build(BuildContext context) {
-    final date = request.neededBy ?? request.createdAt;
+    // Completed donors carry the actual donation time; accepted ones only have
+    // the scheduled appointment.
+    final date = donor.completedAt ?? donor.scheduledAt;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -233,7 +299,7 @@ class _DonorHistoryCard extends StatelessWidget {
                 AppTagPill(
                   label: isCompleted
                       ? AppStrings.donationSuccessful.tr()
-                      : AppStrings.pending.tr(),
+                      : AppStrings.accepted.tr(),
                   dotColor: isCompleted
                       ? ColorManager.success
                       : ColorManager.urgencyCritical,
@@ -248,7 +314,13 @@ class _DonorHistoryCard extends StatelessWidget {
             const SizedBox(height: AppSize.s18),
             AppInfoRow(
               label: AppStrings.fullName.tr(),
-              value: request.patient?.fullName ?? AppStrings.notAvailable.tr(),
+              value: donor.fullName,
+              labelColor: ColorManager.textMuted,
+            ),
+            const SizedBox(height: AppSize.s18),
+            AppInfoRow(
+              label: AppStrings.bloodType.tr(),
+              value: donor.bloodType,
               labelColor: ColorManager.textMuted,
             ),
             const SizedBox(height: AppSize.s18),

@@ -172,6 +172,14 @@ class RequestRestDataSource implements RequestRemoteDataSource {
     );
   }
 
+  @override
+  Future<BloodRequestModel> reactivateRequest(String requestId) async {
+    final response = await dio.post<Map<String, dynamic>>(
+      RestPaths.requestReactivate(requestId),
+    );
+    return _mapRequest(response.data ?? const {});
+  }
+
   // --- mapping ---
 
   RequestDonorModel _mapRequestDonor(Map<String, dynamic> json) =>

@@ -53,8 +53,10 @@ class RequesterRequestCard extends StatelessWidget {
   final String ownerName;
   final VoidCallback? onEdit;
   final VoidCallback? onViewDonors;
+  final VoidCallback? onDelete;
   final Key? editKey;
   final Key? viewDonorsKey;
+  final Key? deleteKey;
 
   const RequesterRequestCard({
     super.key,
@@ -62,8 +64,10 @@ class RequesterRequestCard extends StatelessWidget {
     required this.ownerName,
     this.onEdit,
     this.onViewDonors,
+    this.onDelete,
     this.editKey,
     this.viewDonorsKey,
+    this.deleteKey,
   });
 
   @override
@@ -127,32 +131,46 @@ class RequesterRequestCard extends StatelessWidget {
       progress: request.unitsNeeded == 0
           ? 0
           : request.unitsFulfilled / request.unitsNeeded,
-      footer: onViewDonors == null
-          ? AppPillButton(
-              label: AppStrings.editRequest.tr(),
-              onPressed: onEdit,
-              buttonKey: editKey,
-            )
-          : Row(
-              children: [
-                Expanded(
-                  child: AppPillButton(
-                    label: AppStrings.availableDonors.tr(),
-                    onPressed: onViewDonors,
-                    background: ColorManager.primary,
-                    buttonKey: viewDonorsKey,
-                  ),
+      footer: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          onViewDonors == null
+              ? AppPillButton(
+                  label: AppStrings.editRequest.tr(),
+                  onPressed: onEdit,
+                  buttonKey: editKey,
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: AppPillButton(
+                        label: AppStrings.availableDonors.tr(),
+                        onPressed: onViewDonors,
+                        background: ColorManager.primary,
+                        buttonKey: viewDonorsKey,
+                      ),
+                    ),
+                    const SizedBox(width: AppSize.s16),
+                    Expanded(
+                      child: AppPillButton(
+                        label: AppStrings.editRequest.tr(),
+                        onPressed: onEdit,
+                        buttonKey: editKey,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: AppSize.s16),
-                Expanded(
-                  child: AppPillButton(
-                    label: AppStrings.editRequest.tr(),
-                    onPressed: onEdit,
-                    buttonKey: editKey,
-                  ),
-                ),
-              ],
+          if (onDelete != null) ...[
+            const SizedBox(height: AppSize.s12),
+            AppPillButton(
+              label: AppStrings.cancelRequest.tr(),
+              onPressed: onDelete,
+              background: ColorManager.error,
+              buttonKey: deleteKey,
             ),
+          ],
+        ],
+      ),
     );
   }
 }

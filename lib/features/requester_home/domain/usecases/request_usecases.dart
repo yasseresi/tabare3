@@ -112,6 +112,18 @@ class CancelRecipientRequest
   }
 }
 
+class ReactivateRecipientRequest
+    implements BaseUseCase<BloodRequestEntity, String> {
+  final RequestRepository repository;
+
+  ReactivateRecipientRequest(this.repository);
+
+  @override
+  Future<Either<Failure, BloodRequestEntity>> call(String requestId) {
+    return repository.reactivateRequest(requestId);
+  }
+}
+
 class GetRequestDonors
     implements BaseUseCase<List<RequestDonorEntity>, String> {
   final RequestRepository repository;

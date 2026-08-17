@@ -199,9 +199,29 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                 const SizedBox(height: AppSize.s12),
                 _RequestStatusToggle(
                   isActive: currentRequest.isActive,
-                  onChanged: state.status == RequestViewStatus.submitting || !currentRequest.isActive
+                  onChanged: state.status == RequestViewStatus.submitting
                       ? null
-                      : (_) => _showCancellationDialog(),
+                      : (next) async {
+                          if (next) {
+                            // Re-activate the request (server-side). Ask for
+                            // confirmation or call directly depending on policy.
+                            context.read<RequestBloc>().add(
+                                  RequestReactivateSubmitted(
+                                    requestId: widget.request.id,
+                                  ),
+                                );
+                          } else {
+                            final reason = await showRequestCancellationDialog(context);
+                            if (reason != null && mounted) {
+                              context.read<RequestBloc>().add(
+                                    RequestCancelSubmitted(
+                                      requestId: widget.request.id,
+                                      reason: reason,
+                                    ),
+                                  );
+                            }
+                          }
+                        },
                 ),
                 const SizedBox(height: AppSize.s12),
                 RequestFooterButtons(

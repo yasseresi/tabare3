@@ -26,6 +26,7 @@ class RestPaths {
   static String request(Object id) => '/requests/$id/';
   static String requestCancel(Object id) => '/requests/$id/cancel/';
   static String requestAccept(Object id) => '/requests/$id/accept/';
+  static String requestReactivate(Object id) => '/requests/$id/reactivate/';
   static String requestInvite(Object id) => '/requests/$id/invite/';
   static String requestMatchingDonors(Object id) => '/requests/$id/matching-donors/';
 

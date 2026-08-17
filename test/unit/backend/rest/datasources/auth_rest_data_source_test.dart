@@ -65,6 +65,7 @@ const _profileJson = {
   'full_name': 'Ahmed Ben Ali',
   'mode': 'donor',
   'blood_type': {'id': 7, 'label': 'O+', 'abo': 'O', 'rh': '+'},
+  'wilaya': {'id': 16, 'name_ar': 'الجزائر'},
 };
 
 void main() {
@@ -123,6 +124,7 @@ void main() {
         expect(user.id, '42');
         expect(user.username, 'ahmed'); // email → username reversed
         expect(user.bloodType, 'O+'); // nested blood_type.label
+        expect(user.wilayaId, 16); // nested wilaya.id
         expect(user.isDonor, isTrue);
         expect(user.isRecipient, isFalse);
       },

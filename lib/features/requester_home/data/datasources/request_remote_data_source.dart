@@ -25,4 +25,5 @@ abstract class RequestRemoteDataSource {
     required String donorId,
   });
   Future<IssuedRequestQrModel> issueRequestQr(String requestId);
+  Future<BloodRequestModel> reactivateRequest(String requestId);
 }

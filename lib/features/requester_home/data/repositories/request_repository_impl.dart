@@ -150,4 +150,16 @@ class RequestRepositoryImpl implements RequestRepository {
       return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
     }
   }
+
+  @override
+  Future<Either<Failure, BloodRequestEntity>> reactivateRequest(
+    String requestId,
+  ) async {
+    try {
+      final model = await remoteDataSource.reactivateRequest(requestId);
+      return Right(model.toEntity());
+    } catch (error, stackTrace) {
+      return Left(ErrorHandler.handle(error, stackTrace: stackTrace));
+    }
+  }
 }
