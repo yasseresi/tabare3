@@ -163,18 +163,6 @@ class _RequestsScreenState extends State<RequestsScreen> {
     );
   }
 
-  Future<void> _deleteRequest(
-    BuildContext context,
-    BloodRequestEntity request,
-  ) async {
-    final bloc = context.read<RequestBloc>();
-    final reason = await showRequestCancellationDialog(context);
-    if (reason == null) return;
-    bloc.add(
-      RequestCancelSubmitted(requestId: request.id, reason: reason),
-    );
-  }
-
   void _editRequest(BuildContext context, BloodRequestEntity request) {
     if (widget.onEdit != null) {
       widget.onEdit!(request);
