@@ -91,6 +91,7 @@ void main() {
   late MockCreateRecipientRequest createRequest;
   late MockUpdateRecipientRequest updateRequest;
   late MockCancelRecipientRequest cancelRequest;
+  late MockReactivateRecipientRequest reactivateRequest;
   late MockGetRequestDonors getDonors;
 
   const hospital = HospitalEntity(
