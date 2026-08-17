@@ -21,6 +21,8 @@ class MockUpdateRecipientRequest extends Mock
 class MockCancelRecipientRequest extends Mock
     implements CancelRecipientRequest {}
 
+class MockReactivateRecipientRequest extends Mock implements ReactivateRecipientRequest {}
+
 class MockGetRequestDonors extends Mock implements GetRequestDonors {}
 
 void main() {

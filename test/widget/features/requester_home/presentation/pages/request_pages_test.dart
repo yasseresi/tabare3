@@ -37,6 +37,8 @@ class MockUpdateRecipientRequest extends Mock
 class MockCancelRecipientRequest extends Mock
     implements CancelRecipientRequest {}
 
+class MockReactivateRecipientRequest extends Mock implements ReactivateRecipientRequest {}
+
 class MockGetRequestDonors extends Mock implements GetRequestDonors {}
 
 class MockAuthBloc extends MockBloc<AuthEvent, AuthState> implements AuthBloc {}
