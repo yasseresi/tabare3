@@ -68,6 +68,9 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     // A self request always uses the signed-in user's own blood type, so seed
     // it from the profile up front (the field is read-only in that flow).
     _bloodType = _profileBloodType();
+    // We already know a self requester's wilaya, so pre-fill it (the field is
+    // hidden in that flow) to narrow the hospital list without extra input.
+    _wilayaController.text = _wilayaNameForId(currentUserWilayaId());
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _showProfileNotice();
     });
@@ -246,12 +249,17 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             controller: _unitsController,
             keyboardType: TextInputType.number,
           ),
-          SearchableWilayaField(
-            controller: _wilayaController,
-            // Wilaya drives the hospital list; rebuild and drop any stale
-            // hospital picked under the previous wilaya.
-            onChanged: (_) => setState(() => _hospitalId = null),
-          ),
+          // Self requests reuse the profile wilaya (pre-filled, hidden). Show
+          // the field for third-party requests, or as a fallback when a self
+          // requester has no wilaya on file — otherwise they could never pick a
+          // hospital.
+          if (isForOther || !_wilayaSelected)
+            SearchableWilayaField(
+              controller: _wilayaController,
+              // Wilaya drives the hospital list; rebuild and drop any stale
+              // hospital picked under the previous wilaya.
+              onChanged: (_) => setState(() => _hospitalId = null),
+            ),
           RequestDropdownField<String>(
             fieldKey: WidgetKeys.requestHospitalField,
             value: hospitals.any((hospital) => hospital.id == _hospitalId)
@@ -375,6 +383,14 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   bool get _wilayaSelected =>
       algerianWilayas.contains(_wilayaController.text.trim());
 
+  /// Wilaya name for a 1-based wilaya id, or empty when unknown.
+  String _wilayaNameForId(int? wilayaId) {
+    if (wilayaId == null) return '';
+    final index = wilayaId - AppSize.s1.toInt();
+    if (index < AppSize.s0 || index >= algerianWilayas.length) return '';
+    return algerianWilayas[index];
+  }
+
   /// Hospitals narrowed to the wilaya typed into the Figma `الولاية` field —
   /// a view-level filter over the list the bloc already loaded. Empty until a
   /// wilaya is chosen so the picker never lists every hospital in the country.
@@ -420,12 +436,21 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
 
   void _submit() {
     final units = int.tryParse(_unitsController.text.trim());
-    if (_hospitalId == null ||
-        _bloodType == null ||
-        units == null ||
-        units <= AppSize.s0) {
+    // Name the one missing field instead of a generic "fill everything" —
+    // notes/cause and chronic diseases stay optional and are never checked here.
+    final String? missingField;
+    if (_hospitalId == null) {
+      missingField = AppStrings.selectHospital;
+    } else if (_bloodType == null) {
+      missingField = AppStrings.selectBloodType;
+    } else if (units == null || units <= AppSize.s0) {
+      missingField = AppStrings.enterValidBags;
+    } else {
+      missingField = null;
+    }
+    if (missingField != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.requiredRequestFields.tr())),
+        SnackBar(content: Text(missingField.tr())),
       );
       return;
     }
@@ -459,7 +484,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
           patient: patient,
           bloodType: _bloodType!,
           priority: _priority,
-          unitsNeeded: units,
+          unitsNeeded: units!,
           neededBy: _neededBy,
           notes: _notesController.text.trim(),
         ),
@@ -503,7 +528,10 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       _priority = RequestPriority.normal;
       _unitsController.clear();
       _notesController.clear();
-      _wilayaController.clear();
+      // Self keeps its pre-filled wilaya; third-party resets to empty.
+      _wilayaController.text = _beneficiaryType == BeneficiaryType.self
+          ? _wilayaNameForId(currentUserWilayaId())
+          : '';
       _patientNameController.clear();
       _patientNationalIdController.clear();
       _patientWeightController.clear();
@@ -559,8 +587,11 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             setState(() {
               _beneficiaryType = BeneficiaryType.self;
               _isPatientStep = false;
-              // Self request: lock the blood type to the profile value.
+              // Self request: lock the blood type to the profile value and
+              // reuse the profile wilaya (its field is hidden in this flow).
               _bloodType = _profileBloodType();
+              _wilayaController.text = _wilayaNameForId(currentUserWilayaId());
+              _hospitalId = null;
             });
             Navigator.pop(dialogContext);
           },
@@ -570,8 +601,11 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             setState(() {
               _beneficiaryType = BeneficiaryType.other;
               _isPatientStep = true;
-              // Other request: the patient picks their own blood type.
+              // Other request: the patient picks their own blood type and the
+              // wilaya is entered manually, so start both empty.
               _bloodType = null;
+              _wilayaController.clear();
+              _hospitalId = null;
             });
             Navigator.pop(dialogContext);
           },

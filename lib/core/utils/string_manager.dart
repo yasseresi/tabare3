@@ -327,6 +327,7 @@ class AppStrings {
   static const String selectWilayaFirst = 'select_wilaya_first';
   static const String noHospitalsInWilaya = 'no_hospitals_in_wilaya';
   static const String requiredRequestFields = 'required_request_fields';
+  static const String enterValidBags = 'enter_valid_bags';
   static const String optionalDeadline = 'optional_deadline';
   static const String bagsRatio = 'bags_ratio';
   static const String editRequestBanner = 'edit_request_banner';
@@ -344,6 +345,8 @@ class AppStrings {
   static const String acceptedTab = 'accepted_tab';
   static const String donationSuccessful = 'donation_successful';
   static const String location = 'location';
+  static const String noCompletedDonors = 'no_completed_donors';
+  static const String donorsEmptyDescription = 'donors_empty_description';
 
   // Notifications
   static const String notificationsHeader = 'notifications_header';
