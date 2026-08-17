@@ -112,6 +112,24 @@ void main() {
     expect(hadithText, findsNWidgets(2));
   });
 
+  testWidgets('cancelling the recipient confirmation stays on role screen', (
+    tester,
+  ) async {
+    await pumpTestApp(tester, const RoleSelectionScreen());
+
+    final recipientButton = find.text('أحتاج دم');
+    await tester.ensureVisible(recipientButton);
+    await tester.tap(recipientButton);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('إلغاء'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Dialog), findsNothing);
+    expect(find.byType(RoleSelectionScreen), findsOneWidget);
+    verifyNever(() => (sl<UpdateUserRole>() as _MockRole).call(any()));
+  });
+
   testWidgets(
     'navigates to the donor home named route after selecting donor',
     (tester) async {

@@ -215,7 +215,7 @@ void main() {
             username: any(named: 'username'),
             password: any(named: 'password'),
           ),
-        ).thenAnswer((_) async => testUserModel);
+        ).thenAnswer((_) async => testDonorModel);
 
         await tester.tap(find.text('تسجيل الدخول'));
         await tester.pumpAndSettle();
@@ -235,25 +235,13 @@ void main() {
 
         when(
           () => mockDataSource.getCurrentUser(),
-        ).thenAnswer((_) async => testUserModel);
+        ).thenAnswer((_) async => testDonorModel);
 
+        // A donor logging back in resumes donor home directly — no role screen.
         await tester.tap(find.text('الصفحة الرئيسية'));
         await tester.pumpAndSettle();
 
-        expect(find.byType(RoleSelectionScreen), findsOneWidget);
-
-        when(
-          () => mockDataSource.updateUserRole(
-            isDonor: any(named: 'isDonor'),
-            isRecipient: any(named: 'isRecipient'),
-          ),
-        ).thenAnswer((_) async => testDonorModel);
-
-        await tester.ensureVisible(find.text('أنا متبرع'));
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('أنا متبرع'));
-        await tester.pumpAndSettle();
-
+        expect(find.byType(RoleSelectionScreen), findsNothing);
         expect(find.byType(DonorHomeScreen), findsOneWidget);
       });
 
@@ -291,36 +279,12 @@ void main() {
           () => mockDataSource.getCurrentUser(),
         ).thenAnswer((_) async => testUserModel);
 
+        // Returning users skip role selection: login routes straight to the
+        // home for the mode they already carry (recipient here → requester home).
         await tester.tap(find.text('الصفحة الرئيسية'));
         await tester.pumpAndSettle();
 
-        when(
-          () => mockDataSource.updateUserRole(
-            isDonor: any(named: 'isDonor'),
-            isRecipient: any(named: 'isRecipient'),
-          ),
-        ).thenAnswer((_) async {
-          final updatedModel = UserModel(
-            id: 'user-123',
-            username: 'testuser',
-            fullName: 'Test User',
-            bloodType: 'O+',
-            isDonor: false,
-            isRecipient: true,
-          );
-          return updatedModel;
-        });
-
-        await tester.ensureVisible(find.text('أحتاج دم'));
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('أحتاج دم'));
-        await tester.pumpAndSettle();
-
-        expect(find.byType(Dialog), findsOneWidget);
-
-        await tester.tap(find.text('تأكيد'));
-        await tester.pumpAndSettle();
-
+        expect(find.byType(RoleSelectionScreen), findsNothing);
         expect(find.byType(RequesterHomeScreen), findsOneWidget);
       });
 
@@ -520,102 +484,9 @@ void main() {
       });
     });
 
-    group('Role Selection', () {
-      testWidgets('shows confirmation dialog when selecting recipient', (
-        tester,
-      ) async {
-        when(
-          () => mockDataSource.getCurrentUser(),
-        ).thenAnswer((_) async => null);
-
-        await pumpApp(tester);
-        await tester.pump(const Duration(seconds: 3));
-        await tester.pumpAndSettle();
-
-        when(
-          () => mockDataSource.signIn(
-            username: any(named: 'username'),
-            password: any(named: 'password'),
-          ),
-        ).thenAnswer((_) async => testUserModel);
-
-        await tester.tap(find.text('تسجيل الدخول'));
-        await tester.pumpAndSettle();
-
-        final emailFields = find.byType(TextFormField);
-        await tester.enterText(emailFields.at(0), 'test@test.com');
-        await tester.enterText(emailFields.at(1), 'password123');
-
-        await tester.ensureVisible(find.text('تسجيل الدخول').last);
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('تسجيل الدخول').last);
-        await tester.pumpAndSettle();
-
-        when(
-          () => mockDataSource.getCurrentUser(),
-        ).thenAnswer((_) async => testUserModel);
-
-        await tester.tap(find.text('الصفحة الرئيسية'));
-        await tester.pumpAndSettle();
-
-        await tester.ensureVisible(find.text('أحتاج دم'));
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('أحتاج دم'));
-        await tester.pumpAndSettle();
-
-        expect(find.byType(Dialog), findsOneWidget);
-        expect(find.text('تأكيد'), findsOneWidget);
-        expect(find.text('إلغاء'), findsOneWidget);
-      });
-
-      testWidgets('cancels recipient confirmation and stays on role screen', (
-        tester,
-      ) async {
-        when(
-          () => mockDataSource.getCurrentUser(),
-        ).thenAnswer((_) async => null);
-
-        await pumpApp(tester);
-        await tester.pump(const Duration(seconds: 3));
-        await tester.pumpAndSettle();
-
-        when(
-          () => mockDataSource.signIn(
-            username: any(named: 'username'),
-            password: any(named: 'password'),
-          ),
-        ).thenAnswer((_) async => testUserModel);
-
-        await tester.tap(find.text('تسجيل الدخول'));
-        await tester.pumpAndSettle();
-
-        final emailFields = find.byType(TextFormField);
-        await tester.enterText(emailFields.at(0), 'test@test.com');
-        await tester.enterText(emailFields.at(1), 'password123');
-
-        await tester.ensureVisible(find.text('تسجيل الدخول').last);
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('تسجيل الدخول').last);
-        await tester.pumpAndSettle();
-
-        when(
-          () => mockDataSource.getCurrentUser(),
-        ).thenAnswer((_) async => testUserModel);
-
-        await tester.tap(find.text('الصفحة الرئيسية'));
-        await tester.pumpAndSettle();
-
-        await tester.ensureVisible(find.text('أحتاج دم'));
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('أحتاج دم'));
-        await tester.pumpAndSettle();
-
-        await tester.tap(find.text('إلغاء'));
-        await tester.pumpAndSettle();
-
-        expect(find.byType(RoleSelectionScreen), findsOneWidget);
-        expect(find.byType(Dialog), findsNothing);
-      });
-    });
+    // RoleSelectionScreen's confirmation-dialog behaviour is covered directly
+    // in test/widget/.../role_selection_screen_test.dart. It is no longer
+    // reachable from the login path — returning users skip role selection — so
+    // the integration coverage lives with the widget instead of this flow.
   });
 }

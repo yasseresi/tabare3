@@ -18,7 +18,6 @@ import '../../../../core/utils/values_manager.dart';
 import '../../../../core/validators/validators.dart';
 import '../../../../injection_container.dart';
 import '../bloc/auth_bloc.dart';
-import 'role_selection_screen.dart';
 
 class LoginFormScreen extends StatefulWidget {
   const LoginFormScreen({super.key});
@@ -167,9 +166,14 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
           title: AppStrings.loginSuccess.tr(),
           actionLabel: AppStrings.homePage.tr(),
           onAction: () {
-            Navigator.pushAndRemoveUntil(
+            // Returning users resume the mode they last saved instead of being
+            // sent back through role selection. The backend always carries an
+            // exclusive mode, so route straight to the matching home.
+            Navigator.pushNamedAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (_) => const RoleSelectionScreen()),
+              state.user.isDonor
+                  ? Routes.donorHomeRoute
+                  : Routes.requesterHomeRoute,
               (route) => false,
             );
           },
