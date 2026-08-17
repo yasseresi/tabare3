@@ -157,6 +157,7 @@ void main() {
     createRequest: createRequest,
     updateRequest: updateRequest,
     cancelRequest: cancelRequest,
+    reactivateRequest: reactivateRequest,
     getDonors: getDonors,
   )..add(const RequestsLoadRequested());
 
