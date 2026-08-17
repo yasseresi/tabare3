@@ -14,7 +14,6 @@ import '../../../../core/utils/greeting.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/blood_request_entity.dart';
 import '../bloc/request_bloc.dart';
-import '../widgets/request_cancellation_dialog.dart';
 import '../widgets/requester_request_card.dart';
 
 class RequestsScreen extends StatefulWidget {
