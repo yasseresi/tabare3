@@ -14,6 +14,7 @@ import '../../../../core/utils/greeting.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/blood_request_entity.dart';
 import '../bloc/request_bloc.dart';
+import '../widgets/request_cancellation_dialog.dart';
 import '../widgets/requester_request_card.dart';
 
 class RequestsScreen extends StatefulWidget {
@@ -39,7 +40,28 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: BlocBuilder<RequestBloc, RequestState>(
+      child: BlocConsumer<RequestBloc, RequestState>(
+        // A cancellation resolves to success/failure while the list is already
+        // on screen. Report it with a snackbar so a transient failure does not
+        // replace the whole list with the load-error view (that stays reserved
+        // for a failed initial load, when there is nothing to show).
+        listenWhen: (previous, current) => previous.status != current.status,
+        listener: (context, state) {
+          if (state.status == RequestViewStatus.success) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(AppStrings.requestCancelled.tr())),
+            );
+          } else if (state.status == RequestViewStatus.failure &&
+              state.requests.isNotEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.errorMessage ?? AppStrings.defaultError.tr(),
+                ),
+              ),
+            );
+          }
+        },
         builder: (context, state) {
           if (state.status == RequestViewStatus.loading ||
               state.status == RequestViewStatus.initial) {
@@ -49,7 +71,8 @@ class _RequestsScreenState extends State<RequestsScreen> {
               ),
             );
           }
-          if (state.status == RequestViewStatus.failure) {
+          if (state.status == RequestViewStatus.failure &&
+              state.requests.isEmpty) {
             return AppGradientBackground(
               child: Center(
                 child: Column(
@@ -137,6 +160,18 @@ class _RequestsScreenState extends State<RequestsScreen> {
       context,
       Routes.requestDetailRoute,
       arguments: request,
+    );
+  }
+
+  Future<void> _deleteRequest(
+    BuildContext context,
+    BloodRequestEntity request,
+  ) async {
+    final bloc = context.read<RequestBloc>();
+    final reason = await showRequestCancellationDialog(context);
+    if (reason == null) return;
+    bloc.add(
+      RequestCancelSubmitted(requestId: request.id, reason: reason),
     );
   }
 

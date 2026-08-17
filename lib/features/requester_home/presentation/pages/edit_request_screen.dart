@@ -22,6 +22,7 @@ import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/blood_request_entity.dart';
 import '../bloc/request_bloc.dart';
+import '../widgets/request_cancellation_dialog.dart';
 import '../widgets/request_form_fields.dart';
 
 class EditRequestScreen extends StatefulWidget {
@@ -91,6 +92,15 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
       builder: (context, state) {
         final hospitals = _visibleHospitals(state);
         final neededBy = _neededBy;
+        // Read the live status from the bloc: once a cancellation lands, the
+        // bloc replaces this request with a cancelled copy. Reading
+        // `widget.request` would leave the switch green forever and re-open
+        // the cancel dialog on every tap. The API has no reopen endpoint, so
+        // the switch is one-way — deactivate only.
+        final currentRequest = state.requests.firstWhere(
+          (request) => request.id == widget.request.id,
+          orElse: () => widget.request,
+        );
         return Directionality(
           textDirection: TextDirection.rtl,
           child: Scaffold(
@@ -188,8 +198,8 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                 ),
                 const SizedBox(height: AppSize.s12),
                 _RequestStatusToggle(
-                  isActive: widget.request.isActive,
-                  onChanged: state.status == RequestViewStatus.submitting
+                  isActive: currentRequest.isActive,
+                  onChanged: state.status == RequestViewStatus.submitting || !currentRequest.isActive
                       ? null
                       : (_) => _showCancellationDialog(),
                 ),
@@ -315,10 +325,7 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
   }
 
   Future<void> _showCancellationDialog() async {
-    final reason = await showDialog<String>(
-      context: context,
-      builder: (_) => const _CancellationDialog(),
-    );
+    final reason = await showRequestCancellationDialog(context);
 
     if (reason != null && mounted) {
       context.read<RequestBloc>().add(
@@ -431,76 +438,6 @@ class _StatusSwitch extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _CancellationDialog extends StatefulWidget {
-  const _CancellationDialog();
-
-  @override
-  State<_CancellationDialog> createState() => _CancellationDialogState();
-}
-
-class _CancellationDialogState extends State<_CancellationDialog> {
-  final _reasonController = TextEditingController();
-  String? _validationMessage;
-
-  @override
-  void dispose() {
-    _reasonController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(AppStrings.cancelRequest.tr()),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              AppStrings.confirmCancelRequest.tr(),
-              textAlign: TextAlign.right,
-            ),
-            const SizedBox(height: AppSize.s16),
-            TextField(
-              key: WidgetKeys.requestCancelReasonField,
-              controller: _reasonController,
-              maxLines: AppSize.s3.toInt(),
-              textAlign: TextAlign.right,
-              decoration: InputDecoration(
-                labelText: AppStrings.cancellationReason.tr(),
-                errorText: _validationMessage,
-              ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(AppStrings.cancel.tr()),
-        ),
-        ElevatedButton(
-          key: WidgetKeys.requestCancelConfirmButton,
-          onPressed: _confirm,
-          child: Text(AppStrings.confirm.tr()),
-        ),
-      ],
-    );
-  }
-
-  void _confirm() {
-    final reason = _reasonController.text.trim();
-    if (reason.isEmpty) {
-      setState(
-        () => _validationMessage = AppStrings.cancellationReasonRequired.tr(),
-      );
-      return;
-    }
-    Navigator.pop(context, reason);
   }
 }
 
