@@ -51,6 +51,11 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
   late String _bloodType;
   late RequestPriority _priority;
   DateTime? _neededBy;
+  // Which mutation the bloc's next success/failure belongs to. Set before
+  // dispatching so the listener can tell an edit-save apart from a toggle
+  // (cancel/reactivate) and show the right copy without a dialog-then-nav
+  // that would be wrong for a simple toggle.
+  _PendingAction? _pendingAction;
 
   @override
   void initState() {
@@ -80,8 +85,25 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
       listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) {
         if (state.status == RequestViewStatus.success) {
-          _showSuccessDialog();
+          final action = _pendingAction;
+          _pendingAction = null;
+          switch (action) {
+            case _PendingAction.cancel:
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(AppStrings.requestCancelled.tr())),
+              );
+            case _PendingAction.reactivate:
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(AppStrings.requestReactivated.tr())),
+              );
+            case _PendingAction.save:
+            case null:
+              // Save (or an unattributed success) is the flow that finishes
+              // editing, so it keeps the dialog + navigate-home behavior.
+              _showSuccessDialog();
+          }
         } else if (state.status == RequestViewStatus.failure) {
+          _pendingAction = null;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage ?? AppStrings.defaultError.tr()),
@@ -92,11 +114,9 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
       builder: (context, state) {
         final hospitals = _visibleHospitals(state);
         final neededBy = _neededBy;
-        // Read the live status from the bloc: once a cancellation lands, the
-        // bloc replaces this request with a cancelled copy. Reading
-        // `widget.request` would leave the switch green forever and re-open
-        // the cancel dialog on every tap. The API has no reopen endpoint, so
-        // the switch is one-way — deactivate only.
+        // Read the live status from the bloc: cancel and reactivate both
+        // replace this request in-place, so `widget.request` would go stale
+        // and the switch would fall out of sync with what the user just did.
         final currentRequest = state.requests.firstWhere(
           (request) => request.id == widget.request.id,
           orElse: () => widget.request,
@@ -201,27 +221,7 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                   isActive: currentRequest.isActive,
                   onChanged: state.status == RequestViewStatus.submitting
                       ? null
-                      : (next) async {
-                          if (next) {
-                            // Re-activate the request (server-side). Ask for
-                            // confirmation or call directly depending on policy.
-                            context.read<RequestBloc>().add(
-                                  RequestReactivateSubmitted(
-                                    requestId: widget.request.id,
-                                  ),
-                                );
-                          } else {
-                            final reason = await showRequestCancellationDialog(context);
-                            if (reason != null && mounted) {
-                              context.read<RequestBloc>().add(
-                                    RequestCancelSubmitted(
-                                      requestId: widget.request.id,
-                                      reason: reason,
-                                    ),
-                                  );
-                            }
-                          }
-                        },
+                      : (next) => _onStatusToggled(context, next),
                 ),
                 const SizedBox(height: AppSize.s12),
                 RequestFooterButtons(
@@ -329,6 +329,7 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
       return;
     }
 
+    _pendingAction = _PendingAction.save;
     context.read<RequestBloc>().add(
       RequestUpdateSubmitted(
         requestId: widget.request.id,
@@ -344,7 +345,25 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
     );
   }
 
+  Future<void> _onStatusToggled(BuildContext context, bool next) async {
+    final bloc = context.read<RequestBloc>();
+    if (next) {
+      _pendingAction = _PendingAction.reactivate;
+      bloc.add(RequestReactivateSubmitted(requestId: widget.request.id));
+      return;
+    }
+    // Capture the bloc before awaiting so we don't touch a stale context after
+    // the dialog closes; a mounted check then guards the dispatch itself.
+    final reason = await showRequestCancellationDialog(context);
+    if (reason == null || !mounted) return;
+    _pendingAction = _PendingAction.cancel;
+    bloc.add(
+      RequestCancelSubmitted(requestId: widget.request.id, reason: reason),
+    );
+  }
 }
+
+enum _PendingAction { save, cancel, reactivate }
 
 /// Figma `Button - Mode`: the `حالة الطلب` label with the active/closed switch
 /// that opens the cancellation flow.

@@ -119,6 +119,7 @@
   "request_created": "Donation request created successfully",
   "request_accepted": "Request accepted successfully",
   "request_cancelled": "Request cancelled successfully",
+  "request_reactivated": "Request reactivated successfully",
   "profile_updated": "Profile updated successfully",
   "avatar_coming_soon": "Profile photo changes will be available in a future update.",
   "edit_success": "Modified successfully",

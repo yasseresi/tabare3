@@ -159,6 +159,7 @@ class AppStrings {
   static const String requestCreated = 'request_created';
   static const String requestAccepted = 'request_accepted';
   static const String requestCancelled = 'request_cancelled';
+  static const String requestReactivated = 'request_reactivated';
   static const String profileUpdated = 'profile_updated';
   static const String editSuccess = 'edit_success';
   static const String confirmLogout = 'confirm_logout';

@@ -35,7 +35,6 @@ class WidgetKeys {
   static const Key requestCancelConfirmButton = Key(
     'request_cancel_confirm_button',
   );
-  static const Key requestDeleteButton = Key('request_delete_button');
   static const Key requestsRetryButton = Key('requests_retry_button');
   static const Key requestDetailsButton = Key('request_details_button');
   static const Key requestQrIssueButton = Key('request_qr_issue_button');

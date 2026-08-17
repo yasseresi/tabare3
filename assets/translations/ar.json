@@ -119,6 +119,7 @@
   "request_created": "تم إنشاء طلب التبرع بنجاح",
   "request_accepted": "تم قبول الطلب بنجاح",
   "request_cancelled": "تم إلغاء الطلب",
+  "request_reactivated": "تم إعادة تفعيل الطلب",
   "profile_updated": "تم تحديث الملف الشخصي",
   "avatar_coming_soon": "ستتوفر إمكانية تغيير الصورة الشخصية في تحديث قادم.",
   "edit_success": "تم التعديل بنجاح",

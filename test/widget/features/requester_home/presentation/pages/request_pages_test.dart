@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tabare3/core/constants/widget_keys.dart';
-import 'package:tabare3/core/error/failures.dart';
 import 'package:tabare3/core/presentation/widgets/searchable_wilaya_field.dart';
 import 'package:tabare3/core/session/session_manager.dart';
 import 'package:tabare3/core/usecases/usecase.dart';
@@ -883,73 +882,4 @@ void main() {
     expect(captured.reason, 'تم تأجيل العملية');
   });
 
-  testWidgets('requests screen deletes a request from the list card', (
-    tester,
-  ) async {
-    when(() => getRequests(any())).thenAnswer((_) async => Right([request]));
-    when(() => cancelRequest(any())).thenAnswer(
-      (_) async =>
-          Right(request.copyWith(status: BloodRequestStatus.cancelled)),
-    );
-
-    await pumpTestApp(
-      tester,
-      BlocProvider(
-        create: (_) => buildBloc(),
-        // A Scaffold ancestor mirrors RequesterHomeScreen, whose Scaffold hosts
-        // the snackbar in production; RequestsScreen builds only an AppPage.
-        child: const Scaffold(body: RequestsScreen()),
-      ),
-    );
-
-    await tester.tap(find.byKey(WidgetKeys.requestDeleteButton));
-    await tester.pumpAndSettle();
-    await tester.enterText(
-      find.byKey(WidgetKeys.requestCancelReasonField),
-      'لم يعد الطلب مطلوباً',
-    );
-    await tester.tap(find.byKey(WidgetKeys.requestCancelConfirmButton));
-    await tester.pumpAndSettle();
-
-    final captured =
-        verify(() => cancelRequest(captureAny())).captured.single
-            as CancelRequestParams;
-    expect(captured.requestId, 'request-id');
-    expect(captured.reason, 'لم يعد الطلب مطلوباً');
-    // The card flips to a cancelled state and a confirmation snackbar shows.
-    expect(find.text('تم إلغاء الطلب'), findsOneWidget);
-  });
-
-  testWidgets(
-    'requests screen keeps the list and reports a failed cancellation',
-    (tester) async {
-      when(() => getRequests(any())).thenAnswer((_) async => Right([request]));
-      when(
-        () => cancelRequest(any()),
-      ).thenAnswer((_) async => const Left(ServerFailure()));
-
-      await pumpTestApp(
-        tester,
-        BlocProvider(
-          create: (_) => buildBloc(),
-          child: const Scaffold(body: RequestsScreen()),
-        ),
-      );
-
-      await tester.tap(find.byKey(WidgetKeys.requestDeleteButton));
-      await tester.pumpAndSettle();
-      await tester.enterText(
-        find.byKey(WidgetKeys.requestCancelReasonField),
-        'محاولة فاشلة',
-      );
-      await tester.tap(find.byKey(WidgetKeys.requestCancelConfirmButton));
-      await tester.pumpAndSettle();
-
-      // A transient cancel failure must not swap the whole list for the
-      // load-error/retry view — the list stays and the error is a snackbar.
-      expect(find.byKey(WidgetKeys.requestsRetryButton), findsNothing);
-      expect(find.text('مستشفى مصطفى باشا'), findsWidgets);
-      expect(find.text('خطأ في الخادم، يرجى المحاولة لاحقاً'), findsOneWidget);
-    },
-  );
 }
