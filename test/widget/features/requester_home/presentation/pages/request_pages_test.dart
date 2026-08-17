@@ -143,6 +143,7 @@ void main() {
     createRequest = MockCreateRecipientRequest();
     updateRequest = MockUpdateRecipientRequest();
     cancelRequest = MockCancelRecipientRequest();
+    reactivateRequest = MockReactivateRecipientRequest();
     getDonors = MockGetRequestDonors();
     when(
       () => getHospitals(any()),
