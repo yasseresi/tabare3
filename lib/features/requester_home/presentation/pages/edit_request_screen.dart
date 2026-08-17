@@ -344,15 +344,6 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
     );
   }
 
-  Future<void> _showCancellationDialog() async {
-    final reason = await showRequestCancellationDialog(context);
-
-    if (reason != null && mounted) {
-      context.read<RequestBloc>().add(
-        RequestCancelSubmitted(requestId: widget.request.id, reason: reason),
-      );
-    }
-  }
 }
 
 /// Figma `Button - Mode`: the `حالة الطلب` label with the active/closed switch

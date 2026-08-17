@@ -133,6 +133,7 @@ class RequestBloc extends Bloc<RequestEvent, RequestState> {
     required this.createRequest,
     required this.updateRequest,
     required this.cancelRequest,
+    required this.reactivateRequest,
     required this.getDonors,
   }) : super(const RequestState()) {
     on<RequestsLoadRequested>(_onLoad);
@@ -140,6 +141,34 @@ class RequestBloc extends Bloc<RequestEvent, RequestState> {
     on<RequestCreateSubmitted>(_onCreate);
     on<RequestUpdateSubmitted>(_onUpdate);
     on<RequestCancelSubmitted>(_onCancel);
+    on<RequestReactivateSubmitted>(_onReactivate);
+  }
+
+  Future<void> _onReactivate(
+    RequestReactivateSubmitted event,
+    Emitter<RequestState> emit,
+  ) async {
+    emit(
+      state.copyWith(status: RequestViewStatus.submitting, clearError: true),
+    );
+    final result = await reactivateRequest(event.requestId);
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          status: RequestViewStatus.failure,
+          errorMessage: failure.message,
+        ),
+      ),
+      (reactivated) => emit(
+        state.copyWith(
+          status: RequestViewStatus.success,
+          requests: state.requests
+              .map((request) => request.id == reactivated.id ? reactivated : request)
+              .toList(),
+          clearError: true,
+        ),
+      ),
+    );
   }
 
   Future<void> _onLoad(
