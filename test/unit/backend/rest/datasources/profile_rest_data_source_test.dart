@@ -117,25 +117,37 @@ void main() {
     expect(body['phone'], '0555123456');
   });
 
-  test('changeRole posts switch-mode and maps the echoed profile', () async {
+  test('changeRole toggles switch-mode only when the mode differs', () async {
+    // Live mode is donor; the user asks for recipient, so we must toggle.
     when(
-      () => dio.post<Map<String, dynamic>>(
-        RestPaths.switchMode,
-        data: any(named: 'data'),
-      ),
-    ).thenAnswer((_) async => _res(RestPaths.switchMode, _profileJson));
+      () => dio.get<Map<String, dynamic>>(RestPaths.profile),
+    ).thenAnswer((_) async => _res(RestPaths.profile, _profileJson));
+    when(
+      () => dio.post<Map<String, dynamic>>(RestPaths.switchMode),
+    ).thenAnswer(
+      (_) async => _res(RestPaths.switchMode, {
+        ..._profileJson,
+        'mode': 'recipient',
+      }),
+    );
+
+    final p = await source.changeRole(isDonor: false, isRecipient: true);
+
+    verify(
+      () => dio.post<Map<String, dynamic>>(RestPaths.switchMode),
+    ).called(1);
+    expect(p.isRecipient, isTrue);
+  });
+
+  test('changeRole is a no-op when already in the requested mode', () async {
+    // Live mode is already donor; asking for donor must not toggle.
+    when(
+      () => dio.get<Map<String, dynamic>>(RestPaths.profile),
+    ).thenAnswer((_) async => _res(RestPaths.profile, _profileJson));
 
     final p = await source.changeRole(isDonor: true, isRecipient: false);
 
-    final body =
-        verify(
-              () => dio.post<Map<String, dynamic>>(
-                RestPaths.switchMode,
-                data: captureAny(named: 'data'),
-              ),
-            ).captured.single
-            as Map<String, dynamic>;
-    expect(body['mode'], 'donor');
+    verifyNever(() => dio.post<Map<String, dynamic>>(RestPaths.switchMode));
     expect(p.isDonor, isTrue);
   });
 

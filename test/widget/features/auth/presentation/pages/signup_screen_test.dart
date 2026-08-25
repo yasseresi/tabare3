@@ -85,8 +85,8 @@ void main() {
     sl.registerLazySingleton<CheckUsernameAvailability>(
       () => MockCheckUsernameAvailability(),
     );
-    // The username field checks availability on blur, so every step-1 keystroke
-    // sequence reaches this use case.
+    // The step-1 "Next" tap checks availability before advancing, so the flow
+    // reaches this use case; default it to a free username.
     when(
       () => sl<CheckUsernameAvailability>().call(any()),
     ).thenAnswer((_) async => const Right(true));
@@ -182,7 +182,7 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
     await tester.tap(find.text('التالي'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('المعلومات الشخصية'), findsOneWidget);
     expect(find.text('تاريخ الميلاد'), findsOneWidget);
@@ -201,7 +201,7 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
     await tester.tap(find.text('التالي'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     await tester.enterText(
       find.widgetWithText(TextFormField, 'تاريخ الميلاد'),
@@ -223,6 +223,31 @@ void main() {
     expect(find.text('إنشاء حساب'), findsWidgets);
   });
 
+  testWidgets('holds on step 1 and flags the field when the username is taken', (
+    tester,
+  ) async {
+    when(
+      () => sl<CheckUsernameAvailability>().call('testuser1'),
+    ).thenAnswer((_) async => const Right(false));
+
+    await pumpTestApp(tester, signUpUnderTest());
+
+    await fillStep1(tester);
+
+    await tester.scrollUntilVisible(
+      find.text('التالي'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('التالي'));
+    await tester.pumpAndSettle();
+
+    // Still on step 1 — the personal-info step title never appears — and the
+    // taken-username error is painted on the field.
+    expect(find.text('المعلومات الشخصية'), findsNothing);
+    expect(find.text('معلومات الحساب'), findsOneWidget);
+  });
+
   testWidgets('selects wilaya from searchable dropdown in step 2', (
     tester,
   ) async {
@@ -236,7 +261,7 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
     await tester.tap(find.text('التالي'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     await tester.enterText(
       find.widgetWithText(TextFormField, 'تاريخ الميلاد'),

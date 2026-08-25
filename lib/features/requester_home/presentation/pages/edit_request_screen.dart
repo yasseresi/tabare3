@@ -22,6 +22,7 @@ import '../../../../core/utils/styles_manager.dart';
 import '../../../../core/utils/values_manager.dart';
 import '../../domain/entities/blood_request_entity.dart';
 import '../bloc/request_bloc.dart';
+import '../widgets/request_cancellation_dialog.dart';
 import '../widgets/request_form_fields.dart';
 
 class EditRequestScreen extends StatefulWidget {
@@ -50,11 +51,17 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
   late String _bloodType;
   late RequestPriority _priority;
   DateTime? _neededBy;
+  // Which mutation the bloc's next success/failure belongs to. Set before
+  // dispatching so the listener can tell an edit-save apart from a toggle
+  // (cancel/reactivate) and show the right copy without a dialog-then-nav
+  // that would be wrong for a simple toggle.
+  _PendingAction? _pendingAction;
 
   @override
   void initState() {
     super.initState();
     _hospitalId = widget.request.hospital?.id;
+    _wilayaController.text = _wilayaNameFor(widget.request.hospital?.wilayaId);
     _bloodType = widget.request.bloodType;
     _priority = widget.request.priority;
     _neededBy = widget.request.neededBy;
@@ -78,8 +85,25 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
       listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) {
         if (state.status == RequestViewStatus.success) {
-          _showSuccessDialog();
+          final action = _pendingAction;
+          _pendingAction = null;
+          switch (action) {
+            case _PendingAction.cancel:
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(AppStrings.requestCancelled.tr())),
+              );
+            case _PendingAction.reactivate:
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(AppStrings.requestReactivated.tr())),
+              );
+            case _PendingAction.save:
+            case null:
+              // Save (or an unattributed success) is the flow that finishes
+              // editing, so it keeps the dialog + navigate-home behavior.
+              _showSuccessDialog();
+          }
         } else if (state.status == RequestViewStatus.failure) {
+          _pendingAction = null;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.errorMessage ?? AppStrings.defaultError.tr()),
@@ -90,6 +114,13 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
       builder: (context, state) {
         final hospitals = _visibleHospitals(state);
         final neededBy = _neededBy;
+        // Read the live status from the bloc: cancel and reactivate both
+        // replace this request in-place, so `widget.request` would go stale
+        // and the switch would fall out of sync with what the user just did.
+        final currentRequest = state.requests.firstWhere(
+          (request) => request.id == widget.request.id,
+          orElse: () => widget.request,
+        );
         return Directionality(
           textDirection: TextDirection.rtl,
           child: Scaffold(
@@ -132,7 +163,12 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                       controller: _unitsController,
                       keyboardType: TextInputType.number,
                     ),
-                    SearchableWilayaField(controller: _wilayaController),
+                    SearchableWilayaField(
+                      controller: _wilayaController,
+                      // Wilaya drives the hospital list; rebuild and drop any
+                      // hospital picked under the previous wilaya.
+                      onChanged: (_) => setState(() => _hospitalId = null),
+                    ),
                     RequestDropdownField<String>(
                       fieldKey: WidgetKeys.requestHospitalField,
                       value: hospitals.any(
@@ -140,7 +176,9 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                       )
                           ? _hospitalId
                           : null,
-                      hintText: AppStrings.hospitalNameField.tr(),
+                      hintText: _wilayaSelected
+                          ? AppStrings.hospitalNameField.tr()
+                          : AppStrings.selectWilayaFirst.tr(),
                       prefixSvg: SvgAssets.requestHospital,
                       items: hospitals
                           .map(
@@ -180,10 +218,10 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
                 ),
                 const SizedBox(height: AppSize.s12),
                 _RequestStatusToggle(
-                  isActive: widget.request.isActive,
+                  isActive: currentRequest.isActive,
                   onChanged: state.status == RequestViewStatus.submitting
                       ? null
-                      : (_) => _showCancellationDialog(),
+                      : (next) => _onStatusToggled(context, next),
                 ),
                 const SizedBox(height: AppSize.s12),
                 RequestFooterButtons(
@@ -204,11 +242,24 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
     );
   }
 
+  /// True once the field holds a recognised wilaya name.
+  bool get _wilayaSelected =>
+      algerianWilayas.contains(_wilayaController.text.trim());
+
+  /// Wilaya name for a 1-based wilaya id, or empty when unknown.
+  String _wilayaNameFor(int? wilayaId) {
+    if (wilayaId == null) return '';
+    final index = wilayaId - AppSize.s1.toInt();
+    if (index < AppSize.s0 || index >= algerianWilayas.length) return '';
+    return algerianWilayas[index];
+  }
+
   /// Hospitals narrowed to the wilaya typed into the Figma `الولاية` field —
-  /// a view-level filter over the list the bloc already loaded.
+  /// a view-level filter over the list the bloc already loaded. Empty until a
+  /// wilaya is chosen so the picker never lists every hospital in the country.
   List<HospitalEntity> _visibleHospitals(RequestState state) {
     final index = algerianWilayas.indexOf(_wilayaController.text.trim());
-    if (index < AppSize.s0) return state.hospitals;
+    if (index < AppSize.s0) return const [];
     final wilayaId = index + AppSize.s1.toInt();
     return state.hospitals
         .where((hospital) => hospital.wilayaId == wilayaId)
@@ -239,7 +290,7 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
       _bloodType = widget.request.bloodType;
       _priority = widget.request.priority;
       _neededBy = widget.request.neededBy;
-      _wilayaController.clear();
+      _wilayaController.text = _wilayaNameFor(widget.request.hospital?.wilayaId);
       _unitsController.text = widget.request.unitsNeeded.toString();
       _notesController.text = widget.request.notes ?? '';
     });
@@ -278,6 +329,7 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
       return;
     }
 
+    _pendingAction = _PendingAction.save;
     context.read<RequestBloc>().add(
       RequestUpdateSubmitted(
         requestId: widget.request.id,
@@ -293,19 +345,25 @@ class _EditRequestScreenState extends State<EditRequestScreen> {
     );
   }
 
-  Future<void> _showCancellationDialog() async {
-    final reason = await showDialog<String>(
-      context: context,
-      builder: (_) => const _CancellationDialog(),
-    );
-
-    if (reason != null && mounted) {
-      context.read<RequestBloc>().add(
-        RequestCancelSubmitted(requestId: widget.request.id, reason: reason),
-      );
+  Future<void> _onStatusToggled(BuildContext context, bool next) async {
+    final bloc = context.read<RequestBloc>();
+    if (next) {
+      _pendingAction = _PendingAction.reactivate;
+      bloc.add(RequestReactivateSubmitted(requestId: widget.request.id));
+      return;
     }
+    // Capture the bloc before awaiting so we don't touch a stale context after
+    // the dialog closes; a mounted check then guards the dispatch itself.
+    final reason = await showRequestCancellationDialog(context);
+    if (reason == null || !mounted) return;
+    _pendingAction = _PendingAction.cancel;
+    bloc.add(
+      RequestCancelSubmitted(requestId: widget.request.id, reason: reason),
+    );
   }
 }
+
+enum _PendingAction { save, cancel, reactivate }
 
 /// Figma `Button - Mode`: the `حالة الطلب` label with the active/closed switch
 /// that opens the cancellation flow.
@@ -410,76 +468,6 @@ class _StatusSwitch extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _CancellationDialog extends StatefulWidget {
-  const _CancellationDialog();
-
-  @override
-  State<_CancellationDialog> createState() => _CancellationDialogState();
-}
-
-class _CancellationDialogState extends State<_CancellationDialog> {
-  final _reasonController = TextEditingController();
-  String? _validationMessage;
-
-  @override
-  void dispose() {
-    _reasonController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(AppStrings.cancelRequest.tr()),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              AppStrings.confirmCancelRequest.tr(),
-              textAlign: TextAlign.right,
-            ),
-            const SizedBox(height: AppSize.s16),
-            TextField(
-              key: WidgetKeys.requestCancelReasonField,
-              controller: _reasonController,
-              maxLines: AppSize.s3.toInt(),
-              textAlign: TextAlign.right,
-              decoration: InputDecoration(
-                labelText: AppStrings.cancellationReason.tr(),
-                errorText: _validationMessage,
-              ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(AppStrings.cancel.tr()),
-        ),
-        ElevatedButton(
-          key: WidgetKeys.requestCancelConfirmButton,
-          onPressed: _confirm,
-          child: Text(AppStrings.confirm.tr()),
-        ),
-      ],
-    );
-  }
-
-  void _confirm() {
-    final reason = _reasonController.text.trim();
-    if (reason.isEmpty) {
-      setState(
-        () => _validationMessage = AppStrings.cancellationReasonRequired.tr(),
-      );
-      return;
-    }
-    Navigator.pop(context, reason);
   }
 }
 

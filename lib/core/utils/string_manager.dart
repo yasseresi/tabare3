@@ -122,6 +122,7 @@ class AppStrings {
   static const String completedRequests = 'completed_requests';
   static const String myRequests = 'my_requests';
   static const String acceptRequest = 'accept_request';
+  static const String requestAlreadyAccepted = 'request_already_accepted';
   static const String cancelRequest = 'cancel_request';
   static const String closeRequest = 'close_request';
 
@@ -158,6 +159,7 @@ class AppStrings {
   static const String requestCreated = 'request_created';
   static const String requestAccepted = 'request_accepted';
   static const String requestCancelled = 'request_cancelled';
+  static const String requestReactivated = 'request_reactivated';
   static const String profileUpdated = 'profile_updated';
   static const String editSuccess = 'edit_success';
   static const String confirmLogout = 'confirm_logout';
@@ -323,7 +325,10 @@ class AppStrings {
   static const String selectHospital = 'select_hospital';
   static const String selectBloodType = 'select_blood_type';
   static const String noVerifiedHospitals = 'no_verified_hospitals';
+  static const String selectWilayaFirst = 'select_wilaya_first';
+  static const String noHospitalsInWilaya = 'no_hospitals_in_wilaya';
   static const String requiredRequestFields = 'required_request_fields';
+  static const String enterValidBags = 'enter_valid_bags';
   static const String optionalDeadline = 'optional_deadline';
   static const String bagsRatio = 'bags_ratio';
   static const String editRequestBanner = 'edit_request_banner';
@@ -341,6 +346,8 @@ class AppStrings {
   static const String acceptedTab = 'accepted_tab';
   static const String donationSuccessful = 'donation_successful';
   static const String location = 'location';
+  static const String noCompletedDonors = 'no_completed_donors';
+  static const String donorsEmptyDescription = 'donors_empty_description';
 
   // Notifications
   static const String notificationsHeader = 'notifications_header';

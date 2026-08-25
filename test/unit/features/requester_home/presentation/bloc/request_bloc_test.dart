@@ -21,12 +21,18 @@ class MockUpdateRecipientRequest extends Mock
 class MockCancelRecipientRequest extends Mock
     implements CancelRecipientRequest {}
 
+class MockReactivateRecipientRequest extends Mock implements ReactivateRecipientRequest {}
+
+class MockGetRequestDonors extends Mock implements GetRequestDonors {}
+
 void main() {
   late MockGetRecipientRequests getRequests;
   late MockGetHospitals getHospitals;
   late MockCreateRecipientRequest createRequest;
   late MockUpdateRecipientRequest updateRequest;
   late MockCancelRecipientRequest cancelRequest;
+  late MockReactivateRecipientRequest reactivateRequest;
+  late MockGetRequestDonors getDonors;
 
   const hospital = HospitalEntity(
     id: 'hospital-id',
@@ -58,6 +64,8 @@ void main() {
     createRequest: createRequest,
     updateRequest: updateRequest,
     cancelRequest: cancelRequest,
+    reactivateRequest: reactivateRequest,
+    getDonors: getDonors,
   );
 
   setUpAll(() {
@@ -77,6 +85,8 @@ void main() {
     createRequest = MockCreateRecipientRequest();
     updateRequest = MockUpdateRecipientRequest();
     cancelRequest = MockCancelRecipientRequest();
+    reactivateRequest = MockReactivateRecipientRequest();
+    getDonors = MockGetRequestDonors();
   });
 
   blocTest<RequestBloc, RequestState>(
@@ -115,6 +125,47 @@ void main() {
         status: RequestViewStatus.empty,
         hospitals: [hospital],
       ),
+    ],
+  );
+
+  blocTest<RequestBloc, RequestState>(
+    'load donors maps responders by request id and marks them loaded',
+    setUp: () {
+      when(() => getRequests(any())).thenAnswer((_) async => Right([request]));
+      when(
+        () => getHospitals(any()),
+      ).thenAnswer((_) async => const Right([hospital]));
+      when(() => getDonors('request-id')).thenAnswer(
+        (_) async => Right([
+          RequestDonorEntity(
+            donorId: 'donor-1',
+            fullName: 'متبرع',
+            bloodType: 'O+',
+            appointmentId: 'appt-1',
+            status: DonationAppointmentStatus.completed,
+            scheduledAt: DateTime.utc(2030, 1, 1),
+            completedAt: DateTime.utc(2030, 1, 2),
+          ),
+        ]),
+      );
+    },
+    build: buildBloc,
+    act: (bloc) async {
+      bloc.add(const RequestsLoadRequested());
+      await bloc.stream.firstWhere(
+        (state) => state.status == RequestViewStatus.loaded,
+      );
+      bloc.add(const RequestDonorsLoadRequested());
+    },
+    skip: 2,
+    expect: () => [
+      isA<RequestState>()
+          .having((s) => s.donorsLoaded, 'donorsLoaded', isTrue)
+          .having(
+            (s) => s.donorsByRequestId['request-id']?.single.donorId,
+            'donor id',
+            'donor-1',
+          ),
     ],
   );
 

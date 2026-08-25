@@ -15,6 +15,9 @@ abstract class UserModel with _$UserModel {
     @JsonKey(name: 'is_donor') @Default(false) bool isDonor,
     @JsonKey(name: 'is_recipient') @Default(false) bool isRecipient,
     @JsonKey(name: 'blood_type') required String bloodType,
+    // Backend `wilaya` can be an id or a nested object; resolved to a plain
+    // 1-based id in the mapper, so keep it out of JSON codegen.
+    @JsonKey(includeFromJson: false, includeToJson: false) int? wilayaId,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
@@ -30,5 +33,6 @@ extension UserModelX on UserModel {
     isDonor: isDonor,
     isRecipient: isRecipient,
     bloodType: bloodType,
+    wilayaId: wilayaId,
   );
 }

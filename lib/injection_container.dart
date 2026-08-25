@@ -125,6 +125,8 @@ Future<void> initRequesterHome() async {
       createRequest: sl(),
       updateRequest: sl(),
       cancelRequest: sl(),
+      reactivateRequest: sl(),
+      getDonors: sl(),
     ),
   );
   sl.registerFactory(
@@ -143,6 +145,7 @@ Future<void> initRequesterHome() async {
   sl.registerLazySingleton(() => CreateRecipientRequest(sl()));
   sl.registerLazySingleton(() => UpdateRecipientRequest(sl()));
   sl.registerLazySingleton(() => CancelRecipientRequest(sl()));
+  sl.registerLazySingleton(() => ReactivateRecipientRequest(sl()));
   sl.registerLazySingleton(() => GetRequestDonors(sl()));
   sl.registerLazySingleton(() => GetCompatibleDonors(sl()));
   sl.registerLazySingleton(() => GetRequestInvitations(sl()));

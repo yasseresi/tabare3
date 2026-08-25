@@ -32,4 +32,5 @@ abstract class RequestRepository {
   Future<Either<Failure, IssuedRequestQrEntity>> issueRequestQr(
     String requestId,
   );
+  Future<Either<Failure, BloodRequestEntity>> reactivateRequest(String requestId);
 }

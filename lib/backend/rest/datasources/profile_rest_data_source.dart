@@ -81,10 +81,12 @@ class ProfileRestDataSource implements ProfileRemoteDataSource {
     required bool isDonor,
     required bool isRecipient,
   }) async {
-    final response = await dio.post<Map<String, dynamic>>(
-      RestPaths.switchMode,
-      data: {'mode': isDonor ? 'donor' : 'recipient'},
-    );
+    // `switch-mode` is a body-less TOGGLE: it flips donor↔recipient and ignores
+    // any payload. Only fire it when the live mode differs from the requested one,
+    // otherwise a "switch to the mode I'm already in" would flip us the wrong way.
+    final current = await getProfile();
+    if (current.isDonor == isDonor) return current;
+    final response = await dio.post<Map<String, dynamic>>(RestPaths.switchMode);
     // switch-mode may echo the profile; re-fetch if it does not.
     final data = response.data;
     if (data != null && data.containsKey('id')) return _mapProfile(data);

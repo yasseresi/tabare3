@@ -53,6 +53,7 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
           }
           final loaded = state as DonorFeedLoaded;
           final requests = _filter(loaded.feed.compatibleRequests);
+          final committed = loaded.feed.committedRequestIds;
           return AppPage(
             title: welcomeTitle(),
             subtitle: AppStrings.donationLifeChance.tr(),
@@ -78,17 +79,19 @@ class _DonorRequestsScreenState extends State<DonorRequestsScreen> {
                   secondaryMessage: AppStrings.thanksForDonating.tr(),
                 )
               else
-                ...requests.map(
-                  (request) => Padding(
+                ...requests.map((request) {
+                  final accepted = committed.contains(request.id);
+                  return Padding(
                     padding: const EdgeInsets.only(bottom: AppPadding.p15),
                     child: DonorRequestCard(
                       request: request,
-                      onAccept: loaded.isMutating
+                      isAccepted: accepted,
+                      onAccept: (loaded.isMutating || accepted)
                           ? null
                           : () => acceptDonorRequest(context, request.id),
                     ),
-                  ),
-                ),
+                  );
+                }),
               const SizedBox(height: AppSize.s12),
               AppSectionHeader(title: AppStrings.availableCampaigns.tr()),
               const SizedBox(height: AppSize.s12),

@@ -5,9 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tabare3/core/constants/widget_keys.dart';
+import 'package:tabare3/core/presentation/widgets/searchable_wilaya_field.dart';
+import 'package:tabare3/core/session/session_manager.dart';
 import 'package:tabare3/core/usecases/usecase.dart';
+import 'package:tabare3/features/auth/domain/entities/user_entity.dart';
 import 'package:tabare3/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:tabare3/features/notifications/presentation/bloc/notifications_bloc.dart';
+import 'package:tabare3/injection_container.dart';
 import 'package:tabare3/features/requester_home/domain/entities/blood_request_entity.dart';
 import 'package:tabare3/features/requester_home/domain/usecases/request_usecases.dart';
 import 'package:tabare3/features/requester_home/presentation/bloc/request_bloc.dart';
@@ -32,6 +36,10 @@ class MockUpdateRecipientRequest extends Mock
 class MockCancelRecipientRequest extends Mock
     implements CancelRecipientRequest {}
 
+class MockReactivateRecipientRequest extends Mock implements ReactivateRecipientRequest {}
+
+class MockGetRequestDonors extends Mock implements GetRequestDonors {}
+
 class MockAuthBloc extends MockBloc<AuthEvent, AuthState> implements AuthBloc {}
 
 class MockNotificationsBloc
@@ -44,12 +52,46 @@ MockNotificationsBloc buildNotificationsBloc() {
   return bloc;
 }
 
+/// Registers a signed-in recipient in the service locator so self-request
+/// flows can read the profile blood type and wilaya. Caller resets `sl`.
+void registerSessionUser({String bloodType = '', int? wilayaId}) {
+  sl.registerLazySingleton(() => SessionManager());
+  sl<SessionManager>().setUser(
+    UserEntity(
+      id: 'recipient-id',
+      email: 'me@example.com',
+      username: 'me',
+      fullName: 'Me',
+      isRecipient: true,
+      bloodType: bloodType,
+      wilayaId: wilayaId,
+    ),
+  );
+}
+
+/// Picks the wilaya that the seeded hospital (wilayaId 16) belongs to, so the
+/// hospital dropdown narrows to it. The list stays empty until a wilaya is set.
+Future<void> selectSeededWilaya(WidgetTester tester) async {
+  final wilayaInput = find.descendant(
+    of: find.byType(SearchableWilayaField),
+    matching: find.byType(TextFormField),
+  );
+  await tester.ensureVisible(wilayaInput);
+  await tester.pumpAndSettle();
+  await tester.enterText(wilayaInput, 'الجزائر');
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('الجزائر').last);
+  await tester.pumpAndSettle();
+}
+
 void main() {
   late MockGetRecipientRequests getRequests;
   late MockGetHospitals getHospitals;
   late MockCreateRecipientRequest createRequest;
   late MockUpdateRecipientRequest updateRequest;
   late MockCancelRecipientRequest cancelRequest;
+  late MockReactivateRecipientRequest reactivateRequest;
+  late MockGetRequestDonors getDonors;
 
   const hospital = HospitalEntity(
     id: 'hospital-id',
@@ -103,9 +145,12 @@ void main() {
     createRequest = MockCreateRecipientRequest();
     updateRequest = MockUpdateRecipientRequest();
     cancelRequest = MockCancelRecipientRequest();
+    reactivateRequest = MockReactivateRecipientRequest();
+    getDonors = MockGetRequestDonors();
     when(
       () => getHospitals(any()),
     ).thenAnswer((_) async => const Right([hospital]));
+    when(() => getDonors(any())).thenAnswer((_) async => const Right([]));
   });
 
   RequestBloc buildBloc() => RequestBloc(
@@ -114,6 +159,8 @@ void main() {
     createRequest: createRequest,
     updateRequest: updateRequest,
     cancelRequest: cancelRequest,
+    reactivateRequest: reactivateRequest,
+    getDonors: getDonors,
   )..add(const RequestsLoadRequested());
 
   testWidgets('requests screen renders backend request data', (tester) async {
@@ -342,30 +389,81 @@ void main() {
     },
   );
 
-  testWidgets('donor history renders the Figma donor completion cards', (
-    tester,
-  ) async {
-    final donorRequest = request.copyWith(
-      hospital: hospital.copyWith(nameAr: 'مستشفى سجل المتبرعين'),
-    );
-    when(
-      () => getRequests(any()),
-    ).thenAnswer((_) async => Right([donorRequest]));
+  testWidgets(
+    'donor history shows the empty state (not a spinner) with no requests',
+    (tester) async {
+      when(() => getRequests(any())).thenAnswer((_) async => const Right([]));
 
-    await pumpTestApp(
-      tester,
-      BlocProvider(
-        create: (_) => buildBloc(),
-        child: const DonorHistoryScreen(),
-      ),
-    );
+      await pumpTestApp(
+        tester,
+        BlocProvider(
+          create: (_) => buildBloc(),
+          child: const DonorHistoryScreen(),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.text('المتبرعين'), findsOneWidget);
-    expect(find.text('قائمة المتبرعين'), findsOneWidget);
-    expect(find.text('المكتملين'), findsOneWidget);
-    expect(find.text('مستشفى سجل المتبرعين'), findsOneWidget);
-    expect(find.text('تم التبرع بنجاح'), findsOneWidget);
-  });
+      // No requests means nothing to fetch — the tab must settle on the empty
+      // state rather than spinning forever.
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.text('لا يوجد متبرعون أكملوا التبرع بعد'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'donor history splits donors by tab and never shows one in both',
+    (tester) async {
+      final donorRequest = request.copyWith(
+        hospital: hospital.copyWith(nameAr: 'مستشفى سجل المتبرعين'),
+      );
+      when(
+        () => getRequests(any()),
+      ).thenAnswer((_) async => Right([donorRequest]));
+      when(() => getDonors('request-id')).thenAnswer(
+        (_) async => Right([
+          RequestDonorEntity(
+            donorId: 'donor-completed',
+            fullName: 'متبرع مكتمل',
+            bloodType: 'O+',
+            appointmentId: 'appt-1',
+            status: DonationAppointmentStatus.completed,
+            scheduledAt: DateTime.utc(2030, 1, 1),
+            completedAt: DateTime.utc(2030, 1, 2),
+          ),
+          RequestDonorEntity(
+            donorId: 'donor-accepted',
+            fullName: 'متبرع مقبول',
+            bloodType: 'A+',
+            appointmentId: 'appt-2',
+            status: DonationAppointmentStatus.pending,
+            scheduledAt: DateTime.utc(2030, 1, 3),
+          ),
+        ]),
+      );
+
+      await pumpTestApp(
+        tester,
+        BlocProvider(
+          create: (_) => buildBloc(),
+          child: const DonorHistoryScreen(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Completed tab (default): only the donor who finished the donation.
+      expect(find.text('مستشفى سجل المتبرعين'), findsOneWidget);
+      expect(find.text('متبرع مكتمل'), findsOneWidget);
+      expect(find.text('تم التبرع بنجاح'), findsOneWidget);
+      expect(find.text('متبرع مقبول'), findsNothing);
+
+      // Accepted tab: only the donor who accepted but has not donated.
+      await tester.tap(find.text('المقبولين'));
+      await tester.pumpAndSettle();
+      expect(find.text('متبرع مقبول'), findsOneWidget);
+      expect(find.text('متبرع مكتمل'), findsNothing);
+      expect(find.text('تم التبرع بنجاح'), findsNothing);
+    },
+  );
 
   testWidgets(
     'donor history delegates notifications with the Figma bell size',
@@ -469,6 +567,11 @@ void main() {
       () => createRequest(any()),
     ).thenAnswer((invocation) async => Right(request));
 
+    // Self requester with a known wilaya (16) but no blood type on file, so the
+    // wilaya is pre-filled/hidden and the blood-type picker is shown.
+    registerSessionUser(wilayaId: 16);
+    addTearDown(() => sl.reset());
+
     await pumpTestApp(
       tester,
       BlocProvider(
@@ -486,6 +589,9 @@ void main() {
     expect(find.text('طلب لشخص آخر'), findsOneWidget);
     await tester.tap(find.byKey(WidgetKeys.requestForSelfButton));
     await tester.pumpAndSettle();
+
+    // The wilaya is known for a self request, so its field is hidden.
+    expect(find.byType(SearchableWilayaField), findsNothing);
 
     await tester.scrollUntilVisible(
       find.byKey(WidgetKeys.requestHospitalField),
@@ -537,6 +643,137 @@ void main() {
     expect(captured.bloodType, 'O+');
     expect(captured.unitsNeeded, 2);
   });
+
+  testWidgets(
+    'self request locks blood type to the profile value and submits it',
+    (tester) async {
+      when(() => getRequests(any())).thenAnswer((_) async => const Right([]));
+      when(
+        () => createRequest(any()),
+      ).thenAnswer((invocation) async => Right(request));
+
+      registerSessionUser(bloodType: 'AB-', wilayaId: 16);
+      addTearDown(() => sl.reset());
+
+      await pumpTestApp(
+        tester,
+        BlocProvider(
+          create: (_) => buildBloc(),
+          child: const CreateRequestScreen(),
+        ),
+      );
+
+      await tester.tap(find.text('تأكيد'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(WidgetKeys.requestForSelfButton));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SearchableWilayaField), findsNothing);
+
+      await tester.scrollUntilVisible(
+        find.byKey(WidgetKeys.requestHospitalField),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(find.byKey(WidgetKeys.requestHospitalField));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(WidgetKeys.requestHospitalField));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('مستشفى مصطفى باشا').last);
+      await tester.pumpAndSettle();
+
+      // Blood type is shown read-only from the profile — no dropdown to open.
+      await tester.scrollUntilVisible(
+        find.byKey(WidgetKeys.requestBloodTypeField),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('AB-'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(WidgetKeys.requestBloodTypeField),
+          matching: find.byType(DropdownButtonFormField<String>),
+        ),
+        findsNothing,
+      );
+
+      await tester.scrollUntilVisible(
+        find.byKey(WidgetKeys.requestUnitsField),
+        -200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(find.byKey(WidgetKeys.requestUnitsField));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(WidgetKeys.requestUnitsField), '2');
+      await tester.scrollUntilVisible(
+        find.byKey(WidgetKeys.requestSubmitButton),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(find.byKey(WidgetKeys.requestSubmitButton));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(WidgetKeys.requestSubmitButton));
+      await tester.pumpAndSettle();
+
+      final captured =
+          verify(() => createRequest(captureAny())).captured.single
+              as RequestDraft;
+      expect(captured.beneficiaryType, BeneficiaryType.self);
+      expect(captured.bloodType, 'AB-');
+    },
+  );
+
+  testWidgets(
+    'third-party hospital dropdown lists nothing until a wilaya is selected',
+    (tester) async {
+      when(() => getRequests(any())).thenAnswer((_) async => const Right([]));
+
+      await pumpTestApp(
+        tester,
+        BlocProvider(
+          create: (_) => buildBloc(),
+          child: const CreateRequestScreen(),
+        ),
+      );
+
+      // Third-party flow keeps the wilaya field (the patient's wilaya is
+      // unknown), so it drives the empty-until-selected behaviour.
+      await tester.tap(find.text('تأكيد'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(WidgetKeys.requestForOtherButton));
+      await tester.pumpAndSettle();
+      // Advance past the patient identity step to the request step.
+      await tester.scrollUntilVisible(
+        find.text('التالي'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.text('التالي'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SearchableWilayaField), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.byKey(WidgetKeys.requestHospitalField),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(find.byKey(WidgetKeys.requestHospitalField));
+      await tester.pumpAndSettle();
+      expect(find.text('اختر الولاية أولاً'), findsOneWidget);
+      await tester.tap(find.byKey(WidgetKeys.requestHospitalField));
+      await tester.pumpAndSettle();
+      expect(find.text('مستشفى مصطفى باشا'), findsNothing);
+
+      // Selecting the hospital's wilaya reveals it in the picker.
+      await selectSeededWilaya(tester);
+      await tester.ensureVisible(find.byKey(WidgetKeys.requestHospitalField));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(WidgetKeys.requestHospitalField));
+      await tester.pumpAndSettle();
+      expect(find.text('مستشفى مصطفى باشا'), findsWidgets);
+    },
+  );
 
   testWidgets('edit request submits the existing request id and new values', (
     tester,
@@ -644,4 +881,5 @@ void main() {
     expect(captured.requestId, 'request-id');
     expect(captured.reason, 'تم تأجيل العملية');
   });
+
 }

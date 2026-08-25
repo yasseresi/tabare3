@@ -89,10 +89,13 @@ class AuthRestDataSource implements AuthRemoteDataSource {
     required bool isDonor,
     required bool isRecipient,
   }) async {
-    await dio.post<Map<String, dynamic>>(
-      RestPaths.switchMode,
-      data: {'mode': isDonor ? 'donor' : 'recipient'},
-    );
+    // `switch-mode` is a body-less TOGGLE on the backend: it flips donor↔recipient
+    // and ignores any payload. New accounts default to donor, so posting blindly
+    // would flip a user who picked "donor" straight into recipient. Only toggle
+    // when the current mode differs from the one the user asked for.
+    final current = await _fetchProfile();
+    if (current.isDonor == isDonor) return current;
+    await dio.post<Map<String, dynamic>>(RestPaths.switchMode);
     return _fetchProfile();
   }
 
@@ -139,6 +142,7 @@ class AuthRestDataSource implements AuthRemoteDataSource {
     final email = json['email']?.toString() ?? '';
     final mode = json['mode']?.toString();
     final bloodType = json['blood_type'];
+    final wilaya = json['wilaya'];
     return UserModel(
       id: json['id']?.toString() ?? '',
       email: email,
@@ -149,6 +153,9 @@ class AuthRestDataSource implements AuthRemoteDataSource {
       bloodType: bloodType is Map<String, dynamic>
           ? (bloodType['label']?.toString() ?? '')
           : (bloodType?.toString() ?? ''),
+      wilayaId: wilaya is Map<String, dynamic>
+          ? int.tryParse(wilaya['id']?.toString() ?? '')
+          : int.tryParse(wilaya?.toString() ?? ''),
     );
   }
 

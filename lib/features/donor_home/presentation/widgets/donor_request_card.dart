@@ -28,10 +28,16 @@ class DonorRequestCard extends StatelessWidget {
   final DonorBloodRequestEntity request;
   final VoidCallback? onAccept;
 
+  /// The donor already holds an appointment for this request; the footer shows
+  /// a disabled "accepted" pill instead of the accept action so acceptance
+  /// stays idempotent.
+  final bool isAccepted;
+
   const DonorRequestCard({
     super.key,
     required this.request,
     required this.onAccept,
+    this.isAccepted = false,
   });
 
   @override
@@ -80,10 +86,16 @@ class DonorRequestCard extends StatelessWidget {
       progress: request.unitsNeeded == 0
           ? 0
           : request.unitsFulfilled / request.unitsNeeded,
-      footer: AppPillButton(
-        label: AppStrings.acceptRequest.tr(),
-        onPressed: onAccept,
-      ),
+      footer: isAccepted
+          ? AppPillButton(
+              label: AppStrings.requestAlreadyAccepted.tr(),
+              onPressed: null,
+              background: ColorManager.textMuted,
+            )
+          : AppPillButton(
+              label: AppStrings.acceptRequest.tr(),
+              onPressed: onAccept,
+            ),
     );
   }
 }

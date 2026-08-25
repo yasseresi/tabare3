@@ -14,7 +14,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserEntity {
 
- String get id; String get email; String get username; String get fullName; bool get isDonor; bool get isRecipient; String get bloodType;
+ String get id; String get email; String get username; String get fullName; bool get isDonor; bool get isRecipient; String get bloodType;// 1-based Algerian wilaya id from the profile; null when unknown. Used to
+// pre-fill the wilaya on a self blood request.
+ int? get wilayaId;
 /// Create a copy of UserEntity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +27,16 @@ $UserEntityCopyWith<UserEntity> get copyWith => _$UserEntityCopyWithImpl<UserEnt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.username, username) || other.username == username)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.isDonor, isDonor) || other.isDonor == isDonor)&&(identical(other.isRecipient, isRecipient) || other.isRecipient == isRecipient)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.username, username) || other.username == username)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.isDonor, isDonor) || other.isDonor == isDonor)&&(identical(other.isRecipient, isRecipient) || other.isRecipient == isRecipient)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.wilayaId, wilayaId) || other.wilayaId == wilayaId));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,email,username,fullName,isDonor,isRecipient,bloodType);
+int get hashCode => Object.hash(runtimeType,id,email,username,fullName,isDonor,isRecipient,bloodType,wilayaId);
 
 @override
 String toString() {
-  return 'UserEntity(id: $id, email: $email, username: $username, fullName: $fullName, isDonor: $isDonor, isRecipient: $isRecipient, bloodType: $bloodType)';
+  return 'UserEntity(id: $id, email: $email, username: $username, fullName: $fullName, isDonor: $isDonor, isRecipient: $isRecipient, bloodType: $bloodType, wilayaId: $wilayaId)';
 }
 
 
@@ -45,7 +47,7 @@ abstract mixin class $UserEntityCopyWith<$Res>  {
   factory $UserEntityCopyWith(UserEntity value, $Res Function(UserEntity) _then) = _$UserEntityCopyWithImpl;
 @useResult
 $Res call({
- String id, String email, String username, String fullName, bool isDonor, bool isRecipient, String bloodType
+ String id, String email, String username, String fullName, bool isDonor, bool isRecipient, String bloodType, int? wilayaId
 });
 
 
@@ -62,7 +64,7 @@ class _$UserEntityCopyWithImpl<$Res>
 
 /// Create a copy of UserEntity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? username = null,Object? fullName = null,Object? isDonor = null,Object? isRecipient = null,Object? bloodType = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? username = null,Object? fullName = null,Object? isDonor = null,Object? isRecipient = null,Object? bloodType = null,Object? wilayaId = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
@@ -71,7 +73,8 @@ as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast
 as String,isDonor: null == isDonor ? _self.isDonor : isDonor // ignore: cast_nullable_to_non_nullable
 as bool,isRecipient: null == isRecipient ? _self.isRecipient : isRecipient // ignore: cast_nullable_to_non_nullable
 as bool,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
-as String,
+as String,wilayaId: freezed == wilayaId ? _self.wilayaId : wilayaId // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -156,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String username,  String fullName,  bool isDonor,  bool isRecipient,  String bloodType)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String username,  String fullName,  bool isDonor,  bool isRecipient,  String bloodType,  int? wilayaId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserEntity() when $default != null:
-return $default(_that.id,_that.email,_that.username,_that.fullName,_that.isDonor,_that.isRecipient,_that.bloodType);case _:
+return $default(_that.id,_that.email,_that.username,_that.fullName,_that.isDonor,_that.isRecipient,_that.bloodType,_that.wilayaId);case _:
   return orElse();
 
 }
@@ -177,10 +180,10 @@ return $default(_that.id,_that.email,_that.username,_that.fullName,_that.isDonor
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String username,  String fullName,  bool isDonor,  bool isRecipient,  String bloodType)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String username,  String fullName,  bool isDonor,  bool isRecipient,  String bloodType,  int? wilayaId)  $default,) {final _that = this;
 switch (_that) {
 case _UserEntity():
-return $default(_that.id,_that.email,_that.username,_that.fullName,_that.isDonor,_that.isRecipient,_that.bloodType);case _:
+return $default(_that.id,_that.email,_that.username,_that.fullName,_that.isDonor,_that.isRecipient,_that.bloodType,_that.wilayaId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +200,10 @@ return $default(_that.id,_that.email,_that.username,_that.fullName,_that.isDonor
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String username,  String fullName,  bool isDonor,  bool isRecipient,  String bloodType)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String username,  String fullName,  bool isDonor,  bool isRecipient,  String bloodType,  int? wilayaId)?  $default,) {final _that = this;
 switch (_that) {
 case _UserEntity() when $default != null:
-return $default(_that.id,_that.email,_that.username,_that.fullName,_that.isDonor,_that.isRecipient,_that.bloodType);case _:
+return $default(_that.id,_that.email,_that.username,_that.fullName,_that.isDonor,_that.isRecipient,_that.bloodType,_that.wilayaId);case _:
   return null;
 
 }
@@ -212,7 +215,7 @@ return $default(_that.id,_that.email,_that.username,_that.fullName,_that.isDonor
 
 
 class _UserEntity implements UserEntity {
-  const _UserEntity({required this.id, required this.email, required this.username, required this.fullName, this.isDonor = false, this.isRecipient = false, required this.bloodType});
+  const _UserEntity({required this.id, required this.email, required this.username, required this.fullName, this.isDonor = false, this.isRecipient = false, required this.bloodType, this.wilayaId});
   
 
 @override final  String id;
@@ -222,6 +225,9 @@ class _UserEntity implements UserEntity {
 @override@JsonKey() final  bool isDonor;
 @override@JsonKey() final  bool isRecipient;
 @override final  String bloodType;
+// 1-based Algerian wilaya id from the profile; null when unknown. Used to
+// pre-fill the wilaya on a self blood request.
+@override final  int? wilayaId;
 
 /// Create a copy of UserEntity
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +239,16 @@ _$UserEntityCopyWith<_UserEntity> get copyWith => __$UserEntityCopyWithImpl<_Use
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.username, username) || other.username == username)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.isDonor, isDonor) || other.isDonor == isDonor)&&(identical(other.isRecipient, isRecipient) || other.isRecipient == isRecipient)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserEntity&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.username, username) || other.username == username)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.isDonor, isDonor) || other.isDonor == isDonor)&&(identical(other.isRecipient, isRecipient) || other.isRecipient == isRecipient)&&(identical(other.bloodType, bloodType) || other.bloodType == bloodType)&&(identical(other.wilayaId, wilayaId) || other.wilayaId == wilayaId));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,email,username,fullName,isDonor,isRecipient,bloodType);
+int get hashCode => Object.hash(runtimeType,id,email,username,fullName,isDonor,isRecipient,bloodType,wilayaId);
 
 @override
 String toString() {
-  return 'UserEntity(id: $id, email: $email, username: $username, fullName: $fullName, isDonor: $isDonor, isRecipient: $isRecipient, bloodType: $bloodType)';
+  return 'UserEntity(id: $id, email: $email, username: $username, fullName: $fullName, isDonor: $isDonor, isRecipient: $isRecipient, bloodType: $bloodType, wilayaId: $wilayaId)';
 }
 
 
@@ -253,7 +259,7 @@ abstract mixin class _$UserEntityCopyWith<$Res> implements $UserEntityCopyWith<$
   factory _$UserEntityCopyWith(_UserEntity value, $Res Function(_UserEntity) _then) = __$UserEntityCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String email, String username, String fullName, bool isDonor, bool isRecipient, String bloodType
+ String id, String email, String username, String fullName, bool isDonor, bool isRecipient, String bloodType, int? wilayaId
 });
 
 
@@ -270,7 +276,7 @@ class __$UserEntityCopyWithImpl<$Res>
 
 /// Create a copy of UserEntity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? username = null,Object? fullName = null,Object? isDonor = null,Object? isRecipient = null,Object? bloodType = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? username = null,Object? fullName = null,Object? isDonor = null,Object? isRecipient = null,Object? bloodType = null,Object? wilayaId = freezed,}) {
   return _then(_UserEntity(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
@@ -279,7 +285,8 @@ as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast
 as String,isDonor: null == isDonor ? _self.isDonor : isDonor // ignore: cast_nullable_to_non_nullable
 as bool,isRecipient: null == isRecipient ? _self.isRecipient : isRecipient // ignore: cast_nullable_to_non_nullable
 as bool,bloodType: null == bloodType ? _self.bloodType : bloodType // ignore: cast_nullable_to_non_nullable
-as String,
+as String,wilayaId: freezed == wilayaId ? _self.wilayaId : wilayaId // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
