@@ -5,6 +5,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:tabare3/core/error/failures.dart';
 import 'package:tabare3/core/session/session_manager.dart';
 import 'package:tabare3/core/usecases/usecase.dart';
+import 'package:tabare3/features/auth/domain/entities/user_entity.dart';
 import 'package:tabare3/features/profile/domain/entities/profile_entity.dart';
 import 'package:tabare3/features/profile/domain/usecases/change_role.dart';
 import 'package:tabare3/features/profile/domain/usecases/get_cached_profile.dart';
@@ -142,6 +143,18 @@ void main() {
       act: (bloc) => bloc.add(const LoadProfile()),
       expect: () => const [ProfileLoaded(profile: profile, isEditing: false)],
     );
+
+    blocTest<ProfileBloc, ProfileState>(
+      'mirrors the refreshed profile into the session',
+      build: () {
+        final remote = profile.copyWith(city: 'الجزائر');
+        when(() => getProfile(any())).thenAnswer((_) async => Right(remote));
+        return buildBloc(sessionManager: session);
+      },
+      act: (bloc) => bloc.add(const LoadProfile()),
+      expect: () => [isA<ProfileLoading>(), isA<ProfileLoaded>()],
+      verify: (_) => expect(session.currentUser!.wilayaId, 16),
+    );
   });
 
   group('ToggleEditMode', () {
@@ -221,6 +234,30 @@ void main() {
       act: (bloc) => bloc.add(const SaveProfile(updatedProfile)),
       expect: () => [const ProfileLoading(), isA<ProfileError>()],
       verify: (_) => expect(session.currentUser, isNull),
+    );
+
+    blocTest<ProfileBloc, ProfileState>(
+      'keeps the previous session wilaya when the saved city cannot be '
+      'resolved to an id',
+      build: () {
+        session.setUser(
+          const UserEntity(
+            id: 'user-1',
+            email: 'test@example.com',
+            username: 'testuser',
+            fullName: 'Updated Name',
+            bloodType: 'O+',
+            wilayaId: 16,
+          ),
+        );
+        final drift = updatedProfile.copyWith(city: 'Algiers');
+        when(() => updateProfile(drift)).thenAnswer((_) async => Right(drift));
+        return buildBloc(sessionManager: session);
+      },
+      act: (bloc) =>
+          bloc.add(SaveProfile(updatedProfile.copyWith(city: 'Algiers'))),
+      expect: () => [const ProfileLoading(), isA<ProfileLoaded>()],
+      verify: (_) => expect(session.currentUser!.wilayaId, 16),
     );
   });
 

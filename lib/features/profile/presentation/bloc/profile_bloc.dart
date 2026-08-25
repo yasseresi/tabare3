@@ -195,7 +195,16 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   /// Mirrors the freshly persisted profile into [SessionManager] so
   /// synchronous readers (greetings, self-request wilaya pre-fill) never see a
   /// stale user between profile edits and re-login.
+  ///
+  /// When the profile's city cannot be resolved to a wilaya id (data drift
+  /// between the backend and the canonical list), the id already held by the
+  /// session is preserved rather than demoted to null.
   void _syncSession(ProfileEntity profile) {
-    sessionManager.setUser(profileToSessionUser(profile));
+    final previous = sessionManager.currentUser;
+    final mapped = profileToSessionUser(profile);
+    final wilayaId = mapped.wilayaId ?? previous?.wilayaId;
+    sessionManager.setUser(
+      wilayaId == null ? mapped : mapped.copyWith(wilayaId: wilayaId),
+    );
   }
 }
