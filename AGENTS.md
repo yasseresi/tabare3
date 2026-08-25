@@ -57,6 +57,11 @@ Data → Domain ← Presentation. Domain depends on nothing. Data implements dom
 - Navigation: `DonorHomeScreen` / `RequesterHomeScreen` wrap themselves in `BlocListener<AuthBloc>` (`listenWhen: Unauthenticated`) and push to `Routes.welcomeRoute` with `pushAndRemoveUntil`.
 - `AuthBloc` is provided via the route manager for `/donor-home` and `/requester-home`; direct `MaterialPageRoute` to those screens skips the provider and breaks the listener.
 
+### Session mirroring (MANDATORY)
+- `lib/core/session/session_manager.dart` is the only synchronous snapshot of the signed-in user; `lib/core/utils/greeting.dart` helpers (`currentUserFullName`, `currentUserWilayaId`, ...) read it.
+- Writers: `AuthBloc` on login/session-restore/sign-out, and `ProfileBloc` after every successful persisting mutation (`_syncSession` → `profileToSessionUser` in `lib/core/session/profile_user_mapper.dart`, which maps profile `city` name → 1-based wilaya id).
+- Any feature that changes server-side user data must mirror the fresh entity into the session in the same handler, or synchronous readers (e.g. self-request wilaya pre-fill driving hospital filtering) go stale until re-login.
+
 ### Folder structure (per feature)
 ```
 lib/features/<feature>/

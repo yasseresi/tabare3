@@ -6,6 +6,7 @@ import 'package:mocktail/mocktail.dart';
 
 import 'package:tabare3/core/constants/widget_keys.dart';
 import 'package:tabare3/core/error/failures.dart';
+import 'package:tabare3/core/session/session_manager.dart';
 import 'package:tabare3/core/usecases/usecase.dart';
 import 'package:tabare3/features/profile/domain/entities/profile_entity.dart';
 import 'package:tabare3/features/profile/domain/usecases/change_role.dart';
@@ -102,6 +103,7 @@ void main() {
       changeRole: changeRole,
       setAccountStatus: setAccountStatus,
       uploadAvatar: uploadAvatar,
+      sessionManager: SessionManager(),
     )..add(LoadProfile());
   }
 
