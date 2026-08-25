@@ -34,20 +34,27 @@
 
 ## 🏗️ Architecture
 
-The project follows **Clean Architecture** principles with a **feature-first** directory structure:
+The project follows **Clean Architecture** principles with a **feature-first** directory structure and a swappable **backend abstraction**:
 
 ```
 lib/
 ├── core/
+│   ├── backend/        # Backend interface + error mapper contract
+│   ├── constants/      # App strings, dimensions, env constants
 │   ├── error/          # Failures & exceptions
+│   ├── theme/          # Colors, typography
 │   └── usecases/       # Base UseCase abstraction
+├── backend/
+│   ├── active_backend.dart   # Single switch point (SupabaseBackend | RestBackend)
+│   ├── rest/                 # Django REST implementation
+│   └── supabase/             # Supabase implementation (on supabase-backend branch)
 ├── features/
-│   ├── auth/           # Login, Sign-up, Role selection
-│   ├── donor_home/     # Donor dashboard & sub-screens
-│   ├── requester_home/ # Requester dashboard & sub-screens
-│   ├── profile/        # User profile
-│   ├── splash/         # Splash/loading screen
-│   └── counter/        # Example BLoC feature (template)
+│   ├── auth/                 # Login, Sign-up, Role selection
+│   ├── donor_home/           # Donor dashboard & sub-screens
+│   ├── requester_home/       # Requester dashboard & sub-screens
+│   ├── notifications/        # In-app notifications + realtime bell
+│   ├── profile/              # User profile
+│   └── splash/               # Splash/loading screen
 ├── injection_container.dart  # Dependency injection setup
 └── main.dart
 ```
@@ -79,6 +86,9 @@ feature/
 | **Dependency Injection** | [`get_it`](https://pub.dev/packages/get_it) ^8.0.2 | Service locator |
 | **Functional Programming** | [`dartz`](https://pub.dev/packages/dartz) ^0.10.1 | `Either` type for error handling |
 | **Equality** | [`equatable`](https://pub.dev/packages/equatable) ^2.0.7 | Value-based equality for BLoC states |
+| **Localization** | [`easy_localization`](https://pub.dev/packages/easy_localization) | Arabic / English strings + RTL |
+| **REST backend** | [`dio`](https://pub.dev/packages/dio) | HTTP client for the Django REST API |
+| **Supabase backend** | [`supabase_flutter`](https://pub.dev/packages/supabase_flutter) | Auth, Postgres RPCs, Realtime (on `supabase-backend` branch) |
 | **Fonts** | [`google_fonts`](https://pub.dev/packages/google_fonts) ^6.2.1 | Cairo Arabic font |
 | **SVG Support** | [`flutter_svg`](https://pub.dev/packages/flutter_svg) ^2.0.10 | SVG icons rendering |
 
@@ -108,25 +118,100 @@ feature/
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/tabare3.git
-cd tabare3
+git clone https://github.com/Mouaadmoudraa/tabara3.git
+cd tabara3
 
 # 2. Install dependencies
 flutter pub get
+```
 
-# 3. Run the app
-flutter run
+### Run (default: REST backend)
+
+The `main` and `feature/rest-backend-migration` branches target the Django REST API. Point the app at your API host via `--dart-define`:
+
+```bash
+flutter run --dart-define=API_BASE_URL=https://your-api-host/api
 ```
 
 ### Build for Release
 
 ```bash
 # Android
-flutter build apk --release
+flutter build apk --release --dart-define=API_BASE_URL=https://your-api-host/api
 
 # iOS
-flutter build ios --release
+flutter build ios --release --dart-define=API_BASE_URL=https://your-api-host/api
 ```
+
+---
+
+## 🔌 Backend
+
+The app talks to its backend through a single `Backend` interface (`lib/core/backend/backend.dart`). One line — `activeBackend` in `lib/backend/active_backend.dart` — picks the implementation, and every feature's `*RemoteDataSource` is bound in that backend's `registerDataSources()`.
+
+Two implementations live on separate branches:
+
+| Branch | `activeBackend` | Env vars |
+|--------|-----------------|----------|
+| `main`, `feature/rest-backend-migration` | `RestBackend` (Django REST) | `API_BASE_URL` |
+| `supabase-backend` (a.k.a. `integration/full-parity`) | `SupabaseBackend` | `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` |
+
+Feature code, BLoCs, use cases, entities, and UI are identical across both — only `lib/backend/<name>/` and the datasource bindings change.
+
+---
+
+## 🗄️ Running the Supabase version
+
+The Supabase-backed variant lives on the remote branch `supabase-backend` (mirrored locally as `integration/full-parity`). It includes the full SQL schema, RLS policies, RPCs, storage buckets, and Realtime wiring under `supabase/`.
+
+### 1. Check out the branch
+
+```bash
+git fetch origin
+git checkout -b supabase-backend origin/supabase-backend
+flutter pub get
+```
+
+### 2. Provision a Supabase project
+
+Either use an existing hosted project or spin up a local stack.
+
+**Option A — hosted project**
+
+1. Create a project at [supabase.com](https://supabase.com).
+2. Grab the project URL and the **publishable** API key (Project Settings → API).
+3. Push the migrations:
+
+   ```bash
+   supabase link --project-ref <your-project-ref>
+   supabase db push
+   ```
+
+**Option B — local stack (needs Docker)**
+
+```bash
+supabase start           # boots Postgres, GoTrue, Realtime, Storage on ports 54321/54322
+supabase db reset        # applies every migration in supabase/migrations/
+```
+
+`supabase start` prints the local `API URL` and `anon key` — those are the values you pass to Flutter.
+
+### 3. Run the app pointed at Supabase
+
+```bash
+flutter run \
+  --dart-define=SUPABASE_URL=https://<project-ref>.supabase.co \
+  --dart-define=SUPABASE_PUBLISHABLE_KEY=<publishable-or-anon-key>
+```
+
+For local Supabase, use the URL/key printed by `supabase start` (URL is typically `http://127.0.0.1:54321`; on Android emulator use `http://10.0.2.2:54321`).
+
+### 4. Notes & gotchas
+
+- Migrations are the source of truth (`supabase/migrations/`). Do **not** hand-edit the remote schema — write a new migration and `supabase db push`.
+- The remote history is authoritative; do not run `supabase db push` if local and remote diverge — reconcile first.
+- Realtime bell/notifications require the notifications migration to be applied on the target project.
+- Avatar uploads use the `profile_pic` storage bucket with RLS enforced (see migration `00005_profile_pic_storage_rls.sql`).
 
 ---
 
@@ -158,7 +243,7 @@ Test files are located in the `test/` directory.
 
 ## 🌍 Localization
 
-The app is currently built for **Arabic-speaking users** with RTL layout support throughout. All UI strings are in Arabic.
+Arabic-first with RTL layout throughout, plus English fallback. Strings live under `assets/translations/` and are loaded via `easy_localization`. `startLocale` defaults to Arabic.
 
 ---
 
