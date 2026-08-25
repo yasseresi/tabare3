@@ -166,6 +166,7 @@ Future<void> initProfile() async {
       changeRole: sl(),
       setAccountStatus: sl(),
       uploadAvatar: sl(),
+      sessionManager: sl(),
     ),
   );
 

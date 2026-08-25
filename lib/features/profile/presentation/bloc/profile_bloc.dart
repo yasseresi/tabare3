@@ -1,6 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/session/profile_user_mapper.dart';
+import '../../../../core/session/session_manager.dart';
 import '../../../../core/usecases/usecase.dart';
+import '../../domain/entities/profile_entity.dart';
 import '../../domain/usecases/change_role.dart';
 import '../../domain/usecases/get_cached_profile.dart';
 import '../../domain/usecases/get_profile.dart';
@@ -20,6 +23,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final ChangeRole changeRole;
   final SetAccountStatus setAccountStatus;
   final UploadAvatar uploadAvatar;
+  final SessionManager sessionManager;
 
   ProfileBloc({
     required this.getProfile,
@@ -28,6 +32,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     required this.changeRole,
     required this.setAccountStatus,
     required this.uploadAvatar,
+    required this.sessionManager,
   }) : super(ProfileInitial()) {
     on<LoadProfile>(_onLoadProfile);
     on<ToggleEditMode>(_onToggleEditMode);
@@ -52,12 +57,18 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     }
 
     final result = await getProfile(NoParams());
-    result.fold((failure) {
-      // Keep the cached view on-screen if the refresh fails. Keyed off
-      // `cached` rather than the current state, which a concurrent event
-      // could have changed.
-      if (cached == null) emit(ProfileError(failure: failure));
-    }, (profile) => emit(ProfileLoaded(profile: profile, isEditing: false)));
+    result.fold(
+      (failure) {
+        // Keep the cached view on-screen if the refresh fails. Keyed off
+        // `cached` rather than the current state, which a concurrent event
+        // could have changed.
+        if (cached == null) emit(ProfileError(failure: failure));
+      },
+      (profile) {
+        _syncSession(profile);
+        emit(ProfileLoaded(profile: profile, isEditing: false));
+      },
+    );
   }
 
   void _onToggleEditMode(ToggleEditMode event, Emitter<ProfileState> emit) {
@@ -75,10 +86,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ) async {
     emit(ProfileLoading());
     final result = await updateProfile(event.profile);
-    result.fold(
-      (failure) => emit(ProfileError(failure: failure)),
-      (profile) => emit(ProfileLoaded(profile: profile, isEditing: false)),
-    );
+    result.fold((failure) => emit(ProfileError(failure: failure)), (profile) {
+      _syncSession(profile);
+      emit(ProfileLoaded(profile: profile, isEditing: false));
+    });
   }
 
   Future<void> _onChangeRole(
@@ -89,10 +100,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     final result = await changeRole(
       ChangeRoleParams(isDonor: event.isDonor, isRecipient: event.isRecipient),
     );
-    result.fold(
-      (failure) => emit(ProfileError(failure: failure)),
-      (profile) => emit(ProfileRoleChanged(profile: profile)),
-    );
+    result.fold((failure) => emit(ProfileError(failure: failure)), (profile) {
+      _syncSession(profile);
+      emit(ProfileRoleChanged(profile: profile));
+    });
   }
 
   Future<void> _onAccountStatusToggled(
@@ -115,8 +126,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           actionError: failure,
         ),
       ),
-      (profile) =>
-          emit(ProfileLoaded(profile: profile, isEditing: current.isEditing)),
+      (profile) {
+        _syncSession(profile);
+        emit(ProfileLoaded(profile: profile, isEditing: current.isEditing));
+      },
     );
   }
 
@@ -162,8 +175,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           actionError: failure,
         ),
       ),
-      (profile) =>
-          emit(ProfileLoaded(profile: profile, isEditing: current.isEditing)),
+      (profile) {
+        _syncSession(profile);
+        emit(ProfileLoaded(profile: profile, isEditing: current.isEditing));
+      },
     );
   }
 
@@ -175,5 +190,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     if (current is ProfileLoaded) {
       emit(ProfileLoaded(profile: event.profile, isEditing: current.isEditing));
     }
+  }
+
+  /// Mirrors the freshly persisted profile into [SessionManager] so
+  /// synchronous readers (greetings, self-request wilaya pre-fill) never see a
+  /// stale user between profile edits and re-login.
+  void _syncSession(ProfileEntity profile) {
+    sessionManager.setUser(profileToSessionUser(profile));
   }
 }
