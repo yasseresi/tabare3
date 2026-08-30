@@ -11,6 +11,7 @@ import '../../../../core/presentation/widgets/loading_overlay.dart';
 import '../../../../core/presentation/widgets/searchable_wilaya_field.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/widget_keys.dart';
+import '../../../../core/error/failures.dart';
 import '../../../../core/utils/constants_manager.dart';
 import '../../../../core/utils/assets_manager.dart';
 import '../../../../core/utils/values_manager.dart';
@@ -35,6 +36,11 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   int _currentStep = 1;
+
+  /// Highest step the user has legitimately advanced to. Circles up to this
+  /// step are tappable so the user can jump back to any step already visited;
+  /// steps beyond it stay locked behind the "Next" button's validation.
+  int _maxStepReached = 1;
   bool _agreeToTerms = false;
   DateTime? _selectedDate;
   String? _genderValue;
@@ -86,7 +92,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
         UsernameCheckRequested(_usernameController.text.trim()),
       );
     } else if (_currentStep < 3) {
-      setState(() => _currentStep++);
+      setState(() {
+        _currentStep++;
+        if (_currentStep > _maxStepReached) _maxStepReached = _currentStep;
+      });
     } else {
       if (!_agreeToTerms) return;
       _dispatchSignup();
@@ -286,25 +295,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildCircle(1),
-          _buildLine(),
+          _buildLine(1),
           _buildCircle(2),
-          _buildLine(),
+          _buildLine(2),
           _buildCircle(3),
         ],
       ),
     );
   }
 
+  /// Any step at or before the current one is treated as reached, so its circle
+  /// is filled red — the completed steps and the current step read as one solid
+  /// progress trail rather than only highlighting where the user stands.
   Widget _buildCircle(int step) {
-    final isCurrent = _currentStep == step;
+    final isReached = step <= _currentStep;
+    final canNavigate = step <= _maxStepReached && step != _currentStep;
     final numeral = '$step';
-    return Container(
+    final circle = Container(
       width: AppSize.s37_4,
       height: AppSize.s37_4,
       decoration: BoxDecoration(
-        color: isCurrent ? ColorManager.primary : ColorManager.white,
+        color: isReached ? ColorManager.primary : ColorManager.white,
         shape: BoxShape.circle,
-        border: isCurrent
+        border: isReached
             ? null
             : Border.all(color: ColorManager.dividerGrey, width: AppSize.s1),
       ),
@@ -314,7 +327,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 numeral,
                 style: getMediumStyle(
                   fontSize: FontSize.s17_9,
-                  color: isCurrent
+                  color: isReached
                       ? ColorManager.white
                       : ColorManager.stepperInactive,
                 ),
@@ -323,21 +336,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 numeral,
                 style: getLightStyle(
                   fontSize: FontSize.s17_9,
-                  color: isCurrent
+                  color: isReached
                       ? ColorManager.white
                       : ColorManager.stepperInactive,
                 ),
               ),
       ),
     );
+    return GestureDetector(
+      onTap: canNavigate ? () => _onStepTapped(step) : null,
+      // Keep the whole circle a tap target even where it's padding-only.
+      behavior: HitTestBehavior.opaque,
+      child: circle,
+    );
   }
 
-  Widget _buildLine() {
+  /// The connector after [leftStep] turns red once the user has moved past it,
+  /// so the filled segment tracks progress between the reached circles.
+  Widget _buildLine(int leftStep) {
+    final isPassed = _currentStep > leftStep;
     return Container(
       width: AppSize.s44_9,
       height: AppSize.s1,
-      color: ColorManager.dividerGrey,
+      color: isPassed ? ColorManager.primary : ColorManager.dividerGrey,
     );
+  }
+
+  /// Jumps back (or forward to an already-visited step) when a stepper circle is
+  /// tapped. Forward moves to unvisited steps stay gated behind "Next".
+  void _onStepTapped(int step) {
+    if (step == _currentStep || step > _maxStepReached) return;
+    setState(() => _currentStep = step);
   }
 
   /// Full-width red pill shared by all three steps.
@@ -672,6 +701,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         setState(() {
           _checkingUsername = false;
           _currentStep = 2;
+          if (_maxStepReached < 2) _maxStepReached = 2;
         });
       }
     } else if (state is UsernameTaken) {
@@ -686,6 +716,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
         _formKey.currentState?.validate();
       });
     } else if (state is AuthError) {
+      // A rejected field value (e.g. a wilaya/blood type the backend can't
+      // resolve) comes back as a ValidationFailure. Send the user to the step
+      // that owns the data — the first one the client can flag, else step 2,
+      // where all the demographic/medical fields live — so the fix is reachable
+      // instead of stranding them on the terms step.
+      if (state.failure is ValidationFailure) {
+        _goToStep(_firstInvalidStep() ?? 2);
+      }
       showDialog(
         context: context,
         barrierDismissible: true,
