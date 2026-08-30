@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:tabare3/core/usecases/usecase.dart';
+import 'package:tabare3/core/utils/color_manager.dart';
 import 'package:tabare3/core/utils/values_manager.dart';
 import 'package:tabare3/features/auth/domain/repositories/auth_repository.dart';
 import 'package:tabare3/features/auth/domain/usecases/check_username_availability.dart';
@@ -148,6 +149,29 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('الجزائر').last);
     await tester.pumpAndSettle();
+
+    // Weight is required by the backend, so it now gates leaving step 2 too.
+    await tester.scrollUntilVisible(
+      find.widgetWithText(TextFormField, 'الوزن'),
+      400,
+      scrollable: scrollable,
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'الوزن'),
+      '70',
+    );
+    await tester.pumpAndSettle();
+  }
+
+  /// Fill color of the stepper circle whose numeral is [numeral]. The numeral's
+  /// immediate Container ancestor is the circle, carrying the BoxDecoration.
+  Color stepCircleColor(WidgetTester tester, String numeral) {
+    final container = tester.widget<Container>(
+      find
+          .ancestor(of: find.text(numeral), matching: find.byType(Container))
+          .first,
+    );
+    return (container.decoration as BoxDecoration).color!;
   }
 
   testWidgets('renders step 1 with account info fields', (tester) async {
@@ -294,5 +318,83 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.widgetWithText(TextFormField, 'وهران'), findsOneWidget);
+  });
+
+  // Advances step 1 → step 2 by filling account info and tapping Next.
+  Future<void> goToStep2(WidgetTester tester) async {
+    await fillStep1(tester);
+    await tester.scrollUntilVisible(
+      find.text('التالي'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('التالي'));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('leaving weight blank keeps the user on step 2', (tester) async {
+    await pumpTestApp(tester, signUpUnderTest());
+    await goToStep2(tester);
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'تاريخ الميلاد'),
+      '2000-01-01',
+    );
+    // Fill every required step-2 field EXCEPT weight, then try to advance.
+    await fillStep2Required(tester);
+    await tester.enterText(find.widgetWithText(TextFormField, 'الوزن'), '');
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(
+      find.text('التالي'),
+      400,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('التالي'));
+    await tester.pumpAndSettle();
+
+    // Never reaches the terms step; the weight-required error is shown.
+    expect(find.text('الشروط والأحكام'), findsNothing);
+    expect(find.text('المعلومات الشخصية'), findsOneWidget);
+    expect(find.text('يرجى إدخال الوزن'), findsOneWidget);
+  });
+
+  testWidgets('step 2 fills both circle 1 and 2 red, circle 3 stays empty', (
+    tester,
+  ) async {
+    await pumpTestApp(tester, signUpUnderTest());
+    await goToStep2(tester);
+
+    // Reached steps (1, 2) fill red; the unreached step (3) stays white.
+    expect(stepCircleColor(tester, '1'), ColorManager.primary);
+    expect(stepCircleColor(tester, '2'), ColorManager.primary);
+    expect(stepCircleColor(tester, '3'), ColorManager.white);
+  });
+
+  testWidgets('tapping circle 1 on step 2 navigates back to step 1', (
+    tester,
+  ) async {
+    await pumpTestApp(tester, signUpUnderTest());
+    await goToStep2(tester);
+    expect(find.text('المعلومات الشخصية'), findsOneWidget);
+
+    await tester.tap(find.text('1'));
+    await tester.pumpAndSettle();
+
+    // Back on step 1; step-2 title is gone and circle 2 is no longer filled.
+    expect(find.text('معلومات الحساب'), findsOneWidget);
+    expect(find.text('المعلومات الشخصية'), findsNothing);
+    expect(stepCircleColor(tester, '2'), ColorManager.white);
+  });
+
+  testWidgets('unvisited circle 3 is not tappable from step 1', (tester) async {
+    await pumpTestApp(tester, signUpUnderTest());
+
+    // Step 3 was never reached, so tapping its circle is a no-op.
+    await tester.tap(find.text('3'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('معلومات الحساب'), findsOneWidget);
+    expect(find.text('الشروط والأحكام'), findsNothing);
   });
 }

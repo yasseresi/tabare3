@@ -394,6 +394,12 @@ void main() {
         await tester.tap(find.text('الجزائر').last);
         await tester.pumpAndSettle();
 
+        // Weight is a required field on step 2 (backend requires weight_kg).
+        final weightField = find.widgetWithText(TextFormField, 'الوزن');
+        await tester.ensureVisible(weightField);
+        await tester.enterText(weightField, '70');
+        await tester.pumpAndSettle();
+
         await tester.ensureVisible(
           find.widgetWithText(ElevatedButton, 'التالي'),
         );
