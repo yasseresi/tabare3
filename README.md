@@ -127,7 +127,13 @@ flutter pub get
 
 ### Run (default: REST backend)
 
-The `main` and `feature/rest-backend-migration` branches target the Django REST API. Point the app at your API host via `--dart-define`:
+The `main` and `feature/rest-backend-migration` branches target the Django REST API. The default host (`https://blood-backend-dz.onrender.com/api/v1`) is baked into `lib/core/constants/env_constants.dart`, so no flags are needed:
+
+```bash
+flutter run
+```
+
+To point at a different backend, override `API_BASE_URL` per build:
 
 ```bash
 flutter run --dart-define=API_BASE_URL=https://your-api-host/api
@@ -137,11 +143,13 @@ flutter run --dart-define=API_BASE_URL=https://your-api-host/api
 
 ```bash
 # Android
-flutter build apk --release --dart-define=API_BASE_URL=https://your-api-host/api
+flutter build apk --release
 
 # iOS
-flutter build ios --release --dart-define=API_BASE_URL=https://your-api-host/api
+flutter build ios --release
 ```
+
+Override the host the same way when needed: append `--dart-define=API_BASE_URL=https://your-api-host/api`.
 
 ---
 
