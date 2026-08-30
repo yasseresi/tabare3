@@ -5,7 +5,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/presentation/widgets/adaptive_pickers.dart';
 import '../../../../core/presentation/widgets/app_dialog.dart';
-import '../../../../core/presentation/widgets/app_gradient_background.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
 import '../../../../core/presentation/widgets/loading_overlay.dart';
 import '../../../../core/presentation/widgets/searchable_wilaya_field.dart';
@@ -160,6 +159,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return null;
   }
 
+  /// The earliest signup step that owns one of the backend [fields], or null
+  /// when none map to a known field. Backend keys (Django) are mapped to the
+  /// step whose input feeds them, so a server-side rejection lands the user on
+  /// the right page.
+  int? _stepForFields(List<String> fields) {
+    const step1 = {
+      'first_name',
+      'last_name',
+      'full_name',
+      'name',
+      'email',
+      'username',
+      'phone',
+      'password',
+      'password_confirm',
+    };
+    const step2 = {
+      'gender',
+      'date_of_birth',
+      'wilaya',
+      'blood_type',
+      'weight_kg',
+      'national_id',
+      'city',
+      'mode',
+    };
+    var target = 4;
+    for (final field in fields) {
+      if (step1.contains(field)) return 1;
+      if (step2.contains(field)) target = target > 2 ? 2 : target;
+    }
+    return target == 4 ? null : target;
+  }
+
   /// Jumps to [step] and paints its field errors once it has mounted.
   void _goToStep(int step) {
     setState(() => _currentStep = step);
@@ -207,9 +240,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
           visible: state is AuthLoading,
           message: AppStrings.signingUp.tr(),
           child: Scaffold(
+            backgroundColor: ColorManager.white,
             body: Directionality(
               textDirection: TextDirection.rtl,
-              child: AppGradientBackground(
+              // A single flat surface for the whole page so the colour reads the
+              // same top to bottom. The shared gradient wash left a saturated
+              // full-width strip below the content on the short terms step,
+              // which clashed with the white cards above it.
+              child: ColoredBox(
+                color: ColorManager.white,
                 child: SafeArea(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
@@ -718,13 +757,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
         _formKey.currentState?.validate();
       });
     } else if (state is AuthError) {
-      // A rejected field value (e.g. a wilaya/blood type the backend can't
-      // resolve) comes back as a ValidationFailure. Send the user to the step
-      // that owns the data — the first one the client can flag, else step 2,
-      // where all the demographic/medical fields live — so the fix is reachable
-      // instead of stranding them on the terms step.
-      if (state.failure is ValidationFailure) {
-        _goToStep(_firstInvalidStep() ?? 2);
+      // The backend rejected a value (phone already used, name too short, an
+      // unresolvable wilaya/blood type, …). Route to the step that owns the
+      // failing field so the fix is reachable, instead of stranding the user on
+      // the terms step. Prefer the backend's own field keys; fall back to the
+      // first step the client can flag, else step 2 (demographic/medical data).
+      final failure = state.failure;
+      if (failure is ValidationFailure) {
+        _goToStep(_stepForFields(failure.fields) ?? _firstInvalidStep() ?? 2);
       }
       showDialog(
         context: context,

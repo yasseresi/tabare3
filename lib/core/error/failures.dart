@@ -55,8 +55,14 @@ class ParseFailure extends Failure {
 }
 
 class ValidationFailure extends Failure {
+  /// Backend field keys that failed validation (e.g. `phone`, `first_name`),
+  /// when the response carried per-field errors. Empty when unknown. Lets the
+  /// UI route the user to the step that owns the offending field.
+  final List<String> fields;
+
   const ValidationFailure([
     super.code = -11,
     super.message = 'البيانات المدخلة غير صالحة',
+    this.fields = const [],
   ]);
 }

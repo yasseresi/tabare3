@@ -50,7 +50,7 @@ class RestErrorMapper implements BackendErrorMapper {
           ErrorMessages.getMessage(AppStrings.networkError),
         );
       case DioExceptionType.badResponse:
-        return _mapStatus(error.response?.statusCode, operation);
+        return _mapResponse(error.response, operation);
       case DioExceptionType.badCertificate:
       case DioExceptionType.cancel:
       case DioExceptionType.unknown:
@@ -61,7 +61,9 @@ class RestErrorMapper implements BackendErrorMapper {
     }
   }
 
-  Failure _mapStatus(int? status, BackendOperation operation) {
+  Failure _mapResponse(Response<dynamic>? response, BackendOperation operation) {
+    final status = response?.statusCode;
+
     // Mirrors the Supabase mapper: on the sign-in path every rejection of the
     // credentials — malformed, unknown user, forbidden — reads the same, so the
     // response never says which factor was wrong. 429 and 5xx are about the
@@ -79,8 +81,18 @@ class RestErrorMapper implements BackendErrorMapper {
 
     switch (status) {
       case 400:
+      case 422:
+        // DRF returns per-field errors ({field: [msg], ...}) or {detail: msg}.
+        // Surface those verbatim so the user learns the real problem (phone
+        // already used, name too short, …) instead of a blanket "fill the
+        // required fields", and carry the field keys so the UI can route to the
+        // step that owns the offending field.
+        final parsed = _parseFieldErrors(response?.data);
+        if (parsed != null) {
+          return ValidationFailure(status ?? 400, parsed.message, parsed.fields);
+        }
         return ValidationFailure(
-          400,
+          status ?? 400,
           ErrorMessages.getMessage(AppStrings.missingRequiredFields),
         );
       case 401:
@@ -103,11 +115,6 @@ class RestErrorMapper implements BackendErrorMapper {
           409,
           ErrorMessages.getMessage(AppStrings.duplicateEntry),
         );
-      case 422:
-        return ValidationFailure(
-          422,
-          ErrorMessages.getMessage(AppStrings.missingRequiredFields),
-        );
       case 429:
         return ServerFailure(
           429,
@@ -119,5 +126,43 @@ class RestErrorMapper implements BackendErrorMapper {
           ErrorMessages.getMessage(AppStrings.serverError),
         );
     }
+  }
+
+  /// Flattens a DRF error body into a single message plus the field keys that
+  /// failed. Handles the two shapes the backend emits:
+  ///   `{"phone": ["…"], "first_name": ["…"]}`  → per-field errors
+  ///   `{"detail": "…"}` / `{"non_field_errors": ["…"]}` → form-level errors
+  /// Returns null when nothing usable can be extracted (so the caller falls
+  /// back to the generic message).
+  ({String message, List<String> fields})? _parseFieldErrors(Object? data) {
+    if (data is! Map) return null;
+
+    final messages = <String>[];
+    final fields = <String>[];
+
+    void collect(Object? value) {
+      if (value is String) {
+        if (value.trim().isNotEmpty) messages.add(value.trim());
+      } else if (value is List) {
+        for (final item in value) {
+          collect(item);
+        }
+      } else if (value is Map) {
+        for (final item in value.values) {
+          collect(item);
+        }
+      }
+    }
+
+    data.forEach((key, value) {
+      final keyStr = key.toString();
+      if (keyStr != 'detail' && keyStr != 'non_field_errors') {
+        fields.add(keyStr);
+      }
+      collect(value);
+    });
+
+    if (messages.isEmpty) return null;
+    return (message: messages.join('\n'), fields: fields);
   }
 }
