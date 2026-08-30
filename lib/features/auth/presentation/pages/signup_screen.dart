@@ -119,8 +119,54 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return null;
   }
 
+  /// The first step (1-based) that still has an invalid or empty required
+  /// field, or null when everything checks out. Only one step is mounted at a
+  /// time, so [FormState.validate] can't see the others — this runs the same
+  /// validators directly against the controllers/state to cover every step.
+  ///
+  /// Chronic diseases is intentionally excluded: it is optional (some users
+  /// have none), matching the field having no validator.
+  int? _firstInvalidStep() {
+    final step1Invalid =
+        validateFullName(_fullNameController.text) != null ||
+        _validateUsernameField(_usernameController.text) != null ||
+        validatePhone(_phoneController.text) != null ||
+        validateStrongPassword(_passwordController.text) != null ||
+        validatePasswordConfirmation(
+              _passwordConfirmController.text,
+              _passwordController.text,
+            ) !=
+            null;
+    if (step1Invalid) return 1;
+
+    final step2Invalid =
+        validateDate(_dobController.text) != null ||
+        _genderValue == null ||
+        validateNationalIdOptional(_nationalIdController.text) != null ||
+        _bloodTypeController.text.trim().isEmpty ||
+        validateWeight(_weightController.text) != null ||
+        validateCity(_cityController.text) != null;
+    if (step2Invalid) return 2;
+
+    return null;
+  }
+
+  /// Jumps to [step] and paints its field errors once it has mounted.
+  void _goToStep(int step) {
+    setState(() => _currentStep = step);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _formKey.currentState?.validate();
+    });
+  }
+
   void _dispatchSignup() {
-    if (!_formKey.currentState!.validate()) return;
+    // A required field can live on a step that is no longer mounted, so route
+    // back to the first offending step instead of trusting the mounted form.
+    final invalidStep = _firstInvalidStep();
+    if (invalidStep != null) {
+      _goToStep(invalidStep);
+      return;
+    }
     final params = SignupParams(
       username: _usernameController.text.trim(),
       fullName: _fullNameController.text.trim(),
@@ -534,6 +580,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           prefixSvg: SvgAssets.weight,
           controller: _weightController,
           keyboardType: TextInputType.number,
+          validator: validateWeight,
         ),
         const SizedBox(height: AppSize.s15),
         SearchableWilayaField(

@@ -148,6 +148,19 @@ String? validatePasswordConfirmation(String? value, String originalPassword) {
   return null;
 }
 
+/// Weight in kilograms. Required by the backend on registration; any supplied
+/// value must be a positive number.
+String? validateWeight(String? value) {
+  if (!isRequired(value)) {
+    return ErrorMessages.getValidationMessage(ValidationKeys.weightRequired);
+  }
+  final parsed = double.tryParse(value!.trim());
+  if (parsed == null || parsed <= 0) {
+    return ErrorMessages.getValidationMessage(ValidationKeys.weightInvalid);
+  }
+  return null;
+}
+
 String? validateCity(String? value) {
   if (!isRequired(value)) {
     return ErrorMessages.getValidationMessage(ValidationKeys.cityRequired);

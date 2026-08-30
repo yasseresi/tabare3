@@ -219,6 +219,8 @@ class AppStrings {
   static const String termsRequired = 'terms_required';
   static const String passwordConfirmRequired = 'password_confirm_required';
   static const String passwordConfirmMismatch = 'password_confirm_mismatch';
+  static const String weightRequired = 'weight_required';
+  static const String weightInvalid = 'weight_invalid';
 
   // Info
   static const String aboutApp = 'about_app';

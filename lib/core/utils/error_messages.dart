@@ -26,6 +26,8 @@ class ValidationKeys {
       AppStrings.passwordConfirmRequired;
   static const String passwordConfirmMismatch =
       AppStrings.passwordConfirmMismatch;
+  static const String weightRequired = AppStrings.weightRequired;
+  static const String weightInvalid = AppStrings.weightInvalid;
 }
 
 class ErrorMessages {
@@ -62,6 +64,8 @@ class ErrorMessages {
     ValidationKeys.termsRequired: 'يجب الموافقة على الشروط والأحكام',
     ValidationKeys.passwordConfirmRequired: 'يرجى تأكيد كلمة المرور',
     ValidationKeys.passwordConfirmMismatch: 'كلمة المرور غير متطابقة',
+    ValidationKeys.weightRequired: 'يرجى إدخال الوزن',
+    ValidationKeys.weightInvalid: 'يرجى إدخال وزن صحيح بالكيلوغرام',
   };
 
   static const Map<String, String> _arabicMessages = {
