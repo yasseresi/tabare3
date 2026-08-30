@@ -148,14 +148,21 @@ String? validatePasswordConfirmation(String? value, String originalPassword) {
   return null;
 }
 
+/// Smallest / largest body weight (kg) accepted at registration. A generous
+/// human range: below/above this is almost certainly a typo, so reject it
+/// client-side with a clear message instead of waiting for the backend.
+const double minWeightKg = 1;
+const double maxWeightKg = 400;
+
 /// Weight in kilograms. Required by the backend on registration; any supplied
-/// value must be a positive number.
+/// value must be a number within [minWeightKg]..[maxWeightKg]. A comma decimal
+/// separator (common on Arabic/French keyboards) is accepted as a dot.
 String? validateWeight(String? value) {
   if (!isRequired(value)) {
     return ErrorMessages.getValidationMessage(ValidationKeys.weightRequired);
   }
-  final parsed = double.tryParse(value!.trim());
-  if (parsed == null || parsed <= 0) {
+  final parsed = double.tryParse(value!.trim().replaceAll(',', '.'));
+  if (parsed == null || parsed < minWeightKg || parsed > maxWeightKg) {
     return ErrorMessages.getValidationMessage(ValidationKeys.weightInvalid);
   }
   return null;

@@ -188,7 +188,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       nationalId: _nationalIdController.text.trim().isEmpty
           ? null
           : _nationalIdController.text.trim(),
-      weight: double.tryParse(_weightController.text.trim()),
+      weight: double.tryParse(
+        _weightController.text.trim().replaceAll(',', '.'),
+      ),
       chronicDiseases: _chronicDiseasesController.text.trim().isEmpty
           ? null
           : _chronicDiseasesController.text.trim(),

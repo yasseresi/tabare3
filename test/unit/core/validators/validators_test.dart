@@ -27,6 +27,39 @@ void main() {
     });
   });
 
+  group('validateWeight', () {
+    test('returns required error for empty value', () {
+      expect(validateWeight(null), isNotNull);
+      expect(validateWeight(''), isNotNull);
+      expect(validateWeight('   '), isNotNull);
+    });
+
+    test('returns null for a plain numeric weight', () {
+      expect(validateWeight('70'), isNull);
+      expect(validateWeight('70.5'), isNull);
+    });
+
+    test('accepts a comma decimal separator', () {
+      expect(validateWeight('70,5'), isNull);
+    });
+
+    test('rejects non-numeric input', () {
+      expect(validateWeight('abc'), isNotNull);
+      expect(validateWeight('7o'), isNotNull);
+    });
+
+    test('rejects values outside the human range', () {
+      expect(validateWeight('0'), isNotNull);
+      expect(validateWeight('-5'), isNotNull);
+      expect(validateWeight('401'), isNotNull);
+    });
+
+    test('accepts the range boundaries', () {
+      expect(validateWeight('1'), isNull);
+      expect(validateWeight('400'), isNull);
+    });
+  });
+
   group('validateStrongPassword', () {
     test('returns required error for empty value', () {
       expect(validateStrongPassword(null), isNotNull);
