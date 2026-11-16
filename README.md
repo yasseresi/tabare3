@@ -32,6 +32,20 @@
 
 ---
 
+## 📸 Screenshots
+
+New UI design for the donor side, made in Figma (not yet the shipped app).
+
+| Donor home | Donor card | Donation history |
+|:---:|:---:|:---:|
+| <img src="screenshots/01-home.png" width="220"> | <img src="screenshots/03-donor-card.png" width="220"> | <img src="screenshots/02-donation-history.png" width="220"> |
+
+| Scan QR | About the app | Reports |
+|:---:|:---:|:---:|
+| <img src="screenshots/04-scan-qr.png" width="220"> | <img src="screenshots/05-about-app.png" width="220"> | <img src="screenshots/06-report-to-admin.png" width="220"> |
+
+---
+
 ## 🏗️ Architecture
 
 The project follows **Clean Architecture** principles with a **feature-first** directory structure and a swappable **backend abstraction**:
