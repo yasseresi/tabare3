@@ -132,8 +132,8 @@ feature/
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Mouaadmoudraa/tabara3.git
-cd tabara3
+git clone https://github.com/yasseresi/tabare3.git
+cd tabare3
 
 # 2. Install dependencies
 flutter pub get
